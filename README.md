@@ -1,6 +1,10 @@
 # Dimensional
 
+**WORK IN PROGRESS**
 
+This library is in very early development and is not yet ready for any form of release.
+
+**The following documentatin is GitLab generated placeholder and is not yet populated**
 
 ## Getting started
 
