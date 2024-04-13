@@ -7,6 +7,11 @@
 #include <vector>
 #include <type_traits>
 #include <tuple>
+#include <string>
+#include <unordered_map>
+#include <functional>
+
+#include <typeindex>
 
 #include "DimensionUtilities.h"
 
@@ -25,7 +30,17 @@ namespace Dimension
       //{}
       virtual ~BaseUnit() {}
 
+      virtual std::string GetDimName() {
+         return "Base";
+      };
 
+      virtual std::string GetUnitName() {
+         return unitName;
+      }
+
+      std::string unitName = "";
+
+      std::unordered_map<std::string, std::function<double(double)>> conversions;
       /*
       //template<typename... Args>
        constexpr double GetID() {
@@ -91,27 +106,32 @@ namespace Dimension
       std::vector<BaseUnit<>*> numList;
       std::vector<BaseUnit<>*> denList;
 
-   };
+      double GetVal(const std::vector<BaseUnit<>*>& i_numList, const std::vector<BaseUnit<>*>& i_denList)
+      {
+         auto temp_InputNumList = i_numList;
+         auto temp_InputDenList = i_denList;
+         auto temp_MyNumList = numList;
+         auto temp_MyDenList = denList;
 
-   // Division operator for two Dimensions
-   template<typename... T_Classes1, typename... T_Classes2>
-   auto operator/(const BaseDimension<T_Classes1...>& obj1, const BaseDimension<T_Classes2...>& obj2)
-      -> BaseDimension<T_Classes1..., typename InvertReturnType<T_Classes2>::type...>
-   {
-      return BaseDimension<T_Classes1..., typename InvertReturnType<T_Classes2>::type...>(
-         obj1.value / obj2.value, // Consider how to deal with divide-by-zero
-         ConcatenateUnitVectors(obj1.numList, obj2.denList),
-         ConcatenateUnitVectors(obj1.denList, obj2.numList));
-   }
-   
-   // Multiplication operator for two Dimensions
-   template<typename ... T_Classes1, typename ... T_Classes2>
-   auto operator*(const BaseDimension<T_Classes1...>& obj1, const BaseDimension<T_Classes2...>& obj2) -> BaseDimension < T_Classes1..., T_Classes2... > {
-      return BaseDimension < T_Classes1..., T_Classes2... >(
-         obj1.value * obj2.value, // Consider how to deal with divide-by-zero
-         ConcatenateUnitVectors(obj1.numList, obj2.numList),
-         ConcatenateUnitVectors(obj1.denList, obj2.denList));
-   }
+         for (const BaseUnit<>* myUnit : numList)
+         {
+            if (auto it = std::find(temp_InputNumList.begin(), temp_InputNumList.end(), myUnit) != temp_InputNumList.end())
+            {
+               temp_InputNumList.erase(it);
+            }
+            else if (true) // Handle non-matching but corresponding units
+            {
+               continue;
+            }
+            else
+            {
+               assert(false); // No matching unit for conversion. Something went wrong in the Dimension library
+            }
+         }
+
+      }
+
+   };
 
 
    // Forward declare TimeUnit
@@ -130,21 +150,36 @@ namespace Dimension
    // Some portion should live with the Time class
 
 
+
+   template <int N>
+   struct AbsHelper {
+      static constexpr int value = N >= 0 ? N : -N;
+   };
+
+
+// Simplify function for any Simplifier type
+   template <typename... Ts>
+   struct SimplifierInterface {};
+
+
    // ==========================================
    // Time Simplification
 
    // Simplify function for TimeUnit types
+   
    template <typename... Ts>
-   struct TimeUnitSimplifier {
+   struct TimeUnitSimplifier : SimplifierInterface<Ts...> {
   
       static constexpr size_t TimeCount = count_type<TimeUnit<>, Ts...>();
       static constexpr size_t InverseTimeCount = count_type<TimeUnit<Inverse>, Ts...>();
-      static constexpr int TimeTotal = TimeCount - InverseTimeCount;
-
-      using type = std::conditional_t<(TimeTotal > 0), typename Repeat<TimeTotal, TimeUnit<>>::type,
-         std::conditional_t<(TimeTotal < 0), typename Repeat<TimeTotal, TimeUnit<Inverse>>::type, std::tuple<>>>;
-
+      
+      using type = std::conditional_t<(TimeCount > InverseTimeCount),
+         typename Repeat<TimeCount - InverseTimeCount, TimeUnit<>>::type,
+         std::conditional_t<(TimeCount < InverseTimeCount),
+         typename Repeat<InverseTimeCount - TimeCount, TimeUnit<Inverse>>::type,
+         std::tuple<>>>;
    };
+   
 
 
    // ==========================================
@@ -152,18 +187,16 @@ namespace Dimension
 
    // Simplify function for LengthUnit types
    template <typename... Ts>
-   struct LengthUnitSimplifier {
+   struct LengthUnitSimplifier : SimplifierInterface<Ts...> {
 
       static constexpr size_t LengthCount = count_type<LengthUnit<>, Ts...>();
       static constexpr size_t InverseLengthCount = count_type<LengthUnit<Inverse>, Ts...>();
-      static constexpr int LengthTotal = LengthCount - InverseLengthCount;
 
-      static_assert(LengthCount == 2, "Bad Length Count");
-      static_assert(InverseLengthCount == 0, "Bad LengthInverted Count");
-      static_assert(LengthTotal == 2, "Bad Total Length");
-
-      using type = std::conditional_t<(LengthTotal > 0), typename Repeat<LengthTotal, LengthUnit<>>::type,
-         std::conditional_t<(LengthTotal < 0), typename Repeat<LengthTotal, LengthUnit<Inverse>>::type, std::tuple<>>>;
+      using type = std::conditional_t<(LengthCount > InverseLengthCount),
+         typename Repeat<LengthCount - InverseLengthCount, LengthUnit<>>::type,
+         std::conditional_t<(LengthCount < InverseLengthCount),
+         typename Repeat<InverseLengthCount - LengthCount, LengthUnit<Inverse>>::type,
+         std::tuple<>>>;
 
    };
 
@@ -173,6 +206,11 @@ namespace Dimension
    // Consider using some equavalent to lambda/functor registration
    // Must be compile-time aware
 
+
+
+   // Commenting out to test
+   // THE FOLLOWING WORKS, DO NOT DELETE!!!
+   
    template <typename ... Ts>
    struct AllUnitSimplifier
    {
@@ -180,13 +218,162 @@ namespace Dimension
    };
 
 
+   
+   /*
+   template<typename...>
+   struct AllUnitSimplifier;
+
+   template<typename T, typename... Ts>
+   struct AllUnitSimplifier<std::tuple<T, Ts...>> {
+
+      // Ensure T is non-inverse
+
+      using firstTypes = BreakTypes<T, T, Ts...>;
+
+      using rest = remove_t<T<>, T<Inverse>, T, Ts...>;
+
+      using type = tuple_cat_t<typename LengthUnitSimplifier<Ts...>::type, AllUnitSimplifier<>>;
+   };
+   */
+
+   // Function to check if two pointers in the vector belong to the same derived class
+   inline bool areSameDerivedClass(const BaseUnit<>* unit1, const BaseUnit<>* unit2) {
+      const std::type_index& type1 = typeid(*unit1);
+      const std::type_index& type2 = typeid(*unit2);
+
+      bool areSame = type1 == type2;
+
+      return areSame;
+      //return type1 == type2;
+   }
+
+
+
+
+
+   // Helper function to convert tuple types to BaseDimension
+   template<typename... Ts, std::size_t... Is, typename ... Args>
+   auto TupleToBaseDimension(const std::tuple<Ts...>&, std::index_sequence<Is...>, const BaseDimension<Args...>& obj) {
+
+      std::vector<BaseUnit<>*> newNumList = obj.numList;
+      std::vector<BaseUnit<>*> newDenList = obj.denList;
+      double newValue = obj.value;
+
+      // Consider ways to improve effeciency of this section
+
+      for (auto numIter = newNumList.begin(); numIter != newNumList.end(); ++numIter)
+      {
+         for (auto denIter = newDenList.begin(); denIter != newDenList.end(); ++denIter)
+         {
+            //if (typeid(*numIter) == typeid(*denIter))
+            //if (dynamic_cast<BaseUnit*>(*numIter)->getClassType() == dynamic_cast<BaseUnit*>(*denIter)->getClassType())
+            //if(areSameDerivedClass(*numIter, *denIter))
+            if((*numIter)->GetDimName() == (*denIter)->GetDimName())
+            {
+               if (*numIter != *denIter)
+               {
+                  //newValue = (*denIter)->conversions[(*numIter)->GetUnitName()](newValue);
+                  newValue = (*numIter)->conversions[(*denIter)->GetUnitName()](newValue);
+               }
+               // Remove the current items from both lists
+               numIter = newNumList.erase(numIter);
+               denIter = newDenList.erase(denIter);
+
+               // Break out of the inner loop
+               break;
+            }
+            
+         }
+         // Check if we need to break out of the outer loop
+         if (numIter == newNumList.end())
+            break;
+      }
+
+      return BaseDimension<Ts...>(newValue, newNumList, newDenList);
+   }
+
+
    // Simplify function for BaseDimension
    // If problems arise, consider specifying return type
    template<typename... Ts>
-   auto SimplifyBaseDimension(const BaseDimension<Ts...>&) {
+   auto SimplifyBaseDimension(const BaseDimension<Ts...>& obj)// -> decltype(TupleToBaseDimension(typename AllUnitSimplifier<Ts...>::type{}, std::index_sequence_for<Ts...>{}, std::declval<BaseDimension<Ts...>>()))
+   {
       using TupleType = typename AllUnitSimplifier<Ts...>::type;
-      return TupleToBaseDimension(TupleType{}, std::index_sequence_for<Ts...>{});
+      return TupleToBaseDimension(TupleType{}, std::index_sequence_for<Ts...>{}, obj);
    }
+
+
+ 
+
+
+   // Division operator for two Dimensions
+   template<typename... T_Classes1, typename... T_Classes2>
+   auto operator/(const BaseDimension<T_Classes1...>& obj1, const BaseDimension<T_Classes2...>& obj2)
+      -> decltype(SimplifyBaseDimension(std::declval<BaseDimension<T_Classes1..., typename InvertReturnType<T_Classes2>::type...>>()))
+   {
+      using ResultType = BaseDimension<T_Classes1..., typename InvertReturnType<T_Classes2>::type...>;
+      auto result = ResultType(
+         obj1.value / obj2.value,
+         ConcatenateUnitVectors(obj1.numList, obj2.denList),
+         ConcatenateUnitVectors(obj1.denList, obj2.numList));
+      return SimplifyBaseDimension(result);
+   }
+
+   // Multiplication operator for two Dimensions
+   template<typename ... T_Classes1, typename ... T_Classes2>
+   auto operator*(const BaseDimension<T_Classes1...>& obj1, const BaseDimension<T_Classes2...>& obj2) 
+      -> decltype(SimplifyBaseDimension(std::declval<BaseDimension < T_Classes1..., T_Classes2... >>()))
+   {
+      using ResultType = BaseDimension<T_Classes1..., T_Classes2...>;
+      auto result = ResultType(
+         obj1.value * obj2.value,
+         ConcatenateUnitVectors(obj1.numList, obj2.numList),
+         ConcatenateUnitVectors(obj1.denList, obj2.denList)
+      );
+      return SimplifyBaseDimension(result);
+   }
+
+
+
+
+   // Scalar Math
+   template<typename ... Ts>
+   BaseDimension<Ts...> operator*(const BaseDimension<Ts...>& obj, double scalar)
+   {
+      return BaseDimension<Ts...>(obj.value * scalar, obj.numList, obj.denList);
+   }
+
+   template<typename ... Ts>
+   BaseDimension<Ts...> operator*(double scalar, const BaseDimension<Ts...>& obj)
+   {
+      return obj * scalar;
+   }
+
+   template<typename ... Ts>
+   BaseDimension<Ts...> operator/(const BaseDimension<Ts...>& obj, double scalar)
+   {
+      return BaseDimension<Ts...>(obj.value / scalar, obj.numList, obj.denList);
+   }
+
+   template<typename ... Ts>
+   auto operator/(double scalar, const BaseDimension<Ts...>& obj) -> BaseDimension<typename InvertReturnType<Ts>::type...>
+   {
+      using ResultType = BaseDimension<typename InvertReturnType<Ts>::type...>;
+
+      return ResultType(scalar / obj.value, obj.denList, obj.numList);
+   }
+
+
+
+   // Additive Math
+   template<typename ... Ts>
+   BaseDimension<Ts...> operator+(const BaseDimension<Ts...>& obj1, const BaseDimension<Ts...>& obj2)
+   {
+      return BaseDimension<Ts...>(obj1.value + obj2.GetVal(), obj.numList, obj.denList); // Need to think more about conversion math...
+   }
+
+   
+
 
 }
 #endif // DIMENSION_BASE_H

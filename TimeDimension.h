@@ -26,9 +26,17 @@ namespace Dimension
 
       std::string unitName;
 
+      std::string GetDimName() override {
+         return "Time";
+      };
+
+      std::string GetUnitName() override {
+         return unitName;
+      }
+
       // The intention is to store a map of conversion functions to each known unit, minimally the "default" unit of this dimension
       //std::unordered_map<std::string, std::function<double(Time)>> conversions;
-      std::unordered_map<std::string, std::function<double(double)>> conversions;
+      //std::unordered_map<std::string, std::function<double(double)>> conversions;
 
       //bool add_conversion(TimeUnit toUnit, std::function<double(Time)> conversion)
       bool add_conversion(TimeUnit toUnit, std::function<double(double)> conversion)
@@ -68,6 +76,11 @@ namespace Dimension
 
       };
 
+      Time(const BaseDimension<TimeUnit<is_inverse...>>& base) : BaseDimension<TimeUnit<is_inverse...>>(base.value, base.numList, base.denList)
+      {
+
+      }
+
 
       /*
       operator BaseDimension<TimeUnit<>>() const {
@@ -104,20 +117,19 @@ namespace Dimension
    template<typename... is_inverse>
    inline double Time<is_inverse...>::GetVal(TimeUnit<is_inverse...>* getUnit)
    {
-      /*
-      if (getUnit == unit)
+      
+      if (getUnit == numList[0])
       {
-         //return value;
-         return 0;
+         return value;
       }
       else
       {
-         //return unit->conversions[getUnit->unitName](this->value);
-         return 0;
+         return numList[0]->conversions[getUnit->unitName](this->value);
       }
-      */
-      return 0; // temporarily disabling this logic to debug constructors
+      
    }
+
+   //using UpdatedSimplifiedUnits = RegisterSimplifier<TimeUnitSimplifier>;
 
 }
 

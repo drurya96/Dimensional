@@ -39,19 +39,25 @@ namespace Dimension
    using tuple_cat_t = decltype(std::tuple_cat(std::declval<Ts>()...));
 
    // Primary template declaration
-   template <int N, typename T>
+   template <int N, typename T, typename = void>
    struct Repeat;
+
+   // Recursive case: define type as a tuple containing N copies of T
+   template <int N, typename T>
+   struct Repeat<N, T, std::enable_if_t<(N > 0)>> {
+      using type = decltype(std::tuple_cat(std::tuple<T>(), typename Repeat<N - 1, T>::type()));
+   };
+
+   // Recursive case: define type as a tuple containing N copies of T
+   template <int N, typename T>
+   struct Repeat<N, T, std::enable_if_t<(N < 0)>> {
+      using type = std::tuple<>;
+   };
 
    // Base case: when N is 0, define type as an empty tuple
    template <typename T>
    struct Repeat<0, T> {
       using type = std::tuple<>;
-   };
-
-   // Recursive case: define type as a tuple containing N copies of T
-   template <int N, typename T>
-   struct Repeat {
-      using type = decltype(tuple_cat_t<std::tuple<T>, typename Repeat<N - 1, T>::type>());
    };
 
    // Base case: count is 0
@@ -74,12 +80,6 @@ namespace Dimension
       std::tuple<Ts>
       >::type...
    >;
-
-   // Helper function to convert tuple types to BaseDimension
-   template<typename... Ts, std::size_t... Is>
-   auto TupleToBaseDimension(const std::tuple<Ts...>&, std::index_sequence<Is...>) {
-      return BaseDimension<Ts...>{};
-   }
 
 
    // Helper function to concatenate vectors in a single line

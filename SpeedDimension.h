@@ -21,9 +21,6 @@ namespace Dimension
          lengthUnit(lengthUnit),
          timeUnit(timeUnit)
       {
-         //numList.push_back(&lengthUnit);
-         //denList.push_back(&timeUnit);
-
          if (unitName != "")
          {
             unitName = ""; // placeholder logic for name construction
@@ -35,32 +32,28 @@ namespace Dimension
       TimeUnit<>& timeUnit;
    };
 
-   class Speed
+   class Speed : public BaseDimension<LengthUnit<>, TimeUnit<Inverse>>
    {
    public:
-      explicit Speed(double value, SpeedUnit<>& unit):
-         value(value),
-         lengthUnit(unit.lengthUnit),
-         timeUnit(unit.timeUnit)
+
+      explicit Speed(double value, LengthUnit<>* length, TimeUnit<>* time)
+         : BaseDimension<LengthUnit<>, TimeUnit<Inverse>>(value, std::vector<BaseUnit<>*>{ static_cast<BaseUnit<>*>(length) }, std::vector<BaseUnit<>*>{ static_cast<BaseUnit<>*>(time) })//, numList({ unit }), denList({})
       {
 
       };
 
-      double value;
-      LengthUnit<>& lengthUnit;
-      TimeUnit<>& timeUnit;
+      
+      Speed(const BaseDimension<LengthUnit<>, TimeUnit<Inverse>>& base) : BaseDimension<LengthUnit<>, TimeUnit<Inverse>>(base.value, base.numList, base.denList){}
+      
 
    };
 
+   // TODO: Not using this yet, but consider adding it for convenience
    namespace SpeedUnits
    {
       extern SpeedUnit<> MetersPerSecond;
       extern SpeedUnit<> FeetPerSecond;
    }
-   
-   //Speed operator/(const Length& length, const Time& time);
-
-   //Speed operator/(const BaseDimension& length, const BaseDimension& time);
 
 }
 

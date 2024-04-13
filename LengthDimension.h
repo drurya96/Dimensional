@@ -25,8 +25,14 @@ namespace Dimension
 
       std::string unitName;
 
+      std::string GetDimName() override { return "Length"; };
+
+      std::string GetUnitName() override {
+         return unitName;
+      }
+
       // The intention is to store a map of conversion functions to each known unit, minimally the "default" unit of this dimension
-      std::unordered_map<std::string, std::function<double(double)>> conversions;
+      //std::unordered_map<std::string, std::function<double(double)>> conversions;
 
       bool add_conversion(LengthUnit toUnit, std::function<double(double)> conversion)
       {
@@ -50,38 +56,24 @@ namespace Dimension
 
       };
 
-      /*
-      operator BaseDimension<LengthUnit<is_inverse...>>() const {
-         std::cout << "Length Cast to BaseDimension" << std::endl;
-         return BaseDimension<LengthUnit<is_inverse...>>(value);
+      Length(const BaseDimension<LengthUnit<is_inverse...>>& base) : BaseDimension<LengthUnit<is_inverse...>>(base.value, base.numList, base.denList)
+      {
+         
       }
-      */
-      
-
-
-      //double value;
-      //LengthUnit<is_inverse...>* unit;
 
       double GetVal(LengthUnit<is_inverse...>*);
-
-      //static bool initializeLengthUnits();
    };
 
    namespace LengthUnits
    {
       extern LengthUnit<> Meters;
       extern LengthUnit<> Feet;
-      //extern LengthUnit<Inverse> Inverse_Meters;
-      //extern LengthUnit<Inverse> Inverse_Feet;
    }
    
    inline bool initializeLengthUnits()
    {
       LengthUnits::Meters.add_conversion(LengthUnits::Feet, [](double val) {return val * 3.28084; });
       LengthUnits::Feet.add_conversion(LengthUnits::Meters, [](double val) {return val / 3.28084; });
-
-      //LengthUnits::Meters.add_conversion(LengthUnits::Feet, [](Length& length) {return length.value * 3.28084; });
-      //LengthUnits::Feet.add_conversion(LengthUnits::Meters, [](Length& length) {return length.value / 3.28084; });
       return true;
    }
 
@@ -89,21 +81,16 @@ namespace Dimension
    template<typename... is_inverse>
    inline double Length<is_inverse...>::GetVal(LengthUnit<is_inverse...>* getUnit)
    {
-      /*
-      if (getUnit == unit)
+      
+      if (getUnit == numList[0])
       {
-         //return value;
-         return 0;
+         return value;
       }
       else
       {
-         //return unit->conversions[getUnit->unitName](this->value);
-         return 0;
-      }
-      */
-      return 0; // temporarily disabling this logic to debug constructors
+         return numList[0]->conversions[getUnit->unitName](this->value);
+      } 
    }
-
 }
 
 #endif // DIMENSION_LENGTH_H
