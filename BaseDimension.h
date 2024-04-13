@@ -38,6 +38,10 @@ namespace Dimension
          return unitName;
       }
 
+      virtual BaseUnit<>* GetBaseUnit() {
+         return new BaseUnit<>(); // TODO: This is only a placeholder and IS A MEMORY LEAK. Instead just make this abstract.
+      }
+
       std::string unitName = "";
 
       std::unordered_map<std::string, std::function<double(double)>> conversions;
@@ -109,8 +113,9 @@ namespace Dimension
       std::vector<BaseUnit<>*> denList;
 
       
-      // This method is very inefficient and will likely be bottleneck.
+      // TODO: This method is very inefficient and will likely be bottleneck.
       // Optimize as soon as possible, but other features take priority.
+      // Also consider breaking some of this functionality up
       double GetVal(const std::vector<BaseUnit<>*>& i_numList, const std::vector<BaseUnit<>*>& i_denList) const
       {
          auto temp_InputNumList = i_numList;
@@ -154,14 +159,19 @@ namespace Dimension
          for (BaseUnit<>* myUnit : temp_MyNumList)
          {
             found = false;
-            //for (BaseUnit<>* inputUnit : temp_InputNumList)
             for (auto it = temp_InputNumList.begin(); it != temp_InputNumList.end();)
             {
                if (myUnit->baseUnitVector == (*it)->baseUnitVector)
                {
-                  // do stuff
-                  //result = (*it)->conversions[myUnit->GetUnitName()](result);
-                  result = myUnit->conversions[(*it)->GetUnitName()](result);
+                  if (myUnit->conversions.find((*it)->GetUnitName()) != myUnit->conversions.end())
+                  {
+                     result = myUnit->conversions[(*it)->GetUnitName()](result);
+                  }
+                  else
+                  {
+                     result = myUnit->conversions[myUnit->GetBaseUnit()->GetUnitName()](result);
+                     result = myUnit->GetBaseUnit()->conversions[(*it)->GetUnitName()](result);
+                  }
 
                   temp_InputNumList.erase(it);
                   found = true;
@@ -187,14 +197,19 @@ namespace Dimension
          for (BaseUnit<>* myUnit : temp_MyDenList)
          {
             found = false;
-            //for (BaseUnit<>* inputUnit : temp_InputDenList)
             for (auto it = temp_InputDenList.begin(); it != temp_InputDenList.end();)
             {
                if (myUnit->baseUnitVector == (*it)->baseUnitVector)
                {
-                  // do stuff
-                  //result = myUnit->conversions[(*it)->GetUnitName()](result);
-                  result = (*it)->conversions[myUnit->GetUnitName()](result);
+                  if (myUnit->conversions.find((*it)->GetUnitName()) != myUnit->conversions.end())
+                  {
+                     result = (*it)->conversions[myUnit->GetUnitName()](result);
+                  }
+                  else
+                  {
+                     result = (*it)->conversions[myUnit->GetBaseUnit()->GetUnitName()](result);
+                     result = myUnit->GetBaseUnit()->conversions[myUnit->GetUnitName()](result);
+                  }
 
                   temp_InputDenList.erase(it);
                   found = true;
@@ -234,8 +249,25 @@ namespace Dimension
          return *this;
       }
 
-      friend BaseDimension<UnitType...>& operator*=(BaseDimension<UnitType...>& lhs, const BaseDimension<UnitType...>& rhs) = delete;
-      friend BaseDimension<UnitType...>& operator/=(BaseDimension<UnitType...>& lhs, const BaseDimension<UnitType...>& rhs) = delete;
+      // The following operators are explicitly deleted
+      BaseDimension<UnitType...>& operator*=(const BaseDimension<UnitType...>& rhs) = delete; // Multiplication results in a different type
+      BaseDimension<UnitType...>& operator/=(const BaseDimension<UnitType...>& rhs) = delete; // Division results in a different type
+      BaseDimension<UnitType...>& operator+=(double rhs) = delete; // Addition cannot be performed between a Dimension and a scalar
+      BaseDimension<UnitType...>& operator-=(double rhs) = delete; // Subtraction cannot be performed between a Dimension and a scalar
+
+
+
+
+      // Comparison Operators
+      bool operator>(const BaseDimension<UnitType...>& rhs) const { return value > rhs.GetValue(numList, denList); }
+      bool operator<(const BaseDimension<UnitType...>& rhs) const { return value < rhs.GetValue(numList, denList); }
+      bool operator>=(const BaseDimension<UnitType...>& rhs) const { return value >= rhs.GetValue(numList, denList); }
+      bool operator<=(const BaseDimension<UnitType...>& rhs) const { return value <= rhs.GetValue(numList, denList); }
+      bool operator==(const BaseDimension<UnitType...>& rhs) const { return value == rhs.GetValue(numList, denList); } // I need to add a small tolerance to this
+      bool operator!=(const BaseDimension<UnitType...>& rhs) const { return !(*this == rhs); }
+
+      // TODO: Define a NearlyEqual method with custom tolerance
+
 
    };
 

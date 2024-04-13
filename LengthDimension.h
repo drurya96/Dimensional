@@ -31,6 +31,10 @@ namespace Dimension
          return unitName;
       }
 
+      LengthUnit<>* GetBaseUnit() override {
+         return &LengthUnits::Meters;
+      }
+
       // The intention is to store a map of conversion functions to each known unit, minimally the "default" unit of this dimension
       //std::unordered_map<std::string, std::function<double(double)>> conversions;
 

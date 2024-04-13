@@ -8,6 +8,8 @@
 #include <functional>
 #include <type_traits>
 
+#include <cassert>
+
 namespace Dimension
 {
    template<typename ... is_inverse>
@@ -16,9 +18,7 @@ namespace Dimension
    public:
       explicit TimeUnit(std::string name) :
          unitName(name)
-      {
-         //numList.push_back(this);
-      };
+      {};
 
       TimeUnit() :
          unitName("")
@@ -32,6 +32,10 @@ namespace Dimension
 
       std::string GetUnitName() override {
          return unitName;
+      }
+
+      TimeUnit<>* GetBaseUnit() override {
+         return &TimeUnits::Seconds;
       }
 
       // The intention is to store a map of conversion functions to each known unit, minimally the "default" unit of this dimension
@@ -54,49 +58,20 @@ namespace Dimension
       */
 
    private:
-      constexpr double GetStandardID() override { return 2.0; };
-      constexpr double GetInverseID() override { return 1 / 2.0; };
+      //constexpr double GetStandardID() override { return 2.0; };
+      //constexpr double GetInverseID() override { return 1 / 2.0; };
    };
 
    template<typename ... is_inverse>
    class Time : public BaseDimension<TimeUnit<>>
    {
    public:
-      /*
-      explicit Time(double value, TimeUnit<>* unit): BaseDimension(value),
-         unit(unit)
-      {
-        // Numerator.push_back(unit);
-      };
-      */
 
       explicit Time(double value, TimeUnit<is_inverse...>* unit)
          : BaseDimension<TimeUnit<is_inverse...>>(value, std::vector<BaseUnit<>*>{ static_cast<BaseUnit<>*>(unit) }, std::vector<BaseUnit<>*>{})//, numList({ unit }), denList({})
-      {
+      {};
 
-      };
-
-      Time(const BaseDimension<TimeUnit<is_inverse...>>& base) : BaseDimension<TimeUnit<is_inverse...>>(base.value, base.numList, base.denList)
-      {
-
-      }
-
-
-      /*
-      operator BaseDimension<TimeUnit<>>() const {
-         return BaseDimension<TimeUnit<>>(value);
-      }
-      */
-      
-
-      //double value;
-      
-      //std::vector<BaseUnit*> Numerator;
-      //TimeUnit<>* unit;
-
-      //double GetVal(TimeUnit<is_inverse...>* getUnit);
-
-      //static bool initializeTimeUnits();
+      Time(const BaseDimension<TimeUnit<is_inverse...>>& base) : BaseDimension<TimeUnit<is_inverse...>>(base.value, base.numList, base.denList){}
 
    };
 
@@ -121,27 +96,21 @@ namespace Dimension
       TimeUnitVector.push_back(&TimeUnits::Seconds);
       TimeUnitVector.push_back(&TimeUnits::Minutes);
 
+
+      // Validate there is a conversion to Seconds from each unit
+      // TODO: Consider returning false instead of asserting
+      for (auto unit : TimeUnitVector)
+      {
+         auto findit = unit->conversions.find(TimeUnits::Seconds.GetUnitName());
+         auto findit2 = TimeUnits::Seconds.conversions.find(unit->GetUnitName());
+         assert((findit != unit->conversions.end()) || (unit == &TimeUnits::Seconds));
+         assert((findit2 != TimeUnits::Seconds.conversions.end()) || (unit == &TimeUnits::Seconds));
+      }
+
+
+
       return true;
    }
-
-
-   /*
-   template<typename... is_inverse>
-   inline double Time<is_inverse...>::GetVal(TimeUnit<is_inverse...>* getUnit)
-   {
-      
-      if (getUnit == numList[0])
-      {
-         return value;
-      }
-      else
-      {
-         return numList[0]->conversions[getUnit->unitName](this->value);
-      }
-      
-   }
-   */
-   //using UpdatedSimplifiedUnits = RegisterSimplifier<TimeUnitSimplifier>;
 
 }
 
