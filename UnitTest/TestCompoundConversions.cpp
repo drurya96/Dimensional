@@ -58,7 +58,9 @@ TEST_F(CompoundConversions, TestTime) {
 
    //auto const mySpeed2 = Dimension::Speed(30.0, Dimension::SpeedUnits::MetersPerSecond);
 
-   auto const length = Dimension::Length(20.0, &Dimension::LengthUnits::Feet);
+   auto length = Dimension::Length(20.0, &Dimension::LengthUnits::Feet);
+   auto length2 = Dimension::Length(20.0, &Dimension::LengthUnits::Meters);
+   
    auto const time = Dimension::Time(10.0, &Dimension::TimeUnits::Seconds);
 
    //auto const i_time = Dimension::Time(0.5, &Dimension::TimeUnit);
@@ -74,6 +76,11 @@ TEST_F(CompoundConversions, TestTime) {
    Dimension::Length newTest1 = Dimension::Length(test);
 
    Dimension::Length test2 = time / time * length * length / length;
+
+   Dimension::Length test3 = length + length2;
+   Dimension::Length test4 = length2 + length;
+
+   length += length2;
 
    std::cout << "Numerator unit: " << newTest1.numList[0]->unitName << std::endl;
 

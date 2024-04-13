@@ -94,7 +94,7 @@ namespace Dimension
       //std::vector<BaseUnit*> Numerator;
       //TimeUnit<>* unit;
 
-      double GetVal(TimeUnit<is_inverse...>* getUnit);
+      //double GetVal(TimeUnit<is_inverse...>* getUnit);
 
       //static bool initializeTimeUnits();
 
@@ -107,13 +107,25 @@ namespace Dimension
       extern TimeUnit<> Minutes;
    }
    
+   static std::vector<BaseUnit<>*> TimeUnitVector;
+
    inline bool initializeTimeUnits()
    {
       TimeUnits::Seconds.add_conversion(TimeUnits::Minutes, [](double val) {return val / 60.0; });
       TimeUnits::Minutes.add_conversion(TimeUnits::Seconds, [](double val) {return val * 60.0; });
+
+      TimeUnits::Seconds.baseUnitVector = &TimeUnitVector;
+      TimeUnits::Minutes.baseUnitVector = &TimeUnitVector;
+
+
+      TimeUnitVector.push_back(&TimeUnits::Seconds);
+      TimeUnitVector.push_back(&TimeUnits::Minutes);
+
       return true;
    }
 
+
+   /*
    template<typename... is_inverse>
    inline double Time<is_inverse...>::GetVal(TimeUnit<is_inverse...>* getUnit)
    {
@@ -128,7 +140,7 @@ namespace Dimension
       }
       
    }
-
+   */
    //using UpdatedSimplifiedUnits = RegisterSimplifier<TimeUnitSimplifier>;
 
 }

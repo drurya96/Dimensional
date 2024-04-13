@@ -56,6 +56,8 @@ namespace Dimension
       //std::vector<BaseUnit*> numList;
       //std::vector<BaseUnit*> denList;
 
+      std::vector<BaseUnit<>*>* baseUnitVector;
+
    private:
 
       // Prefer making these pure virtual, but this is fine for now
@@ -106,30 +108,134 @@ namespace Dimension
       std::vector<BaseUnit<>*> numList;
       std::vector<BaseUnit<>*> denList;
 
-      double GetVal(const std::vector<BaseUnit<>*>& i_numList, const std::vector<BaseUnit<>*>& i_denList)
+      
+      // This method is very inefficient and will likely be bottleneck.
+      // Optimize as soon as possible, but other features take priority.
+      double GetVal(const std::vector<BaseUnit<>*>& i_numList, const std::vector<BaseUnit<>*>& i_denList) const
       {
          auto temp_InputNumList = i_numList;
          auto temp_InputDenList = i_denList;
          auto temp_MyNumList = numList;
          auto temp_MyDenList = denList;
 
-         for (const BaseUnit<>* myUnit : numList)
-         {
-            if (auto it = std::find(temp_InputNumList.begin(), temp_InputNumList.end(), myUnit) != temp_InputNumList.end())
-            {
-               temp_InputNumList.erase(it);
+         double result = value;
+
+
+         for (auto it = temp_MyNumList.begin(); it != temp_MyNumList.end(); ) {
+            auto duplicateIt = std::find(temp_InputNumList.begin(), temp_InputNumList.end(), *it);
+            if (duplicateIt != temp_InputNumList.end()) {
+               it = temp_MyNumList.erase(it);
+               temp_InputNumList.erase(duplicateIt);
             }
-            else if (true) // Handle non-matching but corresponding units
-            {
-               continue;
-            }
-            else
-            {
-               assert(false); // No matching unit for conversion. Something went wrong in the Dimension library
+            else {
+               ++it;
             }
          }
 
+         for (auto it = temp_MyDenList.begin(); it != temp_MyDenList.end(); ) {
+            auto duplicateIt = std::find(temp_InputDenList.begin(), temp_InputDenList.end(), *it);
+            if (duplicateIt != temp_InputDenList.end()) {
+               it = temp_MyDenList.erase(it);
+               temp_InputDenList.erase(duplicateIt);
+            }
+            else {
+               ++it;
+            }
+         }
+
+
+         // Handle Numerator
+
+         if (temp_MyNumList.size() != temp_InputNumList.size()) {
+            throw std::runtime_error("Vectors must have the same size.");
+         }
+
+         bool found = false;
+         for (BaseUnit<>* myUnit : temp_MyNumList)
+         {
+            found = false;
+            //for (BaseUnit<>* inputUnit : temp_InputNumList)
+            for (auto it = temp_InputNumList.begin(); it != temp_InputNumList.end();)
+            {
+               if (myUnit->baseUnitVector == (*it)->baseUnitVector)
+               {
+                  // do stuff
+                  //result = (*it)->conversions[myUnit->GetUnitName()](result);
+                  result = myUnit->conversions[(*it)->GetUnitName()](result);
+
+                  temp_InputNumList.erase(it);
+                  found = true;
+                  break;
+               }
+               else { ++it; }
+            }
+
+            if (!found)
+            {
+               // Not found, raise an exception
+            }
+         }
+
+
+         // Handle Denominator
+
+         if (temp_MyDenList.size() != temp_InputDenList.size()) {
+            throw std::runtime_error("Vectors must have the same size.");
+         }
+
+         //bool found = false;
+         for (BaseUnit<>* myUnit : temp_MyDenList)
+         {
+            found = false;
+            //for (BaseUnit<>* inputUnit : temp_InputDenList)
+            for (auto it = temp_InputDenList.begin(); it != temp_InputDenList.end();)
+            {
+               if (myUnit->baseUnitVector == (*it)->baseUnitVector)
+               {
+                  // do stuff
+                  //result = myUnit->conversions[(*it)->GetUnitName()](result);
+                  result = (*it)->conversions[myUnit->GetUnitName()](result);
+
+                  temp_InputDenList.erase(it);
+                  found = true;
+                  break;
+               }
+               else { ++it; }
+            }
+
+            if (!found)
+            {
+               // Not found, raise an exception
+            }
+         }
+         return result;
       }
+      
+      BaseDimension<UnitType...>& operator+=(const BaseDimension<UnitType...>& rhs)
+      {
+         value += rhs.GetVal(numList, denList);
+         return *this;
+      }
+      BaseDimension<UnitType...>& operator-=(const BaseDimension<UnitType...>& rhs)
+      {
+         value -= rhs.GetVal(numList, denList);
+         return *this;
+      }
+
+      BaseDimension<UnitType...>& operator*=(double rhs)
+      {
+         value *= rhs;
+         return *this;
+      }
+
+      BaseDimension<UnitType...>& operator/=(double rhs)
+      {
+         value /= rhs;
+         return *this;
+      }
+
+      friend BaseDimension<UnitType...>& operator*=(BaseDimension<UnitType...>& lhs, const BaseDimension<UnitType...>& rhs) = delete;
+      friend BaseDimension<UnitType...>& operator/=(BaseDimension<UnitType...>& lhs, const BaseDimension<UnitType...>& rhs) = delete;
 
    };
 
@@ -319,6 +425,12 @@ namespace Dimension
       return SimplifyBaseDimension(result);
    }
 
+   template<typename ... Ts>
+   BaseDimension<Ts...>& operator/=(BaseDimension<Ts...>& lhs, const BaseDimension<Ts...>& rhs) {
+      lhs.value += rhs.GetVal(lhs.numList, lhs.denList);
+      return lhs;
+   }
+
    // Multiplication operator for two Dimensions
    template<typename ... T_Classes1, typename ... T_Classes2>
    auto operator*(const BaseDimension<T_Classes1...>& obj1, const BaseDimension<T_Classes2...>& obj2) 
@@ -369,11 +481,14 @@ namespace Dimension
    template<typename ... Ts>
    BaseDimension<Ts...> operator+(const BaseDimension<Ts...>& obj1, const BaseDimension<Ts...>& obj2)
    {
-      return BaseDimension<Ts...>(obj1.value + obj2.GetVal(), obj.numList, obj.denList); // Need to think more about conversion math...
+      return BaseDimension<Ts...>(obj1.value + obj2.GetVal(obj1.numList, obj1.denList), obj1.numList, obj1.denList);
    }
 
-   
-
+   template<typename ... Ts>
+   BaseDimension<Ts...> operator-(const BaseDimension<Ts...>& obj1, const BaseDimension<Ts...>& obj2)
+   {
+      return BaseDimension<Ts...>(obj1.value - obj2.GetVal(obj1.numList, obj1.denList), obj1.numList, obj1.denList);
+   }
 
 }
 #endif // DIMENSION_BASE_H

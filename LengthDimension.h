@@ -61,7 +61,7 @@ namespace Dimension
          
       }
 
-      double GetVal(LengthUnit<is_inverse...>*);
+      //double GetVal(LengthUnit<is_inverse...>*);
    };
 
    namespace LengthUnits
@@ -70,14 +70,23 @@ namespace Dimension
       extern LengthUnit<> Feet;
    }
    
+   static std::vector<BaseUnit<>*> LengthUnitVector;
+
    inline bool initializeLengthUnits()
    {
       LengthUnits::Meters.add_conversion(LengthUnits::Feet, [](double val) {return val * 3.28084; });
       LengthUnits::Feet.add_conversion(LengthUnits::Meters, [](double val) {return val / 3.28084; });
+
+      LengthUnits::Meters.baseUnitVector = &LengthUnitVector;
+      LengthUnits::Feet.baseUnitVector = &LengthUnitVector;
+
+      LengthUnitVector.push_back(& LengthUnits::Meters);
+      LengthUnitVector.push_back(& LengthUnits::Feet);
+
       return true;
    }
 
-
+   /*
    template<typename... is_inverse>
    inline double Length<is_inverse...>::GetVal(LengthUnit<is_inverse...>* getUnit)
    {
@@ -91,6 +100,7 @@ namespace Dimension
          return numList[0]->conversions[getUnit->unitName](this->value);
       } 
    }
+   */
 }
 
 #endif // DIMENSION_LENGTH_H
