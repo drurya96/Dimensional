@@ -7,37 +7,23 @@
 #include <unordered_map>
 #include <functional>
 
+#include <cassert> // Necessary for assert in initializeLengthUnits. TODO: Remove if logic changes
+
 namespace Dimension
 {
    template<typename ... is_inverse>
    class LengthUnit : public BaseUnit<is_inverse...>
    {
    public:
-      explicit LengthUnit(std::string name) :
-         unitName(name)
-      {
-         //numList.push_back(this);
-      };
+      LengthUnit(std::string name) : BaseUnit<is_inverse...>(name) {}
 
-      LengthUnit() :
-         unitName("")
-      {};
+      LengthUnit() : BaseUnit<is_inverse...>() {}
 
-      std::string unitName;
+      std::string GetDimName() override { return "Length"; }
+      std::string GetUnitName() override { return unitName; }
+      LengthUnit<>* GetBaseUnit() override { return &LengthUnits::Meters; }
 
-      std::string GetDimName() override { return "Length"; };
-
-      std::string GetUnitName() override {
-         return unitName;
-      }
-
-      LengthUnit<>* GetBaseUnit() override {
-         return &LengthUnits::Meters;
-      }
-
-      // The intention is to store a map of conversion functions to each known unit, minimally the "default" unit of this dimension
-      //std::unordered_map<std::string, std::function<double(double)>> conversions;
-
+      // TODO: Add logic ensureing conversion is successfully added
       bool add_conversion(LengthUnit toUnit, std::function<double(double)> conversion)
       {
          conversions[toUnit.unitName] = conversion;
@@ -45,8 +31,6 @@ namespace Dimension
       };
 
    private:
-      constexpr double GetStandardID() override { return 3.0; };
-      constexpr double GetInverseID() override { return 1 / 3.0; };
 
    };
 
@@ -55,17 +39,12 @@ namespace Dimension
    {
    public:
       explicit Length(double value, LengthUnit<is_inverse...>* unit) 
-         : BaseDimension<LengthUnit<is_inverse...>>(value, std::vector<BaseUnit<>*>{ static_cast<BaseUnit<>*>(unit) }, std::vector<BaseUnit<>*>{})//, numList({ unit }), denList({})
-      {
-
-      };
+         : BaseDimension<LengthUnit<is_inverse...>>(value, std::vector<BaseUnit<>*>{ static_cast<BaseUnit<>*>(unit) }, std::vector<BaseUnit<>*>{})
+      {}
 
       Length(const BaseDimension<LengthUnit<is_inverse...>>& base) : BaseDimension<LengthUnit<is_inverse...>>(base.value, base.numList, base.denList)
-      {
-         
-      }
+      {}
 
-      //double GetVal(LengthUnit<is_inverse...>*);
    };
 
    namespace LengthUnits
@@ -87,24 +66,21 @@ namespace Dimension
       LengthUnitVector.push_back(& LengthUnits::Meters);
       LengthUnitVector.push_back(& LengthUnits::Feet);
 
+
+      // Validate there is a conversion to Meters from each unit
+      // TODO: Consider returning false instead of asserting
+      for (auto unit : LengthUnitVector)
+      {
+         auto findit = unit->conversions.find(LengthUnits::Meters.GetUnitName());
+         auto findit2 = LengthUnits::Meters.conversions.find(unit->GetUnitName());
+         assert((findit != unit->conversions.end()) || (unit == &LengthUnits::Meters));
+         assert((findit2 != LengthUnits::Meters.conversions.end()) || (unit == &LengthUnits::Meters));
+      }
+
+      // TODO: Return false when necessary
       return true;
    }
 
-   /*
-   template<typename... is_inverse>
-   inline double Length<is_inverse...>::GetVal(LengthUnit<is_inverse...>* getUnit)
-   {
-      
-      if (getUnit == numList[0])
-      {
-         return value;
-      }
-      else
-      {
-         return numList[0]->conversions[getUnit->unitName](this->value);
-      } 
-   }
-   */
 }
 
 #endif // DIMENSION_LENGTH_H

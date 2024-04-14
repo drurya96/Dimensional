@@ -6,9 +6,8 @@
 #include "BaseDimension.h"
 #include <unordered_map>
 #include <functional>
-#include <type_traits>
 
-#include <cassert>
+#include <cassert> // Necessary for assert in initializeTimeUnits. TODO: Remove if logic changes
 
 namespace Dimension
 {
@@ -16,50 +15,22 @@ namespace Dimension
    class TimeUnit : public BaseUnit<is_inverse...>
    {
    public:
-      explicit TimeUnit(std::string name) :
-         unitName(name)
-      {};
+      explicit TimeUnit(std::string name) : BaseUnit(name) {}
 
-      TimeUnit() :
-         unitName("")
-      {};
+      TimeUnit() : BaseUnit() {}
 
-      std::string unitName;
+      std::string GetDimName() override { return "Time"; }
+      std::string GetUnitName() override { return unitName; }
+      TimeUnit<>* GetBaseUnit() override { return &TimeUnits::Seconds; }
 
-      std::string GetDimName() override {
-         return "Time";
-      };
-
-      std::string GetUnitName() override {
-         return unitName;
-      }
-
-      TimeUnit<>* GetBaseUnit() override {
-         return &TimeUnits::Seconds;
-      }
-
-      // The intention is to store a map of conversion functions to each known unit, minimally the "default" unit of this dimension
-      //std::unordered_map<std::string, std::function<double(Time)>> conversions;
-      //std::unordered_map<std::string, std::function<double(double)>> conversions;
-
-      //bool add_conversion(TimeUnit toUnit, std::function<double(Time)> conversion)
       bool add_conversion(TimeUnit toUnit, std::function<double(double)> conversion)
       {
          conversions[toUnit.unitName] = conversion;
          return true;
       };
 
-      // This might be needed for Singleton, need to revisit
-      /*
-      static const TimeUnit& instance() {
-         static TimeUnit<T> inst("");
-         return inst;
-      }
-      */
-
    private:
-      //constexpr double GetStandardID() override { return 2.0; };
-      //constexpr double GetInverseID() override { return 1 / 2.0; };
+
    };
 
    template<typename ... is_inverse>
@@ -69,12 +40,12 @@ namespace Dimension
 
       explicit Time(double value, TimeUnit<is_inverse...>* unit)
          : BaseDimension<TimeUnit<is_inverse...>>(value, std::vector<BaseUnit<>*>{ static_cast<BaseUnit<>*>(unit) }, std::vector<BaseUnit<>*>{})//, numList({ unit }), denList({})
-      {};
+      {}
 
-      Time(const BaseDimension<TimeUnit<is_inverse...>>& base) : BaseDimension<TimeUnit<is_inverse...>>(base.value, base.numList, base.denList){}
+      Time(const BaseDimension<TimeUnit<is_inverse...>>& base) : BaseDimension<TimeUnit<is_inverse...>>(base.value, base.numList, base.denList)
+      {}
 
    };
-
 
    namespace TimeUnits
    {
@@ -106,8 +77,6 @@ namespace Dimension
          assert((findit != unit->conversions.end()) || (unit == &TimeUnits::Seconds));
          assert((findit2 != TimeUnits::Seconds.conversions.end()) || (unit == &TimeUnits::Seconds));
       }
-
-
 
       return true;
    }

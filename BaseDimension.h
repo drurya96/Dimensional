@@ -22,12 +22,9 @@ namespace Dimension
    class BaseUnit
    {
    public:
-      BaseUnit() {}
+      BaseUnit() : unitName(""){}
+      BaseUnit(std::string name) : unitName(name) {}
 
-      //BaseUnit(std::vector<BaseUnit*> num, std::vector<BaseUnit*> den):
-         //numList(num),
-         //denList(den)
-      //{}
       virtual ~BaseUnit() {}
 
       virtual std::string GetDimName() {
@@ -45,28 +42,10 @@ namespace Dimension
       std::string unitName = "";
 
       std::unordered_map<std::string, std::function<double(double)>> conversions;
-      /*
-      //template<typename... Args>
-       constexpr double GetID() {
-         if constexpr (sizeof...(is_inverse) == 0) {
-            return GetStandardID();
-         }
-         else {
-            return GetInverseID();
-         }
-      }
-      */
 
-      //std::vector<BaseUnit*> numList;
-      //std::vector<BaseUnit*> denList;
-
-      std::vector<BaseUnit<>*>* baseUnitVector;
+      std::vector<BaseUnit<>*>* baseUnitVector = {};
 
    private:
-
-      // Prefer making these pure virtual, but this is fine for now
-        virtual constexpr double GetStandardID() { return 0.0; };
-        virtual constexpr double GetInverseID() { return 0.0; };
 
    };
 
@@ -92,6 +71,7 @@ namespace Dimension
       {
       }
 
+      // TODO: Investigate changing BaseUnit logic from pointer to reference
       BaseDimension(double newValue, std::vector<BaseUnit<>*> newNumList, std::vector<BaseUnit<>*> newDenList) :
          value(newValue),
          numList(newNumList.begin(), newNumList.end()),
@@ -101,7 +81,6 @@ namespace Dimension
 
 
       double value;
-      //myUnitTypes<UnitType...> units;
 
       // These are pointers for simplicity for now, but may change.
       // Consider using a tuple for immutability
@@ -148,9 +127,7 @@ namespace Dimension
             }
          }
 
-
          // Handle Numerator
-
          if (temp_MyNumList.size() != temp_InputNumList.size()) {
             throw std::runtime_error("Vectors must have the same size.");
          }
@@ -188,7 +165,6 @@ namespace Dimension
 
 
          // Handle Denominator
-
          if (temp_MyDenList.size() != temp_InputDenList.size()) {
             throw std::runtime_error("Vectors must have the same size.");
          }
@@ -264,8 +240,6 @@ namespace Dimension
       bool operator!=(const BaseDimension<UnitType...>& rhs) const { return !(*this == rhs); }
 
       // TODO: Define a NearlyEqual method with custom tolerance
-
-
    };
 
 
@@ -292,7 +266,7 @@ namespace Dimension
    };
 
 
-// Simplify function for any Simplifier type
+   // Simplify function for any Simplifier type
    template <typename... Ts>
    struct SimplifierInterface {};
 
@@ -342,34 +316,12 @@ namespace Dimension
    // Must be compile-time aware
 
 
-
-   // Commenting out to test
-   // THE FOLLOWING WORKS, DO NOT DELETE!!!
-   
    template <typename ... Ts>
    struct AllUnitSimplifier
    {
       using type = tuple_cat_t<typename LengthUnitSimplifier<Ts...>::type, typename TimeUnitSimplifier<Ts...>::type>;
    };
 
-
-   
-   /*
-   template<typename...>
-   struct AllUnitSimplifier;
-
-   template<typename T, typename... Ts>
-   struct AllUnitSimplifier<std::tuple<T, Ts...>> {
-
-      // Ensure T is non-inverse
-
-      using firstTypes = BreakTypes<T, T, Ts...>;
-
-      using rest = remove_t<T<>, T<Inverse>, T, Ts...>;
-
-      using type = tuple_cat_t<typename LengthUnitSimplifier<Ts...>::type, AllUnitSimplifier<>>;
-   };
-   */
 
    // Function to check if two pointers in the vector belong to the same derived class
    inline bool areSameDerivedClass(const BaseUnit<>* unit1, const BaseUnit<>* unit2) {
@@ -383,9 +335,6 @@ namespace Dimension
    }
 
 
-
-
-
    // Helper function to convert tuple types to BaseDimension
    template<typename... Ts, std::size_t... Is, typename ... Args>
    auto TupleToBaseDimension(const std::tuple<Ts...>&, std::index_sequence<Is...>, const BaseDimension<Args...>& obj) {
@@ -395,38 +344,6 @@ namespace Dimension
       double newValue = obj.value;
 
       // TODO: Consider ways to improve effeciency of this section
-
-
-
-
-      /*
-      for (auto numIter = newNumList.begin(); numIter != newNumList.end(); ++numIter)
-      {
-         for (auto denIter = newDenList.begin(); denIter != newDenList.end(); ++denIter)
-         {
-            //if (typeid(*numIter) == typeid(*denIter))
-            //if (dynamic_cast<BaseUnit*>(*numIter)->getClassType() == dynamic_cast<BaseUnit*>(*denIter)->getClassType())
-            //if(areSameDerivedClass(*numIter, *denIter))
-            if((*numIter)->GetDimName() == (*denIter)->GetDimName())
-            {
-               if (*numIter != *denIter)
-               {
-                  newValue = (*numIter)->conversions[(*denIter)->GetUnitName()](newValue);
-               }
-               // Remove the current items from both lists
-               numIter = newNumList.erase(numIter);
-               denIter = newDenList.erase(denIter);
-
-               // Break out of the inner loop
-               break;
-            }
-            
-         }
-         // Check if we need to break out of the outer loop
-         if (numIter == newNumList.end())
-            break;
-      }
-      */
 
       for (auto numIter = newNumList.begin(); numIter != newNumList.end();)
       {
@@ -476,9 +393,6 @@ namespace Dimension
    }
 
 
- 
-
-
    // Division operator for two Dimensions
    template<typename... T_Classes1, typename... T_Classes2>
    auto operator/(const BaseDimension<T_Classes1...>& obj1, const BaseDimension<T_Classes2...>& obj2)
@@ -511,9 +425,6 @@ namespace Dimension
       );
       return SimplifyBaseDimension(result);
    }
-
-
-
 
    // Scalar Math
    template<typename ... Ts>
