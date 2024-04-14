@@ -1,7 +1,6 @@
 #ifndef DIMENSION_UTILITIES_H
 #define DIMENSION_UTILITIES_H
 
-#include <vector>
 #include <type_traits>
 #include <tuple>
 
@@ -15,25 +14,13 @@ namespace Dimension
    template <typename...>
    class BaseUnit;
 
-
-   // Define a variadic template for myClass types
-   template<typename ... T_Units>
-   struct myUnitTypes {};
-
-   class Inverse
-   {
-      Inverse();
-   };
+   struct Inverse;
 
    template<typename...>
    struct is_inverse_dimension : std::true_type {};
 
    template<>
    struct is_inverse_dimension<> : std::false_type {};
-
-
-   // ==========================================
-   // Helpers
 
    template<typename...Ts>
    using tuple_cat_t = decltype(std::tuple_cat(std::declval<Ts>()...));
@@ -48,7 +35,10 @@ namespace Dimension
       using type = decltype(std::tuple_cat(std::tuple<T>(), typename Repeat<N - 1, T>::type()));
    };
 
-   // Recursive case: define type as a tuple containing N copies of T
+   // Repeat for negative number of occurences
+   // This should NEVER occur, but the compiler must be able to resolve all types
+   //    that may be produced by conditional_t
+   // Consider a different approach, but this is sufficient for now
    template <int N, typename T>
    struct Repeat<N, T, std::enable_if_t<(N < 0)>> {
       using type = std::tuple<>;
@@ -93,28 +83,6 @@ namespace Dimension
       return result;
    }
 
-
-
-
-   // Check if two packs are equal
-   template<typename...>
-   struct arePacksEqual : std::true_type {};
-
-   template<typename T1, typename... Ts1, typename T2, typename... Ts2>
-   struct arePacksEqual<std::tuple<T1, Ts1...>, std::tuple<T2, Ts2...>> : std::conditional_t<std::is_same_v<T1, T2>, arePacksEqual<std::tuple<Ts1...>, std::tuple<Ts2...>>, std::false_type> {};
-
-   // Check if two flags are equal
-   template<typename... T_Flag1, typename... T_Flag2>
-   constexpr bool areFlagsEqual(const myUnitTypes<T_Flag1...>&, const myUnitTypes<T_Flag2...>&) {
-      return arePacksEqual<std::tuple<T_Flag1...>, std::tuple<T_Flag2...>>::value;
-   }
-
-   // Extract flags from myUnitTypes
-   template<typename ... T_Classes>
-   constexpr auto extractFlags(const myUnitTypes<T_Classes...>&) {
-      return std::tuple<T_Classes...>{};
-   }
-
    // Define a helper type trait to deduce the return type of invertDimension for each type
    template <typename T>
    struct InvertReturnType {
@@ -127,8 +95,6 @@ namespace Dimension
       using type = void;
    };
 
-
-
    template<template<typename...> class T, typename ... Args>
    typename std::enable_if<is_inverse_dimension<Args...>::value, T<>>::type
       invertDimension(const T<Args...>& obj) {
@@ -140,11 +106,6 @@ namespace Dimension
       invertDimension(const T<Args...>& obj) {
       return T<Inverse>();
    }
-
-
 }
-
-
-
 
 #endif // DIMENSION_UTILITIES_H

@@ -5,12 +5,7 @@ project(Dimensional)
 set(Enable_Dimensional_Tests OFF CACHE BOOL "Enable this flag to run unit tests for the Dimensional library")
 
 set(Dimensional_Sources
-    BaseDimension.cpp
     UnitDefinitions.cpp
-
-    TimeDimension.cpp
-    LengthDimension.cpp
-    SpeedDimension.cpp
 )
 
 add_library(Dimensional_LIB OBJECT ${Dimensional_Sources})
