@@ -11,19 +11,33 @@
 
 namespace Dimension
 {
+   /// @brief Length unit, derived from BaseUnit
    template<typename ... is_inverse>
    class LengthUnit : public BaseUnit<is_inverse...>
    {
    public:
+      /// @brief Constructor only giving name, primary constructor
       LengthUnit(std::string name) : BaseUnit<is_inverse...>(name) {}
 
+      /// @brief Default constructor
+      /// @todo Check if removing is possible
       LengthUnit() : BaseUnit<is_inverse...>() {}
 
+      /// @brief Override for GetDimName
       std::string GetDimName() override { return "Length"; }
+
+      /// @brief Override for GetUnitName
       std::string GetUnitName() override { return unitName; }
+
+      /// @brief Override for GetBaseUnit
       LengthUnit<>* GetBaseUnit() override { return &LengthUnits::Meters; }
 
-      // TODO: Add logic ensureing conversion is successfully added
+      /// @brief Add a conversion to the map of conversions
+      /// @param[in] toUnit The unit to convert to
+      /// @param[in] conversion The conversion lamda to convert from this unit to toUnit
+      /// @return A bool indicating success of adding the conversion
+      /// @todo Check for success of adding
+      /// @todo Consider moving this to BaseUnit
       bool add_conversion(LengthUnit toUnit, std::function<double(double)> conversion)
       {
          conversions[toUnit.unitName] = conversion;
@@ -34,14 +48,23 @@ namespace Dimension
 
    };
 
+   /// @brief Length dimension, derived from BaseDimension
+   /// @details This dimension is a specialization using
+   ///    Length as the unit.
+   /// @todo Add some convenience methods to retrieve Length by name
    template<typename ... is_inverse>
    class Length : public BaseDimension<LengthUnit<is_inverse...>>
    {
    public:
+
+      /// @brief Constructor using value and Length units
+      /// @param[in] value The value to set
+      /// @param[in] Length Pointer to the Length unit
       explicit Length(double value, LengthUnit<is_inverse...>* unit) 
          : BaseDimension<LengthUnit<is_inverse...>>(value, std::vector<BaseUnit<>*>{ static_cast<BaseUnit<>*>(unit) }, std::vector<BaseUnit<>*>{})
       {}
 
+      /// @brief Cast operator from a BaseDimension
       Length(const BaseDimension<LengthUnit<is_inverse...>>& base) : BaseDimension<LengthUnit<is_inverse...>>(base.value, base.numList, base.denList)
       {}
 
@@ -49,12 +72,28 @@ namespace Dimension
 
    namespace LengthUnits
    {
+      /// @brief Meters, a LengthUnit singleton for creating Dimension objects
       extern LengthUnit<> Meters;
+
+      /// @brief Feet, a LengthUnit singleton for creating Dimension objects
       extern LengthUnit<> Feet;
    }
    
+   /// @brief Static vector of all LengthUnits
+   /// @details This vector of all LengthUnits is stored in each
+   ///    LengthUnit object for use in simplification and other
+   ///    helper functions
+   /// @todo Consider other ways to handle this
    static std::vector<BaseUnit<>*> LengthUnitVector;
 
+   /// @brief Add conversions to each LengthUnit
+   /// @details Adds conversions to all Length units and assigns the 
+   ///    LengthUnitVector to each. This method also validates each 
+   ///    LengthUnit as a conversion to the "primary" LengthUnit, Meters,
+   ///    and that Meters has a conversion to each LengthUnit.
+   ///    Note this must be called at the start of the program.
+   /// @return bool indicating success
+   /// @todo Correctly handle missing conversions
    inline bool initializeLengthUnits()
    {
       LengthUnits::Meters.add_conversion(LengthUnits::Feet, [](double val) {return val * 3.28084; });
