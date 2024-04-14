@@ -255,15 +255,12 @@ namespace Dimension
       BaseDimension<UnitType...>& operator+=(double rhs) = delete; // Addition cannot be performed between a Dimension and a scalar
       BaseDimension<UnitType...>& operator-=(double rhs) = delete; // Subtraction cannot be performed between a Dimension and a scalar
 
-
-
-
       // Comparison Operators
-      bool operator>(const BaseDimension<UnitType...>& rhs) const { return value > rhs.GetValue(numList, denList); }
-      bool operator<(const BaseDimension<UnitType...>& rhs) const { return value < rhs.GetValue(numList, denList); }
-      bool operator>=(const BaseDimension<UnitType...>& rhs) const { return value >= rhs.GetValue(numList, denList); }
-      bool operator<=(const BaseDimension<UnitType...>& rhs) const { return value <= rhs.GetValue(numList, denList); }
-      bool operator==(const BaseDimension<UnitType...>& rhs) const { return value == rhs.GetValue(numList, denList); } // I need to add a small tolerance to this
+      bool operator>(const BaseDimension<UnitType...>& rhs) const { return value > rhs.GetVal(numList, denList); }
+      bool operator<(const BaseDimension<UnitType...>& rhs) const { return value < rhs.GetVal(numList, denList); }
+      bool operator>=(const BaseDimension<UnitType...>& rhs) const { return value >= rhs.GetVal(numList, denList); }
+      bool operator<=(const BaseDimension<UnitType...>& rhs) const { return value <= rhs.GetVal(numList, denList); }
+      bool operator==(const BaseDimension<UnitType...>& rhs) const { return value == rhs.GetVal(numList, denList); } // I need to add a small tolerance to this
       bool operator!=(const BaseDimension<UnitType...>& rhs) const { return !(*this == rhs); }
 
       // TODO: Define a NearlyEqual method with custom tolerance
@@ -397,8 +394,12 @@ namespace Dimension
       std::vector<BaseUnit<>*> newDenList = obj.denList;
       double newValue = obj.value;
 
-      // Consider ways to improve effeciency of this section
+      // TODO: Consider ways to improve effeciency of this section
 
+
+
+
+      /*
       for (auto numIter = newNumList.begin(); numIter != newNumList.end(); ++numIter)
       {
          for (auto denIter = newDenList.begin(); denIter != newDenList.end(); ++denIter)
@@ -410,7 +411,6 @@ namespace Dimension
             {
                if (*numIter != *denIter)
                {
-                  //newValue = (*denIter)->conversions[(*numIter)->GetUnitName()](newValue);
                   newValue = (*numIter)->conversions[(*denIter)->GetUnitName()](newValue);
                }
                // Remove the current items from both lists
@@ -426,6 +426,41 @@ namespace Dimension
          if (numIter == newNumList.end())
             break;
       }
+      */
+
+      for (auto numIter = newNumList.begin(); numIter != newNumList.end();)
+      {
+         bool erased = false; // Flag to track if an element was erased
+
+         for (auto denIter = newDenList.begin(); denIter != newDenList.end(); ++denIter)
+         {
+            if ((*numIter)->GetDimName() == (*denIter)->GetDimName())
+            {
+               if (*numIter != *denIter)
+               {
+                  newValue = (*numIter)->conversions[(*denIter)->GetUnitName()](newValue);
+               }
+               // Remove the current items from both lists
+               numIter = newNumList.erase(numIter);
+               denIter = newDenList.erase(denIter);
+               erased = true; // Set erased flag to true
+               // Break out of the inner loop
+               break;
+            }
+         }
+
+         // Check if an element was erased and if we need to break out of the outer loop
+         if (!erased)
+         {
+            ++numIter;
+         }
+
+         if (numIter == newNumList.end())
+         {
+            break;
+         }
+      }
+
 
       return BaseDimension<Ts...>(newValue, newNumList, newDenList);
    }
