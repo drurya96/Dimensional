@@ -106,6 +106,53 @@ namespace Dimension
       invertDimension(const T<Args...>& obj) {
       return T<Inverse>();
    }
+
+   // Helper function to convert tuple types to BaseDimension
+   template<typename... Ts, std::size_t... Is, typename ... Args>
+   auto TupleToBaseDimension(const std::tuple<Ts...>&, std::index_sequence<Is...>, const BaseDimension<Args...>& obj) {
+
+      std::vector<BaseUnit<>*> newNumList = obj.numList;
+      std::vector<BaseUnit<>*> newDenList = obj.denList;
+      double newValue = obj.value;
+
+      // TODO: Consider ways to improve effeciency of this section
+
+      for (auto numIter = newNumList.begin(); numIter != newNumList.end();)
+      {
+         bool erased = false; // Flag to track if an element was erased
+
+         for (auto denIter = newDenList.begin(); denIter != newDenList.end(); ++denIter)
+         {
+            if ((*numIter)->GetDimName() == (*denIter)->GetDimName())
+            {
+               if (*numIter != *denIter)
+               {
+                  newValue = (*numIter)->conversions[(*denIter)->GetUnitName()](newValue);
+               }
+               // Remove the current items from both lists
+               numIter = newNumList.erase(numIter);
+               denIter = newDenList.erase(denIter);
+               erased = true; // Set erased flag to true
+               // Break out of the inner loop
+               break;
+            }
+         }
+
+         // Check if an element was erased and if we need to break out of the outer loop
+         if (!erased)
+         {
+            ++numIter;
+         }
+
+         if (numIter == newNumList.end())
+         {
+            break;
+         }
+      }
+
+
+      return BaseDimension<Ts...>(newValue, newNumList, newDenList);
+   }
 }
 
 #endif // DIMENSION_UTILITIES_H

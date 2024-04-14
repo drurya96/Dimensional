@@ -1,6 +1,3 @@
-
-
-
 #ifndef DIMENSION_BASE_H
 #define DIMENSION_BASE_H
 
@@ -14,6 +11,7 @@
 #include <typeindex>
 
 #include "DimensionUtilities.h"
+#include "Simplification.h"
 
 namespace Dimension
 {
@@ -241,157 +239,6 @@ namespace Dimension
 
       // TODO: Define a NearlyEqual method with custom tolerance
    };
-
-
-   // Forward declare TimeUnit
-   template <typename...>
-   class TimeUnit;
-
-   // Forward declare LengthUnit
-   template <typename...>
-   class LengthUnit;
-
-
-   // ==========================================
-   // Simplification logic
-   // Only for Time for now
-   // This needs to be moved around
-   // Some portion should live with the Time class
-
-
-
-   template <int N>
-   struct AbsHelper {
-      static constexpr int value = N >= 0 ? N : -N;
-   };
-
-
-   // Simplify function for any Simplifier type
-   template <typename... Ts>
-   struct SimplifierInterface {};
-
-
-   // ==========================================
-   // Time Simplification
-
-   // Simplify function for TimeUnit types
-   
-   template <typename... Ts>
-   struct TimeUnitSimplifier : SimplifierInterface<Ts...> {
-  
-      static constexpr size_t TimeCount = count_type<TimeUnit<>, Ts...>();
-      static constexpr size_t InverseTimeCount = count_type<TimeUnit<Inverse>, Ts...>();
-      
-      using type = std::conditional_t<(TimeCount > InverseTimeCount),
-         typename Repeat<TimeCount - InverseTimeCount, TimeUnit<>>::type,
-         std::conditional_t<(TimeCount < InverseTimeCount),
-         typename Repeat<InverseTimeCount - TimeCount, TimeUnit<Inverse>>::type,
-         std::tuple<>>>;
-   };
-   
-
-
-   // ==========================================
-   // Length Simplification
-
-   // Simplify function for LengthUnit types
-   template <typename... Ts>
-   struct LengthUnitSimplifier : SimplifierInterface<Ts...> {
-
-      static constexpr size_t LengthCount = count_type<LengthUnit<>, Ts...>();
-      static constexpr size_t InverseLengthCount = count_type<LengthUnit<Inverse>, Ts...>();
-
-      using type = std::conditional_t<(LengthCount > InverseLengthCount),
-         typename Repeat<LengthCount - InverseLengthCount, LengthUnit<>>::type,
-         std::conditional_t<(LengthCount < InverseLengthCount),
-         typename Repeat<InverseLengthCount - LengthCount, LengthUnit<Inverse>>::type,
-         std::tuple<>>>;
-
-   };
-
-   // =========================================
-   // Generic Unit Simplification
-   // This will need updates to handle user-defined units
-   // Consider using some equavalent to lambda/functor registration
-   // Must be compile-time aware
-
-
-   template <typename ... Ts>
-   struct AllUnitSimplifier
-   {
-      using type = tuple_cat_t<typename LengthUnitSimplifier<Ts...>::type, typename TimeUnitSimplifier<Ts...>::type>;
-   };
-
-
-   // Function to check if two pointers in the vector belong to the same derived class
-   inline bool areSameDerivedClass(const BaseUnit<>* unit1, const BaseUnit<>* unit2) {
-      const std::type_index& type1 = typeid(*unit1);
-      const std::type_index& type2 = typeid(*unit2);
-
-      bool areSame = type1 == type2;
-
-      return areSame;
-      //return type1 == type2;
-   }
-
-
-   // Helper function to convert tuple types to BaseDimension
-   template<typename... Ts, std::size_t... Is, typename ... Args>
-   auto TupleToBaseDimension(const std::tuple<Ts...>&, std::index_sequence<Is...>, const BaseDimension<Args...>& obj) {
-
-      std::vector<BaseUnit<>*> newNumList = obj.numList;
-      std::vector<BaseUnit<>*> newDenList = obj.denList;
-      double newValue = obj.value;
-
-      // TODO: Consider ways to improve effeciency of this section
-
-      for (auto numIter = newNumList.begin(); numIter != newNumList.end();)
-      {
-         bool erased = false; // Flag to track if an element was erased
-
-         for (auto denIter = newDenList.begin(); denIter != newDenList.end(); ++denIter)
-         {
-            if ((*numIter)->GetDimName() == (*denIter)->GetDimName())
-            {
-               if (*numIter != *denIter)
-               {
-                  newValue = (*numIter)->conversions[(*denIter)->GetUnitName()](newValue);
-               }
-               // Remove the current items from both lists
-               numIter = newNumList.erase(numIter);
-               denIter = newDenList.erase(denIter);
-               erased = true; // Set erased flag to true
-               // Break out of the inner loop
-               break;
-            }
-         }
-
-         // Check if an element was erased and if we need to break out of the outer loop
-         if (!erased)
-         {
-            ++numIter;
-         }
-
-         if (numIter == newNumList.end())
-         {
-            break;
-         }
-      }
-
-
-      return BaseDimension<Ts...>(newValue, newNumList, newDenList);
-   }
-
-
-   // Simplify function for BaseDimension
-   // If problems arise, consider specifying return type
-   template<typename... Ts>
-   auto SimplifyBaseDimension(const BaseDimension<Ts...>& obj)// -> decltype(TupleToBaseDimension(typename AllUnitSimplifier<Ts...>::type{}, std::index_sequence_for<Ts...>{}, std::declval<BaseDimension<Ts...>>()))
-   {
-      using TupleType = typename AllUnitSimplifier<Ts...>::type;
-      return TupleToBaseDimension(TupleType{}, std::index_sequence_for<Ts...>{}, obj);
-   }
-
 
    // Division operator for two Dimensions
    template<typename... T_Classes1, typename... T_Classes2>
