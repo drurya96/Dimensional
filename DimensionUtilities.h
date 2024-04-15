@@ -188,7 +188,7 @@ namespace Dimension
             {
                if (*numIter != *denIter)
                {
-                  newValue = (*numIter)->conversions[(*denIter)->GetUnitName()](newValue);
+                  newValue = (*numIter)->ConvertValueNumerator(newValue, **denIter);
                }
                // Remove the current items from both lists
                numIter = newNumList.erase(numIter);
