@@ -230,9 +230,7 @@ namespace Dimension
 
       // TODO: Consider copy operator
 
-      /// @brief The value of the given object
-      /// @todo Make this private
-      double value;
+
 
       // These are pointers for simplicity for now, but may change.
       // Consider using a tuple for immutability
@@ -384,6 +382,17 @@ namespace Dimension
       bool operator!=(const BaseDimension<UnitType...>& rhs) const { return !(*this == rhs); }
 
       // TODO: Define a NearlyEqual method with custom tolerance
+
+      /// @brief Get the raw value field
+      /// @todo This really shouldn't be used, need to investigate
+      double GetRawValue() const { return value; }
+
+   protected:
+
+   private:
+      /// @brief The value of the given object
+      double value;
+
    };
 
    /// @brief Division operator for two Dimensions
@@ -399,7 +408,7 @@ namespace Dimension
    {
       using ResultType = BaseDimension<T_Classes1..., typename InvertReturnType<T_Classes2>::type...>;
       auto result = ResultType(
-         obj1.value / obj2.value,
+         obj1.GetRawValue() / obj2.GetRawValue(),
          ConcatenateUnitVectors(obj1.numList, obj2.denList),
          ConcatenateUnitVectors(obj1.denList, obj2.numList));
       return SimplifyBaseDimension(result);
@@ -418,7 +427,7 @@ namespace Dimension
    {
       using ResultType = BaseDimension<T_Classes1..., T_Classes2...>;
       auto result = ResultType(
-         obj1.value * obj2.value,
+         obj1.GetRawValue() * obj2.GetRawValue(),
          ConcatenateUnitVectors(obj1.numList, obj2.numList),
          ConcatenateUnitVectors(obj1.denList, obj2.denList)
       );
@@ -435,7 +444,7 @@ namespace Dimension
    template<typename ... Ts>
    BaseDimension<Ts...> operator*(const BaseDimension<Ts...>& obj, double scalar)
    {
-      return BaseDimension<Ts...>(obj.value * scalar, obj.numList, obj.denList);
+      return BaseDimension<Ts...>(obj.GetRawValue() * scalar, obj.numList, obj.denList);
    }
 
    /// @brief Multiplication operator for a scalar and Dimension
@@ -457,7 +466,7 @@ namespace Dimension
    template<typename ... Ts>
    BaseDimension<Ts...> operator/(const BaseDimension<Ts...>& obj, double scalar)
    {
-      return BaseDimension<Ts...>(obj.value / scalar, obj.numList, obj.denList);
+      return BaseDimension<Ts...>(obj.GetRawValue() / scalar, obj.numList, obj.denList);
    }
 
    /// @brief Division operator for a scalar and Dimension
@@ -471,7 +480,7 @@ namespace Dimension
    {
       using ResultType = BaseDimension<typename InvertReturnType<Ts>::type...>;
 
-      return ResultType(scalar / obj.value, obj.denList, obj.numList);
+      return ResultType(scalar / obj.GetRawValue(), obj.denList, obj.numList);
    }
 
    /// @brief Addition operator for two Dimensions
@@ -484,7 +493,7 @@ namespace Dimension
    template<typename ... Ts>
    BaseDimension<Ts...> operator+(const BaseDimension<Ts...>& obj1, const BaseDimension<Ts...>& obj2)
    {
-      return BaseDimension<Ts...>(obj1.value + obj2.GetVal(obj1.numList, obj1.denList), obj1.numList, obj1.denList);
+      return BaseDimension<Ts...>(obj1.GetRawValue() + obj2.GetVal(obj1.numList, obj1.denList), obj1.numList, obj1.denList);
    }
 
    /// @brief Subtraction operator for two Dimensions
@@ -497,7 +506,7 @@ namespace Dimension
    template<typename ... Ts>
    BaseDimension<Ts...> operator-(const BaseDimension<Ts...>& obj1, const BaseDimension<Ts...>& obj2)
    {
-      return BaseDimension<Ts...>(obj1.value - obj2.GetVal(obj1.numList, obj1.denList), obj1.numList, obj1.denList);
+      return BaseDimension<Ts...>(obj1.GetRawValue() - obj2.GetVal(obj1.numList, obj1.denList), obj1.numList, obj1.denList);
    }
 
 }

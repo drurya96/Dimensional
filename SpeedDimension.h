@@ -25,11 +25,11 @@ namespace Dimension
       /// @param[in] length Pointer to the length unit
       /// @param[in] time Pointer to the time unit
       explicit Speed(double value, LengthUnit<>* length, TimeUnit<>* time)
-         : BaseDimension<LengthUnit<>, TimeUnit<Inverse>>(value, std::vector<BaseUnit<>*>{ static_cast<BaseUnit<>*>(length) }, std::vector<BaseUnit<>*>{ static_cast<BaseUnit<>*>(time) })//, numList({ unit }), denList({})
+         : BaseDimension<LengthUnit<>, TimeUnit<Inverse>>(value, std::vector<BaseUnit<>*>{ static_cast<BaseUnit<>*>(length) }, std::vector<BaseUnit<>*>{ static_cast<BaseUnit<>*>(time) })
       {}
 
       /// @brief Cast operator from a BaseDimension
-      Speed(const BaseDimension<LengthUnit<>, TimeUnit<Inverse>>& base) : BaseDimension<LengthUnit<>, TimeUnit<Inverse>>(base.value, base.numList, base.denList)
+      Speed(const BaseDimension<LengthUnit<>, TimeUnit<Inverse>>& base) : BaseDimension<LengthUnit<>, TimeUnit<Inverse>>(base)
       {}
       
    };
