@@ -7,6 +7,7 @@
 #include <string>
 #include <unordered_map>
 #include <functional>
+#include <algorithm>
 
 #include <typeindex>
 
@@ -24,22 +25,23 @@ namespace Dimension
    ///    <> indicates the unit is in the numerator, while an instance
    ///    templated on <Inverse> indicates the unit is in the denominator
    /// @tparam is_inverse This should be either empty or Inverse
-   /// @todo Make this class abstract
+   /// @todo Use CRTP to reduce code duplication and move as much
+   ///    as possible into the BaseUnit
    /// @todo Attempt to implement the initialization function here
    template<typename ... is_inverse>
    class BaseUnit
    {
    public:
       /// @brief Default constructor
+      /// @details This default constructor is necessary
+      ///    for some template metaprogramming below
       BaseUnit() : unitName(""){}
 
       /// @brief Constructor setting name
-      /// @todo consider whether this is really needed
       BaseUnit(std::string name) : unitName(name) {}
 
-      /// @brief Default destructor
-      /// @todo make the class abstract by making this pure virtual
-      virtual ~BaseUnit() {}
+      /// @brief Pure virtual destructor
+      virtual ~BaseUnit() = 0;
 
       /// @brief Getter for the Dimension name
       /// @details Get the name of the dimension this unit
@@ -48,7 +50,8 @@ namespace Dimension
       /// @return A string indicating the dimension name
       /// @todo Consider whether this should return some
       ///    some singleton rather than string
-      virtual std::string GetDimName() {
+      virtual std::string GetDimName() const
+      {
          return "Base";
       };
 
@@ -56,7 +59,8 @@ namespace Dimension
       /// @return A string indicating the unit name
       /// @todo This is primarily used to determine which conversion to use.
       ///    If conversions change to use the existing singletons, this could be removed
-      virtual std::string GetUnitName() {
+      virtual std::string GetUnitName() const
+      {
          return unitName;
       }
 
@@ -66,30 +70,105 @@ namespace Dimension
       ///    Feet might return a pointer to Meters, if Meters is the primary unit.
       ///    More on the "primary" unit below
       /// @return A pointer to the "primary" unit
-      /// @todo Decide on a better name than "primary"
       /// @todo Prefer returning a reference, need to evaluate fallout
-      /// @todo Make this method pure virtual. Currently, THIS IS A MEMORY LEAK!
-      virtual BaseUnit<>* GetBaseUnit() {
-         return new BaseUnit<>();
+      virtual BaseUnit<>* GetPrimaryUnit() const = 0;
+
+      /// @brief Get the conversion functor from this unit to the provided unit
+      /// @param[in] unit The unit to retrieve a conversion to
+      /// @return The conversion functor
+      /// @todo Validate successful conversion retrieval
+      const std::function<double(double)>& getConversion(const BaseUnit& unit) const
+      {
+         return conversions.at(unit.GetUnitName());
       }
 
+      /// @brief Add a conversion to the map of conversions
+      /// @param[in] toUnit The unit to convert to
+      /// @param[in] conversion The conversion lamda to convert from this unit to toUnit
+      /// @return A bool indicating success of adding the conversion
+      /// @todo Check for success of adding
+      bool add_conversion(const BaseUnit& toUnit, std::function<double(double)> conversion)
+      {
+         conversions[toUnit.GetUnitName()] = conversion;
+         return true;
+      };
+
+      /// @brief Validate all conversions
+      /// @details This function should be called as part of the initialization step of each
+      ///    derived Unit type. It should be given the vector of all Units for the 
+      ///    Unit type at hand, as well as the Primary Unit of that Dimension
+      /// @param[in] UnitVector The vector of all Units within this dimension
+      /// @param[in] PrimaryUnit The "primary" unit for this dimension.
+      ///    Every unit must have a conversion to and from this unit. While other conversions
+      ///    are allowed, these conversions are mandatory.
+      /// @return A bool indicating successful validation
+      static bool ValidateConversions(const std::vector<BaseUnit<>*>& UnitVector, const BaseUnit<>& PrimaryUnit)
+      {
+         return std::all_of(UnitVector.begin(), UnitVector.end(), [&](BaseUnit<>* unit)
+            {
+            auto findit = unit->conversions.find(PrimaryUnit.GetUnitName());
+            auto findit2 = PrimaryUnit.conversions.find(unit->GetUnitName());
+            return (findit != unit->conversions.end() || unit == &PrimaryUnit) &&
+               (findit2 != PrimaryUnit.conversions.end() || unit == &PrimaryUnit);
+            });
+      }
+
+      /// @brief Convert the input value from this unit to the given unit
+      /// @details This will use the direct conversion if one is provided,
+      ///    otherwise it will convert to the primary unit, then to the
+      ///    given unit.
+      /// @param[in] input The value to convert
+      /// @param[in] NewUnit The unit to convert to
+      /// @return The converted value
+      double ConvertValueNumerator(const double input, const BaseUnit& NewUnit) const
+      {
+         double result;
+         if (conversions.find(NewUnit.GetUnitName()) != conversions.end())
+         {
+            result = getConversion(NewUnit)(input);
+         }
+         else
+         {
+            result = getConversion(*GetPrimaryUnit())(input);
+            result = GetPrimaryUnit()->getConversion(NewUnit)(result);
+         }
+         return result;
+      }
+
+      /// @brief Convert the input value from this unit to the given unit
+      /// @details This will use the direct conversion if one is provided,
+      ///    otherwise it will convert to the primary unit, then to the
+      ///    given unit. This conversion is inverted relative to
+      ///    ConvertValueNumerator since reciprocals must be used.
+      /// @param[in] input The value to convert
+      /// @param[in] NewUnit The unit to convert to
+      /// @return The converted value
+      double ConvertValueDenominator(const double input, const BaseUnit& NewUnit) const
+      {
+         double result;
+         if (conversions.find(NewUnit.GetUnitName()) != conversions.end())
+         {
+            result = NewUnit.getConversion(*this)(input);
+         }
+         else
+         {
+            result = NewUnit.getConversion(*GetPrimaryUnit())(input);
+            result = GetPrimaryUnit()->getConversion(*this)(result);
+         }
+         return result;
+      }
+
+   private:
       /// @brief The name of the unit
-      /// @todo Make this private
       std::string unitName = "";
 
       /// @brief A map of unit names to conversion functors
-      /// @todo Make this private
       std::unordered_map<std::string, std::function<double(double)>> conversions;
-
-      /// @brief A vector of all units within this dimension
-      /// @todo Make this private
-      /// @todo Rename this
-      /// @todo Reevaluate usage
-      std::vector<BaseUnit<>*>* baseUnitVector = {};
-
-   private:
-
    };
+
+   /// @brief Destructor implementation
+   template<typename ... is_inverse>
+   inline BaseUnit<is_inverse...>::~BaseUnit() {}
 
    /// @brief A generic Dimension class
    /// @details This class represents a Dimension,
@@ -215,17 +294,9 @@ namespace Dimension
             found = false;
             for (auto it = temp_InputNumList.begin(); it != temp_InputNumList.end();)
             {
-               if (myUnit->baseUnitVector == (*it)->baseUnitVector)
+               if (myUnit->GetPrimaryUnit() == (*it)->GetPrimaryUnit())
                {
-                  if (myUnit->conversions.find((*it)->GetUnitName()) != myUnit->conversions.end())
-                  {
-                     result = myUnit->conversions[(*it)->GetUnitName()](result);
-                  }
-                  else
-                  {
-                     result = myUnit->conversions[myUnit->GetBaseUnit()->GetUnitName()](result);
-                     result = myUnit->GetBaseUnit()->conversions[(*it)->GetUnitName()](result);
-                  }
+                  result = myUnit->ConvertValueNumerator(result, *(*it));
 
                   temp_InputNumList.erase(it);
                   found = true;
@@ -246,23 +317,14 @@ namespace Dimension
             throw std::runtime_error("Vectors must have the same size.");
          }
 
-         //bool found = false;
          for (BaseUnit<>* myUnit : temp_MyDenList)
          {
             found = false;
             for (auto it = temp_InputDenList.begin(); it != temp_InputDenList.end();)
             {
-               if (myUnit->baseUnitVector == (*it)->baseUnitVector)
+               if (myUnit->GetPrimaryUnit() == (*it)->GetPrimaryUnit())
                {
-                  if (myUnit->conversions.find((*it)->GetUnitName()) != myUnit->conversions.end())
-                  {
-                     result = (*it)->conversions[myUnit->GetUnitName()](result);
-                  }
-                  else
-                  {
-                     result = (*it)->conversions[myUnit->GetBaseUnit()->GetUnitName()](result);
-                     result = myUnit->GetBaseUnit()->conversions[myUnit->GetUnitName()](result);
-                  }
+                  result = myUnit->ConvertValueDenominator(result, *(*it));
 
                   temp_InputDenList.erase(it);
                   found = true;

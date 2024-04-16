@@ -7,8 +7,6 @@
 #include <unordered_map>
 #include <functional>
 
-#include <cassert> // Necessary for assert in initializeTimeUnits. TODO: Remove if logic changes
-
 namespace Dimension
 {
    /// @brief Time unit, derived from BaseUnit
@@ -20,33 +18,23 @@ namespace Dimension
       explicit TimeUnit(std::string name) : BaseUnit(name) {}
 
       /// @brief Default constructor
-      /// @todo Check if removing is possible
+      /// @details This default constructor is necessary
+      ///    for some template metaprogramming on BaseUnit
       TimeUnit() : BaseUnit() {}
 
+      /// @brief Default destructor
+      ~TimeUnit() {}
+
       /// @brief Override for GetDimName
-      std::string GetDimName() override { return "Time"; }
+      std::string GetDimName() const override { return "Time"; }
 
-      /// @brief Override for GetUnitName
-      std::string GetUnitName() override { return unitName; }
-
-      /// @brief Override for GetBaseUnit
-      TimeUnit<>* GetBaseUnit() override { return &TimeUnits::Seconds; }
-
-      /// @brief Add a conversion to the map of conversions
-      /// @param[in] toUnit The unit to convert to
-      /// @param[in] conversion The conversion lamda to convert from this unit to toUnit
-      /// @return A bool indicating success of adding the conversion
-      /// @todo Check for success of adding
-      /// @todo Consider moving this to BaseUnit
-      bool add_conversion(TimeUnit toUnit, std::function<double(double)> conversion)
-      {
-         conversions[toUnit.unitName] = conversion;
-         return true;
-      };
+      /// @brief Override for GetPrimaryUnit
+      TimeUnit<>* GetPrimaryUnit() const override { return &TimeUnits::Seconds; }
 
    private:
 
    };
+
 
    /// @brief Time dimension, derived from BaseDimension
    /// @details This dimension is a specialization using
@@ -99,25 +87,10 @@ namespace Dimension
       TimeUnits::Seconds.add_conversion(TimeUnits::Minutes, [](double val) {return val / 60.0; });
       TimeUnits::Minutes.add_conversion(TimeUnits::Seconds, [](double val) {return val * 60.0; });
 
-      TimeUnits::Seconds.baseUnitVector = &TimeUnitVector;
-      TimeUnits::Minutes.baseUnitVector = &TimeUnitVector;
-
-
       TimeUnitVector.push_back(&TimeUnits::Seconds);
       TimeUnitVector.push_back(&TimeUnits::Minutes);
-
-
-      // Validate there is a conversion to Seconds from each unit
-      // TODO: Consider returning false instead of asserting
-      for (auto unit : TimeUnitVector)
-      {
-         auto findit = unit->conversions.find(TimeUnits::Seconds.GetUnitName());
-         auto findit2 = TimeUnits::Seconds.conversions.find(unit->GetUnitName());
-         assert((findit != unit->conversions.end()) || (unit == &TimeUnits::Seconds));
-         assert((findit2 != TimeUnits::Seconds.conversions.end()) || (unit == &TimeUnits::Seconds));
-      }
-
-      return true;
+      
+      return BaseUnit<>::ValidateConversions(TimeUnitVector, TimeUnits::Seconds);
    }
 
 }

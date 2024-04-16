@@ -7,8 +7,6 @@
 #include <unordered_map>
 #include <functional>
 
-#include <cassert> // Necessary for assert in initializeLengthUnits. TODO: Remove if logic changes
-
 namespace Dimension
 {
    /// @brief Length unit, derived from BaseUnit
@@ -20,29 +18,18 @@ namespace Dimension
       LengthUnit(std::string name) : BaseUnit<is_inverse...>(name) {}
 
       /// @brief Default constructor
-      /// @todo Check if removing is possible
+      /// @details This default constructor is necessary
+      ///    for some template metaprogramming on BaseUnit
       LengthUnit() : BaseUnit<is_inverse...>() {}
 
+      /// @brief Default destructor
+      ~LengthUnit() {}
+
       /// @brief Override for GetDimName
-      std::string GetDimName() override { return "Length"; }
+      std::string GetDimName() const override { return "Length"; }
 
-      /// @brief Override for GetUnitName
-      std::string GetUnitName() override { return unitName; }
-
-      /// @brief Override for GetBaseUnit
-      LengthUnit<>* GetBaseUnit() override { return &LengthUnits::Meters; }
-
-      /// @brief Add a conversion to the map of conversions
-      /// @param[in] toUnit The unit to convert to
-      /// @param[in] conversion The conversion lamda to convert from this unit to toUnit
-      /// @return A bool indicating success of adding the conversion
-      /// @todo Check for success of adding
-      /// @todo Consider moving this to BaseUnit
-      bool add_conversion(LengthUnit toUnit, std::function<double(double)> conversion)
-      {
-         conversions[toUnit.unitName] = conversion;
-         return true;
-      };
+      /// @brief Override for GetPrimaryUnit
+      LengthUnit<>* GetPrimaryUnit() const override { return &LengthUnits::Meters; }
 
    private:
 
@@ -99,25 +86,10 @@ namespace Dimension
       LengthUnits::Meters.add_conversion(LengthUnits::Feet, [](double val) {return val * 3.28084; });
       LengthUnits::Feet.add_conversion(LengthUnits::Meters, [](double val) {return val / 3.28084; });
 
-      LengthUnits::Meters.baseUnitVector = &LengthUnitVector;
-      LengthUnits::Feet.baseUnitVector = &LengthUnitVector;
-
       LengthUnitVector.push_back(& LengthUnits::Meters);
       LengthUnitVector.push_back(& LengthUnits::Feet);
 
-
-      // Validate there is a conversion to Meters from each unit
-      // TODO: Consider returning false instead of asserting
-      for (auto unit : LengthUnitVector)
-      {
-         auto findit = unit->conversions.find(LengthUnits::Meters.GetUnitName());
-         auto findit2 = LengthUnits::Meters.conversions.find(unit->GetUnitName());
-         assert((findit != unit->conversions.end()) || (unit == &LengthUnits::Meters));
-         assert((findit2 != LengthUnits::Meters.conversions.end()) || (unit == &LengthUnits::Meters));
-      }
-
-      // TODO: Return false when necessary
-      return true;
+      return BaseUnit<>::ValidateConversions(LengthUnitVector, LengthUnits::Meters);
    }
 
 }
