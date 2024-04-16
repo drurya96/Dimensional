@@ -10,8 +10,6 @@
 #include <algorithm>
 
 #include <typeindex>
-#include <cassert> // Necessary for assert in initializeTimeUnits. TODO: Remove if logic changes
-
 
 #include "DimensionUtilities.h"
 #include "Simplification.h"
@@ -27,6 +25,8 @@ namespace Dimension
    ///    <> indicates the unit is in the numerator, while an instance
    ///    templated on <Inverse> indicates the unit is in the denominator
    /// @tparam is_inverse This should be either empty or Inverse
+   /// @todo Use CRTP to reduce code duplication and move as much
+   ///    as possible into the BaseUnit
    /// @todo Attempt to implement the initialization function here
    template<typename ... is_inverse>
    class BaseUnit
@@ -70,26 +70,15 @@ namespace Dimension
       ///    Feet might return a pointer to Meters, if Meters is the primary unit.
       ///    More on the "primary" unit below
       /// @return A pointer to the "primary" unit
-      /// @todo Decide on a better name than "primary"
       /// @todo Prefer returning a reference, need to evaluate fallout
-      virtual BaseUnit<>* GetBaseUnit() const = 0;
+      virtual BaseUnit<>* GetPrimaryUnit() const = 0;
 
-      /// @brief A vector of all units within this dimension
-      /// @todo Make this private
-      /// @todo Rename this
-      /// @todo Reevaluate usage
-      std::vector<BaseUnit<>*>* baseUnitVector = {};
-
-      // Currently unused, but would like to keep around for now
-      const std::function<double(double)>& getConversion(const std::string& unitName) const
-      {
-         // Should I do any validation?
-         return conversions.at(unitName);
-      }
-
+      /// @brief Get the conversion functor from this unit to the provided unit
+      /// @param[in] unit The unit to retrieve a conversion to
+      /// @return The conversion functor
+      /// @todo Validate successful conversion retrieval
       const std::function<double(double)>& getConversion(const BaseUnit& unit) const
       {
-         // Should I do any validation?
          return conversions.at(unit.GetUnitName());
       }
 
@@ -124,6 +113,13 @@ namespace Dimension
             });
       }
 
+      /// @brief Convert the input value from this unit to the given unit
+      /// @details This will use the direct conversion if one is provided,
+      ///    otherwise it will convert to the primary unit, then to the
+      ///    given unit.
+      /// @param[in] input The value to convert
+      /// @param[in] NewUnit The unit to convert to
+      /// @return The converted value
       double ConvertValueNumerator(const double input, const BaseUnit& NewUnit) const
       {
          double result;
@@ -133,12 +129,20 @@ namespace Dimension
          }
          else
          {
-            result = getConversion(*GetBaseUnit())(input);
-            result = GetBaseUnit()->getConversion(NewUnit)(result);
+            result = getConversion(*GetPrimaryUnit())(input);
+            result = GetPrimaryUnit()->getConversion(NewUnit)(result);
          }
          return result;
       }
 
+      /// @brief Convert the input value from this unit to the given unit
+      /// @details This will use the direct conversion if one is provided,
+      ///    otherwise it will convert to the primary unit, then to the
+      ///    given unit. This conversion is inverted relative to
+      ///    ConvertValueNumerator since reciprocals must be used.
+      /// @param[in] input The value to convert
+      /// @param[in] NewUnit The unit to convert to
+      /// @return The converted value
       double ConvertValueDenominator(const double input, const BaseUnit& NewUnit) const
       {
          double result;
@@ -148,8 +152,8 @@ namespace Dimension
          }
          else
          {
-            result = NewUnit.getConversion(*GetBaseUnit())(input);
-            result = GetBaseUnit()->getConversion(*this)(result);
+            result = NewUnit.getConversion(*GetPrimaryUnit())(input);
+            result = GetPrimaryUnit()->getConversion(*this)(result);
          }
          return result;
       }
@@ -162,6 +166,7 @@ namespace Dimension
       std::unordered_map<std::string, std::function<double(double)>> conversions;
    };
 
+   /// @brief Destructor implementation
    template<typename ... is_inverse>
    inline BaseUnit<is_inverse...>::~BaseUnit() {}
 
@@ -289,7 +294,7 @@ namespace Dimension
             found = false;
             for (auto it = temp_InputNumList.begin(); it != temp_InputNumList.end();)
             {
-               if (myUnit->baseUnitVector == (*it)->baseUnitVector)
+               if (myUnit->GetPrimaryUnit() == (*it)->GetPrimaryUnit())
                {
                   result = myUnit->ConvertValueNumerator(result, *(*it));
 
@@ -317,7 +322,7 @@ namespace Dimension
             found = false;
             for (auto it = temp_InputDenList.begin(); it != temp_InputDenList.end();)
             {
-               if (myUnit->baseUnitVector == (*it)->baseUnitVector)
+               if (myUnit->GetPrimaryUnit() == (*it)->GetPrimaryUnit())
                {
                   result = myUnit->ConvertValueDenominator(result, *(*it));
 

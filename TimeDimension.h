@@ -7,8 +7,6 @@
 #include <unordered_map>
 #include <functional>
 
-#include <cassert> // Necessary for assert in initializeTimeUnits. TODO: Remove if logic changes
-
 namespace Dimension
 {
    /// @brief Time unit, derived from BaseUnit
@@ -30,12 +28,13 @@ namespace Dimension
       /// @brief Override for GetDimName
       std::string GetDimName() const override { return "Time"; }
 
-      /// @brief Override for GetBaseUnit
-      TimeUnit<>* GetBaseUnit() const override { return &TimeUnits::Seconds; }
+      /// @brief Override for GetPrimaryUnit
+      TimeUnit<>* GetPrimaryUnit() const override { return &TimeUnits::Seconds; }
 
    private:
 
    };
+
 
    /// @brief Time dimension, derived from BaseDimension
    /// @details This dimension is a specialization using
@@ -88,13 +87,9 @@ namespace Dimension
       TimeUnits::Seconds.add_conversion(TimeUnits::Minutes, [](double val) {return val / 60.0; });
       TimeUnits::Minutes.add_conversion(TimeUnits::Seconds, [](double val) {return val * 60.0; });
 
-      TimeUnits::Seconds.baseUnitVector = &TimeUnitVector;
-      TimeUnits::Minutes.baseUnitVector = &TimeUnitVector;
-
-
       TimeUnitVector.push_back(&TimeUnits::Seconds);
       TimeUnitVector.push_back(&TimeUnits::Minutes);
-
+      
       return BaseUnit<>::ValidateConversions(TimeUnitVector, TimeUnits::Seconds);
    }
 

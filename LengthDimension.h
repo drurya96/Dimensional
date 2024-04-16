@@ -7,8 +7,6 @@
 #include <unordered_map>
 #include <functional>
 
-#include <cassert> // Necessary for assert in initializeLengthUnits. TODO: Remove if logic changes
-
 namespace Dimension
 {
    /// @brief Length unit, derived from BaseUnit
@@ -30,8 +28,8 @@ namespace Dimension
       /// @brief Override for GetDimName
       std::string GetDimName() const override { return "Length"; }
 
-      /// @brief Override for GetBaseUnit
-      LengthUnit<>* GetBaseUnit() const override { return &LengthUnits::Meters; }
+      /// @brief Override for GetPrimaryUnit
+      LengthUnit<>* GetPrimaryUnit() const override { return &LengthUnits::Meters; }
 
    private:
 
@@ -87,9 +85,6 @@ namespace Dimension
    {
       LengthUnits::Meters.add_conversion(LengthUnits::Feet, [](double val) {return val * 3.28084; });
       LengthUnits::Feet.add_conversion(LengthUnits::Meters, [](double val) {return val / 3.28084; });
-
-      LengthUnits::Meters.baseUnitVector = &LengthUnitVector;
-      LengthUnits::Feet.baseUnitVector = &LengthUnitVector;
 
       LengthUnitVector.push_back(& LengthUnits::Meters);
       LengthUnitVector.push_back(& LengthUnits::Feet);

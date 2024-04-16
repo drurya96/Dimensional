@@ -14,6 +14,9 @@ namespace Dimension
    ///    Length and Inverse Time as units.
    /// @todo Add some convenience methods to retrieve Speed by name,
    ///    such as MetersPerSecond, MilesPerHour, etc.
+   /// @todo Consider using typedef instead of inheritence here.
+   ///    Constructors won't be as convenient, so only do this after
+   ///    convenience functions are in place, then consider.
    class Speed : public BaseDimension<LengthUnit<>, TimeUnit<Inverse>>
    {
    public:
@@ -30,7 +33,6 @@ namespace Dimension
       {}
       
    };
-
 }
 
 #endif // DIMENSION_SPEED_H
