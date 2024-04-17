@@ -38,22 +38,10 @@ namespace Dimension
       BaseUnit() : unitName(""){}
 
       /// @brief Constructor setting name
-      BaseUnit(std::string name) : unitName(name) {}
+      BaseUnit(const std::string& name) : unitName(name) {}
 
       /// @brief Pure virtual destructor
       virtual ~BaseUnit() = 0;
-
-      /// @brief Getter for the Dimension name
-      /// @details Get the name of the dimension this unit
-      ///    belongs to. For example, a Meter type might
-      ///    return "Length".
-      /// @return A string indicating the dimension name
-      /// @todo Consider whether this should return some
-      ///    the global variable rather than string
-      virtual std::string GetDimName() const
-      {
-         return "Base";
-      };
 
       /// @brief Getter for the Unit name
       /// @return A string indicating the unit name
@@ -199,8 +187,8 @@ namespace Dimension
       template<typename T>
       explicit BaseDimension(const T& dimension) :
          value(dimension.value),
-         numList(dimension.numList.begin(), dimension.numList.end()),
-         denList(dimension.denList.begin(), dimension.denList.end())
+         numList(std::move(dimension.numList)),
+         denList(std::move(dimension.denList))
       {
       }
 

@@ -15,7 +15,7 @@ namespace Dimension
    {
    public:
       /// @brief Constructor only giving name, primary constructor
-      explicit TimeUnit(std::string name) : BaseUnit(name) {}
+      TimeUnit(const std::string& name) : BaseUnit(name) {}
 
       /// @brief Default constructor
       /// @details This default constructor is necessary
@@ -24,9 +24,6 @@ namespace Dimension
 
       /// @brief Default destructor
       ~TimeUnit() {}
-
-      /// @brief Override for GetDimName
-      std::string GetDimName() const override { return "Time"; }
 
       /// @brief Override for GetPrimaryUnit
       TimeUnit<>* GetPrimaryUnit() const override { return &TimeUnits::Seconds; }

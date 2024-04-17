@@ -15,7 +15,7 @@ namespace Dimension
    {
    public:
       /// @brief Constructor only giving name, primary constructor
-      LengthUnit(std::string name) : BaseUnit<is_inverse...>(name) {}
+      LengthUnit(const std::string& name) : BaseUnit<is_inverse...>(name) {}
 
       /// @brief Default constructor
       /// @details This default constructor is necessary
@@ -24,9 +24,6 @@ namespace Dimension
 
       /// @brief Default destructor
       ~LengthUnit() {}
-
-      /// @brief Override for GetDimName
-      std::string GetDimName() const override { return "Length"; }
 
       /// @brief Override for GetPrimaryUnit
       LengthUnit<>* GetPrimaryUnit() const override { return &LengthUnits::Meters; }

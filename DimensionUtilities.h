@@ -182,7 +182,7 @@ namespace Dimension
 
          for (auto denIter = newDenList.begin(); denIter != newDenList.end(); ++denIter)
          {
-            if ((*numIter)->GetDimName() == (*denIter)->GetDimName())
+            if ((*numIter)->GetPrimaryUnit() == (*denIter)->GetPrimaryUnit())
             {
                if (*numIter != *denIter)
                {
