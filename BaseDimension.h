@@ -49,7 +49,7 @@ namespace Dimension
       ///    return "Length".
       /// @return A string indicating the dimension name
       /// @todo Consider whether this should return some
-      ///    some singleton rather than string
+      ///    the global variable rather than string
       virtual std::string GetDimName() const
       {
          return "Base";
@@ -58,7 +58,7 @@ namespace Dimension
       /// @brief Getter for the Unit name
       /// @return A string indicating the unit name
       /// @todo This is primarily used to determine which conversion to use.
-      ///    If conversions change to use the existing singletons, this could be removed
+      ///    If conversions change to use the existing global variables, this could be removed
       virtual std::string GetUnitName() const
       {
          return unitName;
@@ -188,14 +188,6 @@ namespace Dimension
       /// @brief Default constructor
       BaseDimension() : 
          value(0.0)
-      {
-      }
-
-      /// @brief Constructor with a given value
-      /// @param[in] newValue the value to set.
-      /// @todo Consider whether this is still needed
-      BaseDimension(double newValue) :
-         value(newValue)
       {
       }
 
