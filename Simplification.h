@@ -27,55 +27,18 @@ namespace Dimension{
    // This needs to be moved around
    // Some portion should live with the Time class
 
-   // Simplify function for any Simplifier type
-   /// @brief 
+   /// @brief Interface for simplifer.
+   /// @details Interface each simplifier must adhere to.
+   ///    This has no current value-add, but may be useful for
+   ///    type erasure when attempt to resolve the below @todo
    template <typename... Ts>
    struct SimplifierInterface {};
 
-   /// @brief Simplify TimeUnit types
-   /// @details Given a set of types, simplify all TimeUnit types.
-   ///    This means for each pair of TimeUnits (one templated on Inverse
-   ///    and the other not), both will be removed from the type list,
-   ///    and the value will be adjusted accordingly
-   /// @tparam Ts The typelist to simplify. Note in the current implementation
-   ///    this list can contain any BaseUnits, not just TimeUnits.
-   /// @todo Move this logic to the Time declaration. Still trying to find
-   ///    a solution that maintains compile-time type safety.
-   template <typename... Ts>
-   struct TimeUnitSimplifier : SimplifierInterface<Ts...> {
+   template <typename...>
+   struct TimeUnitSimplifier;
 
-      static constexpr size_t TimeCount = count_type<TimeUnit<>, Ts...>();
-      static constexpr size_t InverseTimeCount = count_type<TimeUnit<Inverse>, Ts...>();
-
-      using type = std::conditional_t<(TimeCount > InverseTimeCount),
-         typename Repeat<TimeCount - InverseTimeCount, TimeUnit<>>::type,
-         std::conditional_t<(TimeCount < InverseTimeCount),
-         typename Repeat<InverseTimeCount - TimeCount, TimeUnit<Inverse>>::type,
-         std::tuple<>>>;
-   };
-
-   /// @brief Simplify LengthUnit types
-   /// @details Given a set of types, simplify all LengthUnit types.
-   ///    This means for each pair of LengthUnits (one templated on Inverse
-   ///    and the other not), both will be removed from the type list,
-   ///    and the value will be adjusted accordingly
-   /// @tparam Ts The typelist to simplify. Note in the current implementation
-   ///    this list can contain any BaseUnits, not just LengthUnits.
-   /// @todo Move this logic to the Length declaration. Still trying to find
-   ///    a solution that maintains compile-Length type safety.
-   template <typename... Ts>
-   struct LengthUnitSimplifier : SimplifierInterface<Ts...> {
-
-      static constexpr size_t LengthCount = count_type<LengthUnit<>, Ts...>();
-      static constexpr size_t InverseLengthCount = count_type<LengthUnit<Inverse>, Ts...>();
-
-      using type = std::conditional_t<(LengthCount > InverseLengthCount),
-         typename Repeat<LengthCount - InverseLengthCount, LengthUnit<>>::type,
-         std::conditional_t<(LengthCount < InverseLengthCount),
-         typename Repeat<InverseLengthCount - LengthCount, LengthUnit<Inverse>>::type,
-         std::tuple<>>>;
-
-   };
+   template <typename...>
+   struct LengthUnitSimplifier;
 
    /// @brief Concatenate the type outputs of all simplifiers
    /// @tparam Ts The types to simplify
@@ -101,7 +64,7 @@ namespace Dimension{
    auto SimplifyBaseDimension(const BaseDimension<Ts...>& obj)// -> decltype(TupleToBaseDimension(typename AllUnitSimplifier<Ts...>::type{}, std::index_sequence_for<Ts...>{}, std::declval<BaseDimension<Ts...>>()))
    {
       using TupleType = typename AllUnitSimplifier<Ts...>::type;
-      return TupleToBaseDimension(TupleType{}, std::index_sequence_for<Ts...>{}, obj);
+      return TupleToBaseDimension(TupleType{}, obj);
    }
 
 }

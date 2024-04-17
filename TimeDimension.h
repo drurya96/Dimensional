@@ -15,7 +15,7 @@ namespace Dimension
    {
    public:
       /// @brief Constructor only giving name, primary constructor
-      explicit TimeUnit(std::string name) : BaseUnit(name) {}
+      TimeUnit(const std::string& name) : BaseUnit(name) {}
 
       /// @brief Default constructor
       /// @details This default constructor is necessary
@@ -24,9 +24,6 @@ namespace Dimension
 
       /// @brief Default destructor
       ~TimeUnit() {}
-
-      /// @brief Override for GetDimName
-      std::string GetDimName() const override { return "Time"; }
 
       /// @brief Override for GetPrimaryUnit
       TimeUnit<>* GetPrimaryUnit() const override { return &TimeUnits::Seconds; }
@@ -53,18 +50,18 @@ namespace Dimension
       {}
 
       /// @brief Cast operator from a BaseDimension
-      Time(const BaseDimension<TimeUnit<is_inverse...>>& base) : BaseDimension<TimeUnit<is_inverse...>>(base.value, base.numList, base.denList)
+      Time(const BaseDimension<TimeUnit<is_inverse...>>& base) : BaseDimension<TimeUnit<is_inverse...>>(base)
       {}
 
    };
 
    namespace TimeUnits
    {
-      /// @brief Seconds, a TimeUnit singleton for creating Dimension objects
-      extern TimeUnit<> Seconds;
+      /// @brief Seconds, a TimeUnit global variable for creating Dimension objects
+      inline TimeUnit<> Seconds("Seconds");
 
-      /// @brief Minutes, a TimeUnit singleton for creating Dimension objects
-      extern TimeUnit<> Minutes;
+      /// @brief Minutes, a TimeUnit global variable for creating Dimension objects
+      inline TimeUnit<> Minutes("Minutes");
    }
    
    /// @brief Static vector of all TimeUnits
@@ -81,7 +78,6 @@ namespace Dimension
    ///    and that Seconds has a conversion to each TimeUnit.
    ///    Note this must be called at the start of the program.
    /// @return bool indicating success
-   /// @todo Correctly handle missing conversions
    inline bool initializeTimeUnits()
    {
       TimeUnits::Seconds.add_conversion(TimeUnits::Minutes, [](double val) {return val / 60.0; });
@@ -93,6 +89,26 @@ namespace Dimension
       return BaseUnit<>::ValidateConversions(TimeUnitVector, TimeUnits::Seconds);
    }
 
+   /// @brief Simplify TimeUnit types
+   /// @details Given a set of types, simplify all TimeUnit types.
+   ///    This means for each pair of TimeUnits (one templated on Inverse
+   ///    and the other not), both will be removed from the type list,
+   ///    and the value will be adjusted accordingly
+   /// @tparam Ts The typelist to simplify. Note in the current implementation
+   ///    this list can contain any BaseUnits, not just TimeUnits.
+   /// @todo Attach this to AllSimplifier directly
+   template <typename... Ts>
+   struct TimeUnitSimplifier : SimplifierInterface<Ts...> {
+
+      static constexpr size_t TimeCount = count_type<TimeUnit<>, Ts...>();
+      static constexpr size_t InverseTimeCount = count_type<TimeUnit<Inverse>, Ts...>();
+
+      using type = std::conditional_t<(TimeCount > InverseTimeCount),
+         typename Repeat<TimeCount - InverseTimeCount, TimeUnit<>>::type,
+         std::conditional_t<(TimeCount < InverseTimeCount),
+         typename Repeat<InverseTimeCount - TimeCount, TimeUnit<Inverse>>::type,
+         std::tuple<>>>;
+   };
 }
 
 #endif // DIMENSION_TIME_H

@@ -8,9 +8,10 @@ set(Dimensional_Sources
     UnitDefinitions.cpp
 )
 
-add_library(Dimensional_LIB OBJECT ${Dimensional_Sources})
+#add_library(Dimensional_LIB OBJECT ${Dimensional_Sources})
+add_library(Dimensional_LIB INTERFACE)
 
-target_include_directories(Dimensional_LIB PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(Dimensional_LIB INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(Enable_Dimensional_Tests)
     if(TARGET gtest)

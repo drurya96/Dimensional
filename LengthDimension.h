@@ -15,7 +15,7 @@ namespace Dimension
    {
    public:
       /// @brief Constructor only giving name, primary constructor
-      LengthUnit(std::string name) : BaseUnit<is_inverse...>(name) {}
+      LengthUnit(const std::string& name) : BaseUnit<is_inverse...>(name) {}
 
       /// @brief Default constructor
       /// @details This default constructor is necessary
@@ -24,9 +24,6 @@ namespace Dimension
 
       /// @brief Default destructor
       ~LengthUnit() {}
-
-      /// @brief Override for GetDimName
-      std::string GetDimName() const override { return "Length"; }
 
       /// @brief Override for GetPrimaryUnit
       LengthUnit<>* GetPrimaryUnit() const override { return &LengthUnits::Meters; }
@@ -52,18 +49,18 @@ namespace Dimension
       {}
 
       /// @brief Cast operator from a BaseDimension
-      Length(const BaseDimension<LengthUnit<is_inverse...>>& base) : BaseDimension<LengthUnit<is_inverse...>>(base.value, base.numList, base.denList)
+      Length(const BaseDimension<LengthUnit<is_inverse...>>& base) : BaseDimension<LengthUnit<is_inverse...>>(base)
       {}
 
    };
 
    namespace LengthUnits
    {
-      /// @brief Meters, a LengthUnit singleton for creating Dimension objects
-      extern LengthUnit<> Meters;
+      /// @brief Meters, a LengthUnit global variable for creating Dimension objects
+      inline LengthUnit<> Meters("Meters");
 
-      /// @brief Feet, a LengthUnit singleton for creating Dimension objects
-      extern LengthUnit<> Feet;
+      /// @brief Feet, a LengthUnit global variable for creating Dimension objects
+      inline LengthUnit<> Feet("Feet");
    }
    
    /// @brief Static vector of all LengthUnits
@@ -80,7 +77,6 @@ namespace Dimension
    ///    and that Meters has a conversion to each LengthUnit.
    ///    Note this must be called at the start of the program.
    /// @return bool indicating success
-   /// @todo Correctly handle missing conversions
    inline bool initializeLengthUnits()
    {
       LengthUnits::Meters.add_conversion(LengthUnits::Feet, [](double val) {return val * 3.28084; });
@@ -92,6 +88,27 @@ namespace Dimension
       return BaseUnit<>::ValidateConversions(LengthUnitVector, LengthUnits::Meters);
    }
 
+   /// @brief Simplify LengthUnit types
+   /// @details Given a set of types, simplify all LengthUnit types.
+   ///    This means for each pair of LengthUnits (one templated on Inverse
+   ///    and the other not), both will be removed from the type list,
+   ///    and the value will be adjusted accordingly
+   /// @tparam Ts The typelist to simplify. Note in the current implementation
+   ///    this list can contain any BaseUnits, not just LengthUnits.
+   /// @todo Attach this to AllSimplifier directly
+   template <typename... Ts>
+   struct LengthUnitSimplifier : SimplifierInterface<Ts...> {
+
+      static constexpr size_t LengthCount = count_type<LengthUnit<>, Ts...>();
+      static constexpr size_t InverseLengthCount = count_type<LengthUnit<Inverse>, Ts...>();
+
+      using type = std::conditional_t<(LengthCount > InverseLengthCount),
+         typename Repeat<LengthCount - InverseLengthCount, LengthUnit<>>::type,
+         std::conditional_t<(LengthCount < InverseLengthCount),
+         typename Repeat<InverseLengthCount - LengthCount, LengthUnit<Inverse>>::type,
+         std::tuple<>>>;
+
+   };
 }
 
 #endif // DIMENSION_LENGTH_H

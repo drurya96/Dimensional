@@ -17,6 +17,3 @@ add_executable(UnitTests ${TEST_SOURCES})
 target_include_directories(UnitTests PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 target_link_libraries(UnitTests Dimensional_LIB gtest gtest_main)
-#target_link_libraries(UnitTests Dimensional_LIB GTest::gtest_main)
-#include(GoogleTest)
-#gtest_discover_tests()

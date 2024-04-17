@@ -168,15 +168,13 @@ namespace Dimension
    /// @tparam Args The template parameters of the input BaseDimension
    /// @param[in] obj An object of type BaseDimension
    /// @return An object of type BaseDimension templated on Ts
-   /// @todo remove Is and gauge implications
-   template<typename... Ts, std::size_t... Is, typename ... Args>
-   auto TupleToBaseDimension(const std::tuple<Ts...>&, std::index_sequence<Is...>, const BaseDimension<Args...>& obj) {
+   /// @todo Consider ways to improve effeciency
+   template<typename... Ts, typename ... Args>
+   auto TupleToBaseDimension(const std::tuple<Ts...>&, const BaseDimension<Args...>& obj) {
 
       std::vector<BaseUnit<>*> newNumList = obj.numList;
       std::vector<BaseUnit<>*> newDenList = obj.denList;
-      double newValue = obj.value;
-
-      // TODO: Consider ways to improve effeciency of this section
+      double newValue = obj.GetRawValue();
 
       for (auto numIter = newNumList.begin(); numIter != newNumList.end();)
       {
@@ -184,7 +182,7 @@ namespace Dimension
 
          for (auto denIter = newDenList.begin(); denIter != newDenList.end(); ++denIter)
          {
-            if ((*numIter)->GetDimName() == (*denIter)->GetDimName())
+            if ((*numIter)->GetPrimaryUnit() == (*denIter)->GetPrimaryUnit())
             {
                if (*numIter != *denIter)
                {
