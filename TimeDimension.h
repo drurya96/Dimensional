@@ -38,7 +38,7 @@ namespace Dimension
    ///    Time as the unit.
    /// @todo Add some convenience methods to retrieve Time by name
    template<typename ... is_inverse>
-   class Time : public BaseDimension<TimeUnit<>>
+   class Time : public BaseDimension<std::tuple<TimeUnit<>>, std::tuple<>>
    {
    public:
 
@@ -46,11 +46,11 @@ namespace Dimension
       /// @param[in] value The value to set
       /// @param[in] time Pointer to the time unit
       explicit Time(double value, TimeUnit<is_inverse...>* unit)
-         : BaseDimension<TimeUnit<is_inverse...>>(value, std::vector<BaseUnit<>*>{ static_cast<BaseUnit<>*>(unit) }, std::vector<BaseUnit<>*>{})
+         : BaseDimension<std::tuple<TimeUnit<is_inverse...>>, std::tuple<>>(value, std::vector<BaseUnit<>*>{ static_cast<BaseUnit<>*>(unit) }, std::vector<BaseUnit<>*>{})
       {}
 
       /// @brief Cast operator from a BaseDimension
-      Time(const BaseDimension<TimeUnit<is_inverse...>>& base) : BaseDimension<TimeUnit<is_inverse...>>(base)
+      Time(const BaseDimension<std::tuple<TimeUnit<is_inverse...>>, std::tuple<>>& base) : BaseDimension<std::tuple<TimeUnit<is_inverse...>>, std::tuple<>>(base)
       {}
 
    };
@@ -97,11 +97,11 @@ namespace Dimension
    /// @tparam Ts The typelist to simplify. Note in the current implementation
    ///    this list can contain any BaseUnits, not just TimeUnits.
    /// @todo Attach this to AllSimplifier directly
-   template <typename... Ts>
-   struct TimeUnitSimplifier : SimplifierInterface<Ts...> {
+   template <typename NumTuple, typename DenTuple>
+   struct TimeUnitSimplifier : SimplifierInterface<NumTuple, DenTuple> {
 
-      static constexpr size_t TimeCount = count_type<TimeUnit<>, Ts...>();
-      static constexpr size_t InverseTimeCount = count_type<TimeUnit<Inverse>, Ts...>();
+      static constexpr size_t TimeCount = count_type<TimeUnit<>, NumTuple>();
+      static constexpr size_t InverseTimeCount = count_type<TimeUnit<>, DenTuple>();
 
       using type = std::conditional_t<(TimeCount > InverseTimeCount),
          typename Repeat<TimeCount - InverseTimeCount, TimeUnit<>>::type,

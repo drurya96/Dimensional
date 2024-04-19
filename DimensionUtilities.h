@@ -7,7 +7,8 @@
 namespace Dimension
 {
    // Forward declarations
-   template <typename...>
+   //template <typename...>
+   template<typename NumTuple, typename DenTuple>
    class BaseDimension;
 
    template <typename...>
@@ -74,6 +75,37 @@ namespace Dimension
       using type = std::tuple<>;
    };
 
+   
+
+
+
+   /*
+   /// @brief Count the number of occurances of a given type within a tuple
+   constexpr size_t count_type();
+
+   /// @brief Base-case specialization given only a single type, return 0
+   /// @return 0
+   template<typename T>
+   constexpr size_t count_type() {
+      return 0;
+   }
+
+   /// @brief Recursive specialization given to count type occurences in a tuple
+   /// @details This method counts the number of instances of First within the
+   ///    parameter pack <First, Rest...>.
+   ///    This is achieved by recursively incrementing a counter if the first
+   ///    item in the parameter pack matches the given type.
+   /// @tparam T The type to count
+   /// @tparam First The first item in the parameter pack
+   /// @tparam Rest The remaining parameter pack
+   /// @return The count of T in the given pack, as a size_t
+   template<typename T, typename First, typename... Rest>
+   constexpr size_t count_type() {
+      return std::is_same_v<T, First> +count_type<T, Rest...>();
+   }
+   */
+
+
 
    /// @brief Count the number of occurances of a given type within a tuple
    constexpr size_t count_type();
@@ -98,6 +130,29 @@ namespace Dimension
    constexpr size_t count_type() {
       return std::is_same_v<T, First> +count_type<T, Rest...>();
    }
+
+
+
+
+
+
+
+
+
+
+   /*
+   template<typename T, typename Tuple>
+   struct count_type_in_tuple;
+
+   template<typename T, typename... Types>
+   struct count_type_in_tuple<T, std::tuple<Types...>> {
+      static constexpr size_t value = (std::is_same_v<T, Types> +...);
+   };
+
+   template<typename T, typename Tuple>
+   constexpr size_t count_type_in_tuple_v = count_type_in_tuple<T, Tuple>::value;
+   */
+
 
    /// @brief Alias to remove types from a parameter pack
    /// @details remove_t will resolve to the type of a tuple
@@ -162,6 +217,72 @@ namespace Dimension
       using type = decltype(invertDimension(std::declval<T>()));
    };
 
+
+
+
+
+
+
+   /// @brief Return a base dimension templated on types within the given tuple
+/// @tparam Ts The types within the given tuple
+/// @tparam Is Index sequence, currently unused
+/// @tparam Args The template parameters of the input BaseDimension
+/// @param[in] obj An object of type BaseDimension
+/// @return An object of type BaseDimension templated on Ts
+/// @todo Consider ways to improve effeciency
+   template<typename NumTuple, typename DenTuple, typename ... Args>
+   auto TupleToBaseDimension(const NumTuple&, const DenTuple&, const BaseDimension<Args...>& obj) {
+
+      std::vector<BaseUnit<>*> newNumList = obj.numList;
+      std::vector<BaseUnit<>*> newDenList = obj.denList;
+      double newValue = obj.GetRawValue();
+
+      for (auto numIter = newNumList.begin(); numIter != newNumList.end();)
+      {
+         bool erased = false; // Flag to track if an element was erased
+
+         for (auto denIter = newDenList.begin(); denIter != newDenList.end(); ++denIter)
+         {
+            if ((*numIter)->GetPrimaryUnit() == (*denIter)->GetPrimaryUnit())
+            {
+               if (*numIter != *denIter)
+               {
+                  newValue = (*numIter)->ConvertValueNumerator(newValue, **denIter);
+               }
+               // Remove the current items from both lists
+               numIter = newNumList.erase(numIter);
+               denIter = newDenList.erase(denIter);
+               erased = true; // Set erased flag to true
+               // Break out of the inner loop
+               break;
+            }
+         }
+
+         // Check if an element was erased and if we need to break out of the outer loop
+         if (!erased)
+         {
+            ++numIter;
+         }
+
+         if (numIter == newNumList.end())
+         {
+            break;
+         }
+      }
+
+
+      return BaseDimension<NumTuple, DenTuple>(newValue, newNumList, newDenList);
+   }
+
+
+
+
+
+
+
+
+   /*
+
    /// @brief Return a base dimension templated on types within the given tuple
    /// @tparam Ts The types within the given tuple
    /// @tparam Is Index sequence, currently unused
@@ -212,6 +333,7 @@ namespace Dimension
 
       return BaseDimension<Ts...>(newValue, newNumList, newDenList);
    }
+   */
 }
 
 #endif // DIMENSION_UTILITIES_H

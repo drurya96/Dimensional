@@ -9,8 +9,8 @@ using namespace std;
 
 TEST_F(CastOperatorTest, CastSpeed) {
 
-   BaseDimension<LengthUnit<>, TimeUnit<Inverse>> testSpeed(10.0, vector<BaseUnit<>*>{&LengthUnits::Meters}, vector<BaseUnit<>*>{&TimeUnits::Seconds});
-   BaseDimension<LengthUnit<>, TimeUnit<>> testNotSpeed(10.0, vector<BaseUnit<>*>{&LengthUnits::Meters, & TimeUnits::Seconds}, vector<BaseUnit<>*>{});
+   BaseDimension<tuple<LengthUnit<>>, tuple<TimeUnit<>>> testSpeed(10.0, vector<BaseUnit<>*>{&LengthUnits::Meters}, vector<BaseUnit<>*>{&TimeUnits::Seconds});
+   BaseDimension<tuple<LengthUnit<>, TimeUnit<>>, tuple<>> testNotSpeed(10.0, vector<BaseUnit<>*>{&LengthUnits::Meters, & TimeUnits::Seconds}, vector<BaseUnit<>*>{});
 
    Speed mySpeed = testSpeed;
 
@@ -20,8 +20,8 @@ TEST_F(CastOperatorTest, CastSpeed) {
 
 TEST_F(CastOperatorTest, CastLength) {
 
-   BaseDimension<LengthUnit<>> testLength(10.0, vector<BaseUnit<>*>{&LengthUnits::Meters}, vector<BaseUnit<>*>{});
-   BaseDimension<TimeUnit<>> testNotLength(10.0, vector<BaseUnit<>*>{&TimeUnits::Seconds}, vector<BaseUnit<>*>{});
+   BaseDimension<tuple<LengthUnit<>>, tuple<>> testLength(10.0, vector<BaseUnit<>*>{&LengthUnits::Meters}, vector<BaseUnit<>*>{});
+   BaseDimension<tuple<TimeUnit<>>, tuple<>> testNotLength(10.0, vector<BaseUnit<>*>{&TimeUnits::Seconds}, vector<BaseUnit<>*>{});
 
    Length myLength = testLength;
 
@@ -31,8 +31,8 @@ TEST_F(CastOperatorTest, CastLength) {
 
 TEST_F(CastOperatorTest, CastTime) {
 
-   BaseDimension<TimeUnit<>> testTime(10.0, vector<BaseUnit<>*>{&TimeUnits::Seconds}, vector<BaseUnit<>*>{});
-   BaseDimension<LengthUnit<>> testNotTime(10.0, vector<BaseUnit<>*>{&LengthUnits::Meters}, vector<BaseUnit<>*>{});
+   BaseDimension<tuple<TimeUnit<>>, tuple<>> testTime(10.0, vector<BaseUnit<>*>{&TimeUnits::Seconds}, vector<BaseUnit<>*>{});
+   BaseDimension<tuple<LengthUnit<>>, tuple<>> testNotTime(10.0, vector<BaseUnit<>*>{&LengthUnits::Meters}, vector<BaseUnit<>*>{});
 
    Time myTime = testTime;
 

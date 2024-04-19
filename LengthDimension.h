@@ -37,7 +37,7 @@ namespace Dimension
    ///    Length as the unit.
    /// @todo Add some convenience methods to retrieve Length by name
    template<typename ... is_inverse>
-   class Length : public BaseDimension<LengthUnit<is_inverse...>>
+   class Length : public BaseDimension<std::tuple<LengthUnit<is_inverse...>>, std::tuple<>>
    {
    public:
 
@@ -45,11 +45,11 @@ namespace Dimension
       /// @param[in] value The value to set
       /// @param[in] Length Pointer to the Length unit
       explicit Length(double value, LengthUnit<is_inverse...>* unit) 
-         : BaseDimension<LengthUnit<is_inverse...>>(value, std::vector<BaseUnit<>*>{ static_cast<BaseUnit<>*>(unit) }, std::vector<BaseUnit<>*>{})
+         : BaseDimension<std::tuple<LengthUnit<is_inverse...>>, std::tuple<>>(value, std::vector<BaseUnit<>*>{ static_cast<BaseUnit<>*>(unit) }, std::vector<BaseUnit<>*>{})
       {}
 
       /// @brief Cast operator from a BaseDimension
-      Length(const BaseDimension<LengthUnit<is_inverse...>>& base) : BaseDimension<LengthUnit<is_inverse...>>(base)
+      Length(const BaseDimension<std::tuple<LengthUnit<is_inverse...>>, std::tuple<>>& base) : BaseDimension<std::tuple<LengthUnit<is_inverse...>>, std::tuple<>>(base)
       {}
 
    };
@@ -96,11 +96,11 @@ namespace Dimension
    /// @tparam Ts The typelist to simplify. Note in the current implementation
    ///    this list can contain any BaseUnits, not just LengthUnits.
    /// @todo Attach this to AllSimplifier directly
-   template <typename... Ts>
-   struct LengthUnitSimplifier : SimplifierInterface<Ts...> {
+   template<typename NumTuple, typename DenTuple>
+   struct LengthUnitSimplifier : SimplifierInterface<NumTuple, DenTuple> {
 
-      static constexpr size_t LengthCount = count_type<LengthUnit<>, Ts...>();
-      static constexpr size_t InverseLengthCount = count_type<LengthUnit<Inverse>, Ts...>();
+      static constexpr size_t LengthCount = count_type<LengthUnit<>, NumTuple>();
+      static constexpr size_t InverseLengthCount = count_type<LengthUnit<>, DenTuple>();
 
       using type = std::conditional_t<(LengthCount > InverseLengthCount),
          typename Repeat<LengthCount - InverseLengthCount, LengthUnit<>>::type,
