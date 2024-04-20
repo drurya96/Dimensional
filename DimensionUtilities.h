@@ -7,121 +7,82 @@
 namespace Dimension
 {
    // Forward declarations
-   template <typename...>
+   template<typename NumTuple, typename DenTuple>
    class BaseDimension;
-
-   template <typename...>
    class BaseUnit;
-
-   struct Inverse;
-
-   /// @brief Template struct for checking if dimension is Inverse
-   /// @details This struct has a true value, and is used when given
-   ///    a non empty parameter pack.
-   /// @tparam The given parameter pack, which must be non-empty to use specialization
-   template<typename...>
-   struct is_inverse_dimension : std::true_type {};
-
-   /// @brief Template struct for checking if dimension is Inverse
-   /// @details This struct has a false value, and is used when given
-   ///    an empty parameter pack.
-   /// @tparam empty to use this specialization
-   template<>
-   struct is_inverse_dimension<> : std::false_type {};
 
    /// @brief Convenience alias for retrieving the type of a tuple of types
    /// @tparam Ts Parameter pack to types to concatenate
    template<typename...Ts>
    using tuple_cat_t = decltype(std::tuple_cat(std::declval<Ts>()...));
 
-   /// @brief Template struct representing the type of a tuple of repeating types
-   /// @details This struct's type field wil be that of a tuple of N copies
-   ///    of the given type.
-   /// @tparam N The number of copies to repeat
-   /// @tparam T The type to repeat
-   template <int N, typename T, typename = void>
-   struct Repeat;
-
-   /// @brief Recursive specialization of Repeat for positive N
-   /// @details This specialization is used for positive N value.
-   ///    It recursively calls Repeat with N-1, adding one instance of T
-   ///    to the tuple each time.
-   /// @tparam N The number of copies to repeat
-   /// @tparam T The type to repeat
-   template <int N, typename T>
-   struct Repeat<N, T, std::enable_if_t<(N > 0)>> {
-      using type = decltype(std::tuple_cat(std::tuple<T>(), typename Repeat<N - 1, T>::type()));
-   };
-
-   /// @brief Recursive specialization of Repeat for negative N
-   /// @details This specialization is used for positive N value.
-   ///    THIS SPECIALIZATION SHOULD NEVER BE USED!
-   ///    This exists only so the compiler can resolve types within conditional_t
-   ///    which is necessary even if the type cannot be reached.
-   /// @todo Consider replacing this with alternate logic to resolve conditional_t
-   /// @tparam N The number of copies to repeat
-   /// @tparam T The type to repeat
-   template <int N, typename T>
-   struct Repeat<N, T, std::enable_if_t<(N < 0)>> {
+   /// @brief Remove one instance of a type from a type tuple
+   /// @details Recursive base-case
+   template<typename...>
+   struct RemoveOneInstance {
       using type = std::tuple<>;
    };
 
-   
-   /// @brief Base case specialization of Repeat for N == 0
-   /// @tparam T The given type, unused.
-   template <typename T>
-   struct Repeat<0, T> {
+   /// @brief Remove one instance of a type from a type tuple
+   /// @details Primary usage
+   /// @tparam T The type to remove
+   /// @tparam Head The first type in the tuple
+   /// @tparam Tail The remaining types in the tuple
+   template<typename T, typename Head, typename... Tail>
+   struct RemoveOneInstance<T, std::tuple<Head, Tail...>> {
+      using type = std::conditional_t<std::is_same_v<T, Head>,
+         std::tuple<Tail...>,
+         decltype(std::tuple_cat(std::tuple<Head>(), typename RemoveOneInstance<T, std::tuple<Tail...>>::type()))>;
+   };
+
+   /// @brief Check if a tuple contains a type
+   /// @details Recursive base-case
+   template <typename T, typename Tuple>
+   struct has_type;
+
+   /// @brief Check if a tuple contains a type
+   /// @details Primary usage
+   /// @tparam T The type to check for
+   /// @tparam Us The types contained in the given tuple
+   template <typename T, typename... Us>
+   struct has_type<T, std::tuple<Us...>> : std::disjunction<std::is_same<T, Us>...> {};
+
+   /// @brief Find the difference between two type-tuples
+   template<typename T, typename ...>
+   struct tuple_diff;
+
+   /// @brief Find the difference between two type-tuples
+   /// @details Recursive base-case
+   template<typename ... subtrahendTypes>
+   struct tuple_diff<std::tuple<>, std::tuple<subtrahendTypes...>>
+   {
       using type = std::tuple<>;
    };
 
-
-   /// @brief Count the number of occurances of a given type within a tuple
-   constexpr size_t count_type();
-
-   /// @brief Base-case specialization given only a single type, return 0
-   /// @return 0
-   template<typename T>
-   constexpr size_t count_type() {
-      return 0;
-   }
-
-   /// @brief Recursive specialization given to count type occurences in a tuple
-   /// @details This method counts the number of instances of First within the
-   ///    parameter pack <First, Rest...>.
-   ///    This is achieved by recursively incrementing a counter if the first
-   ///    item in the parameter pack matches the given type.
-   /// @tparam T The type to count
-   /// @tparam First The first item in the parameter pack
-   /// @tparam Rest The remaining parameter pack
-   /// @return The count of T in the given pack, as a size_t
-   template<typename T, typename First, typename... Rest>
-   constexpr size_t count_type() {
-      return std::is_same_v<T, First> +count_type<T, Rest...>();
-   }
-
-   /// @brief Alias to remove types from a parameter pack
-   /// @details remove_t will resolve to the type of a tuple
-   ///    containing all items in the given parameter pack
-   ///    except those that match either T1 or T2.
-   /// @tparam T1 The first type to remove
-   /// @tparam T2 The second type to remove
-   /// @tparam Ts The parameter pack to remove types from
-   template<typename T1, typename T2, typename...Ts>
-   using remove_t = tuple_cat_t<
-      typename std::conditional<
-      std::is_same<T1, Ts>::value || std::is_same<T2, Ts>::value,
-      std::tuple<>,
-      std::tuple<Ts>
-      >::type...
-   >;
+   /// @brief Find the difference between two type-tuples
+   /// @details Computes the multiset difference between two tuples, where the multiset
+   ///    difference of the minuend and subtrahend contains all elements from the
+   ///    minuend except those that also appear in the subtrahend.The multiplicity 
+   ///    of elements is taken into account.
+   /// @tparam T The first type in the minuend tuple
+   /// @tparam restMinuendTypes The remaining types in the minuend tuple
+   /// @tparam subtrahendTypes The types in the subtrahend tuple
+   template<typename T, typename... restMinuendTypes, typename... subtrahendTypes>
+   struct tuple_diff<std::tuple<T, restMinuendTypes...>, std::tuple<subtrahendTypes...>> {
+      using type = std::conditional_t<
+         has_type<T, std::tuple<subtrahendTypes...>>::value,
+         typename tuple_diff<std::tuple<restMinuendTypes...>, typename RemoveOneInstance<T, std::tuple<subtrahendTypes...>>::type>::type,
+         tuple_cat_t<std::tuple<T>, typename tuple_diff<std::tuple<restMinuendTypes...>, std::tuple<subtrahendTypes...>>::type>
+      >;
+   };
 
    /// @brief Concatenates two vectors of BaseUnit pointers
    /// @param a The first vector
    /// @param b The second vector
    /// @return The concatenated vector
-   inline std::vector<BaseUnit<>*> ConcatenateUnitVectors(std::vector<BaseUnit<>*> a, std::vector<BaseUnit<>*> b)
+   inline std::vector<BaseUnit*> ConcatenateUnitVectors(std::vector<BaseUnit*> a, std::vector<BaseUnit*> b)
    {
-      std::vector<BaseUnit<>*> result;
+      std::vector<BaseUnit*> result;
       result.reserve(a.size() + b.size());
 
       result.insert(result.end(), a.begin(), a.end());
@@ -129,51 +90,18 @@ namespace Dimension
       return result;
    }
 
-   /// @brief Return the BaseUnit without the Inverted tag
-   /// @details This specialize is enabled for BaseUnits that
-   ///    have the Inverted template. Returns an object
-   ///    of the same BaseUnit without the Inverted template
-   /// @tparam T The BaseUnit to invert
-   /// @tparam Args The template parameters of BaseUnit
-   /// @return An object of type T<>
-   template<template<typename...> class T, typename ... Args>
-   typename std::enable_if<is_inverse_dimension<Args...>::value, T<>>::type
-      invertDimension(const T<Args...>& obj) {
-      return T<>();
-   }
-
-   /// @brief Return the BaseUnit with the Inverted tag
-   /// @details This specialize is enabled for BaseUnits that
-   ///    do not have the Inverted template. Returns an object
-   ///    of the same BaseUnit with the Inverted template
-   /// @tparam T The BaseUnit to invert
-   /// @tparam Args The template parameters of BaseUnit
-   /// @return An object of type T<Inverted>
-   template<template<typename...> class T, typename ... Args>
-   typename std::enable_if<!is_inverse_dimension<Args...>::value, T<Inverse>>::type
-      invertDimension(const T<Args...>& obj) {
-      return T<Inverse>();
-   }
-
-   /// @brief Helper struct to deduce return type of invertDimension
-   /// @tparam T The BaseUnit type to invert
-   template <typename T>
-   struct InvertReturnType {
-      using type = decltype(invertDimension(std::declval<T>()));
-   };
 
    /// @brief Return a base dimension templated on types within the given tuple
    /// @tparam Ts The types within the given tuple
-   /// @tparam Is Index sequence, currently unused
    /// @tparam Args The template parameters of the input BaseDimension
    /// @param[in] obj An object of type BaseDimension
    /// @return An object of type BaseDimension templated on Ts
    /// @todo Consider ways to improve effeciency
-   template<typename... Ts, typename ... Args>
-   auto TupleToBaseDimension(const std::tuple<Ts...>&, const BaseDimension<Args...>& obj) {
+   template<typename NumTuple, typename DenTuple, typename ... Args>
+   auto TupleToBaseDimension(const NumTuple&, const DenTuple&, const BaseDimension<Args...>& obj) {
 
-      std::vector<BaseUnit<>*> newNumList = obj.numList;
-      std::vector<BaseUnit<>*> newDenList = obj.denList;
+      std::vector<BaseUnit*> newNumList = obj.numList;
+      std::vector<BaseUnit*> newDenList = obj.denList;
       double newValue = obj.GetRawValue();
 
       for (auto numIter = newNumList.begin(); numIter != newNumList.end();)
@@ -210,8 +138,9 @@ namespace Dimension
       }
 
 
-      return BaseDimension<Ts...>(newValue, newNumList, newDenList);
+      return BaseDimension<NumTuple, DenTuple>(newValue, newNumList, newDenList);
    }
+
 }
 
 #endif // DIMENSION_UTILITIES_H

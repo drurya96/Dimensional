@@ -7,52 +7,23 @@
 namespace Dimension{
 
    // Forward declarations
-
-   template <typename...>
-   class TimeUnit;
-
-   template <typename...>
-   class LengthUnit;
-
-   template <typename...>
+   template<typename NumTuple, typename DenTuple>
+   class BaseDimension;
    class BaseUnit;
 
-   template <typename...>
-   class BaseDimension;
-
-   class Inverse;
-
-   // ==========================================
-   // Simplification logic
-   // This needs to be moved around
-   // Some portion should live with the Time class
-
-   /// @brief Interface for simplifer.
-   /// @details Interface each simplifier must adhere to.
-   ///    This has no current value-add, but may be useful for
-   ///    type erasure when attempt to resolve the below @todo
-   template <typename... Ts>
-   struct SimplifierInterface {};
-
-   template <typename...>
-   struct TimeUnitSimplifier;
-
-   template <typename...>
-   struct LengthUnitSimplifier;
-
-   /// @brief Concatenate the type outputs of all simplifiers
-   /// @tparam Ts The types to simplify
-   /// @todo Find a way to attach user-defined simplifiers to this
-   ///    while maintaining compile-time type safety.
-   ///    This is high priority, but has proven difficult.
-   template <typename ... Ts>
+   /// @brief Simplify dimensions
+   /// @details Given two tuples of dimensions, produce
+   ///    two new tuples that simplified after "cancelling out"
+   ///    dimensions as appropriate.
+   /// @tparam NumTuple Tuple representing numerator dimensions
+   /// @tparam DenTuple Tuple representing denominator dimensions
+   template<typename NumTuple, typename DenTuple>
    struct AllUnitSimplifier
    {
-      using type = tuple_cat_t<typename LengthUnitSimplifier<Ts...>::type, typename TimeUnitSimplifier<Ts...>::type>;
+      using numTuple = typename tuple_diff<NumTuple, DenTuple>::type;
+      using denTuple = typename tuple_diff<DenTuple, NumTuple>::type;
    };
 
-   // Simplify function for BaseDimension
-   // If problems arise, consider specifying return type
    /// @brief Function to construct a simplified BaseDimension from a given BaseDimension
    /// @details Call AllUnitSimplifier on the given BaseDimension to simplify the units.
    ///    The resulting BaseDimension has simplified units (i.e. no instances of the same
@@ -60,11 +31,11 @@ namespace Dimension{
    /// @tparam Ts The template parameters of the input BaseDimension
    /// @param[in] obj The BaseDimension object to simplify
    /// @return The new BaseDimension object with simplified units
-   template<typename... Ts>
-   auto SimplifyBaseDimension(const BaseDimension<Ts...>& obj)// -> decltype(TupleToBaseDimension(typename AllUnitSimplifier<Ts...>::type{}, std::index_sequence_for<Ts...>{}, std::declval<BaseDimension<Ts...>>()))
+   template<typename NumTuple, typename DenTuple>
+   auto SimplifyBaseDimension(const BaseDimension<NumTuple, DenTuple>& obj)
    {
-      using TupleType = typename AllUnitSimplifier<Ts...>::type;
-      return TupleToBaseDimension(TupleType{}, obj);
+      using Simplified = typename AllUnitSimplifier<NumTuple, DenTuple>;
+      return TupleToBaseDimension(Simplified::numTuple{}, Simplified::denTuple{}, obj);
    }
 
 }
