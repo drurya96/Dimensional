@@ -386,9 +386,9 @@ namespace Dimension
    //template<typename... T_Classes1, typename... T_Classes2>
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    auto operator/(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
-      -> decltype(SimplifyBaseDimension(std::declval<BaseDimension<decltype(std::tuple_cat<NumTuple1, DenTuple2>), decltype(std::tuple_cat<DenTuple1, NumTuple2>)>>()))
+      //-> decltype(SimplifyBaseDimension(std::declval<BaseDimension<decltype(std::tuple_cat<NumTuple1, DenTuple2>), decltype(std::tuple_cat<DenTuple1, NumTuple2>)>>()))
    {
-      using ResultType = BaseDimension<decltype(std::tuple_cat<NumTuple1, DenTuple2>), decltype(std::tuple_cat<DenTuple1, NumTuple2>)>;
+      using ResultType = BaseDimension<decltype(std::tuple_cat(NumTuple1{}, DenTuple2{})), decltype(std::tuple_cat(DenTuple1{}, NumTuple2{}))> ;
       auto result = ResultType(
          obj1.GetRawValue() / obj2.GetRawValue(),
          ConcatenateUnitVectors(obj1.numList, obj2.denList),
@@ -405,14 +405,16 @@ namespace Dimension
    ///    input objects, then simplified.
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    auto operator*(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
-      -> decltype(SimplifyBaseDimension(std::declval<BaseDimension < decltype(std::tuple_cat<NumTuple1, NumTuple2>), decltype(std::tuple_cat<DenTuple1, DenTuple2>) >>()))
+      //-> decltype(SimplifyBaseDimension(std::declval<BaseDimension < decltype(std::tuple_cat<NumTuple1, NumTuple2>), decltype(std::tuple_cat<DenTuple1, DenTuple2>) >>()))
    {
-      using ResultType = BaseDimension<decltype(std::tuple_cat<NumTuple1, NumTuple2>), decltype(std::tuple_cat<DenTuple1, DenTuple2>)>;
+      //static_assert(std::is_same_v<NumTuple1, std::tuple<LengthUnit<>>>);
+      using ResultType = BaseDimension<decltype(std::tuple_cat(NumTuple1{}, NumTuple2{})), decltype(std::tuple_cat(DenTuple1{}, DenTuple2{}))> ;
       auto result = ResultType(
          obj1.GetRawValue() * obj2.GetRawValue(),
          ConcatenateUnitVectors(obj1.numList, obj2.numList),
          ConcatenateUnitVectors(obj1.denList, obj2.denList)
       );
+      //return result;
       return SimplifyBaseDimension(result);
    }
 

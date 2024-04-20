@@ -99,39 +99,37 @@ namespace Dimension{
       using type = std::tuple<>;
    };
 
+   template<typename T, typename... RestNumTypes, typename... DenTuple>
+   struct tuple_diff<std::tuple<T, RestNumTypes...>, std::tuple<DenTuple...>> {
+      using TrueVal = typename tuple_diff<std::tuple<RestNumTypes...>, typename RemoveOneInstance<T, std::tuple<DenTuple...>>::type>::type;
+
+      using FalseVal = tuple_cat_t<std::tuple<T>, typename tuple_diff<std::tuple<RestNumTypes...>, std::tuple<DenTuple...>>::type>;
+
+      using type = std::conditional_t<
+         has_type<T, std::tuple<DenTuple...>>::value,
+         TrueVal,
+         FalseVal
+      >;
+   };
+
+   /*
    template<typename T, typename ... RestNumTypes, typename ... DenTuple>
    struct tuple_diff<std::tuple<T, RestNumTypes...>, std::tuple<DenTuple...>>
    {
+
+      using TrueVal = std::tuple<tuple_diff<std::tuple<RestNumTypes...>, RemoveOneInstance<T, std::tuple<DenTuple...>>::type>::type>;
+
+      using FalseVal = std::tuple<T,tuple_diff<std::tuple<RestNumTypes...>, std::tuple<DenTuple...>>::type>;
+
       using type =
          std::conditional_t 
          <
             has_type<T, std::tuple<DenTuple...>>(),
-
-
-            std::tuple
-            <
-               tuple_diff
-               <
-                  std::tuple<RestNumTypes...>, RemoveOneInstance<T, std::tuple<DenTuple...>>::type
-               >::type
-            >,
-
-
-            std::tuple
-            <
-               T, 
-               tuple_diff
-               <
-                  std::tuple<RestNumTypes...>, std::tuple<DenTuple...>
-               >::type
-            >
-         
-         
-         
-         >
-      ;
+            TrueVal,
+            FalseVal
+         >;
    };
-   
+   */
    
 
 
@@ -236,7 +234,17 @@ namespace Dimension{
    };
    */
 
+   //template<typename...>
+   //struct AllUnitSimplifier;
 
+   //template<typename ... NumTuple, typename ... DenTuple>
+   //struct AllUnitSimplifier<std::tuple<NumTuple...>, std::tuple<DenTuple...>>
+   template<typename NumTuple, typename DenTuple>
+   struct AllUnitSimplifier
+   {
+      //using type = std::tuple<tuple_cat_t<typename LengthUnitSimplifier<NumTuple, DenTuple>::type, typename TimeUnitSimplifier<NumTuple, DenTuple>::type>, std::tuple<>>;
+      using type = std::tuple<typename tuple_diff<NumTuple, DenTuple>::type, typename tuple_diff<DenTuple, NumTuple>::type>;
+   };
 
 
 

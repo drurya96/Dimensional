@@ -225,7 +225,6 @@ namespace Dimension
 
    /// @brief Return a base dimension templated on types within the given tuple
 /// @tparam Ts The types within the given tuple
-/// @tparam Is Index sequence, currently unused
 /// @tparam Args The template parameters of the input BaseDimension
 /// @param[in] obj An object of type BaseDimension
 /// @return An object of type BaseDimension templated on Ts

@@ -6,10 +6,10 @@ set(TEST_SOURCES
     DimensionTest.cpp
 
     TestFundamentalConversions.cpp
-    #TestCompoundConversions.cpp
-    #TestOperators.cpp
-    #TestSimplification.cpp
-    #TestCastOperators.cpp
+    TestCompoundConversions.cpp
+    TestOperators.cpp
+    TestSimplification.cpp
+    TestCastOperators.cpp
 )
 
 add_executable(UnitTests ${TEST_SOURCES})
