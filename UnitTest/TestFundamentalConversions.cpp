@@ -6,16 +6,16 @@
 TEST_F(FundamentalConversions, TestTime) {
    Dimension::Time myTime = Dimension::Time(30.0, &Dimension::TimeUnits::Seconds);
    
-   ASSERT_DOUBLE_EQ(myTime.GetVal(std::vector<Dimension::BaseUnit<>*>{&Dimension::TimeUnits::Seconds}, std::vector<Dimension::BaseUnit<>*>{}), 30.0);
-   ASSERT_DOUBLE_EQ(myTime.GetVal(std::vector<Dimension::BaseUnit<>*>{&Dimension::TimeUnits::Minutes}, std::vector<Dimension::BaseUnit<>*>{}), 0.5);
+   ASSERT_DOUBLE_EQ(myTime.GetVal(std::vector<Dimension::BaseUnit*>{&Dimension::TimeUnits::Seconds}, std::vector<Dimension::BaseUnit*>{}), 30.0);
+   ASSERT_DOUBLE_EQ(myTime.GetVal(std::vector<Dimension::BaseUnit*>{&Dimension::TimeUnits::Minutes}, std::vector<Dimension::BaseUnit*>{}), 0.5);
 }
 
 
 TEST_F(FundamentalConversions, TestLength) {
    Dimension::Length myLength = Dimension::Length(10.0, &Dimension::LengthUnits::Meters);
 
-   ASSERT_DOUBLE_EQ(myLength.GetVal(std::vector<Dimension::BaseUnit<>*>{&Dimension::LengthUnits::Meters}, std::vector<Dimension::BaseUnit<>*>{}), 10.0);
-   ASSERT_DOUBLE_EQ(myLength.GetVal(std::vector<Dimension::BaseUnit<>*>{&Dimension::LengthUnits::Feet}, std::vector<Dimension::BaseUnit<>*>{}), 32.8084);
+   ASSERT_DOUBLE_EQ(myLength.GetVal(std::vector<Dimension::BaseUnit*>{&Dimension::LengthUnits::Meters}, std::vector<Dimension::BaseUnit*>{}), 10.0);
+   ASSERT_DOUBLE_EQ(myLength.GetVal(std::vector<Dimension::BaseUnit*>{&Dimension::LengthUnits::Feet}, std::vector<Dimension::BaseUnit*>{}), 32.8084);
 
 
    using NumTuple = std::tuple<int, double, float, char, double>;
@@ -57,7 +57,7 @@ TEST_F(FundamentalConversions, TestLength) {
    static_assert(is_same_v<n, ExpectedRes>, "");
 
 
-   auto CompDim = Dimension::BaseDimension<std::tuple<Dimension::LengthUnit<>, Dimension::TimeUnit<>>, std::tuple<Dimension::LengthUnit<>>>();
+   auto CompDim = Dimension::BaseDimension<std::tuple<Dimension::LengthUnit, Dimension::TimeUnit>, std::tuple<Dimension::LengthUnit>>();
 
    auto SimpDim = Dimension::SimplifyBaseDimension(CompDim);
 

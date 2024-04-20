@@ -36,10 +36,10 @@ TEST_F(OperatorsTest, DimensionMultiplication) {
 
    auto myTest = myLength * myTime;
 
-   ASSERT_DOUBLE_EQ(myTest.GetVal(vector<BaseUnit<>*>{&LengthUnits::Meters, &TimeUnits::Seconds}, vector<BaseUnit<>*>{}), 50.0);
-   ASSERT_DOUBLE_EQ(myTest.GetVal(vector<BaseUnit<>*>{&LengthUnits::Feet, &TimeUnits::Minutes}, vector<BaseUnit<>*>{}), 2.73403333333333333);
+   ASSERT_DOUBLE_EQ(myTest.GetVal(vector<BaseUnit*>{&LengthUnits::Meters, &TimeUnits::Seconds}, vector<BaseUnit*>{}), 50.0);
+   ASSERT_DOUBLE_EQ(myTest.GetVal(vector<BaseUnit*>{&LengthUnits::Feet, &TimeUnits::Minutes}, vector<BaseUnit*>{}), 2.73403333333333333);
 
-   ASSERT_TRUE((is_same<decltype(myTest), BaseDimension<tuple<LengthUnit<>, TimeUnit<>>, tuple<>>>::value));
+   ASSERT_TRUE((is_same<decltype(myTest), BaseDimension<tuple<LengthUnit, TimeUnit>, tuple<>>>::value));
 }
 
 TEST_F(OperatorsTest, DimensionDivision) {
@@ -48,14 +48,14 @@ TEST_F(OperatorsTest, DimensionDivision) {
    Time myTime(2.0, &TimeUnits::Seconds);
 
    // The following operator should fail to compile, not sure how to unit test a compile time failure though
-   //BaseDimension<LengthUnit<>, TimeUnit<>> = myLength / myTime;
+   //BaseDimension<LengthUnit, TimeUnit> = myLength / myTime;
 
    auto myTest = myLength / myTime;
 
-   ASSERT_DOUBLE_EQ(myTest.GetVal(vector<BaseUnit<>*>{&LengthUnits::Meters}, vector<BaseUnit<>*>{&TimeUnits::Seconds}), 10.0);
-   ASSERT_DOUBLE_EQ(myTest.GetVal(vector<BaseUnit<>*>{&LengthUnits::Feet}, vector<BaseUnit<>*>{&TimeUnits::Minutes}), 1968.504);
+   ASSERT_DOUBLE_EQ(myTest.GetVal(vector<BaseUnit*>{&LengthUnits::Meters}, vector<BaseUnit*>{&TimeUnits::Seconds}), 10.0);
+   ASSERT_DOUBLE_EQ(myTest.GetVal(vector<BaseUnit*>{&LengthUnits::Feet}, vector<BaseUnit*>{&TimeUnits::Minutes}), 1968.504);
 
-   ASSERT_TRUE((is_same<decltype(myTest), BaseDimension<tuple<LengthUnit<>>, tuple<TimeUnit<>>>>::value));
+   ASSERT_TRUE((is_same<decltype(myTest), BaseDimension<tuple<LengthUnit>, tuple<TimeUnit>>>::value));
    //ASSERT_NO_THROW(Speed mySpeed = myTest); // TODO: This is really a test of the cast operator
 }
 
@@ -66,17 +66,17 @@ TEST_F(OperatorsTest, ScalarMultiplication)
 
    mySpeed = mySpeed * 2;
 
-   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit<>*>{&LengthUnits::Meters}, vector<BaseUnit<>*>{&TimeUnits::Seconds}), 10.0);
-   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit<>*>{&LengthUnits::Feet}, vector<BaseUnit<>*>{&TimeUnits::Seconds}), 32.8084);
-   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit<>*>{&LengthUnits::Meters}, vector<BaseUnit<>*>{&TimeUnits::Minutes}), 600.0);
-   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit<>*>{&LengthUnits::Feet}, vector<BaseUnit<>*>{&TimeUnits::Minutes}), 1968.504);
+   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit*>{&LengthUnits::Meters}, vector<BaseUnit*>{&TimeUnits::Seconds}), 10.0);
+   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit*>{&LengthUnits::Feet}, vector<BaseUnit*>{&TimeUnits::Seconds}), 32.8084);
+   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit*>{&LengthUnits::Meters}, vector<BaseUnit*>{&TimeUnits::Minutes}), 600.0);
+   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit*>{&LengthUnits::Feet}, vector<BaseUnit*>{&TimeUnits::Minutes}), 1968.504);
 
    mySpeed *= 2;
 
-   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit<>*>{&LengthUnits::Meters}, vector<BaseUnit<>*>{&TimeUnits::Seconds}), 20.0);
-   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit<>*>{&LengthUnits::Feet}, vector<BaseUnit<>*>{&TimeUnits::Seconds}), 65.6168);
-   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit<>*>{&LengthUnits::Meters}, vector<BaseUnit<>*>{&TimeUnits::Minutes}), 1200.0);
-   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit<>*>{&LengthUnits::Feet}, vector<BaseUnit<>*>{&TimeUnits::Minutes}), 3937.008);
+   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit*>{&LengthUnits::Meters}, vector<BaseUnit*>{&TimeUnits::Seconds}), 20.0);
+   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit*>{&LengthUnits::Feet}, vector<BaseUnit*>{&TimeUnits::Seconds}), 65.6168);
+   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit*>{&LengthUnits::Meters}, vector<BaseUnit*>{&TimeUnits::Minutes}), 1200.0);
+   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit*>{&LengthUnits::Feet}, vector<BaseUnit*>{&TimeUnits::Minutes}), 3937.008);
 }
 
 // Test Scalar division
@@ -86,17 +86,17 @@ TEST_F(OperatorsTest, ScalarDivision)
 
    mySpeed = mySpeed / 2;
 
-   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit<>*>{&LengthUnits::Meters}, vector<BaseUnit<>*>{&TimeUnits::Seconds}), 10.0);
-   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit<>*>{&LengthUnits::Feet}, vector<BaseUnit<>*>{&TimeUnits::Seconds}), 32.8084);
-   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit<>*>{&LengthUnits::Meters}, vector<BaseUnit<>*>{&TimeUnits::Minutes}), 600.0);
-   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit<>*>{&LengthUnits::Feet}, vector<BaseUnit<>*>{&TimeUnits::Minutes}), 1968.504);
+   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit*>{&LengthUnits::Meters}, vector<BaseUnit*>{&TimeUnits::Seconds}), 10.0);
+   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit*>{&LengthUnits::Feet}, vector<BaseUnit*>{&TimeUnits::Seconds}), 32.8084);
+   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit*>{&LengthUnits::Meters}, vector<BaseUnit*>{&TimeUnits::Minutes}), 600.0);
+   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit*>{&LengthUnits::Feet}, vector<BaseUnit*>{&TimeUnits::Minutes}), 1968.504);
 
    mySpeed /= 2;
 
-   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit<>*>{&LengthUnits::Meters}, vector<BaseUnit<>*>{&TimeUnits::Seconds}), 5.0);
-   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit<>*>{&LengthUnits::Feet}, vector<BaseUnit<>*>{&TimeUnits::Seconds}), 16.4042);
-   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit<>*>{&LengthUnits::Meters}, vector<BaseUnit<>*>{&TimeUnits::Minutes}), 300.0);
-   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit<>*>{&LengthUnits::Feet}, vector<BaseUnit<>*>{&TimeUnits::Minutes}), 984.252);
+   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit*>{&LengthUnits::Meters}, vector<BaseUnit*>{&TimeUnits::Seconds}), 5.0);
+   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit*>{&LengthUnits::Feet}, vector<BaseUnit*>{&TimeUnits::Seconds}), 16.4042);
+   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit*>{&LengthUnits::Meters}, vector<BaseUnit*>{&TimeUnits::Minutes}), 300.0);
+   ASSERT_DOUBLE_EQ(mySpeed.GetVal(vector<BaseUnit*>{&LengthUnits::Feet}, vector<BaseUnit*>{&TimeUnits::Minutes}), 984.252);
 }
 
 // Test addition
@@ -108,13 +108,13 @@ TEST_F(OperatorsTest, DimensionAddition)
    auto speed3 = speed1 + speed2;
    Speed speed4 = speed1 + speed2;
 
-   ASSERT_TRUE((is_same<decltype(speed3), BaseDimension<tuple<LengthUnit<>>, tuple<TimeUnit<>>>>::value));
+   ASSERT_TRUE((is_same<decltype(speed3), BaseDimension<tuple<LengthUnit>, tuple<TimeUnit>>>::value));
 
-   ASSERT_DOUBLE_EQ(speed3.GetVal(vector<BaseUnit<>*>{&LengthUnits::Meters}, vector<BaseUnit<>*>{&TimeUnits::Seconds}), 10.0507999983744); // TODO: Need to validate precision
+   ASSERT_DOUBLE_EQ(speed3.GetVal(vector<BaseUnit*>{&LengthUnits::Meters}, vector<BaseUnit*>{&TimeUnits::Seconds}), 10.0507999983744); // TODO: Need to validate precision
 
    speed3 += speed1;
 
-   ASSERT_DOUBLE_EQ(speed3.GetVal(vector<BaseUnit<>*>{&LengthUnits::Meters}, vector<BaseUnit<>*>{&TimeUnits::Seconds}), 20.050799998374401); // TODO: Need to validate precision
+   ASSERT_DOUBLE_EQ(speed3.GetVal(vector<BaseUnit*>{&LengthUnits::Meters}, vector<BaseUnit*>{&TimeUnits::Seconds}), 20.050799998374401); // TODO: Need to validate precision
 }
 
 // Test subtraction
@@ -126,11 +126,11 @@ TEST_F(OperatorsTest, DimensionSubtraction)
    auto speed3 = speed1 - speed2;
    Speed speed4 = speed1 - speed2;
 
-   ASSERT_TRUE((is_same<decltype(speed3), BaseDimension<tuple<LengthUnit<>>, tuple<TimeUnit<>>>>::value));
+   ASSERT_TRUE((is_same<decltype(speed3), BaseDimension<tuple<LengthUnit>, tuple<TimeUnit>>>::value));
 
-   ASSERT_DOUBLE_EQ(speed3.GetVal(vector<BaseUnit<>*>{&LengthUnits::Meters}, vector<BaseUnit<>*>{&TimeUnits::Seconds}), 9.9492000016256); // TODO: Need to validate precision
+   ASSERT_DOUBLE_EQ(speed3.GetVal(vector<BaseUnit*>{&LengthUnits::Meters}, vector<BaseUnit*>{&TimeUnits::Seconds}), 9.9492000016256); // TODO: Need to validate precision
 
    speed3 -= speed1;
 
-   ASSERT_DOUBLE_EQ(speed3.GetVal(vector<BaseUnit<>*>{&LengthUnits::Meters}, vector<BaseUnit<>*>{&TimeUnits::Seconds}), -0.050799998374399635); // TODO: Need to validate precision
+   ASSERT_DOUBLE_EQ(speed3.GetVal(vector<BaseUnit*>{&LengthUnits::Meters}, vector<BaseUnit*>{&TimeUnits::Seconds}), -0.050799998374399635); // TODO: Need to validate precision
 }

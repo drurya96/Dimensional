@@ -19,16 +19,9 @@ namespace Dimension
    /// @brief A base class representing a unit
    /// @details This abstract class represents a Unit,
    ///    such as Meters, Seconds, Grams, etc.
-   ///    Its variadic template is used to determine whether
-   ///    the unit is Inverse (i.e. in the denominator) or not.
-   ///    An instance of this class with the template signature
-   ///    <> indicates the unit is in the numerator, while an instance
-   ///    templated on <Inverse> indicates the unit is in the denominator
-   /// @tparam is_inverse This should be either empty or Inverse
    /// @todo Use CRTP to reduce code duplication and move as much
    ///    as possible into the BaseUnit
    /// @todo Attempt to implement the initialization function here
-   template<typename ... is_inverse>
    class BaseUnit
    {
    public:
@@ -59,7 +52,7 @@ namespace Dimension
       ///    More on the "primary" unit below
       /// @return A pointer to the "primary" unit
       /// @todo Prefer returning a reference, need to evaluate fallout
-      virtual BaseUnit<>* GetPrimaryUnit() const = 0;
+      virtual BaseUnit* GetPrimaryUnit() const = 0;
 
       /// @brief Get the conversion functor from this unit to the provided unit
       /// @param[in] unit The unit to retrieve a conversion to
@@ -90,9 +83,9 @@ namespace Dimension
       ///    Every unit must have a conversion to and from this unit. While other conversions
       ///    are allowed, these conversions are mandatory.
       /// @return A bool indicating successful validation
-      static bool ValidateConversions(const std::vector<BaseUnit<>*>& UnitVector, const BaseUnit<>& PrimaryUnit)
+      static bool ValidateConversions(const std::vector<BaseUnit*>& UnitVector, const BaseUnit& PrimaryUnit)
       {
-         return std::all_of(UnitVector.begin(), UnitVector.end(), [&](BaseUnit<>* unit)
+         return std::all_of(UnitVector.begin(), UnitVector.end(), [&](BaseUnit* unit)
             {
             auto findit = unit->conversions.find(PrimaryUnit.GetUnitName());
             auto findit2 = PrimaryUnit.conversions.find(unit->GetUnitName());
@@ -155,21 +148,20 @@ namespace Dimension
    };
 
    /// @brief Destructor implementation
-   template<typename ... is_inverse>
-   inline BaseUnit<is_inverse...>::~BaseUnit() {}
+   inline BaseUnit::~BaseUnit() {}
 
    /// @brief A generic Dimension class
    /// @details This class represents a Dimension,
    ///    such as Length, Time, Speed, etc.
-   ///    Its variadic template is used to determine which BaseUnit
-   ///    types make up this dimension. For example, a BaseDimension
-   ///    may be templated on a LengthUnit<> and a TimeUnit<Inverse>.
-   ///    This would still be a BaseUnit, but can be treated as "Speed".
+   ///    Its templates are used to set the dimensions of the numerator
+   ///    and denominator, respectively. For example, a BaseDimension
+   ///    may be templated on a tuple<LengthUnit> and a tuple<TimeUnit>.
+   ///    This would still be a BaseDimension, but can be treated as "Speed".
    ///    This library may be used with BaseDimension alone, but Dimensions
    ///    may also be derived from BaseDimension for more readible code,
    ///    for example the Length, Time, and Speed classes provided.
-   /// @tparam UnitType The BaseUnit types defining this dimension.
-   //template<typename ... UnitType>
+   /// @tparam NumTuple A tuple of BaseUnits describing the dimension's numerator.
+   /// @tparam DenTuple A tuple of BaseUnits describing the dimension's denominator.
    template<typename NumTuple, typename DenTuple>
    class BaseDimension
    {
@@ -202,7 +194,7 @@ namespace Dimension
       ///    Note both of these vectors should use the non-templated (<>) BaseUnit
       ///    Since the numerator/denominator is handled by the vectors.
       /// @todo Investigate using references of BaseUnits instead of pointers
-      BaseDimension(double newValue, std::vector<BaseUnit<>*> newNumList, std::vector<BaseUnit<>*> newDenList) :
+      BaseDimension(double newValue, std::vector<BaseUnit*> newNumList, std::vector<BaseUnit*> newDenList) :
          value(newValue),
          numList(newNumList.begin(), newNumList.end()),
          denList(newDenList.begin(), newDenList.end())
@@ -219,8 +211,8 @@ namespace Dimension
       // Note a raw array requires compile-time knowledge of size
       // While this is possible since the templates hold that information,
       //    it may be challenging.
-      std::vector<BaseUnit<>*> numList;
-      std::vector<BaseUnit<>*> denList;
+      std::vector<BaseUnit*> numList;
+      std::vector<BaseUnit*> denList;
 
       /// @brief Return the internal value as a double in terms of the provided units
       /// @details Return the internal value after converting to the provided units.
@@ -230,7 +222,7 @@ namespace Dimension
       /// @todo Substantially improve efficiency, presumed bottleneck (not tested)
       /// @todo Refactor to move some functionality out of this method
       /// @todo Consider what should happen if the parameters are inappropriate for this object
-      double GetVal(const std::vector<BaseUnit<>*>& i_numList, const std::vector<BaseUnit<>*>& i_denList) const
+      double GetVal(const std::vector<BaseUnit*>& i_numList, const std::vector<BaseUnit*>& i_denList) const
       {
          auto temp_InputNumList = i_numList;
          auto temp_InputDenList = i_denList;
@@ -268,7 +260,7 @@ namespace Dimension
          }
 
          bool found = false;
-         for (BaseUnit<>* myUnit : temp_MyNumList)
+         for (BaseUnit* myUnit : temp_MyNumList)
          {
             found = false;
             for (auto it = temp_InputNumList.begin(); it != temp_InputNumList.end();)
@@ -296,7 +288,7 @@ namespace Dimension
             throw std::runtime_error("Vectors must have the same size.");
          }
 
-         for (BaseUnit<>* myUnit : temp_MyDenList)
+         for (BaseUnit* myUnit : temp_MyDenList)
          {
             found = false;
             for (auto it = temp_InputDenList.begin(); it != temp_InputDenList.end();)
@@ -386,7 +378,7 @@ namespace Dimension
    //template<typename... T_Classes1, typename... T_Classes2>
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    auto operator/(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
-      //-> decltype(SimplifyBaseDimension(std::declval<BaseDimension<decltype(std::tuple_cat<NumTuple1, DenTuple2>), decltype(std::tuple_cat<DenTuple1, NumTuple2>)>>()))
+      -> decltype(SimplifyBaseDimension(std::declval< BaseDimension<decltype(std::tuple_cat(NumTuple1{}, DenTuple2{})), decltype(std::tuple_cat(DenTuple1{}, NumTuple2{})) >>()))
    {
       using ResultType = BaseDimension<decltype(std::tuple_cat(NumTuple1{}, DenTuple2{})), decltype(std::tuple_cat(DenTuple1{}, NumTuple2{}))> ;
       auto result = ResultType(
@@ -405,16 +397,15 @@ namespace Dimension
    ///    input objects, then simplified.
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    auto operator*(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
-      //-> decltype(SimplifyBaseDimension(std::declval<BaseDimension < decltype(std::tuple_cat<NumTuple1, NumTuple2>), decltype(std::tuple_cat<DenTuple1, DenTuple2>) >>()))
+      -> decltype(SimplifyBaseDimension(std::declval< BaseDimension<decltype(std::tuple_cat(NumTuple1{}, NumTuple2{})), decltype(std::tuple_cat(DenTuple1{}, DenTuple2{})) >>()))
    {
-      //static_assert(std::is_same_v<NumTuple1, std::tuple<LengthUnit<>>>);
+      //static_assert(std::is_same_v<NumTuple1, std::tuple<LengthUnit>>);
       using ResultType = BaseDimension<decltype(std::tuple_cat(NumTuple1{}, NumTuple2{})), decltype(std::tuple_cat(DenTuple1{}, DenTuple2{}))> ;
       auto result = ResultType(
          obj1.GetRawValue() * obj2.GetRawValue(),
          ConcatenateUnitVectors(obj1.numList, obj2.numList),
          ConcatenateUnitVectors(obj1.denList, obj2.denList)
       );
-      //return result;
       return SimplifyBaseDimension(result);
    }
 
@@ -462,9 +453,6 @@ namespace Dimension
    template<typename NumTuple, typename DenTuple>
    auto operator/(double scalar, const BaseDimension<NumTuple, DenTuple>& obj) -> BaseDimension<DenTuple, NumTuple>
    {
-      //using ResultType = BaseDimension<typename InvertReturnType<Ts>::type...>;
-
-      //return ResultType(scalar / obj.GetRawValue(), obj.denList, obj.numList);
       return BaseDimension<DenTuple, NumTuple>(scalar / obj.GetRawValue(), obj.denList, obj.numList);
    }
 

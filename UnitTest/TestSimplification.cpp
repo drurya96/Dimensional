@@ -21,9 +21,9 @@ TEST_F(SimplificationTest, SimplificationWithMath) {
    // However, Seconds in the numerator cancels Minutes in the denominator and Meters in the numerator cancels Feet in the denominator
    // So the value should be 0.056959025955088914139 Seconds
    auto test = ((length1 * time1) / (length2 * time2)) * time1;
-   ASSERT_TRUE((is_same<decltype(test), BaseDimension<tuple<TimeUnit<>>, tuple<>>>::value));
+   ASSERT_TRUE((is_same<decltype(test), BaseDimension<tuple<TimeUnit>, tuple<>>>::value));
    
-   ASSERT_DOUBLE_EQ(test.GetVal(vector<BaseUnit<>*>{&TimeUnits::Seconds}, vector<BaseUnit<>*>{}), 0.056959027777777775); // TODO: Double check precision
+   ASSERT_DOUBLE_EQ(test.GetVal(vector<BaseUnit*>{&TimeUnits::Seconds}, vector<BaseUnit*>{}), 0.056959027777777775); // TODO: Double check precision
 }
 
 TEST_F(SimplificationTest, Simplification) {
@@ -38,8 +38,8 @@ TEST_F(SimplificationTest, Simplification) {
    using namespace TimeUnits;
 
    // This is 10.0 (Meters-Mintues / Feet-Seconds-Minutes-Minutes)
-   auto test_before = BaseDimension<tuple<LengthUnit<>, TimeUnit<>>, tuple<TimeUnit<>, LengthUnit<>, TimeUnit<>>>(10.0, vector<BaseUnit<>*>{&Meters, &Minutes}, vector<BaseUnit<>*>{&Feet, &Seconds, &Minutes});
-   ASSERT_TRUE((is_same<decltype(test_before), BaseDimension<tuple<LengthUnit<>, TimeUnit<>>, tuple<TimeUnit<>, LengthUnit<>, TimeUnit<>>>>::value));
+   auto test_before = BaseDimension<tuple<LengthUnit, TimeUnit>, tuple<TimeUnit, LengthUnit, TimeUnit>>(10.0, vector<BaseUnit*>{&Meters, &Minutes}, vector<BaseUnit*>{&Feet, &Seconds, &Minutes});
+   ASSERT_TRUE((is_same<decltype(test_before), BaseDimension<tuple<LengthUnit, TimeUnit>, tuple<TimeUnit, LengthUnit, TimeUnit>>>::value));
 
 
    // After simplifying, Meters/Feet cancel and Minutes/Seconds cancel
@@ -47,8 +47,8 @@ TEST_F(SimplificationTest, Simplification) {
 
    // This means the final type will be a per-minutes
    auto test_after = SimplifyBaseDimension(test_before);
-   ASSERT_TRUE((is_same<decltype(test_after), BaseDimension<tuple<>, tuple<TimeUnit<>>>>::value));
-   ASSERT_DOUBLE_EQ(test_after.GetVal(vector<BaseUnit<>*>{}, vector<BaseUnit<>*>{&TimeUnits::Minutes}), 1968.504);
+   ASSERT_TRUE((is_same<decltype(test_after), BaseDimension<tuple<>, tuple<TimeUnit>>>::value));
+   ASSERT_DOUBLE_EQ(test_after.GetVal(vector<BaseUnit*>{}, vector<BaseUnit*>{&TimeUnits::Minutes}), 1968.504);
 }
 
 // TODO: Validate simplification resulting in unitless
