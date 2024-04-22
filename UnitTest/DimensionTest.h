@@ -5,10 +5,9 @@
 
 class DimensionTest : public ::testing::Test {
 protected:
-   // You can put setup code here if needed
+
    virtual void SetUp() override;
 
-   // You can put cleanup code here if needed
    virtual void TearDown() override {}
 };
 

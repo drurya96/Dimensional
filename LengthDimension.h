@@ -9,17 +9,28 @@
 
 namespace Dimension
 {
+   // Forward declaration
+   class LengthUnit;
+
+   /// @brief UnitFactory templated on LengthUnit
+   class LengthUnitFactory : public UnitFactory<LengthUnit, LengthUnitFactory> {};
+
    /// @brief Length unit, derived from BaseUnit
-   class LengthUnit : public BaseUnit
+   class LengthUnit : public BaseUnit<LengthUnit>
    {
    public:
       /// @brief Constructor only giving name, primary constructor
-      LengthUnit(const std::string& name) : BaseUnit(name) {}
+      LengthUnit(const std::string& name) : BaseUnit<LengthUnit>(name) {}
 
       /// @brief Default constructor
       /// @details This default constructor is necessary
       ///    for some template metaprogramming on BaseUnit
-      LengthUnit() : BaseUnit() {}
+      LengthUnit() : BaseUnit<LengthUnit>() {}
+
+      LengthUnit& operator()() {
+         static LengthUnit instance;
+         return instance;
+      }
 
       /// @brief Default destructor
       ~LengthUnit() {}
@@ -29,15 +40,49 @@ namespace Dimension
       ///    the global units are defined.
       LengthUnit* GetPrimaryUnit() const override;
 
+      /// @brief Defines a static conversion map
+      /// @details This static conversion map represents the operations
+      ///    needed to convert from one unit to another.
+      ///    All units **MUST** have a conversion to the Primary unit
+      ///    and the primary unit **MUST** have a conversion to each unit.
+      /// @return The conversion map
+      static ConversionMap GetConversionMap()
+      {
+         static const ConversionMap map =
+         {
+            { 
+               "Meters", 
+               {
+                  { "Feet", [](double val) { return val * 3.28084; }}, 
+               }
+            },
+            { 
+               "Feet", 
+               {
+                  { "Meters", [](double val) { return val / 3.28084; }},
+               }
+            },
+         };
+         return map;
+      }
+
+      /// @brief Call GetInstance using the corresponding UnitFactory
+      static LengthUnit& GetInstance(const std::string& name, bool initialize = true)
+      {
+         return LengthUnitFactory::GetInstance(name, initialize);
+      }
+
    private:
 
    };
+
+   using LengthTup = std::tuple<LengthUnit*>;
 
    /// @brief Length dimension, derived from BaseDimension
    /// @details This dimension is a specialization using
    ///    Length as the unit.
    /// @todo Add some convenience methods to retrieve Length by name
-   class Length : public BaseDimension<std::tuple<LengthUnit>, std::tuple<>>
+   class Length : public BaseDimension<LengthTup, std::tuple<>>
    {
    public:
 
@@ -45,50 +90,41 @@ namespace Dimension
       /// @param[in] value The value to set
       /// @param[in] Length Pointer to the Length unit
       explicit Length(double value, LengthUnit* unit) 
-         : BaseDimension<std::tuple<LengthUnit>, std::tuple<>>(value, std::vector<BaseUnit*>{ static_cast<BaseUnit*>(unit) }, std::vector<BaseUnit*>{})
+         : BaseDimension<LengthTup, std::tuple<>>(value, LengthTup{ unit }, std::tuple<>{})
       {}
 
       /// @brief Cast operator from a BaseDimension
-      Length(const BaseDimension<std::tuple<LengthUnit>, std::tuple<>>& base) : BaseDimension<std::tuple<LengthUnit>, std::tuple<>>(base)
+      Length(const BaseDimension<LengthTup, std::tuple<>>& base) : BaseDimension<LengthTup, std::tuple<>>(base)
       {}
 
    };
 
    namespace LengthUnits
    {
-      /// @brief Meters, a LengthUnit global variable for creating Dimension objects
-      inline LengthUnit Meters("Meters");
+      /// @brief Meters singleton
+      inline static LengthUnit& Meters() {
+         LengthUnit& meters = LengthUnitFactory::GetInstance("Meters");
+         return meters;
+      }
 
-      /// @brief Feet, a LengthUnit global variable for creating Dimension objects
-      inline LengthUnit Feet("Feet");
+      /// @brief Feet singleton
+      inline static LengthUnit& Feet() {
+         LengthUnit& feet = LengthUnitFactory::GetInstance("Feet");
+         return feet;
+      }
    }
 
-   inline LengthUnit* LengthUnit::GetPrimaryUnit() const { return &LengthUnits::Meters; }
+   /// @brief Return a pointer to the primary unit
+   /// @details Return a pointer to Seconds, the primary unit
+   /// @return Pointer to Seconds
+   inline LengthUnit* LengthUnit::GetPrimaryUnit() const { return &LengthUnits::Meters(); }
    
    /// @brief Static vector of all LengthUnits
    /// @details This vector of all LengthUnits is stored in each
    ///    LengthUnit object for use in simplification and other
    ///    helper functions
    /// @todo Consider other ways to handle this
-   static std::vector<BaseUnit*> LengthUnitVector;
-
-   /// @brief Add conversions to each LengthUnit
-   /// @details Adds conversions to all Length units and assigns the 
-   ///    LengthUnitVector to each. This method also validates each 
-   ///    LengthUnit as a conversion to the "primary" LengthUnit, Meters,
-   ///    and that Meters has a conversion to each LengthUnit.
-   ///    Note this must be called at the start of the program.
-   /// @return bool indicating success
-   inline bool initializeLengthUnits()
-   {
-      LengthUnits::Meters.add_conversion(LengthUnits::Feet, [](double val) {return val * 3.28084; });
-      LengthUnits::Feet.add_conversion(LengthUnits::Meters, [](double val) {return val / 3.28084; });
-
-      LengthUnitVector.push_back(& LengthUnits::Meters);
-      LengthUnitVector.push_back(& LengthUnits::Feet);
-
-      return BaseUnit::ValidateConversions(LengthUnitVector, LengthUnits::Meters);
-   }
+   static std::vector<BaseUnit<LengthUnit>*> LengthUnitVector;
 }
 
 #endif // DIMENSION_LENGTH_H

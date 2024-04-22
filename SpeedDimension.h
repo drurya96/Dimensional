@@ -14,7 +14,7 @@ namespace Dimension
    ///    Length and Inverse Time as units.
    /// @todo Add some convenience methods to retrieve Speed by name,
    ///    such as MetersPerSecond, MilesPerHour, etc.
-   class Speed : public BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>
+   class Speed : public BaseDimension<LengthTup, TimeTup>
    {
    public:
       /// @brief Constructor value, length, and time units
@@ -22,13 +22,12 @@ namespace Dimension
       /// @param[in] length Pointer to the length unit
       /// @param[in] time Pointer to the time unit
       explicit Speed(double value, LengthUnit* length, TimeUnit* time)
-         : BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>(value, std::vector<BaseUnit*>{ static_cast<BaseUnit*>(length) }, std::vector<BaseUnit*>{ static_cast<BaseUnit*>(time) })
+         : BaseDimension<LengthTup, TimeTup>(value, LengthTup{length}, TimeTup{time})
       {}
 
       /// @brief Cast operator from a BaseDimension
-      Speed(const BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>& base) : BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>(base)
+      Speed(const BaseDimension<LengthTup, TimeTup>& base) : BaseDimension<LengthTup, TimeTup>(base)
       {}
-      
    };
 }
 

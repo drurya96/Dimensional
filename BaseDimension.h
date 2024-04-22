@@ -9,19 +9,21 @@
 #include <functional>
 #include <algorithm>
 
-#include <typeindex>
-
 #include "DimensionUtilities.h"
-#include "Simplification.h"
 
 namespace Dimension
 {
+   template<typename Unit, typename DerivedFactory>
+   class UnitFactory;
+
+   /// @brief Alias for conversion map
+   using ConversionMap = std::unordered_map<std::string, std::vector<std::pair<std::string, std::function<double(double)>>>>;
+
    /// @brief A base class representing a unit
    /// @details This abstract class represents a Unit,
    ///    such as Meters, Seconds, Grams, etc.
-   /// @todo Use CRTP to reduce code duplication and move as much
-   ///    as possible into the BaseUnit
-   /// @todo Attempt to implement the initialization function here
+   /// @tparam Unit The derived unit, using CRTP
+   template<typename Unit>
    class BaseUnit
    {
    public:
@@ -52,13 +54,13 @@ namespace Dimension
       ///    More on the "primary" unit below
       /// @return A pointer to the "primary" unit
       /// @todo Prefer returning a reference, need to evaluate fallout
-      virtual BaseUnit* GetPrimaryUnit() const = 0;
+      virtual BaseUnit<Unit>* GetPrimaryUnit() const = 0;
 
       /// @brief Get the conversion functor from this unit to the provided unit
       /// @param[in] unit The unit to retrieve a conversion to
       /// @return The conversion functor
       /// @todo Validate successful conversion retrieval
-      const std::function<double(double)>& getConversion(const BaseUnit& unit) const
+      const std::function<double(double)>& getConversion(const BaseUnit<Unit>& unit) const
       {
          return conversions.at(unit.GetUnitName());
       }
@@ -67,11 +69,17 @@ namespace Dimension
       /// @param[in] toUnit The unit to convert to
       /// @param[in] conversion The conversion lamda to convert from this unit to toUnit
       /// @return A bool indicating success of adding the conversion
-      /// @todo Check for success of adding
-      bool add_conversion(const BaseUnit& toUnit, std::function<double(double)> conversion)
+      /// @todo Add validation for successful addition, throw runtime error otherwise
+      Unit& add_conversion(const BaseUnit<Unit>& toUnit, std::function<double(double)> conversion)
       {
          conversions[toUnit.GetUnitName()] = conversion;
-         return true;
+
+         if (false)
+         {
+            throw std::runtime_error("Failed to add conversion");
+         }
+
+         return static_cast<Unit&>(*this);
       };
 
       /// @brief Validate all conversions
@@ -83,9 +91,10 @@ namespace Dimension
       ///    Every unit must have a conversion to and from this unit. While other conversions
       ///    are allowed, these conversions are mandatory.
       /// @return A bool indicating successful validation
-      static bool ValidateConversions(const std::vector<BaseUnit*>& UnitVector, const BaseUnit& PrimaryUnit)
+      /// @todo Update this since the vectors aren't used anymore
+      static bool ValidateConversions(const std::vector<BaseUnit<Unit>*>& UnitVector, const BaseUnit<Unit>& PrimaryUnit)
       {
-         return std::all_of(UnitVector.begin(), UnitVector.end(), [&](BaseUnit* unit)
+         return std::all_of(UnitVector.begin(), UnitVector.end(), [&](BaseUnit<Unit>* unit)
             {
             auto findit = unit->conversions.find(PrimaryUnit.GetUnitName());
             auto findit2 = PrimaryUnit.conversions.find(unit->GetUnitName());
@@ -98,57 +107,130 @@ namespace Dimension
       /// @details This will use the direct conversion if one is provided,
       ///    otherwise it will convert to the primary unit, then to the
       ///    given unit.
+      ///    Conversions are inverted if isNumerator is false.
+      /// @tparam isNumerator Bool indicating if the operation is a numerator.
+      ///    Denominator operations are inverted relative to numerator operations
       /// @param[in] input The value to convert
-      /// @param[in] NewUnit The unit to convert to
-      /// @return The converted value
-      double ConvertValueNumerator(const double input, const BaseUnit& NewUnit) const
+      /// @param[in] toUnit Pointer to the unit object to convert to
+      /// @return The converted value as a double
+      template<bool isNumerator>
+      double ConvertValue(const double input, const BaseUnit<Unit>* toUnit) const
       {
-         double result;
-         if (conversions.find(NewUnit.GetUnitName()) != conversions.end())
+         if (conversions.find(toUnit->GetUnitName()) != conversions.end())
          {
-            result = getConversion(NewUnit)(input);
+            if constexpr (isNumerator) {
+               return getConversion(*toUnit)(input);
+            }
+            else {
+               return toUnit->getConversion(*this)(input);
+            }
          }
          else
          {
-            result = getConversion(*GetPrimaryUnit())(input);
-            result = GetPrimaryUnit()->getConversion(NewUnit)(result);
+            if constexpr (isNumerator)
+            {
+               return GetPrimaryUnit()->getConversion(*toUnit)(
+                  this->getConversion(*GetPrimaryUnit())(input)
+                  );
+            }
+            else
+            {
+               return toUnit->getConversion(*GetPrimaryUnit())(
+                  GetPrimaryUnit()->getConversion(*this)(input)
+                  );
+            }
          }
-         return result;
       }
 
-      /// @brief Convert the input value from this unit to the given unit
-      /// @details This will use the direct conversion if one is provided,
-      ///    otherwise it will convert to the primary unit, then to the
-      ///    given unit. This conversion is inverted relative to
-      ///    ConvertValueNumerator since reciprocals must be used.
-      /// @param[in] input The value to convert
-      /// @param[in] NewUnit The unit to convert to
-      /// @return The converted value
-      double ConvertValueDenominator(const double input, const BaseUnit& NewUnit) const
+      /// @brief Initialize unit and return a reference to self
+      /// @details Sets the initialized flag to true and steps through
+      ///    the conversion map provided for this unit type.
+      ///    Other instances of this unit type are retrieved via the
+      ///    UnitFactory, which is called through the derived unit's
+      ///    GetInstance method.
+      /// @return Instance of self for chaining
+      Unit& Initialize()
       {
-         double result;
-         if (conversions.find(NewUnit.GetUnitName()) != conversions.end())
-         {
-            result = NewUnit.getConversion(*this)(input);
+         initialized = true;
+
+         const ConversionMap& conversions = Unit::GetConversionMap();
+
+         auto it = conversions.find(GetUnitName());
+         if (it != conversions.end()) {
+            const auto& convs = it->second;
+            for (const auto& [targetUnit, conversionFunc] : convs)
+            {
+               add_conversion(Unit::GetInstance(targetUnit, false), conversionFunc);
+            }
          }
-         else
-         {
-            result = NewUnit.getConversion(*GetPrimaryUnit())(input);
-            result = GetPrimaryUnit()->getConversion(*this)(result);
-         }
-         return result;
+
+         return static_cast<Unit&>(*this);
       }
+
+      /// @brief Public getter for initialized
+      bool isInitialized() { return initialized; }
 
    private:
       /// @brief The name of the unit
       std::string unitName = "";
 
       /// @brief A map of unit names to conversion functors
+      /// @todo Revisit keying on unit objects rather than strings
       std::unordered_map<std::string, std::function<double(double)>> conversions;
+
+      /// @brief Flag to determine if unit has been initialized
+      bool initialized = false;
    };
 
    /// @brief Destructor implementation
-   inline BaseUnit::~BaseUnit() {}
+   template<typename Unit>
+   BaseUnit<Unit>::~BaseUnit() {}
+
+   /// @brief Base factory class to produce unit objects
+   /// @tparam Unit The derived unit class to instantiate
+   /// @tparam DerivedFactory Derived class for CRTP
+   template<typename Unit, typename DerivedFactory>
+   class UnitFactory {
+   public:
+      
+      /// @brief Return an instance of Unit with the given name
+      /// @details If a Unit with the given name already exists, return it.
+      ///    Otherwise, create a new instance and add it to the static
+      ///    instances map. Pass the initialize flag along when creating the
+      ///    new instance to determine whether the new instance should be initialized.
+      ///    Creating an unitialized Unit is useful to avoid circular dependencies
+      ///    between Unit instantiations.
+      /// @param[in] name The name of the Unit to retrieve or create
+      /// @param[in] initialize Flag indicating whether newly created instances
+      ///    should be initialized.
+      /// @return An instance of Unit corresponding to name
+      static Unit& GetInstance(const std::string& name, bool initialize = true) {
+         static std::unordered_map<std::string, std::unique_ptr<Unit>> instances;
+         auto it = instances.find(name);
+         
+         if (it == instances.end())
+         {
+            Unit instance = CreateInstance(name);
+            instances[name] = std::make_unique<Unit>(instance);
+         }
+         if (initialize && !(instances[name]->isInitialized()))
+         {
+            instances[name]->Initialize();
+         }
+         
+
+         return *instances[name];
+      }
+   private:
+
+      /// @brief Create a new instance of Unit
+      /// @param[in] name The name of the Unit to create
+      /// @return The instantiated unit
+      static Unit CreateInstance(const std::string& name)
+      {
+         return Unit(name);
+      }
+   };
 
    /// @brief A generic Dimension class
    /// @details This class represents a Dimension,
@@ -189,129 +271,42 @@ namespace Dimension
       /// @details A constructor given all needed information.
       ///    This constructor should typically be used for creating new objects.
       /// @param[in] newValue The value to set
-      /// @param[in] newNumList A vector of BaseUnits to set as numerators
-      /// @param[in] newDenList A vector of BaseUnits to set as denominators
-      ///    Note both of these vectors should use the non-templated (<>) BaseUnit
-      ///    Since the numerator/denominator is handled by the vectors.
-      /// @todo Investigate using references of BaseUnits instead of pointers
-      BaseDimension(double newValue, std::vector<BaseUnit*> newNumList, std::vector<BaseUnit*> newDenList) :
+      /// @param[in] newNumList A tuple of BaseUnits to set as numerators
+      /// @param[in] newDenList A tuple of BaseUnits to set as denominators
+      BaseDimension(double newValue, NumTuple newNumList, DenTuple newDenList) :
          value(newValue),
-         numList(newNumList.begin(), newNumList.end()),
-         denList(newDenList.begin(), newDenList.end())
+         numList(newNumList),
+         denList(newDenList)
       {
       }
 
       // TODO: Consider copy operator
 
+      /// @brief Tuple of units corresponding to the Dimension numerator
+      NumTuple numList;
 
+      /// @brief Tuple of units corresponding to the Dimension denominator
+      DenTuple denList;
 
-      // These are pointers for simplicity for now, but may change.
-      // Consider using a tuple for immutability
-      // Consider use a raw array (not std::array) to allow storage of references
-      // Note a raw array requires compile-time knowledge of size
-      // While this is possible since the templates hold that information,
-      //    it may be challenging.
-      std::vector<BaseUnit*> numList;
-      std::vector<BaseUnit*> denList;
-
+      // TODO: UPDATE THIS DOXY
       /// @brief Return the internal value as a double in terms of the provided units
       /// @details Return the internal value after converting to the provided units.
-      /// @param[in] i_numList vector of BaseUnit pointers to convert to for the numerator
-      /// @param[in] i_denList vector of BaseUnit pointers to convert to for the denominator
+      /// @param[in] i_numList tuple of BaseUnit pointers to convert to for the numerator
+      /// @param[in] i_denList tuple of BaseUnit pointers to convert to for the denominator
       /// @return A double representing the value in terms of the given units
-      /// @todo Substantially improve efficiency, presumed bottleneck (not tested)
-      /// @todo Refactor to move some functionality out of this method
-      /// @todo Consider what should happen if the parameters are inappropriate for this object
-      double GetVal(const std::vector<BaseUnit*>& i_numList, const std::vector<BaseUnit*>& i_denList) const
+      template<typename ... NumTupleTypes, typename ... DenTupleTypes>
+      double GetVal(const std::tuple<NumTupleTypes...>& i_numList, const std::tuple<DenTupleTypes...>& i_denList) const
       {
-         auto temp_InputNumList = i_numList;
-         auto temp_InputDenList = i_denList;
-         auto temp_MyNumList = numList;
-         auto temp_MyDenList = denList;
-
          double result = value;
 
+         if (numList == i_numList && denList == i_denList) { return value; }
 
-         for (auto it = temp_MyNumList.begin(); it != temp_MyNumList.end(); ) {
-            auto duplicateIt = std::find(temp_InputNumList.begin(), temp_InputNumList.end(), *it);
-            if (duplicateIt != temp_InputNumList.end()) {
-               it = temp_MyNumList.erase(it);
-               temp_InputNumList.erase(duplicateIt);
-            }
-            else {
-               ++it;
-            }
-         }
+         GetConvertedValue(numList, i_numList, result, ConvertFunctor<true>());
+         GetConvertedValue(denList, i_denList, result, ConvertFunctor<false>());
 
-         for (auto it = temp_MyDenList.begin(); it != temp_MyDenList.end(); ) {
-            auto duplicateIt = std::find(temp_InputDenList.begin(), temp_InputDenList.end(), *it);
-            if (duplicateIt != temp_InputDenList.end()) {
-               it = temp_MyDenList.erase(it);
-               temp_InputDenList.erase(duplicateIt);
-            }
-            else {
-               ++it;
-            }
-         }
-
-         // Handle Numerator
-         if (temp_MyNumList.size() != temp_InputNumList.size()) {
-            throw std::runtime_error("Vectors must have the same size.");
-         }
-
-         bool found = false;
-         for (BaseUnit* myUnit : temp_MyNumList)
-         {
-            found = false;
-            for (auto it = temp_InputNumList.begin(); it != temp_InputNumList.end();)
-            {
-               if (myUnit->GetPrimaryUnit() == (*it)->GetPrimaryUnit())
-               {
-                  result = myUnit->ConvertValueNumerator(result, *(*it));
-
-                  temp_InputNumList.erase(it);
-                  found = true;
-                  break;
-               }
-               else { ++it; }
-            }
-
-            if (!found)
-            {
-               // Not found, raise an exception
-            }
-         }
-
-
-         // Handle Denominator
-         if (temp_MyDenList.size() != temp_InputDenList.size()) {
-            throw std::runtime_error("Vectors must have the same size.");
-         }
-
-         for (BaseUnit* myUnit : temp_MyDenList)
-         {
-            found = false;
-            for (auto it = temp_InputDenList.begin(); it != temp_InputDenList.end();)
-            {
-               if (myUnit->GetPrimaryUnit() == (*it)->GetPrimaryUnit())
-               {
-                  result = myUnit->ConvertValueDenominator(result, *(*it));
-
-                  temp_InputDenList.erase(it);
-                  found = true;
-                  break;
-               }
-               else { ++it; }
-            }
-
-            if (!found)
-            {
-               // Not found, raise an exception
-            }
-         }
          return result;
       }
-      
+
       /// @brief += operator overload for another Dimension
       BaseDimension<NumTuple, DenTuple>& operator+=(const BaseDimension<NumTuple, DenTuple>& rhs)
       {
@@ -356,55 +351,87 @@ namespace Dimension
 
       // TODO: Define a NearlyEqual method with custom tolerance
 
-      /// @brief Get the raw value field
-      /// @todo This really shouldn't be used, need to investigate
-      double GetRawValue() const { return value; }
-
    protected:
 
    private:
       /// @brief The value of the given object
       double value;
 
+      /// @brief Private getter to retrieve the raw value
+      /// @return The raw value
+      double GetRawValue() const { return value; }
+
+      // Declare operator overloads as friends of this class
+      // This is to directly access the raw value for efficiency
+
+      template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
+      friend auto operator/(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2);
+
+      template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
+      friend auto operator*(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2);
+
+      template<typename NumTuple, typename DenTuple>
+      friend BaseDimension<NumTuple, DenTuple> operator*(const BaseDimension<NumTuple, DenTuple>& obj, double scalar);
+
+      template<typename NumTuple, typename DenTuple>
+      friend BaseDimension<NumTuple, DenTuple> operator*(double scalar, const BaseDimension<NumTuple, DenTuple>& obj);
+
+      template<typename NumTuple, typename DenTuple>
+      friend BaseDimension<NumTuple, DenTuple> operator/(const BaseDimension<NumTuple, DenTuple>& obj, double scalar);
+
+      template<typename NumTuple, typename DenTuple>
+      friend auto operator/(double scalar, const BaseDimension<NumTuple, DenTuple>& obj)->BaseDimension<DenTuple, NumTuple>;
+
+      template<typename NumTuple, typename DenTuple>
+      friend BaseDimension<NumTuple, DenTuple> operator+(const BaseDimension<NumTuple, DenTuple>& obj1, const BaseDimension<NumTuple, DenTuple>& obj2);
+
+      template<typename NumTuple, typename DenTuple>
+      friend BaseDimension<NumTuple, DenTuple> operator-(const BaseDimension<NumTuple, DenTuple>& obj1, const BaseDimension<NumTuple, DenTuple>& obj2);
    };
 
    /// @brief Division operator for two Dimensions
-   /// @tparam T_Classes1 The units of the numerator BaseDimension object
-   /// @tparam T_Classes2 The units of the denominator BaseDimension object
+   /// @tparam NumTuple1 Tuple of numerator units of obj1
+   /// @tparam DenTuple1 Tuple of denominator units of obj1
+   /// @tparam NumTuple2 Tuple of numerator units of obj2
+   /// @tparam DenTuple2 Tuple of denominator units of obj2
    /// @param[in] obj1 The numerator BaseDimension object
    /// @param[in] obj2 The denominator BaseDimension object
    /// @return A base dimension object templated on the numerator types and
    ///    the denominator types, then simplified.
-   //template<typename... T_Classes1, typename... T_Classes2>
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    auto operator/(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
-      -> decltype(SimplifyBaseDimension(std::declval< BaseDimension<decltype(std::tuple_cat(NumTuple1{}, DenTuple2{})), decltype(std::tuple_cat(DenTuple1{}, NumTuple2{})) >>()))
    {
-      using ResultType = BaseDimension<decltype(std::tuple_cat(NumTuple1{}, DenTuple2{})), decltype(std::tuple_cat(DenTuple1{}, NumTuple2{}))> ;
+      using NumResultTuple = decltype(std::tuple_cat(std::declval<NumTuple1>(), std::declval<DenTuple2>()));
+      using DenResultTuple = decltype(std::tuple_cat(std::declval<DenTuple1>(), std::declval<NumTuple2>()));
+
+      using ResultType = BaseDimension<NumResultTuple, DenResultTuple>;
       auto result = ResultType(
          obj1.GetRawValue() / obj2.GetRawValue(),
-         ConcatenateUnitVectors(obj1.numList, obj2.denList),
-         ConcatenateUnitVectors(obj1.denList, obj2.numList));
+         std::tuple_cat(obj1.numList, obj2.denList),
+         std::tuple_cat(obj1.denList, obj2.numList));
       return SimplifyBaseDimension(result);
    }
 
    /// @brief Multiplication operator for two Dimensions
-   /// @tparam T_Classes1 The units of the first BaseDimension object
-   /// @tparam T_Classes2 The units of the second BaseDimension object
+   /// @tparam NumTuple1 Tuple of numerator units of obj1
+   /// @tparam DenTuple1 Tuple of denominator units of obj1
+   /// @tparam NumTuple2 Tuple of numerator units of obj2
+   /// @tparam DenTuple2 Tuple of denominator units of obj2
    /// @param[in] obj1 The first BaseDimension object
    /// @param[in] obj2 The second BaseDimension object
    /// @return A base dimension object templated on the types of both
    ///    input objects, then simplified.
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    auto operator*(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
-      -> decltype(SimplifyBaseDimension(std::declval< BaseDimension<decltype(std::tuple_cat(NumTuple1{}, NumTuple2{})), decltype(std::tuple_cat(DenTuple1{}, DenTuple2{})) >>()))
    {
-      //static_assert(std::is_same_v<NumTuple1, std::tuple<LengthUnit>>);
-      using ResultType = BaseDimension<decltype(std::tuple_cat(NumTuple1{}, NumTuple2{})), decltype(std::tuple_cat(DenTuple1{}, DenTuple2{}))> ;
+      using NumResultTuple = decltype(std::tuple_cat(std::declval<NumTuple1>(), std::declval<NumTuple2>()));
+      using DenResultTuple = decltype(std::tuple_cat(std::declval<DenTuple1>(), std::declval<DenTuple2>()));
+
+      using ResultType = BaseDimension<NumResultTuple, DenResultTuple>;
       auto result = ResultType(
          obj1.GetRawValue() * obj2.GetRawValue(),
-         ConcatenateUnitVectors(obj1.numList, obj2.numList),
-         ConcatenateUnitVectors(obj1.denList, obj2.denList)
+         std::tuple_cat(obj1.numList, obj2.numList),
+         std::tuple_cat(obj1.denList, obj2.denList)
       );
       return SimplifyBaseDimension(result);
    }
@@ -412,7 +439,8 @@ namespace Dimension
    // Scalar Math
 
    /// @brief Multiplication operator for a Dimension and scalar
-   /// @tparam Ts The units of the BaseDimension object
+   /// @tparam NumTuple Tuple of units in the numerator
+   /// @tparam DenTuple Tuple of units in the denominator
    /// @param[in] obj The BaseDimension object
    /// @param[in] scalar The scalar value as a double
    /// @return A BaseDimension object of type matching obj, with value multiplied by scalar
@@ -423,7 +451,8 @@ namespace Dimension
    }
 
    /// @brief Multiplication operator for a scalar and Dimension
-   /// @tparam Ts The units of the BaseDimension object
+   /// @tparam NumTuple Tuple of units in the numerator
+   /// @tparam DenTuple Tuple of units in the denominator
    /// @param[in] scalar The scalar value as a double
    /// @param[in] obj The BaseDimension object
    /// @return A BaseDimension object of type matching obj, with value multiplied by scalar
@@ -434,7 +463,8 @@ namespace Dimension
    }
 
    /// @brief Division operator for a Dimension and scalar
-   /// @tparam Ts The units of the BaseDimension object
+   /// @tparam NumTuple Tuple of units in the numerator
+   /// @tparam DenTuple Tuple of units in the denominator
    /// @param[in] obj The BaseDimension object
    /// @param[in] scalar The scalar value as a double
    /// @return A BaseDimension object of type matching obj, with value divided by scalar
@@ -445,7 +475,8 @@ namespace Dimension
    }
 
    /// @brief Division operator for a scalar and Dimension
-   /// @tparam Ts The units of the BaseDimension object
+   /// @tparam NumTuple Tuple of units in the numerator
+   /// @tparam DenTuple Tuple of units in the denominator
    /// @param[in] scalar The scalar value as a double
    /// @param[in] obj The BaseDimension object
    /// @return A BaseDimension object with Unit parameters inverted relative
@@ -457,7 +488,8 @@ namespace Dimension
    }
 
    /// @brief Addition operator for two Dimensions
-   /// @tparam Ts The units of both BaseDimension objects
+   /// @tparam NumTuple Tuple of units in the numerator
+   /// @tparam DenTuple Tuple of units in the denominator
    /// @param[in] obj1 The first BaseDimension object
    /// @param[in] obj2 The second BaseDimension object
    /// @return A base dimension object of type matching the inputs.
@@ -470,7 +502,8 @@ namespace Dimension
    }
 
    /// @brief Subtraction operator for two Dimensions
-   /// @tparam Ts The units of both BaseDimension objects
+   /// @tparam NumTuple Tuple of units in the numerator
+   /// @tparam DenTuple Tuple of units in the denominator
    /// @param[in] obj1 The first BaseDimension object
    /// @param[in] obj2 The second BaseDimension object
    /// @return A base dimension object of type matching the inputs.
