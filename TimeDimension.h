@@ -9,18 +9,28 @@
 
 namespace Dimension
 {
+   // Forward declaration
+   class TimeUnit;
+
+   /// @brief UnitFactory templated on TimeUnit
+   class TimeUnitFactory : public UnitFactory<TimeUnit, TimeUnitFactory> {};
 
    /// @brief Time unit, derived from BaseUnit
-   class TimeUnit : public BaseUnit
+   class TimeUnit : public BaseUnit<TimeUnit>
    {
    public:
       /// @brief Constructor only giving name, primary constructor
-      TimeUnit(const std::string& name) : BaseUnit(name) {}
+      TimeUnit(const std::string& name) : BaseUnit<TimeUnit>(name) {}
 
       /// @brief Default constructor
       /// @details This default constructor is necessary
       ///    for some template metaprogramming on BaseUnit
-      TimeUnit() : BaseUnit() {}
+      TimeUnit() : BaseUnit<TimeUnit>() {}
+
+      TimeUnit& operator()() {
+         static TimeUnit instance;
+         return instance;
+      }
 
       /// @brief Default destructor
       ~TimeUnit() {}
@@ -30,15 +40,56 @@ namespace Dimension
       ///    the global units are defined.
       TimeUnit* GetPrimaryUnit() const override;
 
+      /// @brief Defines a static conversion map
+      /// @details This static conversion map represents the operations
+      ///    needed to convert from one unit to another.
+      ///    All units **MUST** have a conversion to the Primary unit
+      ///    and the primary unit **MUST** have a conversion to each unit.
+      /// @return The conversion map
+      static ConversionMap GetConversionMap()
+      {
+         static const ConversionMap map =
+         {
+            {
+               "Seconds",
+               {
+                  { "Minutes", [](double val) { return val / 60.0;   }},
+                  { "Hours"  , [](double val) { return val / 3600.0; }}
+               }
+            },
+            {
+               "Minutes",
+               {
+                  { "Seconds", [](double val) { return val * 60.0; }}
+               }
+            },
+            {
+               "Hours",
+               {
+                  { "Seconds", [](double val) { return val * 3600.0; } }
+               }
+            },
+         };
+         return map;
+      }
+
+      /// @brief Call GetInstance using the corresponding UnitFactory
+      static TimeUnit& GetInstance(const std::string& name, bool initialize = true)
+      {
+         return TimeUnitFactory::GetInstance(name, initialize);
+      }
+
    private:
 
    };
+
+   using TimeTup = std::tuple<TimeUnit*>;
 
    /// @brief Time dimension, derived from BaseDimension
    /// @details This dimension is a specialization using
    ///    Time as the unit.
    /// @todo Add some convenience methods to retrieve Time by name
-   class Time : public BaseDimension<std::tuple<TimeUnit>, std::tuple<>>
+   class Time : public BaseDimension<TimeTup, std::tuple<>>
    {
    public:
 
@@ -46,25 +97,40 @@ namespace Dimension
       /// @param[in] value The value to set
       /// @param[in] time Pointer to the time unit
       explicit Time(double value, TimeUnit* unit)
-         : BaseDimension<std::tuple<TimeUnit>, std::tuple<>>(value, std::vector<BaseUnit*>{ static_cast<BaseUnit*>(unit) }, std::vector<BaseUnit*>{})
+         : BaseDimension<TimeTup, std::tuple<>>(value, TimeTup{ unit }, std::tuple<>{})
       {}
 
       /// @brief Cast operator from a BaseDimension
-      Time(const BaseDimension<std::tuple<TimeUnit>, std::tuple<>>& base) : BaseDimension<std::tuple<TimeUnit>, std::tuple<>>(base)
+      Time(const BaseDimension<TimeTup, std::tuple<>>& base) : BaseDimension<TimeTup, std::tuple<>>(base)
       {}
 
    };
-   
+
    namespace TimeUnits
    {
-      /// @brief Seconds, a TimeUnit global variable for creating Dimension objects
-      inline TimeUnit Seconds("Seconds");
+      /// @brief Seconds singleton
+      inline static TimeUnit& Seconds() {
+         TimeUnit& seconds = TimeUnitFactory::GetInstance("Seconds");
+         return seconds;
+      };
 
-      /// @brief Minutes, a TimeUnit global variable for creating Dimension objects
-      inline TimeUnit Minutes("Minutes");
-   }
+      /// @brief Minutes singleton
+      inline static TimeUnit& Minutes() {
+         TimeUnit& minutes = TimeUnitFactory::GetInstance("Minutes");
+         return minutes;
+      };
 
-   inline TimeUnit* TimeUnit::GetPrimaryUnit() const { return &TimeUnits::Seconds; }
+      /// @brief Hours singleton
+      inline static TimeUnit& Hours() {
+         TimeUnit& hours = TimeUnitFactory::GetInstance("Hours");
+         return hours;
+      };
+   };
+
+   /// @brief Return a pointer to the primary unit
+   /// @details Return a pointer to Seconds, the primary unit
+   /// @return Pointer to Seconds
+   inline TimeUnit* TimeUnit::GetPrimaryUnit() const { return &TimeUnits::Seconds(); }
    
 
    /// @brief Static vector of all TimeUnits
@@ -72,25 +138,7 @@ namespace Dimension
    ///    TimeUnit object for use in simplification and other
    ///    helper functions
    /// @todo Consider other ways to handle this
-   static std::vector<BaseUnit*> TimeUnitVector;
-
-   /// @brief Add conversions to each TimeUnit
-   /// @details Adds conversions to all time units and assigns the 
-   ///    TimeUnitVector to each. This method also validates each 
-   ///    TimeUnit as a conversion to the "primary" TimeUnit, Seconds,
-   ///    and that Seconds has a conversion to each TimeUnit.
-   ///    Note this must be called at the start of the program.
-   /// @return bool indicating success
-   inline bool initializeTimeUnits()
-   {
-      TimeUnits::Seconds.add_conversion(TimeUnits::Minutes, [](double val) {return val / 60.0; });
-      TimeUnits::Minutes.add_conversion(TimeUnits::Seconds, [](double val) {return val * 60.0; });
-
-      TimeUnitVector.push_back(&TimeUnits::Seconds);
-      TimeUnitVector.push_back(&TimeUnits::Minutes);
-      
-      return BaseUnit::ValidateConversions(TimeUnitVector, TimeUnits::Seconds);
-   }
+   static std::vector<BaseUnit<TimeUnit>*> TimeUnitVector;
 }
 
 #endif // DIMENSION_TIME_H
