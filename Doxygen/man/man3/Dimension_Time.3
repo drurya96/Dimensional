@@ -1,0 +1,140 @@
+.TH "Dimension::Time" 3 "Version 0.4" "Dimensional" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Dimension::Time \- \fBTime\fP dimension, derived from \fBBaseDimension\fP\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fR#include <TimeDimension\&.h>\fP
+.PP
+Inherits \fBDimension::BaseDimension< TimeTup, std::tuple<> >\fP\&.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBTime\fP (\fBdouble\fP value, \fBTimeUnit\fP *\fBunit\fP)"
+.br
+.RI "Constructor using value and time units\&. "
+.ti -1c
+.RI "\fBTime\fP (\fBconst\fP \fBBaseDimension\fP< \fBTimeTup\fP, std::tuple<> > &\fBbase\fP)"
+.br
+.RI "Cast operator from a \fBBaseDimension\fP\&. "
+.in -1c
+
+Public Member Functions inherited from \fBDimension::BaseDimension< TimeTup, std::tuple<> >\fP
+.in +1c
+.ti -1c
+.RI "\fBBaseDimension\fP ()"
+.br
+.RI "Default constructor\&. "
+.ti -1c
+.RI "\fBBaseDimension\fP (\fBconst\fP \fBT\fP &\fBdimension\fP)"
+.br
+.RI "Constructor using existing dimension\&. "
+.ti -1c
+.RI "\fBBaseDimension\fP (\fBdouble\fP \fBnewValue\fP, \fBTimeTup\fP \fBnewNumList\fP, std::tuple<> \fBnewDenList\fP)"
+.br
+.RI "Constructor explicitly given all values\&. "
+.ti -1c
+.RI "\fBdouble\fP \fBGetVal\fP (\fBconst\fP std::tuple< NumTupleTypes\&.\&.\&. > &\fBi_numList\fP, \fBconst\fP std::tuple< DenTupleTypes\&.\&.\&. > &\fBi_denList\fP) \fBconst\fP"
+.br
+.RI "Return the internal value as a double in terms of the provided units\&. "
+.ti -1c
+.RI "\fBBaseDimension\fP< \fBTimeTup\fP, std::tuple<> > & \fBoperator+=\fP (\fBconst\fP \fBBaseDimension\fP< \fBTimeTup\fP, std::tuple<> > &\fBrhs\fP)"
+.br
+.RI "+= operator overload for another \fBDimension\fP "
+.ti -1c
+.RI "\fBBaseDimension\fP< \fBTimeTup\fP, std::tuple<> > & \fBoperator+=\fP (\fBdouble\fP \fBrhs\fP)=\fBdelete\fP"
+.br
+.ti -1c
+.RI "\fBBaseDimension\fP< \fBTimeTup\fP, std::tuple<> > & \fBoperator\-=\fP (\fBconst\fP \fBBaseDimension\fP< \fBTimeTup\fP, std::tuple<> > &\fBrhs\fP)"
+.br
+.RI "-= operator overload for another \fBDimension\fP "
+.ti -1c
+.RI "\fBBaseDimension\fP< \fBTimeTup\fP, std::tuple<> > & \fBoperator\-=\fP (\fBdouble\fP \fBrhs\fP)=\fBdelete\fP"
+.br
+.ti -1c
+.RI "\fBBaseDimension\fP< \fBTimeTup\fP, std::tuple<> > & \fBoperator*=\fP (\fBdouble\fP \fBrhs\fP)"
+.br
+.RI "*= operator overload for a scalar "
+.ti -1c
+.RI "\fBBaseDimension\fP< \fBTimeTup\fP, std::tuple<> > & \fBoperator*=\fP (\fBconst\fP \fBBaseDimension\fP< \fBTimeTup\fP, std::tuple<> > &\fBrhs\fP)=\fBdelete\fP"
+.br
+.ti -1c
+.RI "\fBBaseDimension\fP< \fBTimeTup\fP, std::tuple<> > & \fBoperator/=\fP (\fBdouble\fP \fBrhs\fP)"
+.br
+.RI "/= operator overload for a scalar "
+.ti -1c
+.RI "\fBBaseDimension\fP< \fBTimeTup\fP, std::tuple<> > & \fBoperator/=\fP (\fBconst\fP \fBBaseDimension\fP< \fBTimeTup\fP, std::tuple<> > &\fBrhs\fP)=\fBdelete\fP"
+.br
+.ti -1c
+.RI "\fBbool\fP \fBoperator>\fP (\fBconst\fP \fBBaseDimension\fP< \fBTimeTup\fP, std::tuple<> > &\fBrhs\fP) \fBconst\fP"
+.br
+.ti -1c
+.RI "\fBbool\fP \fBoperator<\fP (\fBconst\fP \fBBaseDimension\fP< \fBTimeTup\fP, std::tuple<> > &\fBrhs\fP) \fBconst\fP"
+.br
+.ti -1c
+.RI "\fBbool\fP \fBoperator>=\fP (\fBconst\fP \fBBaseDimension\fP< \fBTimeTup\fP, std::tuple<> > &\fBrhs\fP) \fBconst\fP"
+.br
+.ti -1c
+.RI "\fBbool\fP \fBoperator<=\fP (\fBconst\fP \fBBaseDimension\fP< \fBTimeTup\fP, std::tuple<> > &\fBrhs\fP) \fBconst\fP"
+.br
+.ti -1c
+.RI "\fBbool\fP \fBoperator==\fP (\fBconst\fP \fBBaseDimension\fP< \fBTimeTup\fP, std::tuple<> > &\fBrhs\fP) \fBconst\fP"
+.br
+.ti -1c
+.RI "\fBbool\fP \fBoperator!=\fP (\fBconst\fP \fBBaseDimension\fP< \fBTimeTup\fP, std::tuple<> > &\fBrhs\fP) \fBconst\fP"
+.br
+.in -1c
+.SS "Additional Inherited Members"
+
+
+Public Attributes inherited from \fBDimension::BaseDimension< TimeTup, std::tuple<> >\fP
+.in +1c
+.ti -1c
+.RI "\fBTimeTup\fP \fBnumList\fP"
+.br
+.RI "Tuple of units corresponding to the \fBDimension\fP numerator\&. "
+.ti -1c
+.RI "std::tuple<> \fBdenList\fP"
+.br
+.RI "Tuple of units corresponding to the \fBDimension\fP denominator\&. "
+.in -1c
+.SH "Detailed Description"
+.PP 
+\fBTime\fP dimension, derived from \fBBaseDimension\fP\&. 
+
+This dimension is a specialization using \fBTime\fP as the unit\&. 
+.PP
+\fBTodo\fP
+.RS 4
+Add some convenience methods to retrieve \fBTime\fP by name 
+.RE
+.PP
+
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "Dimension::Time::Time (\fBdouble\fP value, \fBTimeUnit\fP * unit)\fR [inline]\fP, \fR [explicit]\fP"
+
+.PP
+Constructor using value and time units\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIvalue\fP The value to set 
+.br
+\fItime\fP Pointer to the time unit 
+.RE
+.PP
+
+.SS "Dimension::Time::Time (\fBconst\fP \fBBaseDimension\fP< \fBTimeTup\fP, std::tuple<> > & base)\fR [inline]\fP"
+
+.PP
+Cast operator from a \fBBaseDimension\fP\&. 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Dimensional from the source code\&.

@@ -1,0 +1,62 @@
+.TH "Dimension::ConvertFunctor< isNumerator >" 3 "Version 0.4" "Dimensional" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Dimension::ConvertFunctor< isNumerator > \- Simple stuct exposing the ConvertValue callable based on the isNumerator flag\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fR#include <DimensionUtilities\&.h>\fP
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "template<\fBtypename\fP \fBFromUnit\fP , \fBtypename\fP \fBToUnit\fP > \fBvoid\fP \fBoperator()\fP (\fBconst\fP \fBFromUnit\fP *\fBfromUnit\fP, \fBconst\fP \fBToUnit\fP *\fBtoUnit\fP, \fBdouble\fP &value) \fBconst\fP"
+.br
+.RI "Operator overload binding () to ConvertValue\&. "
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.SS "template<\fBbool\fP isNumerator>
+.br
+struct Dimension::ConvertFunctor< isNumerator >"Simple stuct exposing the ConvertValue callable based on the isNumerator flag\&. 
+
+
+.PP
+\fBTemplate Parameters\fP
+.RS 4
+\fIisNumerator\fP Bool indicating whether conversions should occur in context of a numerator, which are inverted relative to denominator conversions\&. 
+.RE
+.PP
+
+.SH "Member Function Documentation"
+.PP 
+.SS "template<\fBbool\fP isNumerator> template<\fBtypename\fP \fBFromUnit\fP , \fBtypename\fP \fBToUnit\fP > \fBvoid\fP \fBDimension::ConvertFunctor\fP< \fBisNumerator\fP >::operator() (\fBconst\fP \fBFromUnit\fP * fromUnit, \fBconst\fP \fBToUnit\fP * toUnit, \fBdouble\fP & value) const\fR [inline]\fP"
+
+.PP
+Operator overload binding () to ConvertValue\&. Binds ConvertValue callable to the operator () using the isNumerator flag, which converts from unit FromUnit to unit ToUnit\&. 
+.PP
+\fBTemplate Parameters\fP
+.RS 4
+\fIFromUnit\fP The unit to convert from 
+.br
+\fIToUnit\fP The unit to convert from 
+.RE
+.PP
+\fBParameters\fP
+.RS 4
+\fIfromUnit\fP Pointer to the Unit object to convert from 
+.br
+\fItoUnit\fP Pointer to the Unit object to convert to 
+.br
+\fIvalue\fP The input value to be converted which is updated through this call 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Dimensional from the source code\&.

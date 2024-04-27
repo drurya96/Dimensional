@@ -1,0 +1,10 @@
+var searchData=
+[
+  ['getconversion_0',['getConversion',['../class_dimension_1_1_base_unit.html#a5426940543d124e23cf92e1c247344e2',1,'Dimension::BaseUnit']]],
+  ['getconversionmap_1',['GetConversionMap',['../class_dimension_1_1_length_unit.html#aa42acbf10737841ddf06b374ae3398ec',1,'Dimension::LengthUnit::GetConversionMap()'],['../class_dimension_1_1_time_unit.html#aa01d47915bf7bb646e16bb30ede5c443',1,'Dimension::TimeUnit::GetConversionMap()']]],
+  ['getconvertedvalue_2',['GetConvertedValue',['../namespace_dimension.html#a1285328a09edba0b6037bdda6696aeac',1,'Dimension::GetConvertedValue(const std::tuple&lt; Ts... &gt; &amp;tup, const std::tuple&lt; Ts... &gt; &amp;tup2, double &amp;value, Functor func)'],['../namespace_dimension.html#a1f81cbbaa5d0bc1e039a1b3a925e771e',1,'Dimension::GetConvertedValue(const std::tuple&lt; Ts... &gt; &amp;fromTup, const std::tuple&lt; Ts... &gt; &amp;toTup, double &amp;value, Functor func)']]],
+  ['getinstance_3',['GetInstance',['../class_dimension_1_1_unit_factory.html#abb618ad9563b7c06f387a8ab052cce71',1,'Dimension::UnitFactory::GetInstance()'],['../class_dimension_1_1_length_unit.html#aed53821fe64b028b6c6a6a9a1aca8695',1,'Dimension::LengthUnit::GetInstance()'],['../class_dimension_1_1_time_unit.html#a57fb71be9d205715abda67f85da6d8f0',1,'Dimension::TimeUnit::GetInstance()']]],
+  ['getprimaryunit_4',['GetPrimaryUnit',['../class_dimension_1_1_base_unit.html#a640e739269aa4584028025a2375dc65b',1,'Dimension::BaseUnit::GetPrimaryUnit()'],['../class_dimension_1_1_length_unit.html#a2b022bb8b5737aa78d75cfd364064de9',1,'Dimension::LengthUnit::GetPrimaryUnit()'],['../class_dimension_1_1_time_unit.html#a6a4ea9e7cf4b485098c3a1588cbea662',1,'Dimension::TimeUnit::GetPrimaryUnit()']]],
+  ['getunitname_5',['GetUnitName',['../class_dimension_1_1_base_unit.html#a186261bcf25ad00423814ac7c4edee54',1,'Dimension::BaseUnit']]],
+  ['getval_6',['GetVal',['../class_dimension_1_1_base_dimension.html#a5b1d55775298fb4796d5f7d42fddf4c1',1,'Dimension::BaseDimension']]]
+];

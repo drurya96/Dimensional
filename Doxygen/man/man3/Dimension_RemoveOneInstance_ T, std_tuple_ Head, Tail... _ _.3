@@ -1,0 +1,31 @@
+.TH "Dimension::RemoveOneInstance< T, std::tuple< Head, Tail... > >" 3 "Version 0.4" "Dimensional" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Dimension::RemoveOneInstance< T, std::tuple< Head, Tail... > >
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fR#include <DimensionUtilities\&.h>\fP
+.SS "Public Types"
+
+.in +1c
+.ti -1c
+.RI "\fBusing\fP \fBtype\fP"
+.br
+.in -1c
+.SH "Member Typedef Documentation"
+.PP 
+.SS "template<\fBtypename\fP \fBT\fP , \fBtypename\fP \fBHead\fP , typename\&.\&.\&. Tail> \fBusing\fP \fBDimension::RemoveOneInstance\fP< \fBT\fP, std::tuple< \fBHead\fP, Tail\&.\&.\&. > >::type"
+\fBInitial value:\fP.PP
+.nf
+ std::conditional_t<std::is_same_v<typename remove_pointer<T>::type, typename remove_pointer<Head>::type>,
+         std::tuple<Tail\&.\&.\&.>,
+         decltype(tuple_cat_t<std::tuple<Head>, typename RemoveOneInstance<T, std::tuple<Tail\&.\&.\&.>>::type>())>
+.fi
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Dimensional from the source code\&.

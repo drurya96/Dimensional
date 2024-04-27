@@ -1,0 +1,237 @@
+.TH "Dimension::BaseUnit< Unit >" 3 "Version 0.4" "Dimensional" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+Dimension::BaseUnit< Unit > \- A base class representing a unit\&.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fR#include <BaseDimension\&.h>\fP
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBBaseUnit\fP ()"
+.br
+.RI "Default constructor\&. "
+.ti -1c
+.RI "\fBBaseUnit\fP (\fBconst\fP std::string &\fBname\fP)"
+.br
+.RI "Constructor setting name\&. "
+.ti -1c
+.RI "\fBvirtual\fP \fB~BaseUnit\fP ()=0"
+.br
+.RI "Pure virtual destructor\&. "
+.ti -1c
+.RI "\fBvirtual\fP std::string \fBGetUnitName\fP () \fBconst\fP"
+.br
+.RI "Getter for the Unit name\&. "
+.ti -1c
+.RI "\fBvirtual\fP \fBBaseUnit\fP< \fBUnit\fP > * \fBGetPrimaryUnit\fP () \fBconst\fP =0"
+.br
+.RI "Getter for the 'primary' unit within this units dimension\&. "
+.ti -1c
+.RI "\fBconst\fP std::function< \fBdouble\fP(\fBdouble\fP)> & \fBgetConversion\fP (\fBconst\fP \fBBaseUnit\fP< \fBUnit\fP > &\fBunit\fP) \fBconst\fP"
+.br
+.RI "Get the conversion functor from this unit to the provided unit\&. "
+.ti -1c
+.RI "\fBUnit\fP & \fBadd_conversion\fP (\fBconst\fP \fBBaseUnit\fP< \fBUnit\fP > &\fBtoUnit\fP, std::function< \fBdouble\fP(\fBdouble\fP)> \fBconversion\fP)"
+.br
+.RI "Add a conversion to the map of conversions\&. "
+.ti -1c
+.RI "template<\fBbool\fP isNumerator> \fBdouble\fP \fBConvertValue\fP (\fBconst\fP \fBdouble\fP \fBinput\fP, \fBconst\fP \fBBaseUnit\fP< \fBUnit\fP > *\fBtoUnit\fP) \fBconst\fP"
+.br
+.RI "Convert the input value from this unit to the given unit\&. "
+.ti -1c
+.RI "\fBUnit\fP & \fBInitialize\fP ()"
+.br
+.RI "Initialize unit and return a reference to self\&. "
+.ti -1c
+.RI "\fBbool\fP \fBisInitialized\fP ()"
+.br
+.RI "Public getter for initialized\&. "
+.in -1c
+.SS "Static Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBstatic\fP \fBbool\fP \fBValidateConversions\fP (\fBconst\fP std::vector< \fBBaseUnit\fP< \fBUnit\fP > * > &\fBUnitVector\fP, \fBconst\fP \fBBaseUnit\fP< \fBUnit\fP > &\fBPrimaryUnit\fP)"
+.br
+.RI "Validate all conversions\&. "
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.SS "template<\fBtypename\fP \fBUnit\fP>
+.br
+class Dimension::BaseUnit< Unit >"A base class representing a unit\&. 
+
+This abstract class represents a Unit, such as Meters, Seconds, Grams, etc\&. 
+.PP
+\fBTemplate Parameters\fP
+.RS 4
+\fIUnit\fP The derived unit, using CRTP 
+.RE
+.PP
+
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "template<\fBtypename\fP \fBUnit\fP > \fBDimension::BaseUnit\fP< \fBUnit\fP >::BaseUnit ()\fR [inline]\fP"
+
+.PP
+Default constructor\&. This default constructor is necessary for some template metaprogramming below 
+.SS "template<\fBtypename\fP \fBUnit\fP > \fBDimension::BaseUnit\fP< \fBUnit\fP >::BaseUnit (\fBconst\fP std::string & name)\fR [inline]\fP"
+
+.PP
+Constructor setting name\&. 
+.SS "template<\fBtypename\fP \fBUnit\fP > \fBDimension::BaseUnit\fP< \fBUnit\fP >::~\fBBaseUnit\fP ()\fR [pure virtual]\fP"
+
+.PP
+Pure virtual destructor\&. Destructor implementation\&. 
+.SH "Member Function Documentation"
+.PP 
+.SS "template<\fBtypename\fP \fBUnit\fP > \fBUnit\fP & \fBDimension::BaseUnit\fP< \fBUnit\fP >::add_conversion (\fBconst\fP \fBBaseUnit\fP< \fBUnit\fP > & toUnit, std::function< \fBdouble\fP(\fBdouble\fP)> conversion)\fR [inline]\fP"
+
+.PP
+Add a conversion to the map of conversions\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fItoUnit\fP The unit to convert to 
+.br
+\fIconversion\fP The conversion lamda to convert from this unit to toUnit 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+A bool indicating success of adding the conversion 
+.RE
+.PP
+\fBTodo\fP
+.RS 4
+Add validation for successful addition, throw runtime error otherwise 
+.RE
+.PP
+
+.SS "template<\fBtypename\fP \fBUnit\fP > template<\fBbool\fP isNumerator> \fBdouble\fP \fBDimension::BaseUnit\fP< \fBUnit\fP >::ConvertValue (\fBconst\fP \fBdouble\fP input, \fBconst\fP \fBBaseUnit\fP< \fBUnit\fP > * toUnit) const\fR [inline]\fP"
+
+.PP
+Convert the input value from this unit to the given unit\&. This will use the direct conversion if one is provided, otherwise it will convert to the primary unit, then to the given unit\&. Conversions are inverted if isNumerator is false\&. 
+.PP
+\fBTemplate Parameters\fP
+.RS 4
+\fIisNumerator\fP Bool indicating if the operation is a numerator\&. Denominator operations are inverted relative to numerator operations 
+.RE
+.PP
+\fBParameters\fP
+.RS 4
+\fIinput\fP The value to convert 
+.br
+\fItoUnit\fP Pointer to the unit object to convert to 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+The converted value as a double 
+.RE
+.PP
+
+.SS "template<\fBtypename\fP \fBUnit\fP > \fBconst\fP std::function< \fBdouble\fP(\fBdouble\fP)> & \fBDimension::BaseUnit\fP< \fBUnit\fP >::getConversion (\fBconst\fP \fBBaseUnit\fP< \fBUnit\fP > & unit) const\fR [inline]\fP"
+
+.PP
+Get the conversion functor from this unit to the provided unit\&. 
+.PP
+\fBParameters\fP
+.RS 4
+\fIunit\fP The unit to retrieve a conversion to 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+The conversion functor 
+.RE
+.PP
+\fBTodo\fP
+.RS 4
+Validate successful conversion retrieval 
+.RE
+.PP
+
+.SS "template<\fBtypename\fP \fBUnit\fP > \fBvirtual\fP \fBBaseUnit\fP< \fBUnit\fP > * \fBDimension::BaseUnit\fP< \fBUnit\fP >::GetPrimaryUnit () const\fR [pure virtual]\fP"
+
+.PP
+Getter for the 'primary' unit within this units dimension\&. Get a pointer to the 'primary' unit within this units dimension\&. For example, this functional call for the unit Feet might return a pointer to Meters, if Meters is the primary unit\&. More on the 'primary' unit below 
+.PP
+\fBReturns\fP
+.RS 4
+A pointer to the 'primary' unit 
+.RE
+.PP
+\fBTodo\fP
+.RS 4
+Prefer returning a reference, need to evaluate fallout 
+.RE
+.PP
+
+.PP
+Implemented in \fBDimension::LengthUnit\fP, and \fBDimension::TimeUnit\fP\&.
+.SS "template<\fBtypename\fP \fBUnit\fP > \fBvirtual\fP std::string \fBDimension::BaseUnit\fP< \fBUnit\fP >::GetUnitName () const\fR [inline]\fP, \fR [virtual]\fP"
+
+.PP
+Getter for the Unit name\&. 
+.PP
+\fBReturns\fP
+.RS 4
+A string indicating the unit name 
+.RE
+.PP
+\fBTodo\fP
+.RS 4
+This is primarily used to determine which conversion to use\&. If conversions change to use the existing global variables, this could be removed 
+.RE
+.PP
+
+.SS "template<\fBtypename\fP \fBUnit\fP > \fBUnit\fP & \fBDimension::BaseUnit\fP< \fBUnit\fP >::Initialize ()\fR [inline]\fP"
+
+.PP
+Initialize unit and return a reference to self\&. Sets the initialized flag to true and steps through the conversion map provided for this unit type\&. Other instances of this unit type are retrieved via the \fBUnitFactory\fP, which is called through the derived unit's GetInstance method\&. 
+.PP
+\fBReturns\fP
+.RS 4
+Instance of self for chaining 
+.RE
+.PP
+
+.SS "template<\fBtypename\fP \fBUnit\fP > \fBbool\fP \fBDimension::BaseUnit\fP< \fBUnit\fP >::isInitialized ()\fR [inline]\fP"
+
+.PP
+Public getter for initialized\&. 
+.SS "template<\fBtypename\fP \fBUnit\fP > \fBstatic\fP \fBbool\fP \fBDimension::BaseUnit\fP< \fBUnit\fP >::ValidateConversions (\fBconst\fP std::vector< \fBBaseUnit\fP< \fBUnit\fP > * > & UnitVector, \fBconst\fP \fBBaseUnit\fP< \fBUnit\fP > & PrimaryUnit)\fR [inline]\fP, \fR [static]\fP"
+
+.PP
+Validate all conversions\&. This function should be called as part of the initialization step of each derived Unit type\&. It should be given the vector of all Units for the Unit type at hand, as well as the Primary Unit of that \fBDimension\fP 
+.PP
+\fBParameters\fP
+.RS 4
+\fIUnitVector\fP The vector of all Units within this dimension 
+.br
+\fIPrimaryUnit\fP The 'primary' unit for this dimension\&. Every unit must have a conversion to and from this unit\&. While other conversions are allowed, these conversions are mandatory\&. 
+.RE
+.PP
+\fBReturns\fP
+.RS 4
+A bool indicating successful validation 
+.RE
+.PP
+\fBTodo\fP
+.RS 4
+Update this since the vectors aren't used anymore 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Dimensional from the source code\&.

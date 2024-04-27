@@ -1,0 +1,95 @@
+.TH "BaseDimension.h" 3 "Version 0.4" "Dimensional" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+BaseDimension.h
+.SH SYNOPSIS
+.br
+.PP
+\fR#include <vector>\fP
+.br
+\fR#include <type_traits>\fP
+.br
+\fR#include <tuple>\fP
+.br
+\fR#include <string>\fP
+.br
+\fR#include <unordered_map>\fP
+.br
+\fR#include <functional>\fP
+.br
+\fR#include <algorithm>\fP
+.br
+\fR#include 'DimensionUtilities\&.h'\fP
+.br
+
+.SS "Classes"
+
+.in +1c
+.ti -1c
+.RI "class \fBDimension::BaseUnit< Unit >\fP"
+.br
+.RI "A base class representing a unit\&. "
+.ti -1c
+.RI "class \fBDimension::UnitFactory< Unit, DerivedFactory >\fP"
+.br
+.RI "Base factory class to produce unit objects\&. "
+.ti -1c
+.RI "class \fBDimension::BaseDimension< NumTuple, DenTuple >\fP"
+.br
+.RI "A generic \fBDimension\fP class\&. "
+.in -1c
+.SS "Namespaces"
+
+.in +1c
+.ti -1c
+.RI "namespace \fBDimension\fP"
+.br
+.in -1c
+.SS "Typedefs"
+
+.in +1c
+.ti -1c
+.RI "\fBusing\fP \fBDimension::ConversionMap\fP = std::unordered_map<std::string, std::vector<std::pair<std::string, std::function<\fBdouble\fP(\fBdouble\fP)>>>>"
+.br
+.RI "Alias for conversion map\&. "
+.in -1c
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "template<\fBtypename\fP \fBNumTuple1\fP , \fBtypename\fP \fBDenTuple1\fP , \fBtypename\fP \fBNumTuple2\fP , \fBtypename\fP \fBDenTuple2\fP > \fBauto\fP \fBDimension::operator/\fP (\fBconst\fP \fBBaseDimension\fP< \fBNumTuple1\fP, \fBDenTuple1\fP > &\fBobj1\fP, \fBconst\fP \fBBaseDimension\fP< \fBNumTuple2\fP, \fBDenTuple2\fP > &\fBobj2\fP)"
+.br
+.RI "Division operator for two Dimensions\&. "
+.ti -1c
+.RI "template<\fBtypename\fP \fBNumTuple1\fP , \fBtypename\fP \fBDenTuple1\fP , \fBtypename\fP \fBNumTuple2\fP , \fBtypename\fP \fBDenTuple2\fP > \fBauto\fP \fBDimension::operator*\fP (\fBconst\fP \fBBaseDimension\fP< \fBNumTuple1\fP, \fBDenTuple1\fP > &\fBobj1\fP, \fBconst\fP \fBBaseDimension\fP< \fBNumTuple2\fP, \fBDenTuple2\fP > &\fBobj2\fP)"
+.br
+.RI "Multiplication operator for two Dimensions\&. "
+.ti -1c
+.RI "template<\fBtypename\fP \fBNumTuple\fP , \fBtypename\fP \fBDenTuple\fP > \fBBaseDimension\fP< \fBNumTuple\fP, \fBDenTuple\fP > \fBDimension::operator*\fP (\fBconst\fP \fBBaseDimension\fP< \fBNumTuple\fP, \fBDenTuple\fP > &\fBobj\fP, \fBdouble\fP \fBscalar\fP)"
+.br
+.RI "Multiplication operator for a \fBDimension\fP and scalar\&. "
+.ti -1c
+.RI "template<\fBtypename\fP \fBNumTuple\fP , \fBtypename\fP \fBDenTuple\fP > \fBBaseDimension\fP< \fBNumTuple\fP, \fBDenTuple\fP > \fBDimension::operator*\fP (\fBdouble\fP \fBscalar\fP, \fBconst\fP \fBBaseDimension\fP< \fBNumTuple\fP, \fBDenTuple\fP > &\fBobj\fP)"
+.br
+.RI "Multiplication operator for a scalar and \fBDimension\fP\&. "
+.ti -1c
+.RI "template<\fBtypename\fP \fBNumTuple\fP , \fBtypename\fP \fBDenTuple\fP > \fBBaseDimension\fP< \fBNumTuple\fP, \fBDenTuple\fP > \fBDimension::operator/\fP (\fBconst\fP \fBBaseDimension\fP< \fBNumTuple\fP, \fBDenTuple\fP > &\fBobj\fP, \fBdouble\fP \fBscalar\fP)"
+.br
+.RI "Division operator for a \fBDimension\fP and scalar\&. "
+.ti -1c
+.RI "template<\fBtypename\fP \fBNumTuple\fP , \fBtypename\fP \fBDenTuple\fP > \fBauto\fP \fBDimension::operator/\fP (\fBdouble\fP \fBscalar\fP, \fBconst\fP \fBBaseDimension\fP< \fBNumTuple\fP, \fBDenTuple\fP > &\fBobj\fP) \-> \fBBaseDimension\fP< \fBDenTuple\fP, \fBNumTuple\fP >"
+.br
+.RI "Division operator for a scalar and \fBDimension\fP\&. "
+.ti -1c
+.RI "template<\fBtypename\fP \fBNumTuple\fP , \fBtypename\fP \fBDenTuple\fP > \fBBaseDimension\fP< \fBNumTuple\fP, \fBDenTuple\fP > \fBDimension::operator+\fP (\fBconst\fP \fBBaseDimension\fP< \fBNumTuple\fP, \fBDenTuple\fP > &\fBobj1\fP, \fBconst\fP \fBBaseDimension\fP< \fBNumTuple\fP, \fBDenTuple\fP > &\fBobj2\fP)"
+.br
+.RI "Addition operator for two Dimensions\&. "
+.ti -1c
+.RI "template<\fBtypename\fP \fBNumTuple\fP , \fBtypename\fP \fBDenTuple\fP > \fBBaseDimension\fP< \fBNumTuple\fP, \fBDenTuple\fP > \fBDimension::operator\-\fP (\fBconst\fP \fBBaseDimension\fP< \fBNumTuple\fP, \fBDenTuple\fP > &\fBobj1\fP, \fBconst\fP \fBBaseDimension\fP< \fBNumTuple\fP, \fBDenTuple\fP > &\fBobj2\fP)"
+.br
+.RI "Subtraction operator for two Dimensions\&. "
+.in -1c
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Dimensional from the source code\&.

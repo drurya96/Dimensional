@@ -1,0 +1,27 @@
+.TH "todo" 3 "Version 0.4" "Dimensional" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+todo \- Todo List 
+.PP
+
+.IP "\fBMember \fBDimension::BaseUnit< Unit >::add_conversion\fP (const BaseUnit< Unit > &toUnit, std::function< double(double)> conversion)\fP" 1c
+Add validation for successful addition, throw runtime error otherwise  
+.IP "\fBMember \fBDimension::BaseUnit< Unit >::getConversion\fP (const BaseUnit< Unit > &unit) const\fP" 1c
+Validate successful conversion retrieval  
+.IP "\fBMember \fBDimension::BaseUnit< Unit >::GetPrimaryUnit\fP () const =0\fP" 1c
+Prefer returning a reference, need to evaluate fallout  
+.IP "\fBMember \fBDimension::BaseUnit< Unit >::GetUnitName\fP () const\fP" 1c
+This is primarily used to determine which conversion to use\&. If conversions change to use the existing global variables, this could be removed  
+.IP "\fBMember \fBDimension::BaseUnit< Unit >::ValidateConversions\fP (const std::vector< BaseUnit< Unit > * > &UnitVector, const BaseUnit< Unit > &PrimaryUnit)\fP" 1c
+Update this since the vectors aren't used anymore  
+.IP "\fBClass \fBDimension::Length\fP \fP" 1c
+Add some convenience methods to retrieve \fBLength\fP by name  
+.IP "\fBStruct \fBDimension::MakeCountersImpl< Tuple, UniqueTypes >\fP \fP" 1c
+Consider updating this to a tuple of pairs rather than tuple of tuples  
+.IP "\fBClass \fBDimension::Speed\fP \fP" 1c
+Add some convenience methods to retrieve \fBSpeed\fP by name, such as MetersPerSecond, MilesPerHour, etc\&.  
+.IP "\fBClass \fBDimension::Time\fP \fP" 1c
+Add some convenience methods to retrieve \fBTime\fP by name 
+.PP
+
