@@ -1,9 +1,6 @@
 #include "TestNewDimension.h"
 
 #include "BaseDimension.h"
-//#include "TimeDimension.h"
-//#include "LengthDimension.h"
-//#include "SpeedDimension.h"
 
 using namespace Dimension;
 using namespace std;

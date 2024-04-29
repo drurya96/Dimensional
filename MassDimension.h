@@ -194,7 +194,7 @@ namespace Dimension
 
    /// @brief default implementation if one is not provided
    #ifndef EXTERNAL_MASS_MAP
-      inline ConversionMap LengthUnit::ExternalMap() { return ConversionMap{}; };
+      inline ConversionMap MassUnit::ExternalMap() { return ConversionMap{}; };
    #endif 
 }
 

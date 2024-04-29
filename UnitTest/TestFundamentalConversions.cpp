@@ -7,7 +7,7 @@
 
 
 using Dimension::UnitList;
-/*
+
 TEST_F(FundamentalConversions, TestTime) {
 
    Dimension::Time myTime = Dimension::Time(30.0, &Dimension::TimeUnits::Seconds());
@@ -18,14 +18,8 @@ TEST_F(FundamentalConversions, TestTime) {
 
    Dimension::Time myTime2 = Dimension::Time(60.0, &Dimension::TimeUnits::Minutes());
    ASSERT_DOUBLE_EQ(myTime2.GetVal(UnitList(Dimension::TimeUnits::Hours()), UnitList()), 1.0); // This is a test that conversions can pass through the primary unit
-
-
-   // Testing
-
-   //Dimension::Time myTime3 = Dimension::Time(1000.0, &Dimension::TimeUnits::MilliSeconds());
-   //Dimension::Time myTime4 = Dimension::Time(0.005, &Dimension::TimeUnits::MegaSeconds());
 }
-*/
+
 
 TEST_F(FundamentalConversions, TestLength) {
    Dimension::Length myLength = Dimension::Length(10.0, &Dimension::LengthUnits::Meters());

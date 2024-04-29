@@ -219,7 +219,7 @@ namespace Dimension
 
    /// @brief default implementation if one is not provided
    #ifndef EXTERNAL_TIME_MAP
-      inline ConversionMap LengthUnit::ExternalMap() { return ConversionMap{}; };
+      inline ConversionMap TimeUnit::ExternalMap() { return ConversionMap{}; };
    #endif 
 }
 
