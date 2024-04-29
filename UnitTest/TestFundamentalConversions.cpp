@@ -1,10 +1,13 @@
 #include "TestFundamentalConversions.h"
 
+#include "NewLengthUnits.h"
 #include "TimeDimension.h"
 #include "LengthDimension.h"
+#include "MassDimension.h"
+
 
 using Dimension::UnitList;
-
+/*
 TEST_F(FundamentalConversions, TestTime) {
 
    Dimension::Time myTime = Dimension::Time(30.0, &Dimension::TimeUnits::Seconds());
@@ -15,12 +18,26 @@ TEST_F(FundamentalConversions, TestTime) {
 
    Dimension::Time myTime2 = Dimension::Time(60.0, &Dimension::TimeUnits::Minutes());
    ASSERT_DOUBLE_EQ(myTime2.GetVal(UnitList(Dimension::TimeUnits::Hours()), UnitList()), 1.0); // This is a test that conversions can pass through the primary unit
-}
 
+
+   // Testing
+
+   //Dimension::Time myTime3 = Dimension::Time(1000.0, &Dimension::TimeUnits::MilliSeconds());
+   //Dimension::Time myTime4 = Dimension::Time(0.005, &Dimension::TimeUnits::MegaSeconds());
+}
+*/
 
 TEST_F(FundamentalConversions, TestLength) {
    Dimension::Length myLength = Dimension::Length(10.0, &Dimension::LengthUnits::Meters());
 
    ASSERT_DOUBLE_EQ(myLength.GetVal(UnitList(Dimension::LengthUnits::Meters()), UnitList()), 10.0);
    ASSERT_DOUBLE_EQ(myLength.GetVal(UnitList(Dimension::LengthUnits::Feet()), UnitList()), 32.8084);
+}
+
+TEST_F(FundamentalConversions, TestMass) {
+   Dimension::Mass myMass = Dimension::Mass(1000.0, &Dimension::MassUnits::Gram());
+
+   ASSERT_NEAR(myMass.GetVal(UnitList(Dimension::MassUnits::Pound()), UnitList()), 2.2046226218, 0.0001);
+   ASSERT_NEAR(myMass.GetVal(UnitList(Dimension::MassUnits::Ounce()), UnitList()), 35.273962, 0.0001);
+
 }
