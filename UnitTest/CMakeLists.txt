@@ -12,10 +12,16 @@ set(TEST_SOURCES
     TestOperators.cpp
     TestSimplification.cpp
     TestCastOperators.cpp
+    TestNewDimension.cpp
 )
 
 add_executable(UnitTests ${TEST_SOURCES})
 
 target_include_directories(UnitTests PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
-target_link_libraries(UnitTests Dimensional_LIB gtest gtest_main)
+target_link_libraries(UnitTests PUBLIC
+    Dimensional_LIB
+    Extensions
+    gtest
+    gtest_main
+)

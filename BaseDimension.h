@@ -16,9 +16,6 @@ namespace Dimension
    template<typename Unit, typename DerivedFactory>
    class UnitFactory;
 
-   /// @brief Alias for conversion map
-   using ConversionMap = std::unordered_map<std::string, std::vector<std::pair<std::string, std::function<double(double)>>>>;
-
    /// @brief A base class representing a unit
    /// @details This abstract class represents a Unit,
    ///    such as Meters, Seconds, Grams, etc.
@@ -76,7 +73,7 @@ namespace Dimension
 
          if (false)
          {
-            throw std::runtime_error("Failed to add conversion");
+            //throw std::runtime_error("Failed to add conversion");
          }
 
          return static_cast<Unit&>(*this);
@@ -170,6 +167,10 @@ namespace Dimension
       /// @brief Public getter for initialized
       bool isInitialized() { return initialized; }
 
+      typedef void (*ExtendedMap)();
+
+      static ExtendedMap MyExtendedMap;
+
    private:
       /// @brief The name of the unit
       std::string unitName = "";
@@ -180,6 +181,8 @@ namespace Dimension
 
       /// @brief Flag to determine if unit has been initialized
       bool initialized = false;
+
+      
    };
 
    /// @brief Destructor implementation
@@ -516,4 +519,35 @@ namespace Dimension
    }
 
 }
+
+// TODO: Implement SI conversions
+// Keep this attempt as a starting point
+
+/*
+// Macro for SI prefixes
+
+// Macro definition to create a prefixed factory function
+#define SI_PREFIX(baseName, UnitType, Prefix) \
+   inline static UnitType& Prefix##baseName() { \
+      static std::string fullName = std::string(#Prefix) + #baseName; \
+      UnitType& unit UnitTypeFactory::GetInstance(fullName); \
+      return unit; \
+    }
+
+#define ALL_SI_PREFIXES(baseName, UnitType) \
+SI_PREFIX(baseName, UnitType, Pico); \
+SI_PREFIX(baseName, UnitType, Nano); \
+SI_PREFIX(baseName, UnitType, Micro); \
+SI_PREFIX(baseName, UnitType, Milli); \
+SI_PREFIX(baseName, UnitType, Centi); \
+SI_PREFIX(baseName, UnitType, Deci); \
+SI_PREFIX(baseName, UnitType, Deca); \
+SI_PREFIX(baseName, UnitType, Hepta); \
+SI_PREFIX(baseName, UnitType, Kilo); \
+SI_PREFIX(baseName, UnitType, Mega); \
+SI_PREFIX(baseName, UnitType, Giga); \
+SI_PREFIX(baseName, UnitType, Tera);
+
+*/
+
 #endif // DIMENSION_BASE_H

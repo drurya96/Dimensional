@@ -14,6 +14,7 @@ add_library(Dimensional_LIB INTERFACE)
 target_include_directories(Dimensional_LIB INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(Enable_Dimensional_Tests)
+    add_subdirectory(ExampleExtensions)
     if(TARGET gtest)
         add_subdirectory(UnitTest)
     else()

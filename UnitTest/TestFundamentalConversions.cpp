@@ -1,7 +1,10 @@
 #include "TestFundamentalConversions.h"
 
+#include "NewLengthUnits.h"
 #include "TimeDimension.h"
 #include "LengthDimension.h"
+#include "MassDimension.h"
+
 
 using Dimension::UnitList;
 
@@ -23,4 +26,12 @@ TEST_F(FundamentalConversions, TestLength) {
 
    ASSERT_DOUBLE_EQ(myLength.GetVal(UnitList(Dimension::LengthUnits::Meters()), UnitList()), 10.0);
    ASSERT_DOUBLE_EQ(myLength.GetVal(UnitList(Dimension::LengthUnits::Feet()), UnitList()), 32.8084);
+}
+
+TEST_F(FundamentalConversions, TestMass) {
+   Dimension::Mass myMass = Dimension::Mass(1000.0, &Dimension::MassUnits::Gram());
+
+   ASSERT_NEAR(myMass.GetVal(UnitList(Dimension::MassUnits::Pound()), UnitList()), 2.2046226218, 0.0001);
+   ASSERT_NEAR(myMass.GetVal(UnitList(Dimension::MassUnits::Ounce()), UnitList()), 35.273962, 0.0001);
+
 }
