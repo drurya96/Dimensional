@@ -24,13 +24,10 @@ namespace Dimension
    class BaseUnit
    {
    public:
-      /// @brief Default constructor
-      /// @details This default constructor is necessary
-      ///    for some template metaprogramming below
-      BaseUnit() : unitName(""){}
-
       /// @brief Constructor setting name
-      BaseUnit(const std::string& name) : unitName(name) {}
+      BaseUnit(const std::string& name) : unitName(name), conversions(InitializeMap(name, Unit::GetConversionMap()))
+      {}
+
 
       /// @brief Pure virtual destructor
       virtual ~BaseUnit() = 0;
@@ -61,23 +58,6 @@ namespace Dimension
       {
          return conversions.at(unit.GetUnitName());
       }
-
-      /// @brief Add a conversion to the map of conversions
-      /// @param[in] toUnit The unit to convert to
-      /// @param[in] conversion The conversion lamda to convert from this unit to toUnit
-      /// @return A bool indicating success of adding the conversion
-      /// @todo Add validation for successful addition, throw runtime error otherwise
-      Unit& add_conversion(const BaseUnit<Unit>& toUnit, std::function<double(double)> conversion)
-      {
-         conversions[toUnit.GetUnitName()] = conversion;
-
-         if (false)
-         {
-            //throw std::runtime_error("Failed to add conversion");
-         }
-
-         return static_cast<Unit&>(*this);
-      };
 
       /// @brief Validate all conversions
       /// @details This function should be called as part of the initialization step of each
@@ -138,51 +118,30 @@ namespace Dimension
             }
          }
       }
-
-      /// @brief Initialize unit and return a reference to self
-      /// @details Sets the initialized flag to true and steps through
-      ///    the conversion map provided for this unit type.
-      ///    Other instances of this unit type are retrieved via the
-      ///    UnitFactory, which is called through the derived unit's
-      ///    GetInstance method.
-      /// @return Instance of self for chaining
-      Unit& Initialize()
-      {
-         initialized = true;
-
-         const ConversionMap& conversions = Unit::GetConversionMap();
-
-         auto it = conversions.find(GetUnitName());
-         if (it != conversions.end()) {
-            const auto& convs = it->second;
-            for (const auto& [targetUnit, conversionFunc] : convs)
-            {
-               add_conversion(Unit::GetInstance(targetUnit, false), conversionFunc);
-            }
-         }
-
-         return static_cast<Unit&>(*this);
-      }
-
-      /// @brief Public getter for initialized
-      bool isInitialized() { return initialized; }
-
-      typedef void (*ExtendedMap)();
-
-      static ExtendedMap MyExtendedMap;
-
+      
    private:
       /// @brief The name of the unit
       std::string unitName = "";
 
       /// @brief A map of unit names to conversion functors
       /// @todo Revisit keying on unit objects rather than strings
-      std::unordered_map<std::string, std::function<double(double)>> conversions;
+      std::unordered_map<std::string, std::function<double(double)>>& conversions;
 
-      /// @brief Flag to determine if unit has been initialized
-      bool initialized = false;
-
-      
+      std::unordered_map<std::string, std::function<double(double)>>& InitializeMap(const std::string& name, ConversionMap& map) const
+      {
+         auto it = map.find(GetUnitName());
+         if (it != map.end()) {
+            return it->second;
+         }
+         else
+         {
+            // This should throw some kind of error
+            // Can also do error handling here to ensure conversion to primary exists
+            // Further, if this is the primary, can do checks to ensure conversions to other units
+            static std::unordered_map<std::string, std::function<double(double)>> emptyMap;
+            return emptyMap;
+         }
+      }
    };
 
    /// @brief Destructor implementation
@@ -216,11 +175,6 @@ namespace Dimension
             Unit instance = CreateInstance(name);
             instances[name] = std::make_unique<Unit>(instance);
          }
-         if (initialize && !(instances[name]->isInitialized()))
-         {
-            instances[name]->Initialize();
-         }
-         
 
          return *instances[name];
       }

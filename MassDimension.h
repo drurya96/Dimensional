@@ -22,16 +22,6 @@ namespace Dimension
       /// @brief Constructor only giving name, primary constructor
       MassUnit(const std::string& name) : BaseUnit<MassUnit>(name) {}
 
-      /// @brief Default constructor
-      /// @details This default constructor is necessary
-      ///    for some template metaprogramming on BaseUnit
-      MassUnit() : BaseUnit<MassUnit>() {}
-
-      MassUnit& operator()() {
-         static MassUnit instance;
-         return instance;
-      }
-
       /// @brief Default destructor
       ~MassUnit() {}
 
@@ -55,7 +45,7 @@ namespace Dimension
       ///    All units **MUST** have a conversion to the Primary unit
       ///    and the primary unit **MUST** have a conversion to each unit.
       /// @return The conversion map
-      static ConversionMap GetConversionMap()
+      static ConversionMap& GetConversionMap()
       {
          static ConversionMap map =
          {
@@ -93,11 +83,6 @@ namespace Dimension
                }
             },
          };
-
-         #ifdef EXTERNAL_MASS_MAP
-            ConversionMap externalMap = ExternalMap();
-            mergeConversionMaps(map, externalMap);
-         #endif
 
          return map;
       }
@@ -191,11 +176,6 @@ namespace Dimension
    ///    helper functions
    /// @todo Consider other ways to handle this
    static std::vector<BaseUnit<MassUnit>*> MassUnitVector;
-
-   /// @brief default implementation if one is not provided
-   #ifndef EXTERNAL_MASS_MAP
-      inline ConversionMap MassUnit::ExternalMap() { return ConversionMap{}; };
-   #endif 
 }
 
 #endif // DIMENSION_MASS_H

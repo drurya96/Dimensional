@@ -22,16 +22,6 @@ namespace Dimension
       /// @brief Constructor only giving name, primary constructor
       TimeUnit(const std::string& name) : BaseUnit<TimeUnit>(name) {}
 
-      /// @brief Default constructor
-      /// @details This default constructor is necessary
-      ///    for some template metaprogramming on BaseUnit
-      TimeUnit() : BaseUnit<TimeUnit>() {}
-
-      TimeUnit& operator()() {
-         static TimeUnit instance;
-         return instance;
-      }
-
       /// @brief Default destructor
       ~TimeUnit() {}
 
@@ -55,9 +45,9 @@ namespace Dimension
       ///    All units **MUST** have a conversion to the Primary unit
       ///    and the primary unit **MUST** have a conversion to each unit.
       /// @return The conversion map
-      static ConversionMap GetConversionMap()
+      static ConversionMap& GetConversionMap()
       {
-         static const ConversionMap map =
+         static ConversionMap map =
          {
             {
                "Seconds",
@@ -112,11 +102,6 @@ namespace Dimension
                }
             },
          };
-
-         #ifdef EXTERNAL_TIME_MAP
-            ConversionMap externalMap = ExternalMap();
-            mergeConversionMaps(map, externalMap);
-         #endif
 
          return map;
       }
@@ -216,11 +201,6 @@ namespace Dimension
    ///    helper functions
    /// @todo Consider other ways to handle this
    static std::vector<BaseUnit<TimeUnit>*> TimeUnitVector;
-
-   /// @brief default implementation if one is not provided
-   #ifndef EXTERNAL_TIME_MAP
-      inline ConversionMap TimeUnit::ExternalMap() { return ConversionMap{}; };
-   #endif 
 }
 
 #endif // DIMENSION_TIME_H

@@ -28,8 +28,8 @@ TEST_F(SimplificationTest, SimplificationWithMath) {
 
 TEST_F(SimplificationTest, Simplification) {
 
-   Length length1 = Length(10, &LengthUnits::Meters()());
-   Length length2 = Length(20, &LengthUnits::Feet()());
+   Length length1 = Length(10, &LengthUnits::Meters());
+   Length length2 = Length(20, &LengthUnits::Feet());
 
    Time time1 = Time(5, &TimeUnits::Seconds());
    Time time2 = Time(12, &TimeUnits::Minutes());
