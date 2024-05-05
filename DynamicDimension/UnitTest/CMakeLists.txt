@@ -20,7 +20,7 @@ add_executable(UnitTests ${TEST_SOURCES})
 target_include_directories(UnitTests PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 target_link_libraries(UnitTests PUBLIC
-    Dimensional_LIB
+    DynamicDimension_LIB
     Extensions
     gtest
     gtest_main
