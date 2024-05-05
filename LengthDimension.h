@@ -22,16 +22,6 @@ namespace Dimension
       /// @brief Constructor only giving name, primary constructor
       LengthUnit(const std::string& name) : BaseUnit<LengthUnit>(name) {}
 
-      /// @brief Default constructor
-      /// @details This default constructor is necessary
-      ///    for some template metaprogramming on BaseUnit
-      LengthUnit() : BaseUnit<LengthUnit>() {}
-
-      LengthUnit& operator()() {
-         static LengthUnit instance;
-         return instance;
-      }
-
       /// @brief Default destructor
       ~LengthUnit() {}
 
@@ -40,22 +30,13 @@ namespace Dimension
       ///    the global units are defined.
       LengthUnit* GetPrimaryUnit() const override;
 
-      /// @brief Get user-defined conversion map
-      /// @details (WIP) The conversion map returned by this function
-      ///    will be added to the included conversion map below.
-      ///    The default implementation returns an empty map, but a 
-      ///    new implementation may be provided in a standalone header.
-      ///    This requires passing the compiler definition EXTERNAL_LENGTH_MAP. 
-      /// @todo This is a crude solution, but works for now. Revisit ASAP
-      static ConversionMap ExternalMap();
-
       /// @brief Defines a static conversion map
       /// @details This static conversion map represents the operations
       ///    needed to convert from one unit to another.
       ///    All units **MUST** have a conversion to the Primary unit
       ///    and the primary unit **MUST** have a conversion to each unit.
       /// @return The conversion map
-      static ConversionMap GetConversionMap()
+      static ConversionMap& GetConversionMap()
       {
          static ConversionMap map =
          {
@@ -100,11 +81,6 @@ namespace Dimension
                }
             },
          };
-
-         #ifdef EXTERNAL_LENGTH_MAP
-            ConversionMap externalMap = ExternalMap();
-            mergeConversionMaps(map, externalMap);
-         #endif
 
          return map;
       }
@@ -192,12 +168,6 @@ namespace Dimension
    ///    helper functions
    /// @todo Consider other ways to handle this
    static std::vector<BaseUnit<LengthUnit>*> LengthUnitVector;
-
-   /// @brief default implementation if one is not provided
-   #ifndef EXTERNAL_LENGTH_MAP
-   inline ConversionMap LengthUnit::ExternalMap() { return ConversionMap{}; };
-   #endif 
-
 }
 
 #endif // DIMENSION_LENGTH_H

@@ -28,6 +28,7 @@ TEST_F(FundamentalConversions, TestLength) {
    ASSERT_DOUBLE_EQ(myLength.GetVal(UnitList(Dimension::LengthUnits::Feet()), UnitList()), 32.8084);
 }
 
+
 TEST_F(FundamentalConversions, TestMass) {
    Dimension::Mass myMass = Dimension::Mass(1000.0, &Dimension::MassUnits::Gram());
 

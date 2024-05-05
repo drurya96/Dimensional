@@ -5,18 +5,35 @@
 
 namespace Dimension
 {
-   ConversionMap LengthUnit::ExternalMap() {
-      ConversionMap map =
+   class Initialize_LengthExternalMap
+   {
+   public:
+
+      static inline bool initialized = false;
+
+      Initialize_LengthExternalMap()
       {
+         if (!initialized)
          {
-            "Feet",
+            ConversionMap map =
             {
-               { "Yard", [](double val) { return val / 3.0; }},
-            }
-         },
-      };
-      return map;
+               {
+                  "Feet",
+                  {
+                     { "Yard", [](double val) { return val / 3.0; }},
+                  }
+               },
+            };
+
+            mergeConversionMaps(LengthUnit::GetConversionMap(), map);
+
+            initialized = true;
+         }
+      }
    };
+
+   Initialize_LengthExternalMap init_lengthExternalMap;
+
 }
 
 #endif // LENGTH_EXTENSION_H

@@ -16,24 +16,29 @@ namespace Dimension
    class BaseUnit;
 
    /// @brief Alias for conversion map
-   using ConversionMap = std::unordered_map<std::string, std::vector<std::pair<std::string, std::function<double(double)>>>>;
+   using ConversionMap = std::unordered_map<std::string, std::unordered_map<std::string, std::function<double(double)>>>;
 
    /// @brief Merge items from map2 into map1
    /// @param[in,out] map1 The map to merge items into
    /// @param[in] map2 The new map to merge into map1
-   inline void mergeConversionMaps(ConversionMap& map1, const ConversionMap& map2) {
-      for (const auto& entry : map2) {
-         const std::string& key = entry.first;
-         const auto& vecPairs = entry.second;
+   inline void mergeConversionMaps(ConversionMap& dest, const ConversionMap& src) {
+      for (const auto& srcEntry : src) {
+         const std::string& outerKey = srcEntry.first;
+         const auto& srcInnerMap = srcEntry.second;
 
-         if (map1.find(key) == map1.end()) {
-            map1[key] = vecPairs;
-         }
-         else {
-            map1[key].insert(map1[key].end(), vecPairs.begin(), vecPairs.end());
+         // Access or create the inner map in dest
+         auto& destInnerMap = dest[outerKey];
+
+         for (const auto& srcInnerEntry : srcInnerMap) {
+            const std::string& innerKey = srcInnerEntry.first;
+            const auto& function = srcInnerEntry.second;
+
+            // Add or update the function in dest
+            destInnerMap[innerKey] = function;
          }
       }
    }
+
 
    /// @brief Convenience alias for retrieving the type of a tuple of types
    /// @tparam Ts Parameter pack to types to concatenate
