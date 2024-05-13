@@ -13,9 +13,6 @@
 
 namespace Dimension
 {
-   template<typename Unit, typename DerivedFactory>
-   class UnitFactory;
-
    /// @brief A base class representing a unit
    /// @details This abstract class represents a Unit,
    ///    such as Meters, Seconds, Grams, etc.
@@ -25,169 +22,42 @@ namespace Dimension
    {
    public:
       /// @brief Constructor setting name
-      BaseUnit(const std::string& name) : unitName(name), conversions(InitializeMap(name, Unit::GetConversionMap()))
-      {}
+      BaseUnit(double val) : value(val){}
 
+      BaseUnit() : value(std::numeric_limits<double>::quiet_NaN()) {}
 
       /// @brief Pure virtual destructor
       virtual ~BaseUnit() = 0;
 
-      /// @brief Getter for the Unit name
-      /// @return A string indicating the unit name
-      /// @todo This is primarily used to determine which conversion to use.
-      ///    If conversions change to use the existing global variables, this could be removed
-      virtual std::string GetUnitName() const
-      {
-         return unitName;
-      }
+      double GetValue() { return value; }
 
-      /// @brief Getter for the "primary" unit within this units dimension
-      /// @details Get a pointer to the "primary" unit within this
-      ///    units dimension. For example, this functional call for the unit
-      ///    Feet might return a pointer to Meters, if Meters is the primary unit.
-      ///    More on the "primary" unit below
-      /// @return A pointer to the "primary" unit
-      /// @todo Prefer returning a reference, need to evaluate fallout
-      virtual BaseUnit<Unit>* GetPrimaryUnit() const = 0;
+      void SetValue(double val) { value = val; }
 
-      /// @brief Get the conversion functor from this unit to the provided unit
-      /// @param[in] unit The unit to retrieve a conversion to
-      /// @return The conversion functor
-      /// @todo Validate successful conversion retrieval
-      const std::function<double(double)>& getConversion(const BaseUnit<Unit>& unit) const
-      {
-         return conversions.at(unit.GetUnitName());
-      }
-
-      /// @brief Validate all conversions
-      /// @details This function should be called as part of the initialization step of each
-      ///    derived Unit type. It should be given the vector of all Units for the 
-      ///    Unit type at hand, as well as the Primary Unit of that Dimension
-      /// @param[in] UnitVector The vector of all Units within this dimension
-      /// @param[in] PrimaryUnit The "primary" unit for this dimension.
-      ///    Every unit must have a conversion to and from this unit. While other conversions
-      ///    are allowed, these conversions are mandatory.
-      /// @return A bool indicating successful validation
-      /// @todo Update this since the vectors aren't used anymore
-      static bool ValidateConversions(const std::vector<BaseUnit<Unit>*>& UnitVector, const BaseUnit<Unit>& PrimaryUnit)
-      {
-         return std::all_of(UnitVector.begin(), UnitVector.end(), [&](BaseUnit<Unit>* unit)
-            {
-            auto findit = unit->conversions.find(PrimaryUnit.GetUnitName());
-            auto findit2 = PrimaryUnit.conversions.find(unit->GetUnitName());
-            return (findit != unit->conversions.end() || unit == &PrimaryUnit) &&
-               (findit2 != PrimaryUnit.conversions.end() || unit == &PrimaryUnit);
-            });
-      }
-
-      /// @brief Convert the input value from this unit to the given unit
-      /// @details This will use the direct conversion if one is provided,
-      ///    otherwise it will convert to the primary unit, then to the
-      ///    given unit.
-      ///    Conversions are inverted if isNumerator is false.
-      /// @tparam isNumerator Bool indicating if the operation is a numerator.
-      ///    Denominator operations are inverted relative to numerator operations
-      /// @param[in] input The value to convert
-      /// @param[in] toUnit Pointer to the unit object to convert to
-      /// @return The converted value as a double
-      template<bool isNumerator>
-      double ConvertValue(const double input, const BaseUnit<Unit>* toUnit) const
-      {
-         if (conversions.find(toUnit->GetUnitName()) != conversions.end())
-         {
-            if constexpr (isNumerator) {
-               return getConversion(*toUnit)(input);
-            }
-            else {
-               return toUnit->getConversion(*this)(input);
-            }
-         }
-         else
-         {
-            if constexpr (isNumerator)
-            {
-               return GetPrimaryUnit()->getConversion(*toUnit)(
-                  this->getConversion(*GetPrimaryUnit())(input)
-                  );
-            }
-            else
-            {
-               return toUnit->getConversion(*GetPrimaryUnit())(
-                  GetPrimaryUnit()->getConversion(*this)(input)
-                  );
-            }
-         }
-      }
+      //double GetPrimary()
+      //{
+         // TODO: Implement this to retrieve the value converted to the primary unit
+         //return value;
+      //}
       
-   private:
-      /// @brief The name of the unit
-      std::string unitName = "";
-
-      /// @brief A map of unit names to conversion functors
-      /// @todo Revisit keying on unit objects rather than strings
-      std::unordered_map<std::string, std::function<double(double)>>& conversions;
-
-      std::unordered_map<std::string, std::function<double(double)>>& InitializeMap(const std::string& name, ConversionMap& map) const
-      {
-         auto it = map.find(GetUnitName());
-         if (it != map.end()) {
-            return it->second;
-         }
-         else
-         {
-            // This should throw some kind of error
-            // Can also do error handling here to ensure conversion to primary exists
-            // Further, if this is the primary, can do checks to ensure conversions to other units
-            static std::unordered_map<std::string, std::function<double(double)>> emptyMap;
-            return emptyMap;
-         }
-      }
+   protected:
+      double value = 0;
    };
+   
+   template<typename fromUnit, typename toUnit>
+   toUnit ConvertValue(fromUnit& obj);
+
+   template<typename Unit>
+   Unit ConvertValue(Unit& obj) {
+      return obj;
+   }
 
    /// @brief Destructor implementation
    template<typename Unit>
    BaseUnit<Unit>::~BaseUnit() {}
 
-   /// @brief Base factory class to produce unit objects
-   /// @tparam Unit The derived unit class to instantiate
-   /// @tparam DerivedFactory Derived class for CRTP
-   template<typename Unit, typename DerivedFactory>
-   class UnitFactory {
-   public:
-      
-      /// @brief Return an instance of Unit with the given name
-      /// @details If a Unit with the given name already exists, return it.
-      ///    Otherwise, create a new instance and add it to the static
-      ///    instances map. Pass the initialize flag along when creating the
-      ///    new instance to determine whether the new instance should be initialized.
-      ///    Creating an unitialized Unit is useful to avoid circular dependencies
-      ///    between Unit instantiations.
-      /// @param[in] name The name of the Unit to retrieve or create
-      /// @param[in] initialize Flag indicating whether newly created instances
-      ///    should be initialized.
-      /// @return An instance of Unit corresponding to name
-      static Unit& GetInstance(const std::string& name, bool initialize = true) {
-         static std::unordered_map<std::string, std::unique_ptr<Unit>> instances;
-         auto it = instances.find(name);
-         
-         if (it == instances.end())
-         {
-            Unit instance = CreateInstance(name);
-            instances[name] = std::make_unique<Unit>(instance);
-         }
 
-         return *instances[name];
-      }
-   private:
 
-      /// @brief Create a new instance of Unit
-      /// @param[in] name The name of the Unit to create
-      /// @return The instantiated unit
-      static Unit CreateInstance(const std::string& name)
-      {
-         return Unit(name);
-      }
-   };
+
 
    /// @brief A generic Dimension class
    /// @details This class represents a Dimension,
@@ -207,7 +77,7 @@ namespace Dimension
    public:
       /// @brief Default constructor
       BaseDimension() : 
-         value(0.0)
+         value(1.0)
       {
       }
 
@@ -237,6 +107,38 @@ namespace Dimension
       {
       }
 
+
+
+
+      /// Constructor for doing arithemetic
+      /// Make sure to make these const ref eventually
+      template<typename ... NumTypes1, typename ... NumTypes2, typename ... DenTypes1, typename ... DenTypes2>
+      BaseDimension(std::tuple<NumTypes1...> NumTuple1, std::tuple<NumTypes2...> NumTuple2, std::tuple<DenTypes1...> DenTuple1, std::tuple<DenTypes2...> DenTuple2) :
+         value(1.0),
+         //numList(StaticUnitSimplifier<std::tuple<NumTypes1...>, std::tuple<NumTypes2...>, std::tuple<DenTypes1...>, std::tuple<DenTypes2...>>::newNum{}),
+         //denList(StaticUnitSimplifier<std::tuple<NumTypes1...>, std::tuple<NumTypes2...>, std::tuple<DenTypes1...>, std::tuple<DenTypes2...>>::newDen{})
+         numList(),
+         denList()
+      {
+         // Constructor logic
+         
+
+         /// Need to modify numList and denList to have the appropriate values, along with the scalar value for cancelled units
+         StaticCancelUnits<0, false>(NumTuple1, numList, value);
+         StaticCancelUnits<0, false>(NumTuple2, numList, value);
+         StaticCancelUnits<0, true>(DenTuple1, denList, value);
+         StaticCancelUnits<0, true>(DenTuple2, denList, value);
+      }
+
+
+
+
+
+
+
+
+
+
       // TODO: Consider copy operator
 
       /// @brief Tuple of units corresponding to the Dimension numerator
@@ -264,6 +166,7 @@ namespace Dimension
          return result;
       }
 
+      /*
       /// @brief += operator overload for another Dimension
       BaseDimension<NumTuple, DenTuple>& operator+=(const BaseDimension<NumTuple, DenTuple>& rhs)
       {
@@ -291,6 +194,10 @@ namespace Dimension
          value /= rhs;
          return *this;
       }
+      */
+
+
+      /*
 
       // The following operators are explicitly deleted
       BaseDimension<NumTuple, DenTuple>& operator*=(const BaseDimension<NumTuple, DenTuple>& rhs) = delete; // Multiplication results in a different type
@@ -306,12 +213,15 @@ namespace Dimension
       bool operator==(const BaseDimension<NumTuple, DenTuple>& rhs) const { return value == rhs.GetVal(numList, denList); } // I need to add a small tolerance to this
       bool operator!=(const BaseDimension<NumTuple, DenTuple>& rhs) const { return !(*this == rhs); }
 
+      */
+
       // TODO: Define a NearlyEqual method with custom tolerance
 
    protected:
 
    private:
       /// @brief The value of the given object
+      /// @details UNUSED - Keeping around while fixing implementation
       double value;
 
       /// @brief Private getter to retrieve the raw value
@@ -320,6 +230,9 @@ namespace Dimension
 
       // Declare operator overloads as friends of this class
       // This is to directly access the raw value for efficiency
+
+
+      /*
 
       template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
       friend auto operator/(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2);
@@ -344,7 +257,15 @@ namespace Dimension
 
       template<typename NumTuple, typename DenTuple>
       friend BaseDimension<NumTuple, DenTuple> operator-(const BaseDimension<NumTuple, DenTuple>& obj1, const BaseDimension<NumTuple, DenTuple>& obj2);
+
+      */
+      
+
    };
+
+
+
+   
 
    /// @brief Division operator for two Dimensions
    /// @tparam NumTuple1 Tuple of numerator units of obj1
@@ -358,6 +279,7 @@ namespace Dimension
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    auto operator/(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
    {
+      /*
       using NumResultTuple = decltype(std::tuple_cat(std::declval<NumTuple1>(), std::declval<DenTuple2>()));
       using DenResultTuple = decltype(std::tuple_cat(std::declval<DenTuple1>(), std::declval<NumTuple2>()));
 
@@ -367,8 +289,33 @@ namespace Dimension
          std::tuple_cat(obj1.numList, obj2.denList),
          std::tuple_cat(obj1.denList, obj2.numList));
       return SimplifyBaseDimension(result);
-   }
+      */
 
+      //using NumResultTuple = decltype(std::tuple_cat(std::declval<NumTuple1>(), std::declval<DenTuple2>()));
+      //using DenResultTuple = decltype(std::tuple_cat(std::declval<DenTuple1>(), std::declval<NumTuple2>()));
+
+      //using ResultType = BaseDimension<NumResultTuple, DenResultTuple>;
+      //std::tuple<NumResultTuple, DenResultTuple> = GetNewUnits()
+
+
+      /// Notes to try
+      /// Construct a dimension of the correct output type, accounting for simplification.
+      /// The units within this type should have no value after construction (or default 0)
+      /// Step through each item of num tuple, 
+      /// 
+      /// Alternatively, try providing a templated constructor for Dimension, which takes two numerators and two denominotors, and works out the result.
+      /// ... This could work...
+
+      
+      using simplified = StaticUnitSimplifier<NumTuple1, DenTuple2, DenTuple1, NumTuple2>;
+
+      //return simplified::dimType(obj1.numList, obj2.numList, obj1.denList, obj2.denList);
+      return simplified::dimType(obj1.numList, obj2.denList, obj1.denList, obj2.numList);
+
+   }
+   
+
+   /*
    /// @brief Multiplication operator for two Dimensions
    /// @tparam NumTuple1 Tuple of numerator units of obj1
    /// @tparam DenTuple1 Tuple of denominator units of obj1
@@ -471,7 +418,7 @@ namespace Dimension
    {
       return BaseDimension<NumTuple, DenTuple>(obj1.GetRawValue() - obj2.GetVal(obj1.numList, obj1.denList), obj1.numList, obj1.denList);
    }
-
+   */
 }
 
 // TODO: Implement SI conversions

@@ -15,30 +15,6 @@ namespace Dimension
    template<typename Unit>
    class BaseUnit;
 
-   /// @brief Alias for conversion map
-   using ConversionMap = std::unordered_map<std::string, std::unordered_map<std::string, std::function<double(double)>>>;
-
-   /// @brief Merge items from map2 into map1
-   /// @param[in,out] map1 The map to merge items into
-   /// @param[in] map2 The new map to merge into map1
-   inline void mergeConversionMaps(ConversionMap& dest, const ConversionMap& src) {
-      for (const auto& srcEntry : src) {
-         const std::string& outerKey = srcEntry.first;
-         const auto& srcInnerMap = srcEntry.second;
-
-         // Access or create the inner map in dest
-         auto& destInnerMap = dest[outerKey];
-
-         for (const auto& srcInnerEntry : srcInnerMap) {
-            const std::string& innerKey = srcInnerEntry.first;
-            const auto& function = srcInnerEntry.second;
-
-            // Add or update the function in dest
-            destInnerMap[innerKey] = function;
-         }
-      }
-   }
-
 
    /// @brief Convenience alias for retrieving the type of a tuple of types
    /// @tparam Ts Parameter pack to types to concatenate
@@ -77,7 +53,7 @@ namespace Dimension
    /// @typedef type A tuple type matching the input tuple type, except the first instance of T is removed
    template<typename T, typename Head, typename... Tail>
    struct RemoveOneInstance<T, std::tuple<Head, Tail...>> {
-      using type = std::conditional_t<std::is_same_v<typename remove_pointer<T>::type, typename remove_pointer<Head>::type>,
+      using type = std::conditional_t<std::is_same_v<T, Head>,
          std::tuple<Tail...>,
          decltype(tuple_cat_t<std::tuple<Head>, typename RemoveOneInstance<T, std::tuple<Tail...>>::type>())>;
    };
@@ -408,6 +384,204 @@ namespace Dimension
       CancelUnits<convertValue, I + 1>(primaryTuple, secondaryTuple, outTuple, counterTup, value);
    }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   /// @brief Struct to check if a tuple of types contains a type
+   template<typename T, typename Tuple>
+   struct has_match;
+
+   /// @brief Struct to check if a tuple of types contains a type
+   /// @details Main specialization
+   /// @tparam T The type to check for
+   /// @tparam Us The types within the tuple
+   /// @typedef value A constexpr bool indicating whether Us contains T
+   template<typename T, typename... Us>
+   struct has_match<T, std::tuple<Us...>> : std::disjunction<std::is_same<typename std::remove_cv<typename T::Dim>::type, typename std::remove_cv<typename Us::Dim>::type>...> {};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   /// @brief Find the difference between two type-tuples
+   template<typename T, typename ...>
+   struct static_tuple_diff;
+
+   /// @brief Find the difference between two type-tuples
+   /// @details Specialization for an empty minuend tuple
+   /// @typedef type Empty tuple
+   template<typename ... subtrahendTypes>
+   struct static_tuple_diff<std::tuple<>, std::tuple<subtrahendTypes...>>
+   {
+      using type = std::tuple<>;
+   };
+
+   /// @brief Find the difference between two type-tuples
+   /// @details Specialization for an empty subtrahend tuple
+   /// @typedef type The entire minuend tuple
+   template<typename... restMinuendTypes>
+   struct static_tuple_diff<std::tuple<restMinuendTypes...>, std::tuple<>> {
+      using type = std::tuple<restMinuendTypes...>;
+   };
+
+   /// @brief Find the difference between two type-tuples
+   /// @details Computes the multiset difference between two tuples, where the multiset
+   ///    difference of the minuend and subtrahend contains all elements from the
+   ///    minuend except those that also appear in the subtrahend.The multiplicity 
+   ///    of elements is taken into account.
+   /// @tparam T The first type in the minuend tuple
+   /// @tparam restMinuendTypes The remaining types in the minuend tuple
+   /// @tparam subtrahendTypes The types in the subtrahend tuple
+   /// @typedef type A tuple of types contain the multiset different between the minuend and subtrahend
+   template<typename T, typename... restMinuendTypes, typename... subtrahendTypes>
+   struct static_tuple_diff<std::tuple<T, restMinuendTypes...>, std::tuple<subtrahendTypes...>> {
+      using type = std::conditional_t<
+         has_match<T, std::tuple<subtrahendTypes...>>::value,
+         typename static_tuple_diff<std::tuple<restMinuendTypes...>, typename RemoveOneInstance<T, std::tuple<subtrahendTypes...>>::type>::type,
+         tuple_cat_t<std::tuple<T>, typename static_tuple_diff<std::tuple<restMinuendTypes...>, std::tuple<subtrahendTypes...>>::type>
+      >;
+   };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   template<typename NumTypes1, typename NumTypes2, typename DenTypes1, typename DenTypes2>
+   struct StaticUnitSimplifier;
+
+   template<typename ... NumTypes1, typename ... NumTypes2, typename ... DenTypes1, typename ... DenTypes2>
+   struct StaticUnitSimplifier<std::tuple<NumTypes1...>, std::tuple<NumTypes2...>, std::tuple<DenTypes1...>, std::tuple<DenTypes2...>>
+   {
+
+      using a = static_tuple_diff<std::tuple<NumTypes1...>, std::tuple<DenTypes2...>>;
+      using b = static_tuple_diff<std::tuple<NumTypes2...>, std::tuple<DenTypes1...>>;
+      //static_assert(std::is_same_v<a, std::tuple<NumTypes1...>>);
+      //static_assert(std::is_same_v<b, std::tuple<NumTypes2...>>);
+      using newNum = tuple_cat_t<typename a::type, typename b::type>;
+
+      using c = static_tuple_diff<std::tuple<DenTypes1...>, std::tuple<NumTypes2...>>;
+      using d = static_tuple_diff<std::tuple<DenTypes2...>, std::tuple<NumTypes1...>>;
+      using newDen = tuple_cat_t<typename c::type, typename d::type>;
+
+      using dimType = BaseDimension<newNum, newDen>;
+   };
+
+
+
+
+
+
+
+
+
+   template<int index = 0, typename T, typename ... RealTypes>
+   typename std::enable_if < index == sizeof...(RealTypes), bool>::type
+   StaticUpdateReal(T& Unit, std::tuple<RealTypes...>& RealTup)
+   {
+      return false;
+   }
+
+
+   template<int index = 0, typename T, typename ... RealTypes>
+   typename std::enable_if<index < sizeof...(RealTypes), bool>::type
+   StaticUpdateReal(T& Unit, std::tuple<RealTypes...>& RealTup)
+   {
+      if constexpr (std::is_same_v<std::tuple_element_t<index, std::tuple<RealTypes...>>::Dim, T::Dim>)
+      {
+         if (std::isnan(std::get<index>(RealTup).GetValue()))
+         {
+            std::get<index>(RealTup).SetValue(Unit.GetValue());
+            return true;
+         }
+      }
+      return StaticUpdateReal<index + 1>(Unit, RealTup);
+   }
+
+
+   template<int index = 0, bool inverse = false, typename ... NumTypes, typename ... RealTypes>
+   typename std::enable_if < index == sizeof...(NumTypes), void>::type
+   StaticCancelUnits(std::tuple<NumTypes...> NumTup, std::tuple<RealTypes...>& RealTup, double& value)
+   {
+      return;
+   }
+
+   template<int index = 0, bool inverse = false, typename ... NumTypes, typename ... RealTypes>
+   typename std::enable_if<index < sizeof...(NumTypes), void>::type
+   StaticCancelUnits(std::tuple<NumTypes...> NumTup, std::tuple<RealTypes...>& RealTup, double& value)
+   {
+      if (!StaticUpdateReal<0>(std::get<index>(NumTup), RealTup))
+      {
+         // Modify value by canceling
+         std::cout << "Value: " << std::get<index>(NumTup).GetValue() << std::endl;
+         if constexpr (inverse)
+         {
+            value *= std::get<index>(NumTup).GetPrimary().GetValue();
+         }
+         else
+         {
+            value /= std::get<index>(NumTup).GetPrimary().GetValue();
+         }
+
+
+      }
+      StaticCancelUnits<index + 1, inverse>(NumTup, RealTup, value);
+   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
    /// @brief Simplify dimensions
    /// @details Given two tuples of dimensions, produce
    ///    two new tuples that simplified after "cancelling out"
@@ -456,5 +630,25 @@ namespace Dimension
 
       return BaseDimension<Simplified::numTuple, Simplified::denTuple>(value, newNumTuple, newDenTuple);
    }
+
+
+
+
+
+
+
+
+   template<typename ... NumTypes, typename ... DenTypes>
+   void TestDivision(const std::tuple<NumTypes...>& NumTuple, const std::tuple<DenTypes...>& DenTuple)
+   {
+
+   }
+
+
+
+
+
+
+
 }
 #endif // DIMENSION_UTILITIES_H

@@ -5,7 +5,7 @@ enable_testing()
 set(TEST_SOURCES 
     DimensionTest.cpp
 
-    #TestUtilities.cpp
+    TestUtilities.cpp
 
     #TestFundamentalConversions.cpp
     #TestCompoundConversions.cpp
