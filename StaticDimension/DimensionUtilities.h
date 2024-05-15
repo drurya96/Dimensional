@@ -130,9 +130,9 @@ namespace Dimension
 
    /// @brief Update the input value, using the input callable, based on the given units
    /// @details Recursive base-case
-   template <size_t I = 0, typename... Ts, typename Functor>
+   template <size_t I = 0, bool inverse = false, typename Qs, typename... Ts>
    typename std::enable_if<I == sizeof...(Ts), void>::type
-      GetConvertedValue(const std::tuple<Ts...>& tup, const std::tuple<Ts...>& tup2, double& value, Functor func)
+      GetConvertedValue(const std::tuple<Ts...>& tup, double& value)
    {
       return;
    }
@@ -147,15 +147,21 @@ namespace Dimension
    /// @param value[in,out] Reference of a value to update
    /// @param func[in] The callable to use for conversion.
    ///    This should be either NumFunctor or DenFunctor
-   template <size_t I = 0, typename... Ts, typename Functor>
+   template <size_t I = 0, bool inverse = false, typename Qs, typename... Ts>
    typename std::enable_if<(I < sizeof...(Ts)), void>::type
-      GetConvertedValue(const std::tuple<Ts...>& fromTup, const std::tuple<Ts...>& toTup, double& value, Functor func)
+      GetConvertedValue(const std::tuple<Ts...>& fromTup, double& value)
    {
-      if (std::get<I>(fromTup) != std::get<I>(toTup))
+      if constexpr (inverse)
       {
-         func(std::get<I>(fromTup), std::get<I>(toTup), value);
+         value /= ConvertValue<std::tuple_element_t<I, std::tuple<Ts...>>, std::tuple_element_t<I, Qs>>(std::get<I>(fromTup)).GetValue();
       }
-      GetConvertedValue<I + 1>(fromTup, toTup, value, func);
+      else
+      {
+         value *= ConvertValue<std::tuple_element_t<I, std::tuple<Ts...>>, std::tuple_element_t<I, Qs>>(std::get<I>(fromTup)).GetValue();
+      }
+
+      GetConvertedValue<I + 1, inverse, Qs>(fromTup, value);
+
    }
 
    /// @brief Simple stuct exposing the ConvertValue callable based on the isNumerator flag

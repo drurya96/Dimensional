@@ -10,9 +10,9 @@ TEST_F(CompoundConversions, TestSpeed) {
 
    using namespace std;
 
-   Speed mySpeed(10.0, &LengthUnits::Meters(), &TimeUnits::Seconds());
+   Speed<Meters, Seconds> mySpeed(10.0);
 
-   ASSERT_DOUBLE_EQ(mySpeed.GetVal(UnitList(LengthUnits::Feet()),   UnitList(TimeUnits::Seconds())), 32.8084);
-   ASSERT_DOUBLE_EQ(mySpeed.GetVal(UnitList(LengthUnits::Meters()), UnitList(TimeUnits::Minutes())), 600.0);
-   ASSERT_DOUBLE_EQ(mySpeed.GetVal(UnitList(LengthUnits::Feet()),   UnitList(TimeUnits::Minutes())), 1968.504);
+   ASSERT_DOUBLE_EQ((mySpeed.GetSpeed<Feet, Seconds>()), 32.8084);
+   ASSERT_DOUBLE_EQ((mySpeed.GetSpeed<Meters, Minutes>()), 600.0);
+   ASSERT_DOUBLE_EQ((mySpeed.GetSpeed<Feet, Minutes>()), 1968.504);
 }

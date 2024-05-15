@@ -18,7 +18,13 @@ TEST_F(UtilitiesTest, Test_tuple_diff) {
 
    ASSERT_DOUBLE_EQ(m.GetValue(), 25.0);
 
+   Inches i1 = ConvertValue<Meters, Inches>(m);
+
    Feet f = ConvertValue<Meters, Feet>(m);
+
+   auto a = f.GetPrimary();
+
+   Inches i2 = ConvertValue<Feet, Inches>(f);
 
    ASSERT_DOUBLE_EQ(f.GetValue(), 82.021);
 

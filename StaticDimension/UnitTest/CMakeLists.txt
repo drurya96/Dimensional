@@ -7,9 +7,9 @@ set(TEST_SOURCES
 
     TestUtilities.cpp
 
-    #TestFundamentalConversions.cpp
-    #TestCompoundConversions.cpp
-    #TestOperators.cpp
+    TestFundamentalConversions.cpp
+    TestCompoundConversions.cpp
+    TestOperators.cpp
     #TestSimplification.cpp
     #TestCastOperators.cpp
     #TestNewDimension.cpp

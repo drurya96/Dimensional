@@ -29,7 +29,7 @@ namespace Dimension
       /// @brief Pure virtual destructor
       virtual ~BaseUnit() = 0;
 
-      double GetValue() { return value; }
+      double GetValue() const { return value; }
 
       void SetValue(double val) { value = val; }
 
@@ -44,12 +44,43 @@ namespace Dimension
    };
    
    template<typename fromUnit, typename toUnit>
-   toUnit ConvertValue(fromUnit& obj);
+   toUnit ConvertValue(const fromUnit& obj)
+   {
+      if constexpr (std::is_same_v<fromUnit, toUnit>)
+      {
+         return obj;
+      }
+      else if constexpr (std::is_same_v<fromUnit::Dim, toUnit::Dim>)
+      {
+         //return toUnit{}; // Implement this
 
+         //auto primary = obj.GetPrimary();
+
+         //return ConvertValue<typename decltype(primary), toUnit>(primary);
+         //return ConvertValue<decltype(obj.GetPrimary()), toUnit>(obj.GetPrimary()); // This is almost there, but not quite working.
+         return ConvertValue<fromUnit::Primary, toUnit>(obj.GetPrimary()); // This is almost there, but not quite working.
+      }
+      else
+      {
+         static_assert(false, "No possible conversion for between these types."); // Try to print the type names, if possible without RTTI
+      }
+   }
+
+   /*
    template<typename Unit>
-   Unit ConvertValue(Unit& obj) {
+   inline Unit ConvertValue(const Unit& obj) {
       return obj;
    }
+   */
+
+   /*
+   template<>
+   inline Feet ConvertValue<Meters, Feet>(const Meters& obj)
+   {
+      return Feet(obj.GetValue() * 3.28084);
+   }
+   */
+
 
    /// @brief Destructor implementation
    template<typename Unit>
@@ -153,18 +184,18 @@ namespace Dimension
       /// @param[in] i_numList tuple of BaseUnit pointers to convert to for the numerator
       /// @param[in] i_denList tuple of BaseUnit pointers to convert to for the denominator
       /// @return A double representing the value in terms of the given units
-      template<typename ... NumTupleTypes, typename ... DenTupleTypes>
-      double GetVal(const std::tuple<NumTupleTypes...>& i_numList, const std::tuple<DenTupleTypes...>& i_denList) const
+      template<typename NumTuple, typename DenTuple>
+      double GetVal() const
       {
          double result = value;
 
-         if (numList == i_numList && denList == i_denList) { return value; }
-
-         GetConvertedValue(numList, i_numList, result, ConvertFunctor<true>());
-         GetConvertedValue(denList, i_denList, result, ConvertFunctor<false>());
+         GetConvertedValue<0, false, NumTuple>(numList, result);
+         GetConvertedValue<0, true, DenTuple>(denList, result);
 
          return result;
       }
+      
+      
 
       /*
       /// @brief += operator overload for another Dimension
@@ -180,6 +211,7 @@ namespace Dimension
          value -= rhs.GetVal(numList, denList);
          return *this;
       }
+      */
 
       /// @brief *= operator overload for a scalar
       BaseDimension<NumTuple, DenTuple>& operator*=(double rhs)
@@ -194,11 +226,11 @@ namespace Dimension
          value /= rhs;
          return *this;
       }
-      */
+      
 
 
-      /*
-
+      
+      
       // The following operators are explicitly deleted
       BaseDimension<NumTuple, DenTuple>& operator*=(const BaseDimension<NumTuple, DenTuple>& rhs) = delete; // Multiplication results in a different type
       BaseDimension<NumTuple, DenTuple>& operator/=(const BaseDimension<NumTuple, DenTuple>& rhs) = delete; // Division results in a different type
@@ -206,23 +238,34 @@ namespace Dimension
       BaseDimension<NumTuple, DenTuple>& operator-=(double rhs) = delete; // Subtraction cannot be performed between a Dimension and a scalar
 
       // Comparison Operators
-      bool operator>(const BaseDimension<NumTuple, DenTuple>& rhs) const { return value > rhs.GetVal(numList, denList); }
-      bool operator<(const BaseDimension<NumTuple, DenTuple>& rhs) const { return value < rhs.GetVal(numList, denList); }
-      bool operator>=(const BaseDimension<NumTuple, DenTuple>& rhs) const { return value >= rhs.GetVal(numList, denList); }
-      bool operator<=(const BaseDimension<NumTuple, DenTuple>& rhs) const { return value <= rhs.GetVal(numList, denList); }
-      bool operator==(const BaseDimension<NumTuple, DenTuple>& rhs) const { return value == rhs.GetVal(numList, denList); } // I need to add a small tolerance to this
-      bool operator!=(const BaseDimension<NumTuple, DenTuple>& rhs) const { return !(*this == rhs); }
+      template<typename CompNumTuple, typename CompDenTuple>
+      bool operator>(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return GetVal<NumTuple, DenTuple>() > rhs.GetVal<NumTuple, DenTuple>(); }
 
-      */
+      template<typename CompNumTuple, typename CompDenTuple>
+      bool operator<(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return GetVal<NumTuple, DenTuple>() < rhs.GetVal<NumTuple, DenTuple>(); }
+
+      template<typename CompNumTuple, typename CompDenTuple>
+      bool operator>=(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return GetVal<NumTuple, DenTuple>() >= rhs.GetVal<NumTuple, DenTuple>(); }
+
+      template<typename CompNumTuple, typename CompDenTuple>
+      bool operator<=(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return GetVal<NumTuple, DenTuple>() <= rhs.GetVal<NumTuple, DenTuple>(); }
+
+      template<typename CompNumTuple, typename CompDenTuple>
+      bool operator==(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return GetVal<NumTuple, DenTuple>() == rhs.GetVal<NumTuple, DenTuple>(); } // I need to add a small tolerance to this
+      
+      template<typename CompNumTuple, typename CompDenTuple>
+      bool operator!=(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return !(*this == rhs); }
+      
+      
 
       // TODO: Define a NearlyEqual method with custom tolerance
 
    protected:
-
-   private:
       /// @brief The value of the given object
       /// @details UNUSED - Keeping around while fixing implementation
       double value;
+   private:
+
 
       /// @brief Private getter to retrieve the raw value
       /// @return The raw value
@@ -232,7 +275,8 @@ namespace Dimension
       // This is to directly access the raw value for efficiency
 
 
-      /*
+      
+      // TODO: Check later if these are still needed in the Static library...
 
       template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
       friend auto operator/(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2);
@@ -258,13 +302,10 @@ namespace Dimension
       template<typename NumTuple, typename DenTuple>
       friend BaseDimension<NumTuple, DenTuple> operator-(const BaseDimension<NumTuple, DenTuple>& obj1, const BaseDimension<NumTuple, DenTuple>& obj2);
 
-      */
+      
       
 
    };
-
-
-
    
 
    /// @brief Division operator for two Dimensions
@@ -279,43 +320,10 @@ namespace Dimension
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    auto operator/(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
    {
-      /*
-      using NumResultTuple = decltype(std::tuple_cat(std::declval<NumTuple1>(), std::declval<DenTuple2>()));
-      using DenResultTuple = decltype(std::tuple_cat(std::declval<DenTuple1>(), std::declval<NumTuple2>()));
-
-      using ResultType = BaseDimension<NumResultTuple, DenResultTuple>;
-      auto result = ResultType(
-         obj1.GetRawValue() / obj2.GetRawValue(),
-         std::tuple_cat(obj1.numList, obj2.denList),
-         std::tuple_cat(obj1.denList, obj2.numList));
-      return SimplifyBaseDimension(result);
-      */
-
-      //using NumResultTuple = decltype(std::tuple_cat(std::declval<NumTuple1>(), std::declval<DenTuple2>()));
-      //using DenResultTuple = decltype(std::tuple_cat(std::declval<DenTuple1>(), std::declval<NumTuple2>()));
-
-      //using ResultType = BaseDimension<NumResultTuple, DenResultTuple>;
-      //std::tuple<NumResultTuple, DenResultTuple> = GetNewUnits()
-
-
-      /// Notes to try
-      /// Construct a dimension of the correct output type, accounting for simplification.
-      /// The units within this type should have no value after construction (or default 0)
-      /// Step through each item of num tuple, 
-      /// 
-      /// Alternatively, try providing a templated constructor for Dimension, which takes two numerators and two denominotors, and works out the result.
-      /// ... This could work...
-
-      
       using simplified = StaticUnitSimplifier<NumTuple1, DenTuple2, DenTuple1, NumTuple2>;
-
-      //return simplified::dimType(obj1.numList, obj2.numList, obj1.denList, obj2.denList);
       return simplified::dimType(obj1.numList, obj2.denList, obj1.denList, obj2.numList);
-
    }
-   
-
-   /*
+  
    /// @brief Multiplication operator for two Dimensions
    /// @tparam NumTuple1 Tuple of numerator units of obj1
    /// @tparam DenTuple1 Tuple of denominator units of obj1
@@ -328,18 +336,10 @@ namespace Dimension
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    auto operator*(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
    {
-      using NumResultTuple = decltype(std::tuple_cat(std::declval<NumTuple1>(), std::declval<NumTuple2>()));
-      using DenResultTuple = decltype(std::tuple_cat(std::declval<DenTuple1>(), std::declval<DenTuple2>()));
-
-      using ResultType = BaseDimension<NumResultTuple, DenResultTuple>;
-      auto result = ResultType(
-         obj1.GetRawValue() * obj2.GetRawValue(),
-         std::tuple_cat(obj1.numList, obj2.numList),
-         std::tuple_cat(obj1.denList, obj2.denList)
-      );
-      return SimplifyBaseDimension(result);
+      using simplified = StaticUnitSimplifier<NumTuple1, NumTuple2, DenTuple1, DenTuple2>;
+      return simplified::dimType(obj1.numList, obj2.numList, obj1.denList, obj2.denList);
    }
-
+ 
    // Scalar Math
 
    /// @brief Multiplication operator for a Dimension and scalar
@@ -354,6 +354,7 @@ namespace Dimension
       return BaseDimension<NumTuple, DenTuple>(obj.GetRawValue() * scalar, obj.numList, obj.denList);
    }
 
+   
    /// @brief Multiplication operator for a scalar and Dimension
    /// @tparam NumTuple Tuple of units in the numerator
    /// @tparam DenTuple Tuple of units in the denominator
@@ -390,7 +391,7 @@ namespace Dimension
    {
       return BaseDimension<DenTuple, NumTuple>(scalar / obj.GetRawValue(), obj.denList, obj.numList);
    }
-
+/*
    /// @brief Addition operator for two Dimensions
    /// @tparam NumTuple Tuple of units in the numerator
    /// @tparam DenTuple Tuple of units in the denominator
@@ -402,7 +403,11 @@ namespace Dimension
    template<typename NumTuple, typename DenTuple>
    BaseDimension<NumTuple, DenTuple> operator+(const BaseDimension<NumTuple, DenTuple>& obj1, const BaseDimension<NumTuple, DenTuple>& obj2)
    {
-      return BaseDimension<NumTuple, DenTuple>(obj1.GetRawValue() + obj2.GetVal(obj1.numList, obj1.denList), obj1.numList, obj1.denList);
+      //return BaseDimension<NumTuple, DenTuple>(obj1.GetRawValue() + obj2.GetVal(obj1.numList, obj1.denList), obj1.numList, obj1.denList);
+
+
+      BaseDimension<NumTuple, DenTuple>(1.0, // Need to add values within the units...
+
    }
 
    /// @brief Subtraction operator for two Dimensions
@@ -419,6 +424,20 @@ namespace Dimension
       return BaseDimension<NumTuple, DenTuple>(obj1.GetRawValue() - obj2.GetVal(obj1.numList, obj1.denList), obj1.numList, obj1.denList);
    }
    */
+
+
+   template<typename Unit, typename Primary>
+   inline Primary GetPrimaryImpl(const Unit& obj)
+   {
+      if constexpr (std::is_same_v<Unit, Primary>)
+      {
+         return obj;
+      }
+      else
+      {
+         return ConvertValue<Unit, Primary>(obj);
+      }
+   }
 }
 
 // TODO: Implement SI conversions

@@ -5,8 +5,9 @@
 
 namespace Dimension
 {
-   struct Time {};
+   struct TimeType {};
    class Seconds;
+   class Minutes;
 
    template<typename Unit>
    class TimeUnit : public BaseUnit<TimeUnit<Unit>>
@@ -14,60 +15,67 @@ namespace Dimension
    public:
       using BaseUnit::BaseUnit;
 
-      using Dim = Time;
+      using Dim = TimeType;
+      using Primary = Seconds;
 
-      Seconds GetPrimary();
-
-      /*
-      Seconds GetPrimary()
-      {
-         return ConvertValue<Unit, Seconds>(*this);
-         //return value;
-      }
-      */
+      Primary GetPrimary() const;
    };
-
-   //class TimeUnit : public BaseUnit<TimeUnit> { public: using BaseUnit::BaseUnit; };
 
    class Seconds : public TimeUnit<Seconds> { public: using TimeUnit::TimeUnit; };
    class Minutes : public TimeUnit<Minutes> { public: using TimeUnit::TimeUnit; };
+   class Hours : public TimeUnit<Hours> { public: using TimeUnit::TimeUnit; };
 
    template<typename Unit>
-   inline Seconds TimeUnit<Unit>::GetPrimary()
+   inline typename TimeUnit<Unit>::Primary TimeUnit<Unit>::GetPrimary() const
    {
-
-
-      if constexpr (std::is_same_v<Unit, Seconds>)
-      {
-         return *(static_cast<Seconds*>(this));
-      }
-      else
-      {
-         return ConvertValue<Unit, Seconds>(*(static_cast<Unit*>(this)));
-      }
-
-      
-      //return value;
+      return GetPrimaryImpl<Unit, Primary>(*(static_cast<const Unit*>(this)));
    }
 
-
-
-
-
-
+   // TODO: Provide reasonable error message for failed conversion due to no primary conversion
 
    template<>
-   Minutes ConvertValue<Seconds, Minutes>(Seconds& obj)
+   inline Minutes ConvertValue<Seconds, Minutes>(const Seconds& obj)
    {
       return Minutes(obj.GetValue() / 60.0);
    }
    
    template<>
-   Seconds ConvertValue<Minutes, Seconds>(Minutes& obj)
+   inline Seconds ConvertValue<Minutes, Seconds>(const Minutes& obj)
    {
       return Seconds(obj.GetValue() * 60.0);
    }
    
+   template<>
+   inline Hours ConvertValue<Seconds, Hours>(const Seconds& obj)
+   {
+      return Hours(obj.GetValue() / 3600.0);
+   }
+
+   template<>
+   inline Seconds ConvertValue<Hours, Seconds>(const Hours& obj)
+   {
+      return Seconds(obj.GetValue() * 3600.0);
+   }
+
+
+
+   template<typename Unit = Seconds>
+   class Time : public BaseDimension<std::tuple<Unit>, std::tuple<>>
+   {
+   public:
+      static_assert(std::is_same_v<Unit::Dim, Seconds::Dim>, "Unit provided does not derive from TimeUnit");
+      using BaseDimension::BaseDimension;
+
+      Time(double val) : BaseDimension(1.0, std::tuple<Unit>{val}, std::tuple<>{}) {}
+
+      template<typename T>
+      double GetTime()
+      {
+         return value * ConvertValue<Unit, T>(std::get<0>(numList)).GetValue();
+      }
+      
+   };
+
    
 }
 
