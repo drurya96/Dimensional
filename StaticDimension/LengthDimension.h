@@ -59,13 +59,14 @@ namespace Dimension
    inline Feet ConvertValue<Meters, Feet>(const Meters& obj)
    {
       std::cout << "Converting Meters to Feet using Direct Conversion..." << std::endl;
-      return Feet(obj.GetValue() * 3.28084);
+      return Feet(obj.GetValue() * 3.280839895);
    }
    
    template<>
    inline Meters ConvertValue<Feet, Meters>(const Feet& obj)
    {
-      return Meters(obj.GetValue() / 3.28084);
+      //return Meters(obj.GetValue() / 3.28084);
+      return Meters(obj.GetValue() / 3.280839895);
    }
    
    template<>
@@ -90,7 +91,16 @@ namespace Dimension
       static_assert(std::is_same_v<Unit::Dim, Meters::Dim>, "Unit provided does not derive from LengthUnit");
       using BaseDimension::BaseDimension;
 
+      Length() : BaseDimension(1.0, std::tuple<Unit>{0.0}, std::tuple<>{}) {}
+
       Length(double val) : BaseDimension(1.0, std::tuple<Unit>{val}, std::tuple<>{}) {}
+
+      template<typename T>
+      Length(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension(base.GetVal<std::tuple<Unit>, std::tuple<>>()){}
+
+
+
+
 
       template<typename T>
       double GetLength()

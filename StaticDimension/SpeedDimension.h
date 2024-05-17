@@ -14,15 +14,18 @@ namespace Dimension
       static_assert(std::is_same_v<TimeUnit::Dim, Seconds::Dim>, "Unit provided does not derive from TimeUnit");
       using BaseDimension::BaseDimension;
 
-      Speed(double val) : BaseDimension(1.0, std::tuple<LengthUnit>{val}, std::tuple<TimeUnit>{1.0}) {} // TODO: Is this how I want to handle this?
+      Speed(double val) : BaseDimension(val, std::tuple<LengthUnit>{1.0}, std::tuple<TimeUnit>{1.0}) {} // TODO: Is this how I want to handle this?
 
 
       /// @brief Cast operator from a BaseDimension
       // TODO: Can this be made more efficient?
       // TODO: Can Cast operator be generalized?
       // TODO: Ensure all units have a cast operator
-      Speed(const BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>& base) : BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>(base)
-      {}
+      //Speed(const BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>& base) : BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>(base)
+      //{}
+
+      template<typename LengthT, typename TimeT>
+      Speed(const BaseDimension<std::tuple<LengthT>, std::tuple<TimeT>>& base) : BaseDimension(base.GetVal<std::tuple<LengthUnit>, std::tuple<TimeUnit>>()) {}
 
       
       template<typename LengthUnitRet, typename TimeUnitRet>

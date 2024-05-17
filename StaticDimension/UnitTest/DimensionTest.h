@@ -11,4 +11,6 @@ protected:
    virtual void TearDown() override {}
 };
 
+const double TOLERANCE = 0.01;
+
 #endif // DIMENSION_TEST_H

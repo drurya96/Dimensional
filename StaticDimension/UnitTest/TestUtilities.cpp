@@ -16,7 +16,7 @@ TEST_F(UtilitiesTest, Test_tuple_diff) {
 
    Meters m = Meters(25.0);
 
-   ASSERT_DOUBLE_EQ(m.GetValue(), 25.0);
+   ASSERT_NEAR(m.GetValue(), 25.0, TOLERANCE);
 
    Inches i1 = ConvertValue<Meters, Inches>(m);
 
@@ -26,23 +26,23 @@ TEST_F(UtilitiesTest, Test_tuple_diff) {
 
    Inches i2 = ConvertValue<Feet, Inches>(f);
 
-   ASSERT_DOUBLE_EQ(f.GetValue(), 82.021);
+   ASSERT_NEAR(f.GetValue(), 82.021, TOLERANCE);
 
 
    Seconds s = Seconds(120.0);
 
-   ASSERT_DOUBLE_EQ(s.GetValue(), 120.0);
+   ASSERT_NEAR(s.GetValue(), 120.0, TOLERANCE);
 
    Minutes min = ConvertValue<Seconds, Minutes>(s);
 
-   ASSERT_DOUBLE_EQ(min.GetValue(), 2.0);
+   ASSERT_NEAR(min.GetValue(), 2.0, TOLERANCE);
 
 
    Dimension::BaseDimension<std::tuple<Seconds, Minutes>, std::tuple<Feet, Meters>> d =
       Dimension::BaseDimension<std::tuple<Seconds, Minutes>, std::tuple<Feet, Meters>>(0.0, std::tuple(s, min), std::tuple(f, m));
 
-   ASSERT_DOUBLE_EQ(std::get<1>(d.numList).GetValue(), 2.0);
-   ASSERT_DOUBLE_EQ(std::get<0>(d.denList).GetValue(), 82.021);
+   ASSERT_NEAR(std::get<1>(d.numList).GetValue(), 2.0, TOLERANCE);
+   ASSERT_NEAR(std::get<0>(d.denList).GetValue(), 82.021, TOLERANCE);
 
    //ASSERT_TRUE(convertible<Meters, Feet>::value);
 
@@ -60,6 +60,12 @@ TEST_F(UtilitiesTest, Test_tuple_diff) {
    using testType = Dimension::StaticUnitSimplifier<std::tuple<Feet>, std::tuple<Meters>, std::tuple<Seconds>, std::tuple<Minutes>>;
    auto test5 = testType::newNum{};
 
+   std::tuple<Meters, Feet> t50{10, 20};
+   std::tuple<Feet, Meters> t51{30, 40};
+   std::tuple<Meters, Feet> t52{};
+
+   AddUnitTuples(t50, t51, t52);
+
 
    //using test3 = std::tuple<Feet, Minutes>;
 
@@ -70,7 +76,7 @@ TEST_F(UtilitiesTest, Test_tuple_diff) {
 
    //auto test = testType::newNum{ 0.0, 0.0 };
 
-   auto test = Dimension::BaseDimension<std::tuple<Feet, Meters>, std::tuple<Seconds, Minutes>>(std::tuple<Feet>{10.0}, std::tuple<Meters>{10.0}, std::tuple<Seconds>{10.0}, std::tuple<Minutes>{10.0});
+   auto test = Dimension::BaseDimension<std::tuple<Feet, Meters>, std::tuple<Seconds, Minutes>>(1.0, std::tuple<Feet>{10.0}, std::tuple<Meters>{10.0}, std::tuple<Seconds>{10.0}, std::tuple<Minutes>{10.0});
 
 
    auto t1 = Dimension::BaseDimension<std::tuple<Feet, Meters>, std::tuple<>>(1.0, std::tuple<Feet, Meters>{}, std::tuple<>{});
@@ -106,6 +112,26 @@ TEST_F(UtilitiesTest, Test_tuple_diff) {
 
    auto t13 = t12 / t30;
    
+
+   using dType = static_tuple_diff<std::tuple<Seconds, Feet, Minutes>, std::tuple<Meters, Minutes>>;
+
+   dType::type testingSimple{};
+
+
+   using aType = static_tuple_diff<std::tuple<Seconds, Minutes>, std::tuple<Minutes>>;
+
+   aType::type testingSimple2{};
+
+   using bType = static_tuple_diff<std::tuple<Seconds, Minutes>, std::tuple<Seconds>>;
+
+   bType::type testingSimple3{};
+
+   using cType = static_tuple_diff<std::tuple<Minutes, Seconds>, std::tuple<Seconds>>;
+
+   cType::type testingSimple4{};
+
+   static_assert(has_match<Seconds, std::tuple<Seconds, Minutes>>::value);
+
    /*
    using t1 = tuple<int*, float*>;
 

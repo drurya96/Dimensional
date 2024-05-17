@@ -33,6 +33,43 @@ namespace Dimension
       using type = T;
    };
 
+
+
+   template<typename T, typename U>
+   struct is_match;
+
+   template<typename T, typename U>
+   struct is_match : std::is_same<typename std::remove_cv<typename T::Dim>::type, typename std::remove_cv<typename U::Dim>::type> {};
+
+   /*
+   /// @brief Struct to check if a tuple of types contains a type
+   template<typename T, typename Tuple>
+   struct has_match;
+
+   /// @brief Struct to check if a tuple of types contains a type
+   /// @details Main specialization
+   /// @tparam T The type to check for
+   /// @tparam Us The types within the tuple
+   /// @typedef value A constexpr bool indicating whether Us contains T
+   template<typename T, typename... Us>
+   struct has_match<T, std::tuple<Us...>> : std::disjunction<std::is_same<typename std::remove_cv<typename T::Dim>::type, typename std::remove_cv<typename Us::Dim>::type>...> {};
+   */
+
+
+   /// @brief Struct to check if a tuple of types contains a type
+   template<typename T, typename Tuple>
+   struct has_match;
+
+   /// @brief Struct to check if a tuple of types contains a type
+   /// @details Main specialization
+   /// @tparam T The type to check for
+   /// @tparam Us The types within the tuple
+   /// @typedef value A constexpr bool indicating whether Us contains T
+   template<typename T, typename... Us>
+   struct has_match<T, std::tuple<Us...>> : std::disjunction<is_match<T, Us>...> {};
+
+
+   /*
    /// @brief Struct to remove one instance of a type from a tuple of types
    template<typename T, typename Tuple>
    struct RemoveOneInstance;
@@ -57,6 +94,36 @@ namespace Dimension
          std::tuple<Tail...>,
          decltype(tuple_cat_t<std::tuple<Head>, typename RemoveOneInstance<T, std::tuple<Tail...>>::type>())>;
    };
+   */
+
+
+
+   /// @brief Struct to remove one instance of a type from a tuple of types
+   template<typename T, typename Tuple>
+   struct Static_RemoveOneInstance;
+
+   /// @brief Struct to remove one instance of a type from a tuple of types
+   ///    Specialization for an empty tuple
+   /// @typedef type An empty tuple
+   template<typename T>
+   struct Static_RemoveOneInstance<T, std::tuple<>> {
+      using type = std::tuple<>;
+   };
+
+   /// @brief Struct to remove one instance of a type from a tuple of types
+   /// @details Main specialization
+   /// @tparam T The type to remove
+   /// @tparam Head the first item of the tuple
+   /// @tparam Tail the remaining items in the tuple
+   /// @typedef type A tuple type matching the input tuple type, except the first instance of T is removed
+   template<typename T, typename Head, typename... Tail>
+   struct Static_RemoveOneInstance<T, std::tuple<Head, Tail...>> {
+      using type = std::conditional_t<is_match<T, Head>::value,
+         std::tuple<Tail...>,
+         decltype(tuple_cat_t<std::tuple<Head>, typename Static_RemoveOneInstance<T, std::tuple<Tail...>>::type>())>;
+   };
+
+
 
    /// @brief Struct to check if a tuple of types contains a type
    template<typename T, typename Tuple>
@@ -104,7 +171,7 @@ namespace Dimension
    struct tuple_diff<std::tuple<T, restMinuendTypes...>, std::tuple<subtrahendTypes...>> {
       using type = std::conditional_t<
          has_type<T, std::tuple<subtrahendTypes...>>::value,
-         typename tuple_diff<std::tuple<restMinuendTypes...>, typename RemoveOneInstance<T, std::tuple<subtrahendTypes...>>::type>::type,
+         typename tuple_diff<std::tuple<restMinuendTypes...>, typename Static_RemoveOneInstance<T, std::tuple<subtrahendTypes...>>::type>::type,
          tuple_cat_t<std::tuple<T>, typename tuple_diff<std::tuple<restMinuendTypes...>, std::tuple<subtrahendTypes...>>::type>
       >;
    };
@@ -409,17 +476,7 @@ namespace Dimension
 
 
 
-   /// @brief Struct to check if a tuple of types contains a type
-   template<typename T, typename Tuple>
-   struct has_match;
 
-   /// @brief Struct to check if a tuple of types contains a type
-   /// @details Main specialization
-   /// @tparam T The type to check for
-   /// @tparam Us The types within the tuple
-   /// @typedef value A constexpr bool indicating whether Us contains T
-   template<typename T, typename... Us>
-   struct has_match<T, std::tuple<Us...>> : std::disjunction<std::is_same<typename std::remove_cv<typename T::Dim>::type, typename std::remove_cv<typename Us::Dim>::type>...> {};
 
 
 
@@ -468,7 +525,7 @@ namespace Dimension
    struct static_tuple_diff<std::tuple<T, restMinuendTypes...>, std::tuple<subtrahendTypes...>> {
       using type = std::conditional_t<
          has_match<T, std::tuple<subtrahendTypes...>>::value,
-         typename static_tuple_diff<std::tuple<restMinuendTypes...>, typename RemoveOneInstance<T, std::tuple<subtrahendTypes...>>::type>::type,
+         typename static_tuple_diff<std::tuple<restMinuendTypes...>, typename Static_RemoveOneInstance<T, std::tuple<subtrahendTypes...>>::type>::type,
          tuple_cat_t<std::tuple<T>, typename static_tuple_diff<std::tuple<restMinuendTypes...>, std::tuple<subtrahendTypes...>>::type>
       >;
    };
@@ -526,6 +583,10 @@ namespace Dimension
    typename std::enable_if < index == sizeof...(RealTypes), bool>::type
    StaticUpdateReal(T& Unit, std::tuple<RealTypes...>& RealTup)
    {
+      if constexpr (sizeof...(RealTypes) == 0)
+      {
+
+      }
       return false;
    }
 
@@ -534,11 +595,12 @@ namespace Dimension
    typename std::enable_if<index < sizeof...(RealTypes), bool>::type
    StaticUpdateReal(T& Unit, std::tuple<RealTypes...>& RealTup)
    {
-      if constexpr (std::is_same_v<std::tuple_element_t<index, std::tuple<RealTypes...>>::Dim, T::Dim>)
+      if constexpr (std::is_same_v<std::tuple_element_t<index, std::tuple<RealTypes...>>::Dim, T::Dim>) // TODO: This is apparently safe for empty tuple, but would like to investigate
       {
          if (std::isnan(std::get<index>(RealTup).GetValue()))
          {
-            std::get<index>(RealTup).SetValue(Unit.GetValue());
+            //std::get<index>(RealTup).SetValue(Unit.GetValue());
+            std::get<index>(RealTup).SetValue(ConvertValue<T, std::tuple_element_t<index, std::tuple<RealTypes...>>>(Unit).GetValue());
             return true;
          }
       }
@@ -563,11 +625,11 @@ namespace Dimension
          std::cout << "Value: " << std::get<index>(NumTup).GetValue() << std::endl;
          if constexpr (inverse)
          {
-            value *= std::get<index>(NumTup).GetPrimary().GetValue();
+            value /= std::get<index>(NumTup).GetPrimary().GetValue();
          }
          else
          {
-            value /= std::get<index>(NumTup).GetPrimary().GetValue();
+            value *= std::get<index>(NumTup).GetPrimary().GetValue();
          }
 
 
@@ -644,12 +706,134 @@ namespace Dimension
 
 
 
-   template<typename ... NumTypes, typename ... DenTypes>
-   void TestDivision(const std::tuple<NumTypes...>& NumTuple, const std::tuple<DenTypes...>& DenTuple)
-   {
 
+
+
+
+
+
+
+
+
+   template<typename T>
+   void AddUnits(const T& Unit1, const T& Unit2, T& OutUnit, double scalar1, double scalar2)
+   {
+      OutUnit.SetValue((Unit1.GetValue() * scalar1) + (Unit2.GetValue() * scalar2));
    }
 
+
+
+
+   
+   template<int index = 0, typename ... T1, typename ... T2>
+   typename std::enable_if < sizeof...(T1) == sizeof...(T2) && index == sizeof...(T1), void>::type
+   AddUnitTuples(const std::tuple<T1...>& Tup1, const std::tuple<T2...>& Tup2, std::tuple<T1...>& OutTup, double scalar1 = 1.0, double scalar2 = 1.0)
+   {
+      return;
+   }
+
+   template<int index = 0, typename ... T1, typename ... T2>
+   typename std::enable_if < sizeof...(T1) == sizeof...(T2) && index < sizeof...(T1), void>::type
+   AddUnitTuples(const std::tuple<T1...>& Tup1, const std::tuple<T2...>& Tup2, std::tuple<T1...>& OutTup, double scalar1 = 1.0, double scalar2 = 1.0)
+   {
+      
+      using Type1 = std::tuple_element_t<index, std::tuple<T1...>>;
+      using Type2 = std::tuple_element_t<index, std::tuple<T2...>>;
+
+      AddUnits(std::get<index>(Tup1), ConvertValue<Type2, Type1>(std::get<index>(Tup2)), std::get<index>(OutTup), scalar1, scalar2);
+      AddUnitTuples<index + 1>(Tup1, Tup2, OutTup, scalar1, scalar2);
+   }
+
+
+   /*
+   template<int index = 0, typename ... Ts>
+   typename std::enable_if < index == sizeof...(Ts), void>::type
+   ApplyScalarImpl(double scalar, std::tuple<Ts...>& tup)
+   {
+      return;
+   }
+
+   template<int index = 0, typename ... Ts>
+   typename std::enable_if<index < sizeof...(Ts), void>::type
+   ApplyScalarImpl(double scalar, std::tuple<Ts...>& tup)
+   {
+      std::get<index>(tup).ScaleValue(scalar);
+      ApplyScalarImpl<index + 1>(scalar, tup);
+   }
+   */
+
+
+   /*
+   // Forward declaration of AddUnitTuples with index parameter
+   template<int index = 0, typename Tuple1, typename Tuple2, typename OutTuple>
+   void AddUnitTuples(const Tuple1& Tup1, const Tuple2& Tup2, OutTuple& OutTup);
+
+   // Base case: index equals the size of the tuples
+   template<int index = 0, typename Tuple1, typename Tuple2, typename OutTuple>
+   typename std::enable_if<index == std::tuple_size<Tuple1>::value, void>::type
+   AddUnitTuples(const Tuple1& Tup1, const Tuple2& Tup2, OutTuple& OutTup)
+   {
+      return;
+   }
+
+   // Recursive case: index is less than the size of the tuples
+   template<int index = 0, typename Tuple1, typename Tuple2, typename OutTuple>
+   typename std::enable_if<index < std::tuple_size<Tuple1>::value, void>::type
+   AddUnitTuples(const Tuple1& Tup1, const Tuple2& Tup2, OutTuple& OutTup)
+   {
+      using Type1 = std::tuple_element_t<index, Tuple1>;
+      using Type2 = std::tuple_element_t<index, Tuple2>;
+
+      AddUnits(std::get<index>(Tup1), ConvertValue<Type2, Type1>(std::get<index>(Tup2)), std::get<index>(OutTup));
+      AddUnitTuples<index + 1>(Tup1, Tup2, OutTup);
+   }
+   */
+
+
+
+
+
+
+
+   template<std::size_t... Is>
+   auto make_tuple_of_doubles(std::index_sequence<Is...>) {
+      return std::make_tuple((static_cast<void>(Is), 1.0)...);
+   }
+
+
+
+
+
+
+   template<typename NumTuple, typename DenTuple>
+   auto Simplify(BaseDimension<NumTuple, DenTuple>& obj)
+   {
+
+
+      // I think StaticUnitSimplifier may be broken...
+
+      using simplified = StaticUnitSimplifier<NumTuple, std::tuple<>, std::tuple<>, DenTuple>; // This is a little messy...
+      //return simplified::dimType(obj1.value * obj2.value, obj1.numList, obj2.numList, obj1.denList, obj2.denList);
+
+      simplified::dimType ret{};
+      ret.value = obj.value;
+
+
+      simplified::a::type a{};
+      simplified::b::type b{};
+      simplified::c::type c{};
+      simplified::d::type d{};
+
+
+
+      StaticCancelUnits<0, false>(obj.numList, ret.numList, ret.value);
+      StaticCancelUnits<0, false>(std::tuple<>{}, ret.numList, ret.value);
+      StaticCancelUnits<0, true>(obj.denList, ret.denList, ret.value);
+      StaticCancelUnits<0, true>(std::tuple<>{}, ret.denList, ret.value);
+
+
+      return ret;
+   }
 
 
 

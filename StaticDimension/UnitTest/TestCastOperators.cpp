@@ -9,10 +9,13 @@ using namespace std;
 
 TEST_F(CastOperatorTest, CastSpeed) {
 
-   BaseDimension<tuple<LengthUnit*>, tuple<TimeUnit*>> testSpeed(10.0, UnitList(LengthUnits::Meters()), UnitList(TimeUnits::Seconds()));
-   BaseDimension<tuple<LengthUnit*, TimeUnit*>, tuple<>> testNotSpeed(10.0, UnitList(LengthUnits::Meters(), TimeUnits::Seconds()), UnitList());
+   BaseDimension<tuple<Meters>, tuple<Seconds>> testSpeed(10.0);
+   BaseDimension<tuple<Meters, Seconds>, tuple<>> testNotSpeed(10.0);
 
    Speed mySpeed = testSpeed;
+
+   Speed<Feet, Minutes> differentSpeed = testSpeed;
+
 
    // TODO: I need to find a way to ensure the following DOES NOT compile
    // Speed notSpeed = testNotSpeed;
@@ -20,10 +23,12 @@ TEST_F(CastOperatorTest, CastSpeed) {
 
 TEST_F(CastOperatorTest, CastLength) {
 
-   BaseDimension<tuple<LengthUnit*>, tuple<>> testLength(10.0, UnitList(LengthUnits::Meters()), UnitList());
-   BaseDimension<tuple<TimeUnit*>, tuple<>> testNotLength(10.0, UnitList(TimeUnits::Seconds()), UnitList());
+   BaseDimension<tuple<Meters>, tuple<>> testLength(10.0);
+   BaseDimension<tuple<Seconds>, tuple<>> testNotLength(10.0);
 
    Length myLength = testLength;
+
+   Length<Feet> differentLength = testLength;
 
    // TODO: I need to find a way to ensure the following DOES NOT compile
    // Length notLength = testNotLength;
@@ -31,11 +36,14 @@ TEST_F(CastOperatorTest, CastLength) {
 
 TEST_F(CastOperatorTest, CastTime) {
 
-   BaseDimension<tuple<TimeUnit*>, tuple<>> testTime(10.0, UnitList(TimeUnits::Seconds()), UnitList());
-   BaseDimension<tuple<LengthUnit*>, tuple<>> testNotTime(10.0, UnitList(LengthUnits::Meters()), UnitList());
+   BaseDimension<tuple<Seconds>, tuple<>> testTime(10.0);
+   BaseDimension<tuple<Meters>, tuple<>> testNotTime(10.0);
 
    Time myTime = testTime;
+
+   Time<Minutes> differentTime = testTime;
 
    // TODO: I need to find a way to ensure the following DOES NOT compile
    // Time notTime = testNotTime;
 }
+

@@ -1,0 +1,99 @@
+#ifndef DIMENSION_MASS_H
+#define DIMENSION_MASS_H
+
+#include "BaseDimension.h"
+#include <type_traits>
+#include <tuple>
+
+namespace Dimension
+{
+
+   struct MassType {};
+   class Grams;
+
+   template<typename Unit>
+   class MassUnit : public BaseUnit<MassUnit<Unit>> 
+   { 
+   public: 
+      using BaseUnit::BaseUnit;
+
+      using Dim = MassType;
+      using Primary = Grams;
+
+      Grams GetPrimary() const;
+
+   };
+
+   class Grams : public MassUnit<Grams> { public: using MassUnit::MassUnit; };
+   class Pounds : public MassUnit<Pounds> { public: using MassUnit::MassUnit; };
+   class Ounces : public MassUnit<Ounces> { public: using MassUnit::MassUnit; };
+
+   template<typename Unit>
+   inline Grams MassUnit<Unit>::GetPrimary() const
+   {
+      return GetPrimaryImpl<Unit, Primary>(*(static_cast<const Unit*>(this)));
+   }
+
+
+
+
+
+   template<>
+   inline Pounds ConvertValue<Grams, Pounds>(const Grams& obj)
+   {
+      return Pounds(obj.GetValue() * 0.0022046226);
+   }
+   
+   template<>
+   inline Grams ConvertValue<Pounds, Grams>(const Pounds& obj)
+   {
+      return Grams(obj.GetValue() / 0.0022046226);
+   }
+   
+   template<>
+   inline Ounces ConvertValue<Grams, Ounces>(const Grams& obj)
+   {
+      return Ounces(obj.GetValue() * 0.0352739619);
+   }
+
+   template<>
+   inline Grams ConvertValue<Ounces, Grams>(const Ounces& obj)
+   {
+      return Grams(obj.GetValue() / 0.0352739619);
+   }
+   
+
+
+
+   template<typename Unit = Grams>
+   class Mass : public BaseDimension<std::tuple<Unit>, std::tuple<>>
+   {
+   public:
+      static_assert(std::is_same_v<Unit::Dim, Grams::Dim>, "Unit provided does not derive from MassUnit");
+      using BaseDimension::BaseDimension;
+
+      Mass() : BaseDimension(1.0, std::tuple<Unit>{0.0}, std::tuple<>{}) {}
+
+      Mass(double val) : BaseDimension(1.0, std::tuple<Unit>{val}, std::tuple<>{}) {}
+
+      template<typename T>
+      Mass(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension(base.GetVal<std::tuple<Unit>, std::tuple<>>()){}
+
+
+
+
+
+      template<typename T>
+      double GetMass()
+      {
+         return value * ConvertValue<Unit, T>(std::get<0>(numList)).GetValue();
+      }
+
+   };
+
+
+
+
+}
+
+#endif //DIMENSION_MASS_H

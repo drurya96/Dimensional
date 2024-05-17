@@ -10,9 +10,9 @@ set(TEST_SOURCES
     TestFundamentalConversions.cpp
     TestCompoundConversions.cpp
     TestOperators.cpp
-    #TestSimplification.cpp
-    #TestCastOperators.cpp
-    #TestNewDimension.cpp
+    TestSimplification.cpp
+    TestCastOperators.cpp
+    TestNewDimension.cpp
 )
 
 add_executable(StaticDimension_UnitTests ${TEST_SOURCES})

@@ -13,6 +13,11 @@
 
 namespace Dimension
 {
+
+   const double PLACEHOLDER_EPSILON = 0.001; // TODO: IMPORTANT: Find a better way.. this is only a placeholder to continue development.
+
+
+
    /// @brief A base class representing a unit
    /// @details This abstract class represents a Unit,
    ///    such as Meters, Seconds, Grams, etc.
@@ -26,12 +31,16 @@ namespace Dimension
 
       BaseUnit() : value(std::numeric_limits<double>::quiet_NaN()) {}
 
+
+
       /// @brief Pure virtual destructor
       virtual ~BaseUnit() = 0;
 
       double GetValue() const { return value; }
 
       void SetValue(double val) { value = val; }
+
+      void ScaleValue(double scalar) { value *= scalar; }
 
       //double GetPrimary()
       //{
@@ -112,6 +121,15 @@ namespace Dimension
       {
       }
 
+      /// @brief Default constructor
+      BaseDimension(double val) :
+         value(val),
+         numList(std::make_from_tuple<NumTuple>(make_tuple_of_doubles(std::make_index_sequence<std::tuple_size_v<NumTuple>>{}))),
+         denList(std::make_from_tuple<DenTuple>(make_tuple_of_doubles(std::make_index_sequence<std::tuple_size_v<DenTuple>>{})))
+      {
+      }
+
+      /*
       /// @brief Constructor using existing dimension
       /// @details This constructor creates a new object matching an existing dimension
       /// @tparam T Type of given Dimension
@@ -124,6 +142,7 @@ namespace Dimension
          denList(std::move(dimension.denList))
       {
       }
+      */
 
       /// @brief Constructor explicitly given all values
       /// @details A constructor given all needed information.
@@ -144,8 +163,8 @@ namespace Dimension
       /// Constructor for doing arithemetic
       /// Make sure to make these const ref eventually
       template<typename ... NumTypes1, typename ... NumTypes2, typename ... DenTypes1, typename ... DenTypes2>
-      BaseDimension(std::tuple<NumTypes1...> NumTuple1, std::tuple<NumTypes2...> NumTuple2, std::tuple<DenTypes1...> DenTuple1, std::tuple<DenTypes2...> DenTuple2) :
-         value(1.0),
+      BaseDimension(double scalar, std::tuple<NumTypes1...> NumTuple1, std::tuple<NumTypes2...> NumTuple2, std::tuple<DenTypes1...> DenTuple1, std::tuple<DenTypes2...> DenTuple2) :
+         value(scalar),
          //numList(StaticUnitSimplifier<std::tuple<NumTypes1...>, std::tuple<NumTypes2...>, std::tuple<DenTypes1...>, std::tuple<DenTypes2...>>::newNum{}),
          //denList(StaticUnitSimplifier<std::tuple<NumTypes1...>, std::tuple<NumTypes2...>, std::tuple<DenTypes1...>, std::tuple<DenTypes2...>>::newDen{})
          numList(),
@@ -197,21 +216,24 @@ namespace Dimension
       
       
 
-      /*
+      
       /// @brief += operator overload for another Dimension
-      BaseDimension<NumTuple, DenTuple>& operator+=(const BaseDimension<NumTuple, DenTuple>& rhs)
+      template<typename NumTuple2, typename DenTuple2>
+      BaseDimension<NumTuple, DenTuple>& operator+=(const BaseDimension<NumTuple2, DenTuple2>& rhs)
       {
-         value += rhs.GetVal(numList, denList);
+         value += rhs.GetVal<NumTuple, DenTuple>();
          return *this;
       }
 
+      
       /// @brief -= operator overload for another Dimension
-      BaseDimension<NumTuple, DenTuple>& operator-=(const BaseDimension<NumTuple, DenTuple>& rhs)
+      template<typename NumTuple2, typename DenTuple2>
+      BaseDimension<NumTuple, DenTuple>& operator-=(const BaseDimension<NumTuple2, DenTuple2>& rhs)
       {
-         value -= rhs.GetVal(numList, denList);
+         value -= rhs.GetVal<NumTuple, DenTuple>();
          return *this;
       }
-      */
+      
 
       /// @brief *= operator overload for a scalar
       BaseDimension<NumTuple, DenTuple>& operator*=(double rhs)
@@ -251,7 +273,7 @@ namespace Dimension
       bool operator<=(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return GetVal<NumTuple, DenTuple>() <= rhs.GetVal<NumTuple, DenTuple>(); }
 
       template<typename CompNumTuple, typename CompDenTuple>
-      bool operator==(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return GetVal<NumTuple, DenTuple>() == rhs.GetVal<NumTuple, DenTuple>(); } // I need to add a small tolerance to this
+      bool operator==(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return fabs(GetVal<NumTuple, DenTuple>() - rhs.GetVal<NumTuple, DenTuple>()) < PLACEHOLDER_EPSILON; }
       
       template<typename CompNumTuple, typename CompDenTuple>
       bool operator!=(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return !(*this == rhs); }
@@ -260,10 +282,13 @@ namespace Dimension
 
       // TODO: Define a NearlyEqual method with custom tolerance
 
-   protected:
+
       /// @brief The value of the given object
       /// @details UNUSED - Keeping around while fixing implementation
       double value;
+
+   protected:
+
    private:
 
 
@@ -296,11 +321,11 @@ namespace Dimension
       template<typename NumTuple, typename DenTuple>
       friend auto operator/(double scalar, const BaseDimension<NumTuple, DenTuple>& obj)->BaseDimension<DenTuple, NumTuple>;
 
-      template<typename NumTuple, typename DenTuple>
-      friend BaseDimension<NumTuple, DenTuple> operator+(const BaseDimension<NumTuple, DenTuple>& obj1, const BaseDimension<NumTuple, DenTuple>& obj2);
+      template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
+      friend BaseDimension<NumTuple1, DenTuple1> operator+(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2);
 
-      template<typename NumTuple, typename DenTuple>
-      friend BaseDimension<NumTuple, DenTuple> operator-(const BaseDimension<NumTuple, DenTuple>& obj1, const BaseDimension<NumTuple, DenTuple>& obj2);
+         template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
+      friend BaseDimension<NumTuple1, DenTuple1> operator-(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2);
 
       
       
@@ -321,7 +346,7 @@ namespace Dimension
    auto operator/(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
    {
       using simplified = StaticUnitSimplifier<NumTuple1, DenTuple2, DenTuple1, NumTuple2>;
-      return simplified::dimType(obj1.numList, obj2.denList, obj1.denList, obj2.numList);
+      return simplified::dimType(obj1.value / obj2.value, obj1.numList, obj2.denList, obj1.denList, obj2.numList);
    }
   
    /// @brief Multiplication operator for two Dimensions
@@ -337,7 +362,7 @@ namespace Dimension
    auto operator*(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
    {
       using simplified = StaticUnitSimplifier<NumTuple1, NumTuple2, DenTuple1, DenTuple2>;
-      return simplified::dimType(obj1.numList, obj2.numList, obj1.denList, obj2.denList);
+      return simplified::dimType(obj1.value*obj2.value, obj1.numList, obj2.numList, obj1.denList, obj2.denList);
    }
  
    // Scalar Math
@@ -391,7 +416,7 @@ namespace Dimension
    {
       return BaseDimension<DenTuple, NumTuple>(scalar / obj.GetRawValue(), obj.denList, obj.numList);
    }
-/*
+
    /// @brief Addition operator for two Dimensions
    /// @tparam NumTuple Tuple of units in the numerator
    /// @tparam DenTuple Tuple of units in the denominator
@@ -400,14 +425,10 @@ namespace Dimension
    /// @return A base dimension object of type matching the inputs.
    ///    The value is the values of obj1 and obj2 added, after converting
    ///    obj2 to the same units as obj1
-   template<typename NumTuple, typename DenTuple>
-   BaseDimension<NumTuple, DenTuple> operator+(const BaseDimension<NumTuple, DenTuple>& obj1, const BaseDimension<NumTuple, DenTuple>& obj2)
+   template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
+   BaseDimension<NumTuple1, DenTuple1> operator+(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
    {
-      //return BaseDimension<NumTuple, DenTuple>(obj1.GetRawValue() + obj2.GetVal(obj1.numList, obj1.denList), obj1.numList, obj1.denList);
-
-
-      BaseDimension<NumTuple, DenTuple>(1.0, // Need to add values within the units...
-
+      return BaseDimension<NumTuple1, DenTuple1>{ obj1.GetVal<NumTuple1, DenTuple1>() + obj2.GetVal<NumTuple1, DenTuple1>() };
    }
 
    /// @brief Subtraction operator for two Dimensions
@@ -418,12 +439,11 @@ namespace Dimension
    /// @return A base dimension object of type matching the inputs.
    ///    The value is the difference of values of obj1 and obj2, after 
    ///    converting obj2 to the same units as obj1
-   template<typename NumTuple, typename DenTuple>
-   BaseDimension<NumTuple, DenTuple> operator-(const BaseDimension<NumTuple, DenTuple>& obj1, const BaseDimension<NumTuple, DenTuple>& obj2)
+   template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
+   BaseDimension<NumTuple1, DenTuple1> operator-(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
    {
-      return BaseDimension<NumTuple, DenTuple>(obj1.GetRawValue() - obj2.GetVal(obj1.numList, obj1.denList), obj1.numList, obj1.denList);
+      return BaseDimension<NumTuple1, DenTuple1>{ obj1.GetVal<NumTuple1, DenTuple1>() - obj2.GetVal<NumTuple1, DenTuple1>() };
    }
-   */
 
 
    template<typename Unit, typename Primary>

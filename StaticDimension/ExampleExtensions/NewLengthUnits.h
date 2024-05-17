@@ -5,35 +5,19 @@
 
 namespace Dimension
 {
-   class Initialize_LengthExternalMap
+   class Yards : public LengthUnit<Yards> { public: using LengthUnit::LengthUnit; };
+
+   template<>
+   inline Meters ConvertValue<Yards, Meters>(const Yards& obj)
    {
-   public:
+      return Meters(obj.GetValue() / 1.0936132983);
+   }
 
-      static inline bool initialized = false;
-
-      Initialize_LengthExternalMap()
-      {
-         if (!initialized)
-         {
-            ConversionMap map =
-            {
-               {
-                  "Feet",
-                  {
-                     { "Yard", [](double val) { return val / 3.0; }},
-                  }
-               },
-            };
-
-            mergeConversionMaps(LengthUnit::GetConversionMap(), map);
-
-            initialized = true;
-         }
-      }
-   };
-
-   Initialize_LengthExternalMap init_lengthExternalMap;
-
+   template<>
+   inline Yards ConvertValue<Meters, Yards>(const Meters& obj)
+   {
+      return Yards(obj.GetValue() * 1.0936132983);
+   }
 }
 
 #endif // LENGTH_EXTENSION_H
