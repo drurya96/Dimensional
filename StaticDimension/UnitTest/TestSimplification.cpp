@@ -43,7 +43,7 @@ TEST_F(SimplificationTest, Simplification) {
    // Note, simplification currently works left-to-right, so Minutes won't cancel with Minutes in this example
 
    // This means the final type will be a per-minutes
-   auto test_after = Simplify(test_before);
+   auto test_after = test_before.Simplify();
 
    ASSERT_TRUE((is_same_v<decltype(test_after), BaseDimension<tuple<>, tuple<Minutes>>>));
    ASSERT_NEAR((test_after.GetVal<std::tuple<>, std::tuple<Minutes>>()), 1968.504, TOLERANCE);

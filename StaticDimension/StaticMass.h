@@ -84,7 +84,7 @@ namespace StaticDimension
       template<typename T>
       double GetMass()
       {
-         return value * ConvertValue<Unit, T>(std::get<0>(numList)).GetValue();
+         return scalar * ConvertValue<Unit, T>(GetNumUnit()).GetValue();
       }
 
    };

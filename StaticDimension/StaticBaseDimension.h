@@ -1,14 +1,16 @@
 #ifndef STATIC_DIMENSION_BASE_H
 #define STATIC_DIMENSION_BASE_H
 
-#include <tuple>
+#include <tuple> // For std::tuple and related functions
+#include <limits> // For std::numeric_limits
+#include <type_traits> // For std::is_same
+#include <utility> // For std::make_index_sequence // @todo move this to Utilities
 
 #include "StaticDimensionUtilities.h"
 
 namespace StaticDimension
 {
    const double PLACEHOLDER_EPSILON = 0.001; // TODO: IMPORTANT: Find a better way.. this is only a placeholder to continue development.
-
 
    /// @brief A base class representing a unit
    /// @details This abstract class represents a Unit,
@@ -18,24 +20,44 @@ namespace StaticDimension
    class BaseUnit
    {
    public:
+
+      /// @brief Default constructor
+      /// @details Default constructor that sets the value to NaN
+      BaseUnit() : value(std::numeric_limits<double>::quiet_NaN()) {}
+
       /// @brief Constructor setting name
       BaseUnit(double val) : value(val){}
-
-      BaseUnit() : value(std::numeric_limits<double>::quiet_NaN()) {}
 
       /// @brief Pure virtual destructor
       virtual ~BaseUnit() = 0;
 
+      /// @brief Return the value
       double GetValue() const { return value; }
 
+      /// @brief Set the value
+      /// @param[in] val Value to set
+      /// @todo Consider making this private and implications thereof
       void SetValue(double val) { value = val; }
-
-      void ScaleValue(double scalar) { value *= scalar; }
       
    protected:
+      /// @brief Value of this unit object
       double value = 0;
    };
 
+   /// @brief Convert one unit to another
+   /// @details Return a toUnit type equivalent to the given
+   ///    object of type fromUnit. This will fail at compile-time
+   ///    if the to units do not have a common Dim field.
+   ///    Further, attempting to convert to the same type will simply 
+   ///    return a copy of the same object.
+   /// @tparam fromUnit Unit to convert from, deduced from obj
+   /// @tparam toUnit Unit to convert to, must be provided explicitly
+   /// @param[in] obj Object to convert
+   /// @todo Return the object by reference, if possible.
+   /// @todo After switching to C++20, use a concept to inforce Dim field
+   /// @todo Attempt to print a more meaningful compile-time error when
+   ///    conversion is not possible, including the units being converted.
+   ///    Avoid RTTI for this task.
    template<typename fromUnit, typename toUnit>
    toUnit ConvertValue(const fromUnit& obj)
    {
@@ -49,7 +71,7 @@ namespace StaticDimension
       }
       else
       {
-         static_assert(false, "No possible conversion for between these types."); // Try to print the type names, if possible without RTTI
+         static_assert(false, "No possible conversion for between these types.");
       }
    }
 
@@ -67,23 +89,28 @@ namespace StaticDimension
    ///    This library may be used with BaseDimension alone, but Dimensions
    ///    may also be derived from BaseDimension for more readible code,
    ///    for example the Length, Time, and Speed classes provided.
+   ///    Finally, the dimension itself contains a scalar value which is typically
+   ///    used when constructing an object without existing units, or when simplifying.
    /// @tparam NumTuple A tuple of BaseUnits describing the dimension's numerator.
    /// @tparam DenTuple A tuple of BaseUnits describing the dimension's denominator.
+   /// @todo Reconsider constructors, what should be 0, 1.0, and NaN?
    template<typename NumTuple, typename DenTuple>
    class BaseDimension
    {
    public:
       /// @brief Default constructor
       BaseDimension() : 
-         value(1.0)
+         scalar(1.0),
+         numList(),
+         denList()
       {
       }
 
-      /// @brief Default constructor
+      /// @brief Constructor given value
       BaseDimension(double val) :
-         value(val),
-         numList(std::make_from_tuple<NumTuple>(make_tuple_of_doubles(std::make_index_sequence<std::tuple_size_v<NumTuple>>{}))),
-         denList(std::make_from_tuple<DenTuple>(make_tuple_of_doubles(std::make_index_sequence<std::tuple_size_v<DenTuple>>{})))
+         scalar(val),
+         numList(std::make_from_tuple<NumTuple>(make_tuple_of_doubles(std::make_index_sequence<std::tuple_size_v<NumTuple>>{}, 1.0))),
+         denList(std::make_from_tuple<DenTuple>(make_tuple_of_doubles(std::make_index_sequence<std::tuple_size_v<DenTuple>>{}, 1.0)))
       {
       }
 
@@ -93,8 +120,8 @@ namespace StaticDimension
       /// @param[in] newValue The value to set
       /// @param[in] newNumList A tuple of BaseUnits to set as numerators
       /// @param[in] newDenList A tuple of BaseUnits to set as denominators
-      BaseDimension(double newValue, NumTuple newNumList, DenTuple newDenList) :
-         value(newValue),
+      BaseDimension(double newValue, const NumTuple& newNumList, const DenTuple& newDenList) :
+         scalar(newValue),
          numList(newNumList),
          denList(newDenList)
       {
@@ -102,36 +129,50 @@ namespace StaticDimension
 
       /// Constructor for doing arithemetic
       /// Make sure to make these const ref eventually
+      /// @brief Constructor for arithmetic
+      /// @details This constructor is used in multiplication and division.
+      ///    It takes two numerators and two denominators, and removes any units
+      ///    that would "cancel" between the groups. During this, the scalar value
+      ///    is modified for conversions needed during simplification.
+      /// @tparam NumTypes1... Types of the first numerator group
+      /// @tparam NumTypes2... Types of the second numerator group
+      /// @tparam DenTypes1... Types of the first denominator group
+      /// @tparam DenTypes2... Types of the second denominator group
+      /// param[in] scalar the value to set
+      /// param[in] NumTuple1 The tuple of unit objects for the first numerator group
+      /// param[in] NumTuple2 The tuple of unit objects for the second numerator group
+      /// param[in] DenTuple1 The tuple of unit objects for the first denominator group
+      /// param[in] DenTuple2 The tuple of unit objects for the second denominator group
       template<typename ... NumTypes1, typename ... NumTypes2, typename ... DenTypes1, typename ... DenTypes2>
-      BaseDimension(double scalar, std::tuple<NumTypes1...> NumTuple1, std::tuple<NumTypes2...> NumTuple2, std::tuple<DenTypes1...> DenTuple1, std::tuple<DenTypes2...> DenTuple2) :
-         value(scalar),
-         //numList(StaticUnitSimplifier<std::tuple<NumTypes1...>, std::tuple<NumTypes2...>, std::tuple<DenTypes1...>, std::tuple<DenTypes2...>>::newNum{}),
-         //denList(StaticUnitSimplifier<std::tuple<NumTypes1...>, std::tuple<NumTypes2...>, std::tuple<DenTypes1...>, std::tuple<DenTypes2...>>::newDen{})
+      BaseDimension(double newScalar, const std::tuple<NumTypes1...>& NumTuple1, const std::tuple<NumTypes2...>& NumTuple2, const std::tuple<DenTypes1...>& DenTuple1, const std::tuple<DenTypes2...>& DenTuple2) :
+         scalar(newScalar),
          numList(),
          denList()
       {
-         StaticCancelUnits<0, false>(NumTuple1, numList, value);
-         StaticCancelUnits<0, false>(NumTuple2, numList, value);
-         StaticCancelUnits<0, true>(DenTuple1, denList, value);
-         StaticCancelUnits<0, true>(DenTuple2, denList, value);
+         CancelUnits(NumTuple1, DenTuple1, numList, denList, scalar);
+         CancelUnits(NumTuple2, DenTuple2, numList, denList, scalar);
       }
 
-      /// @brief Tuple of units corresponding to the Dimension numerator
-      NumTuple numList;
+      auto Simplify()
+      {
+         using simplified = UnitSimplifier<NumTuple, std::tuple<>, std::tuple<>, DenTuple>;
 
-      /// @brief Tuple of units corresponding to the Dimension denominator
-      DenTuple denList;
+         simplified::dimType ret{};
+         ret.scalar = scalar;
 
-      // TODO: UPDATE THIS DOXY
+         CancelUnits(numList, denList, ret.numList, ret.denList, ret.scalar);
+
+         return ret;
+      }
+
       /// @brief Return the internal value as a double in terms of the provided units
-      /// @details Return the internal value after converting to the provided units.
-      /// @param[in] i_numList tuple of BaseUnit pointers to convert to for the numerator
-      /// @param[in] i_denList tuple of BaseUnit pointers to convert to for the denominator
+      /// @tparam NumTuple tuple of Unit types to convert numerator to
+      /// @tparam DenTuple tuple of Unit types to convert denominator to
       /// @return A double representing the value in terms of the given units
       template<typename NumTuple, typename DenTuple>
       double GetVal() const
       {
-         double result = value;
+         double result = scalar;
 
          GetConvertedValue<0, false, NumTuple>(numList, result);
          GetConvertedValue<0, true, DenTuple>(denList, result);
@@ -140,32 +181,40 @@ namespace StaticDimension
       }
       
       /// @brief += operator overload for another Dimension
+      /// @tparam NumTuple2 Tuple of numerator types of object being added
+      /// @tparam DenTuple2 Tuple of denominator types of object being added
+      /// @param[in] rhs The object being added
       template<typename NumTuple2, typename DenTuple2>
       BaseDimension<NumTuple, DenTuple>& operator+=(const BaseDimension<NumTuple2, DenTuple2>& rhs)
       {
-         value += rhs.GetVal<NumTuple, DenTuple>();
+         scalar += rhs.GetVal<NumTuple, DenTuple>();
          return *this;
       }
       
       /// @brief -= operator overload for another Dimension
+      /// @tparam NumTuple2 Tuple of numerator types of object being subtracted
+      /// @tparam DenTuple2 Tuple of denominator types of object being substracted
+      /// @param[in] rhs The object being substracted
       template<typename NumTuple2, typename DenTuple2>
       BaseDimension<NumTuple, DenTuple>& operator-=(const BaseDimension<NumTuple2, DenTuple2>& rhs)
       {
-         value -= rhs.GetVal<NumTuple, DenTuple>();
+         scalar -= rhs.GetVal<NumTuple, DenTuple>();
          return *this;
       }
 
       /// @brief *= operator overload for a scalar
+      /// @param[in] rhs scalar value to multiply by
       BaseDimension<NumTuple, DenTuple>& operator*=(double rhs)
       {
-         value *= rhs;
+         scalar *= rhs;
          return *this;
       }
 
       /// @brief /= operator overload for a scalar
+      /// @param[in] rhs scalar value to divide by
       BaseDimension<NumTuple, DenTuple>& operator/=(double rhs)
       {
-         value /= rhs;
+         scalar /= rhs;
          return *this;
       }
       
@@ -176,6 +225,7 @@ namespace StaticDimension
       BaseDimension<NumTuple, DenTuple>& operator-=(double rhs) = delete; // Subtraction cannot be performed between a Dimension and a scalar
 
       // Comparison Operators
+      /// @todo Replace these with <==> operator after switching to C++20
       template<typename CompNumTuple, typename CompDenTuple>
       bool operator>(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return GetVal<NumTuple, DenTuple>() > rhs.GetVal<NumTuple, DenTuple>(); }
 
@@ -196,23 +246,39 @@ namespace StaticDimension
       
       // TODO: Define a NearlyEqual method with custom tolerance
 
-      /// @brief The value of the given object
-      /// @details UNUSED - Keeping around while fixing implementation
-      double value;
-
    protected:
+      /// @brief The scalar value of this dimension
+      /// @todo Consider making this private with a protected Getter
+      double scalar;
+
+      /// @brief Return an item from the numerator
+      /// @tparam index The index of the item to return
+      /// @return A unit object by reference
+      template<int index = 0>
+      auto GetNumUnit()
+      {
+         return std::get<index>(numList);
+      }
+
+      /// @brief Return an item from the denominator
+      /// @tparam index The index of the item to return
+      /// @return A unit object by reference
+      template<int index = 0>
+      auto GetDenUnit()
+      {
+         return std::get<index>(denList);
+      }
 
    private:
+      /// @brief Tuple of units corresponding to the Dimension numerator
+      NumTuple numList;
 
-
-      /// @brief Private getter to retrieve the raw value
-      /// @return The raw value
-      double GetRawValue() const { return value; }
+      /// @brief Tuple of units corresponding to the Dimension denominator
+      DenTuple denList;
 
       // Declare operator overloads as friends of this class
       // This is to directly access the raw value for efficiency
 
-      // TODO: Check if these still need to be "friend"
       template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
       friend auto operator/(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2);
 
@@ -236,6 +302,12 @@ namespace StaticDimension
 
       template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
       friend BaseDimension<NumTuple1, DenTuple1> operator-(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2);
+
+
+      // Making all BaseDimensions friends of one-another for access to scalars and
+      //    unit list information during construction of new objects
+      template<typename NumTupleOther, typename DenTupleOther>
+      friend class BaseDimension;
    };
 
    /// @brief Division operator for two Dimensions
@@ -250,8 +322,8 @@ namespace StaticDimension
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    auto operator/(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
    {
-      using simplified = StaticUnitSimplifier<NumTuple1, DenTuple2, DenTuple1, NumTuple2>;
-      return simplified::dimType(obj1.value / obj2.value, obj1.numList, obj2.denList, obj1.denList, obj2.numList);
+      using simplified = UnitSimplifier<NumTuple1, DenTuple2, DenTuple1, NumTuple2>;
+      return simplified::dimType(obj1.scalar / obj2.scalar, obj1.numList, obj2.denList, obj1.denList, obj2.numList);
    }
   
    /// @brief Multiplication operator for two Dimensions
@@ -266,8 +338,8 @@ namespace StaticDimension
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    auto operator*(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
    {
-      using simplified = StaticUnitSimplifier<NumTuple1, NumTuple2, DenTuple1, DenTuple2>;
-      return simplified::dimType(obj1.value*obj2.value, obj1.numList, obj2.numList, obj1.denList, obj2.denList);
+      using simplified = UnitSimplifier<NumTuple1, NumTuple2, DenTuple1, DenTuple2>;
+      return simplified::dimType(obj1.scalar * obj2.scalar, obj1.numList, obj2.numList, obj1.denList, obj2.denList);
    }
  
    // Scalar Math
@@ -281,7 +353,7 @@ namespace StaticDimension
    template<typename NumTuple, typename DenTuple>
    BaseDimension<NumTuple, DenTuple> operator*(const BaseDimension<NumTuple, DenTuple>& obj, double scalar)
    {
-      return BaseDimension<NumTuple, DenTuple>(obj.GetRawValue() * scalar, obj.numList, obj.denList);
+      return BaseDimension<NumTuple, DenTuple>(obj.scalar * scalar, obj.numList, obj.denList);
    }
 
    
@@ -306,7 +378,7 @@ namespace StaticDimension
    template<typename NumTuple, typename DenTuple>
    BaseDimension<NumTuple, DenTuple> operator/(const BaseDimension<NumTuple, DenTuple>& obj, double scalar)
    {
-      return BaseDimension<NumTuple, DenTuple>(obj.GetRawValue() / scalar, obj.numList, obj.denList);
+      return BaseDimension<NumTuple, DenTuple>(obj.scalar / scalar, obj.numList, obj.denList);
    }
 
    /// @brief Division operator for a scalar and Dimension
@@ -319,7 +391,7 @@ namespace StaticDimension
    template<typename NumTuple, typename DenTuple>
    auto operator/(double scalar, const BaseDimension<NumTuple, DenTuple>& obj) -> BaseDimension<DenTuple, NumTuple>
    {
-      return BaseDimension<DenTuple, NumTuple>(scalar / obj.GetRawValue(), obj.denList, obj.numList);
+      return BaseDimension<DenTuple, NumTuple>(scalar / obj.scalar, obj.denList, obj.numList);
    }
 
    /// @brief Addition operator for two Dimensions

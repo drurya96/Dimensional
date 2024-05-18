@@ -74,7 +74,7 @@ namespace StaticDimension
       template<typename T>
       double GetLength()
       {
-         return value * ConvertValue<Unit, T>(std::get<0>(numList)).GetValue();
+         return scalar * ConvertValue<Unit, T>(GetNumUnit()).GetValue();
       }
    };
 }
