@@ -1,11 +1,11 @@
 #include "TestNewDimension.h"
 
-#include "BaseDimension.h"
-#include "LengthDimension.h"
+#include "StaticBaseDimension.h"
+#include "StaticLength.h"
 
 #include "NewLengthUnits.h"
 
-using namespace Dimension;
+using namespace StaticDimension;
 using namespace std;
 
 TEST_F(NewDimensionTest, NewDimension) {

@@ -1,9 +1,9 @@
-#ifndef DIMENSION_TIME_H
-#define DIMENSION_TIME_H
+#ifndef STATIC_DIMENSION_TIME_H
+#define STATIC_DIMENSION_TIME_H
 
-#include "BaseDimension.h"
+#include "StaticBaseDimension.h"
 
-namespace Dimension
+namespace StaticDimension
 {
    struct TimeType {};
    class Seconds;
@@ -84,4 +84,4 @@ namespace Dimension
    
 }
 
-#endif //DIMENSION_TIME_H
+#endif //STATIC_DIMENSION_TIME_H

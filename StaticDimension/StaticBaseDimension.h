@@ -1,21 +1,13 @@
-#ifndef DIMENSION_BASE_H
-#define DIMENSION_BASE_H
+#ifndef STATIC_DIMENSION_BASE_H
+#define STATIC_DIMENSION_BASE_H
 
-#include <vector>
-#include <type_traits>
 #include <tuple>
-#include <string>
-#include <unordered_map>
-#include <functional>
-#include <algorithm>
 
-#include "DimensionUtilities.h"
+#include "StaticDimensionUtilities.h"
 
-namespace Dimension
+namespace StaticDimension
 {
-
    const double PLACEHOLDER_EPSILON = 0.001; // TODO: IMPORTANT: Find a better way.. this is only a placeholder to continue development.
-
 
 
    /// @brief A base class representing a unit
@@ -31,8 +23,6 @@ namespace Dimension
 
       BaseUnit() : value(std::numeric_limits<double>::quiet_NaN()) {}
 
-
-
       /// @brief Pure virtual destructor
       virtual ~BaseUnit() = 0;
 
@@ -41,17 +31,11 @@ namespace Dimension
       void SetValue(double val) { value = val; }
 
       void ScaleValue(double scalar) { value *= scalar; }
-
-      //double GetPrimary()
-      //{
-         // TODO: Implement this to retrieve the value converted to the primary unit
-         //return value;
-      //}
       
    protected:
       double value = 0;
    };
-   
+
    template<typename fromUnit, typename toUnit>
    toUnit ConvertValue(const fromUnit& obj)
    {
@@ -61,13 +45,7 @@ namespace Dimension
       }
       else if constexpr (std::is_same_v<fromUnit::Dim, toUnit::Dim>)
       {
-         //return toUnit{}; // Implement this
-
-         //auto primary = obj.GetPrimary();
-
-         //return ConvertValue<typename decltype(primary), toUnit>(primary);
-         //return ConvertValue<decltype(obj.GetPrimary()), toUnit>(obj.GetPrimary()); // This is almost there, but not quite working.
-         return ConvertValue<fromUnit::Primary, toUnit>(obj.GetPrimary()); // This is almost there, but not quite working.
+         return ConvertValue<fromUnit::Primary, toUnit>(obj.GetPrimary());
       }
       else
       {
@@ -75,29 +53,9 @@ namespace Dimension
       }
    }
 
-   /*
-   template<typename Unit>
-   inline Unit ConvertValue(const Unit& obj) {
-      return obj;
-   }
-   */
-
-   /*
-   template<>
-   inline Feet ConvertValue<Meters, Feet>(const Meters& obj)
-   {
-      return Feet(obj.GetValue() * 3.28084);
-   }
-   */
-
-
    /// @brief Destructor implementation
    template<typename Unit>
    BaseUnit<Unit>::~BaseUnit() {}
-
-
-
-
 
    /// @brief A generic Dimension class
    /// @details This class represents a Dimension,
@@ -129,21 +87,6 @@ namespace Dimension
       {
       }
 
-      /*
-      /// @brief Constructor using existing dimension
-      /// @details This constructor creates a new object matching an existing dimension
-      /// @tparam T Type of given Dimension
-      /// @param[in] dimension A Dimension object to copy
-      /// @return A new Dimension object of type T
-      template<typename T>
-      explicit BaseDimension(const T& dimension) :
-         value(dimension.value),
-         numList(std::move(dimension.numList)),
-         denList(std::move(dimension.denList))
-      {
-      }
-      */
-
       /// @brief Constructor explicitly given all values
       /// @details A constructor given all needed information.
       ///    This constructor should typically be used for creating new objects.
@@ -157,9 +100,6 @@ namespace Dimension
       {
       }
 
-
-
-
       /// Constructor for doing arithemetic
       /// Make sure to make these const ref eventually
       template<typename ... NumTypes1, typename ... NumTypes2, typename ... DenTypes1, typename ... DenTypes2>
@@ -170,26 +110,11 @@ namespace Dimension
          numList(),
          denList()
       {
-         // Constructor logic
-         
-
-         /// Need to modify numList and denList to have the appropriate values, along with the scalar value for cancelled units
          StaticCancelUnits<0, false>(NumTuple1, numList, value);
          StaticCancelUnits<0, false>(NumTuple2, numList, value);
          StaticCancelUnits<0, true>(DenTuple1, denList, value);
          StaticCancelUnits<0, true>(DenTuple2, denList, value);
       }
-
-
-
-
-
-
-
-
-
-
-      // TODO: Consider copy operator
 
       /// @brief Tuple of units corresponding to the Dimension numerator
       NumTuple numList;
@@ -214,9 +139,6 @@ namespace Dimension
          return result;
       }
       
-      
-
-      
       /// @brief += operator overload for another Dimension
       template<typename NumTuple2, typename DenTuple2>
       BaseDimension<NumTuple, DenTuple>& operator+=(const BaseDimension<NumTuple2, DenTuple2>& rhs)
@@ -224,7 +146,6 @@ namespace Dimension
          value += rhs.GetVal<NumTuple, DenTuple>();
          return *this;
       }
-
       
       /// @brief -= operator overload for another Dimension
       template<typename NumTuple2, typename DenTuple2>
@@ -233,7 +154,6 @@ namespace Dimension
          value -= rhs.GetVal<NumTuple, DenTuple>();
          return *this;
       }
-      
 
       /// @brief *= operator overload for a scalar
       BaseDimension<NumTuple, DenTuple>& operator*=(double rhs)
@@ -248,10 +168,6 @@ namespace Dimension
          value /= rhs;
          return *this;
       }
-      
-
-
-      
       
       // The following operators are explicitly deleted
       BaseDimension<NumTuple, DenTuple>& operator*=(const BaseDimension<NumTuple, DenTuple>& rhs) = delete; // Multiplication results in a different type
@@ -278,10 +194,7 @@ namespace Dimension
       template<typename CompNumTuple, typename CompDenTuple>
       bool operator!=(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return !(*this == rhs); }
       
-      
-
       // TODO: Define a NearlyEqual method with custom tolerance
-
 
       /// @brief The value of the given object
       /// @details UNUSED - Keeping around while fixing implementation
@@ -299,10 +212,7 @@ namespace Dimension
       // Declare operator overloads as friends of this class
       // This is to directly access the raw value for efficiency
 
-
-      
-      // TODO: Check later if these are still needed in the Static library...
-
+      // TODO: Check if these still need to be "friend"
       template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
       friend auto operator/(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2);
 
@@ -324,14 +234,9 @@ namespace Dimension
       template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
       friend BaseDimension<NumTuple1, DenTuple1> operator+(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2);
 
-         template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
+      template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
       friend BaseDimension<NumTuple1, DenTuple1> operator-(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2);
-
-      
-      
-
    };
-   
 
    /// @brief Division operator for two Dimensions
    /// @tparam NumTuple1 Tuple of numerator units of obj1
@@ -490,4 +395,4 @@ SI_PREFIX(baseName, UnitType, Tera);
 
 */
 
-#endif // DIMENSION_BASE_H
+#endif // STATIC_DIMENSION_BASE_H

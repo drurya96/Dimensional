@@ -1,10 +1,10 @@
 #include "TestCompoundConversions.h"
 
-#include "TimeDimension.h"
-#include "LengthDimension.h"
-#include "SpeedDimension.h"
+#include "StaticTime.h"
+#include "StaticLength.h"
+#include "StaticSpeed.h"
 
-using namespace Dimension;
+using namespace StaticDimension;
 
 TEST_F(CompoundConversions, TestSpeed) {
 

@@ -1,18 +1,16 @@
 #include "TestUtilities.h"
 
-#include "TimeDimension.h"
-#include "LengthDimension.h"
+#include "StaticTime.h"
+#include "StaticLength.h"
 //#include "SpeedDimension.h"
 
-//using namespace Dimension;
+using namespace StaticDimension;
 using namespace std;
 
 // This whole file needs to be updated to a real test suite of the utilities
 // In its current state, its more of a testing ground for new utilities
 
 TEST_F(UtilitiesTest, Test_tuple_diff) {
-   
-   using namespace Dimension;
 
    Meters m = Meters(25.0);
 
@@ -38,8 +36,8 @@ TEST_F(UtilitiesTest, Test_tuple_diff) {
    ASSERT_NEAR(min.GetValue(), 2.0, TOLERANCE);
 
 
-   Dimension::BaseDimension<std::tuple<Seconds, Minutes>, std::tuple<Feet, Meters>> d =
-      Dimension::BaseDimension<std::tuple<Seconds, Minutes>, std::tuple<Feet, Meters>>(0.0, std::tuple(s, min), std::tuple(f, m));
+   BaseDimension<std::tuple<Seconds, Minutes>, std::tuple<Feet, Meters>> d =
+      BaseDimension<std::tuple<Seconds, Minutes>, std::tuple<Feet, Meters>>(0.0, std::tuple(s, min), std::tuple(f, m));
 
    ASSERT_NEAR(std::get<1>(d.numList).GetValue(), 2.0, TOLERANCE);
    ASSERT_NEAR(std::get<0>(d.denList).GetValue(), 82.021, TOLERANCE);
@@ -57,7 +55,7 @@ TEST_F(UtilitiesTest, Test_tuple_diff) {
    auto test2 = test1::type{ 10.0 };
 
 
-   using testType = Dimension::StaticUnitSimplifier<std::tuple<Feet>, std::tuple<Meters>, std::tuple<Seconds>, std::tuple<Minutes>>;
+   using testType = StaticUnitSimplifier<std::tuple<Feet>, std::tuple<Meters>, std::tuple<Seconds>, std::tuple<Minutes>>;
    auto test5 = testType::newNum{};
 
    std::tuple<Meters, Feet> t50{10, 20};
@@ -76,11 +74,11 @@ TEST_F(UtilitiesTest, Test_tuple_diff) {
 
    //auto test = testType::newNum{ 0.0, 0.0 };
 
-   auto test = Dimension::BaseDimension<std::tuple<Feet, Meters>, std::tuple<Seconds, Minutes>>(1.0, std::tuple<Feet>{10.0}, std::tuple<Meters>{10.0}, std::tuple<Seconds>{10.0}, std::tuple<Minutes>{10.0});
+   auto test = BaseDimension<std::tuple<Feet, Meters>, std::tuple<Seconds, Minutes>>(1.0, std::tuple<Feet>{10.0}, std::tuple<Meters>{10.0}, std::tuple<Seconds>{10.0}, std::tuple<Minutes>{10.0});
 
 
-   auto t1 = Dimension::BaseDimension<std::tuple<Feet, Meters>, std::tuple<>>(1.0, std::tuple<Feet, Meters>{}, std::tuple<>{});
-   auto t2 = Dimension::BaseDimension<std::tuple<>, std::tuple<Minutes, Seconds>>(1.0, std::tuple<>{}, std::tuple<Minutes, Seconds>{});
+   auto t1 = BaseDimension<std::tuple<Feet, Meters>, std::tuple<>>(1.0, std::tuple<Feet, Meters>{}, std::tuple<>{});
+   auto t2 = BaseDimension<std::tuple<>, std::tuple<Minutes, Seconds>>(1.0, std::tuple<>{}, std::tuple<Minutes, Seconds>{});
 
    auto t3 = t1 / t2;
 
@@ -94,7 +92,7 @@ TEST_F(UtilitiesTest, Test_tuple_diff) {
 
    
 
-   Dimension::StaticCancelUnits(t5, t4, val);
+   StaticCancelUnits(t5, t4, val);
 
 
 

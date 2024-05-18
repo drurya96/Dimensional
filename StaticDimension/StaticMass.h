@@ -1,11 +1,9 @@
-#ifndef DIMENSION_MASS_H
-#define DIMENSION_MASS_H
+#ifndef STATIC_DIMENSION_MASS_H
+#define STATIC_DIMENSION_MASS_H
 
-#include "BaseDimension.h"
-#include <type_traits>
-#include <tuple>
+#include "StaticBaseDimension.h"
 
-namespace Dimension
+namespace StaticDimension
 {
 
    struct MassType {};
@@ -96,4 +94,4 @@ namespace Dimension
 
 }
 
-#endif //DIMENSION_MASS_H
+#endif //STATIC_DIMENSION_MASS_H

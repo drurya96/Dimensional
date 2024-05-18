@@ -1,10 +1,10 @@
-#ifndef DIMENSION_SPEED_H
-#define DIMENSION_SPEED_H
+#ifndef STATIC_DIMENSION_SPEED_H
+#define STATIC_DIMENSION_SPEED_H
 
-#include "LengthDimension.h"
-#include "TimeDimension.h"
+#include "StaticLength.h"
+#include "StaticTime.h"
 
-namespace Dimension
+namespace StaticDimension
 {
    template<typename LengthUnit = Meters, typename TimeUnit = Seconds>
    class Speed : public BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>
@@ -42,4 +42,4 @@ namespace Dimension
 
 
 
-#endif //DIMENSION_SPEED_H
+#endif //STATIC_DIMENSION_SPEED_H
