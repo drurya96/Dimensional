@@ -4,4 +4,4 @@ add_library(Extensions INTERFACE)
 
 target_include_directories(Extensions INTERFACE ${CMAKE_CURRENT_LIST_DIR})
 
-target_link_libraries(Extensions INTERFACE Dimensional_LIB)
+target_link_libraries(Extensions INTERFACE DynamicDimension_LIB)

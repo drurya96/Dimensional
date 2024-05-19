@@ -6,6 +6,8 @@
 #include <functional>
 #include <utility>
 
+using namespace std; // This has to go.
+
 namespace Dimension
 {
    // Forward declarations
