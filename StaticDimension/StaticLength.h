@@ -5,7 +5,6 @@
 
 namespace StaticDimension
 {
-
    struct LengthType {};
    class Meters;
 
@@ -29,7 +28,8 @@ namespace StaticDimension
    template<typename Unit>
    inline typename LengthUnit<Unit>::Primary LengthUnit<Unit>::GetPrimary() const
    {
-      return GetPrimaryImpl<Unit, Primary>(*(static_cast<const Unit*>(this)));
+      //return GetPrimaryImpl<Unit, Primary>(*(static_cast<const Unit*>(this)));
+      return GetPrimaryImpl<Unit>(*(static_cast<const Unit*>(this)));
    }
 
    template<>

@@ -28,7 +28,8 @@ namespace StaticDimension
    template<typename Unit>
    inline typename TimeUnit<Unit>::Primary TimeUnit<Unit>::GetPrimary() const
    {
-      return GetPrimaryImpl<Unit, Primary>(*(static_cast<const Unit*>(this)));
+      //return GetPrimaryImpl<Unit, Primary>(*(static_cast<const Unit*>(this)));
+      return GetPrimaryImpl<Unit>(*(static_cast<const Unit*>(this)));
    }
 
    // TODO: Provide reasonable error message for failed conversion due to no primary conversion

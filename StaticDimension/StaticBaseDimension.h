@@ -355,7 +355,6 @@ namespace StaticDimension
    {
       return BaseDimension<NumTuple, DenTuple>(obj.scalar * scalar, obj.numList, obj.denList);
    }
-
    
    /// @brief Multiplication operator for a scalar and Dimension
    /// @tparam NumTuple Tuple of units in the numerator
@@ -422,17 +421,23 @@ namespace StaticDimension
       return BaseDimension<NumTuple1, DenTuple1>{ obj1.GetVal<NumTuple1, DenTuple1>() - obj2.GetVal<NumTuple1, DenTuple1>() };
    }
 
-
-   template<typename Unit, typename Primary>
-   inline Primary GetPrimaryImpl(const Unit& obj)
+   /// @brief Implementation to retrieve the primary unit
+   /// @details Retrives the primary unit of the dimension of the
+   ///    given unit type.
+   /// @tparam Unit The unit retrieve from
+   /// @param[in] obj The unit object to retrieve as primary
+   /// return The primary unit representation of the given object
+   /// @todo Attempt to return the object by reference when they match
+   template<typename Unit>
+   inline auto GetPrimaryImpl(const Unit& obj)
    {
-      if constexpr (std::is_same_v<Unit, Primary>)
+      if constexpr (std::is_same_v<Unit, Unit::Primary>)
       {
          return obj;
       }
       else
       {
-         return ConvertValue<Unit, Primary>(obj);
+         return ConvertValue<Unit, Unit::Primary>(obj);
       }
    }
 }
