@@ -436,10 +436,10 @@ namespace Dimension
    template<typename OrigNumTuple, typename OrigDenTuple>
    auto SimplifyBaseDimension(const BaseDimension<OrigNumTuple, OrigDenTuple>& obj) {
 
-      using Simplified = typename AllUnitSimplifier<OrigNumTuple, OrigDenTuple>;
+      using Simplified = AllUnitSimplifier<OrigNumTuple, OrigDenTuple>;
 
-      Simplified::numTuple newNumTuple{};
-      Simplified::denTuple newDenTuple{};
+      typename Simplified::numTuple newNumTuple{};
+      typename Simplified::denTuple newDenTuple{};
 
       // TODO: Check performance of this vs using the raw value using some performance tool
       //double value = obj.GetRawValue();

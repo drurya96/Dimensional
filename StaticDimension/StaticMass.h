@@ -13,7 +13,7 @@ namespace StaticDimension
    class MassUnit : public BaseUnit<MassUnit<Unit>> 
    { 
    public: 
-      using BaseUnit::BaseUnit;
+      using BaseUnit<MassUnit<Unit>>::BaseUnit;
 
       using Dim = MassType;
       using Primary = Grams;
@@ -68,30 +68,21 @@ namespace StaticDimension
    {
    public:
       static_assert(std::is_same_v<Unit::Dim, Grams::Dim>, "Unit provided does not derive from MassUnit");
-      using BaseDimension::BaseDimension;
+      using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
 
-      Mass() : BaseDimension(1.0, std::tuple<Unit>{0.0}, std::tuple<>{}) {}
+      Mass() : BaseDimension<std::tuple<Unit>, std::tuple<>>(1.0, std::tuple<Unit>{0.0}, std::tuple<>{}) {}
 
-      Mass(double val) : BaseDimension(1.0, std::tuple<Unit>{val}, std::tuple<>{}) {}
+      Mass(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>(1.0, std::tuple<Unit>{val}, std::tuple<>{}) {}
 
       template<typename T>
-      Mass(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension(base.GetVal<std::tuple<Unit>, std::tuple<>>()){}
-
-
-
-
+      Mass(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>(base.GetVal<std::tuple<Unit>, std::tuple<>>()) {}
 
       template<typename T>
       double GetMass()
       {
-         return scalar * ConvertValue<Unit, T>(GetNumUnit()).GetValue();
+         return this->scalar * ConvertValue<Unit, T>(this->GetNumUnit()).GetValue();
       }
-
    };
-
-
-
-
 }
 
 #endif //STATIC_DIMENSION_MASS_H
