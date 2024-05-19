@@ -157,7 +157,7 @@ namespace StaticDimension
       {
          using simplified = UnitSimplifier<NumTuple, std::tuple<>, std::tuple<>, DenTuple>;
 
-         simplified::dimType ret{};
+         typename simplified::dimType ret{};
          ret.scalar = scalar;
 
          CancelUnits(numList, denList, ret.numList, ret.denList, ret.scalar);
