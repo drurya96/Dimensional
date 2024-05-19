@@ -29,7 +29,6 @@ namespace StaticDimension
    template<typename Unit>
    inline Grams MassUnit<Unit>::GetPrimary() const
    {
-      //return GetPrimaryImpl<Unit, Primary>(*(static_cast<const Unit*>(this)));
       return GetPrimaryImpl<Unit>(*(static_cast<const Unit*>(this)));
    }
 

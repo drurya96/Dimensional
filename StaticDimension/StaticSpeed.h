@@ -16,14 +16,6 @@ namespace StaticDimension
 
       Speed(double val) : BaseDimension(val, std::tuple<LengthUnit>{1.0}, std::tuple<TimeUnit>{1.0}) {} // TODO: Is this how I want to handle this?
 
-
-      /// @brief Cast operator from a BaseDimension
-      // TODO: Can this be made more efficient?
-      // TODO: Can Cast operator be generalized?
-      // TODO: Ensure all units have a cast operator
-      //Speed(const BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>& base) : BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>(base)
-      //{}
-
       template<typename LengthT, typename TimeT>
       Speed(const BaseDimension<std::tuple<LengthT>, std::tuple<TimeT>>& base) : BaseDimension(base.GetVal<std::tuple<LengthUnit>, std::tuple<TimeUnit>>()) {}
 
@@ -35,11 +27,7 @@ namespace StaticDimension
          //   Compile may optimize to the same, unclear
          return GetVal<std::tuple<LengthUnitRet>, std::tuple<TimeUnitRet>>();
       }
-      
-
    };
 }
-
-
 
 #endif //STATIC_DIMENSION_SPEED_H
