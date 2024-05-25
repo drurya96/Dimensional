@@ -6,55 +6,22 @@
 namespace StaticDimension
 {
    struct LengthType {};
-   class Meters;
+   struct Meters;
 
    template<typename Unit>
-   class LengthUnit : public BaseUnit<LengthUnit<Unit>> 
+   struct LengthUnit : public BaseUnit
    { 
    public: 
-      using BaseUnit<LengthUnit<Unit>>::BaseUnit;
+      using BaseUnit::BaseUnit;
 
       using Dim = LengthType;
       using Primary = Meters;
-
-      Primary GetPrimary() const;
    };
 
-   class Feet : public LengthUnit<Feet> { public: using LengthUnit::LengthUnit; };
-   class Inches : public LengthUnit<Inches> { public: using LengthUnit::LengthUnit; };
-   class Meters : public LengthUnit<Meters> { public: using LengthUnit::LengthUnit; };
+   struct Feet : public LengthUnit<Feet> { public: using LengthUnit::LengthUnit; };
+   struct Inches : public LengthUnit<Inches> { public: using LengthUnit::LengthUnit; };
+   struct Meters : public LengthUnit<Meters> { public: using LengthUnit::LengthUnit; };
 
-
-   template<typename Unit>
-   inline typename LengthUnit<Unit>::Primary LengthUnit<Unit>::GetPrimary() const
-   {
-      return GetPrimaryImpl<Unit>(*(static_cast<const Unit*>(this)));
-   }
-
-   template<>
-   inline Feet ConvertValue<Meters, Feet>(const Meters& obj)
-   {
-      return Feet(obj.GetValue() * 3.280839895);
-   }
-   
-   template<>
-   inline Meters ConvertValue<Feet, Meters>(const Feet& obj)
-   {
-      return Meters(obj.GetValue() / 3.280839895);
-   }
-   
-   template<>
-   inline Inches ConvertValue<Meters, Inches>(const Meters& obj)
-   {
-      return Inches(obj.GetValue() * 39.37);
-   }
-
-   template<>
-   inline Meters ConvertValue<Inches, Meters>(const Inches& obj)
-   {
-      return Meters(obj.GetValue() / 39.37);
-   }
-   
    template<typename Unit = Meters>
    class Length : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
@@ -62,9 +29,9 @@ namespace StaticDimension
       static_assert(std::is_same_v<Unit::Dim, Meters::Dim>, "Unit provided does not derive from LengthUnit");
       using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
 
-      Length() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(1.0, std::tuple<Unit>{0.0}, std::tuple<>{}) {}
+      Length() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}
 
-      Length(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(1.0, std::tuple<Unit>{val}, std::tuple<>{}) {}
+      Length(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
 
       template<typename T>
       Length(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.GetVal<std::tuple<Unit>, std::tuple<>>()){}
@@ -73,9 +40,33 @@ namespace StaticDimension
       template<typename T>
       double GetLength()
       {
-         return this->scalar * ConvertValue<Unit, T>(this->GetNumUnit()).GetValue();
+         return this->GetVal<std::tuple<T>, std::tuple<>>();
       }
    };
+
+   template<>
+   inline double Convert<Meters, Feet>(double input)
+   {
+      return input * 3.280839895;
+   }
+
+   template<>
+   inline double Convert<Feet, Meters>(double input)
+   {
+      return input / 3.280839895;
+   }
+
+   template<>
+   inline double Convert<Meters, Inches>(double input)
+   {
+      return input * 39.37;
+   }
+
+   template<>
+   inline double Convert<Inches, Meters>(double input)
+   {
+      return input / 39.37;
+   }
 }
 
 #endif //STATIC_DIMENSION_LENGTH_H

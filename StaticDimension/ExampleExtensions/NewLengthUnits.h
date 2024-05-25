@@ -8,15 +8,15 @@ namespace StaticDimension
    class Yards : public LengthUnit<Yards> { public: using LengthUnit::LengthUnit; };
 
    template<>
-   inline Meters ConvertValue<Yards, Meters>(const Yards& obj)
+   inline double Convert<Yards, Meters>(double input)
    {
-      return Meters(obj.GetValue() / 1.0936132983);
+      return input / 1.0936132983;
    }
 
    template<>
-   inline Yards ConvertValue<Meters, Yards>(const Meters& obj)
+   inline double Convert<Meters, Yards>(double input)
    {
-      return Yards(obj.GetValue() * 1.0936132983);
+      return input * 1.0936132983;
    }
 }
 

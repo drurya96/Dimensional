@@ -258,8 +258,8 @@ namespace Dimension
 
          if (numList == i_numList && denList == i_denList) { return value; }
 
-         GetConvertedValue(numList, i_numList, result, ConvertFunctor<true>());
-         GetConvertedValue(denList, i_denList, result, ConvertFunctor<false>());
+         //GetConvertedValue(numList, i_numList, result, ConvertFunctor<true>());
+         //GetConvertedValue(denList, i_denList, result, ConvertFunctor<false>());
 
          return result;
       }
