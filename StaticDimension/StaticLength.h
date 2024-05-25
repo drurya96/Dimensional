@@ -9,10 +9,10 @@ namespace StaticDimension
    struct Meters;
 
    template<typename Unit>
-   struct LengthUnit : public BaseUnit<LengthUnit<Unit>>
+   struct LengthUnit : public BaseUnit
    { 
    public: 
-      using BaseUnit<LengthUnit<Unit>>::BaseUnit;
+      using BaseUnit::BaseUnit;
 
       using Dim = LengthType;
       using Primary = Meters;
@@ -29,9 +29,9 @@ namespace StaticDimension
       static_assert(std::is_same_v<Unit::Dim, Meters::Dim>, "Unit provided does not derive from LengthUnit");
       using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
 
-      Length() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0, std::tuple<Unit>{}, std::tuple<>{}) {}
+      Length() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}
 
-      Length(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val, std::tuple<Unit>{}, std::tuple<>{}) {}
+      Length(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
 
       template<typename T>
       Length(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.GetVal<std::tuple<Unit>, std::tuple<>>()){}
@@ -44,43 +44,29 @@ namespace StaticDimension
       }
    };
 
-
-
-
-
-
-
-
-
-
    template<>
-   inline double ConvertDouble<Meters, Feet>(double input)
+   inline double Convert<Meters, Feet>(double input)
    {
       return input * 3.280839895;
    }
 
    template<>
-   inline double ConvertDouble<Feet, Meters>(double input)
+   inline double Convert<Feet, Meters>(double input)
    {
       return input / 3.280839895;
    }
 
    template<>
-   inline double ConvertDouble<Meters, Inches>(double input)
+   inline double Convert<Meters, Inches>(double input)
    {
       return input * 39.37;
    }
 
    template<>
-   inline double ConvertDouble<Inches, Meters>(double input)
+   inline double Convert<Inches, Meters>(double input)
    {
       return input / 39.37;
    }
-
-
-
-
-
 }
 
 #endif //STATIC_DIMENSION_LENGTH_H

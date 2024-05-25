@@ -9,10 +9,10 @@ namespace StaticDimension
    struct Seconds;
 
    template<typename Unit>
-   struct TimeUnit : public BaseUnit<TimeUnit<Unit>>
+   struct TimeUnit : public BaseUnit
    {
    public:
-      using BaseUnit<TimeUnit<Unit>>::BaseUnit;
+      using BaseUnit::BaseUnit;
 
       using Dim = TimeType;
       using Primary = Seconds;
@@ -31,9 +31,9 @@ namespace StaticDimension
       static_assert(std::is_same_v<Unit::Dim, Seconds::Dim>, "Unit provided does not derive from TimeUnit");
       using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
 
-      Time() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0, std::tuple<Unit>{}, std::tuple<>{}) {}
+      Time() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}
 
-      Time(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val, std::tuple<Unit>{}, std::tuple<>{}) {}
+      Time(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
 
       template<typename T>
       Time(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.GetVal<std::tuple<Unit>, std::tuple<>>()) {}
@@ -45,34 +45,29 @@ namespace StaticDimension
       }
    };
 
-
-
    template<>
-   inline double ConvertDouble<Seconds, Minutes>(double input)
+   inline double Convert<Seconds, Minutes>(double input)
    {
       return input / 60.0;
    }
 
    template<>
-   inline double ConvertDouble<Minutes, Seconds>(double input)
+   inline double Convert<Minutes, Seconds>(double input)
    {
       return input * 60.0;
    }
 
    template<>
-   inline double ConvertDouble<Seconds, Hours>(double input)
+   inline double Convert<Seconds, Hours>(double input)
    {
       return input / 3600.0;
    }
 
    template<>
-   inline double ConvertDouble<Hours, Seconds>(double input)
+   inline double Convert<Hours, Seconds>(double input)
    {
       return input * 3600.0;
    }
-
-
-
 }
 
 #endif //STATIC_DIMENSION_TIME_H

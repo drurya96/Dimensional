@@ -42,7 +42,6 @@ TEST_F(UtilitiesTest, Test_remove_instance)
    ASSERT_TRUE((is_same_v<RemoveOneInstance<Meters, tuple<>>::type, tuple<>>));
 }
 
-/*
 TEST_F(UtilitiesTest, Test_GetConvertedValue)
 {
    using fromNum = tuple<Meters, Seconds>;
@@ -53,45 +52,24 @@ TEST_F(UtilitiesTest, Test_GetConvertedValue)
 
    double value = 10.0;
 
-   // Converting from units of value 1.0 (simple)
-   typename fromNum OrigNum{ 1.0, 1.0 };
-   typename fromDen OrigDen{ 1.0, 1.0 };
-
    // Convert only the numerator, to the same type. This is a no-op
-   GetConvertedValue<0, false, fromNum>(OrigNum, value);
+   ConvertDimension<0, false, fromNum, fromNum>(value);
    ASSERT_DOUBLE_EQ(value, 10.0);
 
    // Convert only the denominator, to the same type. This is a no-op
-   GetConvertedValue<0, true, fromDen>(OrigDen, value);
+   ConvertDimension<0, true, fromDen, fromDen>(value);
    ASSERT_DOUBLE_EQ(value, 10.0);
 
    // Convert only the numerator
-   GetConvertedValue<0, false, toNum>(OrigNum, value);
+   ConvertDimension<0, false, toNum, fromNum>(value);
    ASSERT_NEAR(value, 0.5468, TOLERANCE);
 
    value = 10.0; // reset value
 
    // Convert only the denominator
-   GetConvertedValue<0, true, toDen>(OrigDen, value);
+   ConvertDimension<0, true, toDen, fromDen>(value);
    ASSERT_NEAR(value, 23.6246, TOLERANCE);
-
-
-   // Converting from units of real values
-   typename fromNum OrigNum2{ 2.0, 5.0 };
-   typename fromDen OrigDen2{ 3.0, 12.0 };
-
-   // Convert only the numerator
-   GetConvertedValue<0, false, toNum>(OrigNum2, value);
-   ASSERT_NEAR(value, 12.9181, TOLERANCE);
-
-   value = 10.0; // reset value
-
-   // Convert only the denominator
-   GetConvertedValue<0, true, toDen>(OrigDen2, value);
-   ASSERT_NEAR(value, 0.65624, TOLERANCE);
 }
-*/
-
 
 TEST_F(UtilitiesTest, Test_tuple_diff)
 {
@@ -135,65 +113,16 @@ TEST_F(UtilitiesTest, Test_UnitSimplifier)
    ASSERT_TRUE((is_same_v<simplified4::newDen, tuple<Seconds, Seconds>>));
 }
 
-/*
-TEST_F(UtilitiesTest, Test_UpdateRealUnits)
-{
-   using NumTup1 = tuple<Meters, Seconds, Grams>;
-   NumTup1 RealNumTup1{};
-
-
-   UpdateRealUnits(Meters{ 2.0 }, RealNumTup1);
-   UpdateRealUnits(Seconds{ 10.0 }, RealNumTup1);
-   UpdateRealUnits(Grams{ 5.0 }, RealNumTup1);
-   double value = 1.0; // This is used to track the value. Consider adding another utility for this
-   GetConvertedValue<0, false, NumTup1>(RealNumTup1, value);
-
-   ASSERT_NEAR(value, 100.0, TOLERANCE);
-}
-
 TEST_F(UtilitiesTest, Test_CancelUnits)
 {
    using NumTup1 = tuple<Meters, Seconds, Grams>;
-   NumTup1 RealNumTup1{};
-   NumTup1 IncomingNumTup1{2.0, 10.0, 5.0};
-
    using DenTup1 = tuple<Feet, Ounces>;
-   DenTup1 RealDenTup1{};
-   DenTup1 IncomingDenTup1{3.0, 15.0};
 
-
-   double value = 1.0; // This is used to track the value. Consider adding another utility for this
-
-   CancelUnits(IncomingNumTup1, IncomingDenTup1, RealNumTup1, RealDenTup1, value);
-
-   
-   GetConvertedValue<0, false, NumTup1>(RealNumTup1, value);
-   GetConvertedValue<0, true, DenTup1>(RealDenTup1, value);
-
-   ASSERT_NEAR(value, 2.22222, TOLERANCE);
-}
-*/
-
-/*
-TEST_F(UtilitiesTest, Test_AddUnits)
-{
-   using tup1T = tuple<Feet, Minutes>;
-   using tup2T = tuple<Meters, Seconds>;
-   tup1T tup1{ 10, 5 };
-   tup2T tup2{ 2, 60 };
-
-   tup1T outTup1{};
-   tup2T outTup2{};
-
-   AddUnitTuples(tup1, tup2, outTup1);
-   AddUnitTuples(tup2, tup1, outTup2);
+   using simplified1 = UnitSimplifier<NumTup1, tuple<>, tuple<>, DenTup1>;
 
    double value = 1.0; // This is used to track the value. Consider adding another utility for this
-   GetConvertedValue<0, false, tup1T>(outTup1, value);
-   ASSERT_NEAR(value, 99.3701, TOLERANCE);
 
-   value = 1.0; // This is used to track the value. Consider adding another utility for this
-   GetConvertedValue<0, false, tup2T>(outTup2, value);
-   ASSERT_NEAR(value, 1817.28, TOLERANCE);
+   CancelUnits<NumTup1, DenTup1, simplified1::newNum, simplified1::newDen>(value);
+
+   ASSERT_NEAR(value, 0.11572835, TOLERANCE);
 }
-*/
