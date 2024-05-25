@@ -68,37 +68,6 @@ namespace StaticDimension
          decltype(tuple_cat_t<std::tuple<Head>, typename RemoveOneInstance<T, std::tuple<Tail...>>::type>())>;
    };
 
-   /// @brief Convert the given value when units are cancelled out
-   /// @details Recursive base-case
-   template <size_t I = 0, bool inverse = false, typename toTuple, typename... Ts>
-   typename std::enable_if<I == sizeof...(Ts), void>::type
-      GetConvertedValue(const std::tuple<Ts...>& tup, double& value)
-   {
-      return;
-   }
-
-   /// @brief Convert the given value when units are cancelled out
-   /// @tparam I The current index of both tuples
-   /// @tparam inverse Whether the conversion is inverted (i.e. in the denominator)
-   /// @tparam toTuple The tuple type to convert to
-   /// @tparam Ts... The types within the tuples to convert from
-   /// @param fromTup[in] Tuple of types to convert from
-   /// @param value[in,out] Reference of a value to update
-   template <size_t I = 0, bool inverse = false, typename toTuple, typename... Ts>
-   typename std::enable_if<(I < sizeof...(Ts)), void>::type
-   GetConvertedValue(const std::tuple<Ts...>& fromTup, double& value)
-   {
-      if constexpr (inverse)
-      {
-         value /= ConvertValue<std::tuple_element_t<I, std::tuple<Ts...>>, std::tuple_element_t<I, toTuple>>(std::get<I>(fromTup)).GetValue();
-      }
-      else
-      {
-         value *= ConvertValue<std::tuple_element_t<I, std::tuple<Ts...>>, std::tuple_element_t<I, toTuple>>(std::get<I>(fromTup)).GetValue();
-      }
-      GetConvertedValue<I + 1, inverse, toTuple>(fromTup, value);
-   }
-
    /// @brief Find the difference between two type-tuples
    template<typename T, typename ...>
    struct tuple_diff;
@@ -165,42 +134,57 @@ namespace StaticDimension
       using dimType = BaseDimension<newNum, newDen>;
    };
 
-   /// @brief Update the given unit tuple with valid values
-   /// @details specialization when there are no more items to update
-   template<int index = 0, typename T, typename ... RealTypes>
-   typename std::enable_if < index == sizeof...(RealTypes), bool>::type
-   UpdateRealUnits(const T& Unit, std::tuple<RealTypes...>& RealTup)
+   struct NullUnit
    {
-      return false;
-   }
+      using Dim = void;
+      using Primary = void;
+   };
 
-   /// @brief Update the given unit tuple with valid values
-   /// @tparam index The index to of the tuple to update
-   /// @tparam T The type of the unit to update the value of
-   /// @tparam RealTypes... The types in the tuple of units to update
-   /// @param[in] Unit The unit to use when updating
-   /// @param[in,out] RealTup The tuple of units to update.
-   ///    Invalid values will be NaN
-   template<int index = 0, typename T, typename ... RealTypes>
-   typename std::enable_if<index < sizeof...(RealTypes), bool>::type
-   UpdateRealUnits(const T& Unit, std::tuple<RealTypes...>& RealTup)
-   {
-      if constexpr (std::is_same_v<std::tuple_element_t<index, std::tuple<RealTypes...>>::Dim, T::Dim>) // TODO: This is apparently safe for empty tuple, but would like to investigate
-      {
-         if (std::isnan(std::get<index>(RealTup).GetValue()))
-         {
-            std::get<index>(RealTup).SetValue(ConvertValue<T, std::tuple_element_t<index, std::tuple<RealTypes...>>>(Unit).GetValue());
-            return true;
-         }
-      }
-      return UpdateRealUnits<index + 1>(Unit, RealTup);
-   }
+
+
+   /// @brief Struct to remove one instance of a type from a tuple of types
+   template<typename T, typename Tuple>
+   struct get_first_match;
+
+   /// @brief Struct to remove one instance of a type from a tuple of types
+   /// @details Specialization for an empty tuple
+   /// @typedef type An empty tuple
+   template<typename T>
+   struct get_first_match<T, std::tuple<>> {
+      using type = NullUnit;
+   };
+
+   /// @brief Struct to remove one instance of a type from a tuple of types
+   /// @details Main specialization
+   /// @tparam T The type to remove
+   /// @tparam Head the first item of the tuple
+   /// @tparam Tail the remaining items in the tuple
+   /// @typedef type A tuple type matching the input tuple type, except the first instance of T is removed
+   template<typename T, typename Head, typename... Tail>
+   struct get_first_match<T, std::tuple<Head, Tail...>> {
+      using type = std::conditional_t<is_same_dim<T, Head>::value,
+         Head,
+         typename get_first_match<T, std::tuple<Tail...>>::type>;
+   };
+
+
+
+
+
+
+
+
+
+
+
+
+
 
    /// @brief Unit cancellation implementation
    /// @details recursive base-case
-   template<bool inverse = false, int index = 0, typename ... IncomingTypes, typename ... RealTypes>
+   template<bool inverse = false, int index = 0, typename RealTupType, typename ... IncomingTypes>
    typename std::enable_if < index == sizeof...(IncomingTypes), void>::type
-   CancelUnitsImpl(const std::tuple<IncomingTypes...>& IncomingTup, std::tuple<RealTypes...>& RealTup, double& value)
+      CancelUnitsImplNEW(const std::tuple<IncomingTypes...>& IncomingTup, double& value)
    {
       return;
    }
@@ -215,23 +199,40 @@ namespace StaticDimension
    /// @param[in] IncomingTup The reference tuple to cancel or update form
    /// @param[in,out] RealTup The tuple to update
    /// @param[in,out] value The value to update when cancelling units
-   template<bool inverse = false, int index = 0, typename ... IncomingTypes, typename ... RealTypes>
-   typename std::enable_if<index < sizeof...(IncomingTypes), void>::type
-   CancelUnitsImpl(const std::tuple<IncomingTypes...>& IncomingTup, std::tuple<RealTypes...>& RealTup, double& value)
+   template<bool inverse = false, int index = 0, typename RealTupType, typename ... IncomingTypes>
+   typename std::enable_if < index < sizeof...(IncomingTypes), void>::type
+      CancelUnitsImplNEW(const std::tuple<IncomingTypes...>& IncomingTup, double& value)
    {
-      if (!UpdateRealUnits<0>(std::get<index>(IncomingTup), RealTup))
+      using currentType = std::tuple_element_t<index, std::tuple<IncomingTypes...>>;
+      if constexpr (has_same_dim<currentType, RealTupType>::value)
       {
-         // Modify value by canceling
+         // Don't cancel
+
          if constexpr (inverse)
          {
-            value /= std::get<index>(IncomingTup).GetPrimary().GetValue();
+            value /= ConvertDouble<currentType, get_first_match<currentType, RealTupType>::type>(1.0);
          }
          else
          {
-            value *= std::get<index>(IncomingTup).GetPrimary().GetValue();
+            value *= ConvertDouble<currentType, get_first_match<currentType, RealTupType>::type>(1.0);
          }
+
+
+         CancelUnitsImplNEW<inverse, index + 1, RemoveOneInstance<currentType, RealTupType>::type>(IncomingTup, value);
       }
-      CancelUnitsImpl<inverse, index + 1>(IncomingTup, RealTup, value);
+      else
+      {
+         if constexpr (inverse)
+         {
+            value /= ConvertDouble<currentType, currentType::Primary>(1.0);
+         }
+         else
+         {
+            value *= ConvertDouble<currentType, currentType::Primary>(1.0);
+         }
+
+         CancelUnitsImplNEW<inverse, index + 1, RealTupType>(IncomingTup, value);
+      }
    }
 
    /// @brief Perform unit cancellation
@@ -245,67 +246,44 @@ namespace StaticDimension
    /// @param[in,out] RealDenTup Denominator tuple to update
    /// @param[in,out] value Value to update
    template<typename ... NumTypes, typename ... DenTypes, typename ... RealNumTypes, typename ... RealDenTypes>
-   void CancelUnits(const std::tuple<NumTypes...>& NumTup, const std::tuple<DenTypes...>& DenTup, std::tuple<RealNumTypes...>& RealNumTup, std::tuple<RealDenTypes...>& RealDenTup, double& value)
+   void CancelUnitsNew(const std::tuple<NumTypes...>& NumTup, const std::tuple<DenTypes...>& DenTup, std::tuple<RealNumTypes...>& RealNumTup, std::tuple<RealDenTypes...>& RealDenTup, double& value)
    {
-      CancelUnitsImpl<false>(NumTup, RealNumTup, value);
-      CancelUnitsImpl<true>(DenTup, RealDenTup, value);
+      CancelUnitsImplNEW<false, 0, std::tuple<RealNumTypes...>>(NumTup, value);
+      CancelUnitsImplNEW<true, 0, std::tuple<RealDenTypes...>>(DenTup, value);
    }
 
-   /// @brief Add two units accounting for necessary scalars
-   /// @tparam T The Unit type to add and update
-   /// @param[in] Unit1 The first unit to add
-   /// @param[in] Unit2 The second unit to add
-   /// @param[out] OutUnit The unit to update results in
-   /// @param[in] scalar1 Scalar value for first unit
-   /// @param[in] scalar2 Scalar value for second unit
-   template<typename T>
-   void AddUnits(const T& Unit1, const T& Unit2, T& OutUnit, double scalar1, double scalar2)
-   {
-      OutUnit.SetValue((Unit1.GetValue() * scalar1) + (Unit2.GetValue() * scalar2));
-   }
-   
-   /// @brief Add two tuples of units
+
+
+   /// @brief Convert the given value when units are cancelled out
    /// @details Recursive base-case
-   template<int index = 0, typename ... T1, typename ... T2>
-   typename std::enable_if < sizeof...(T1) == sizeof...(T2) && index == sizeof...(T1), void>::type
-   AddUnitTuples(const std::tuple<T1...>& Tup1, const std::tuple<T2...>& Tup2, std::tuple<T1...>& OutTup, double scalar1 = 1.0, double scalar2 = 1.0)
+   template <size_t I = 0, bool inverse = false, typename toTuple, typename... Ts>
+   typename std::enable_if<I == sizeof...(Ts), void>::type
+      GetConvertedDouble(const std::tuple<Ts...>& tup, double& value)
    {
       return;
    }
 
-   /// @brief Add two tuples of units
-   /// @details tuples must be of the same size, and units at
-   ///    corresponding positions must be convertible.
-   /// @tparam index Position in tuple to add
-   /// @tparam T1... Types of the first unit tuple
-   /// @tparam T2... Types of the second unit tuple
-   /// @param[in] Tup1 First tuple to add
-   /// @param[in] Tup2 Second tuple to add
-   /// @param[out] OutTup Tuple to write output to.
-   ///    This will be the same type as Tup1
-   /// @param[in] scalar1 Scalar values for Tup1
-   /// @param[in] scalar2 Scalar values for Tup2
-   template<int index = 0, typename ... T1, typename ... T2>
-   typename std::enable_if < sizeof...(T1) == sizeof...(T2) && index < sizeof...(T1), void>::type
-   AddUnitTuples(const std::tuple<T1...>& Tup1, const std::tuple<T2...>& Tup2, std::tuple<T1...>& OutTup, double scalar1 = 1.0, double scalar2 = 1.0)
+   /// @brief Convert the given value when units are cancelled out
+   /// @tparam I The current index of both tuples
+   /// @tparam inverse Whether the conversion is inverted (i.e. in the denominator)
+   /// @tparam toTuple The tuple type to convert to
+   /// @tparam Ts... The types within the tuples to convert from
+   /// @param fromTup[in] Tuple of types to convert from
+   /// @param value[in,out] Reference of a value to update
+   template <size_t I = 0, bool inverse = false, typename toTuple, typename... Ts>
+   typename std::enable_if<(I < sizeof...(Ts)), void>::type
+      GetConvertedDouble(const std::tuple<Ts...>& fromTup, double& value)
    {
-      using Type1 = std::tuple_element_t<index, std::tuple<T1...>>;
-      using Type2 = std::tuple_element_t<index, std::tuple<T2...>>;
-
-      AddUnits(std::get<index>(Tup1), ConvertValue<Type2, Type1>(std::get<index>(Tup2)), std::get<index>(OutTup), scalar1, scalar2);
-      AddUnitTuples<index + 1>(Tup1, Tup2, OutTup, scalar1, scalar2);
+      if constexpr(inverse)
+      {
+         value /= ConvertDouble<std::tuple_element_t<I, std::tuple<Ts...>>, std::tuple_element_t<I, toTuple>>(1.0);        
+      }
+      else
+      {
+         value *= ConvertDouble<std::tuple_element_t<I, std::tuple<Ts...>>, std::tuple_element_t<I, toTuple>>(1.0);
+      }
+      GetConvertedDouble<I + 1, inverse, toTuple>(fromTup, value);
    }
 
-   /// @brief Produce a tuple of doubles
-   /// @details Returns a tuple of doubles of the given size,
-   ///    initialized to the indicated value.
-   /// @tparam Is... An index sequence informing the size of the tuple
-   /// @param[in] The index sequence
-   /// @param[in] value The value to initialize all items to
-   /// @return The tuple of the indicated size initialized to the given value
-   template<std::size_t... Is>
-   auto make_tuple_of_doubles(std::index_sequence<Is...>, double value = 1.0) {
-      return std::make_tuple((static_cast<void>(Is), value)...);
-   }
 }
 #endif // STATIC_DIMENSION_UTILITIES_H

@@ -42,6 +42,7 @@ TEST_F(UtilitiesTest, Test_remove_instance)
    ASSERT_TRUE((is_same_v<RemoveOneInstance<Meters, tuple<>>::type, tuple<>>));
 }
 
+/*
 TEST_F(UtilitiesTest, Test_GetConvertedValue)
 {
    using fromNum = tuple<Meters, Seconds>;
@@ -89,6 +90,8 @@ TEST_F(UtilitiesTest, Test_GetConvertedValue)
    GetConvertedValue<0, true, toDen>(OrigDen2, value);
    ASSERT_NEAR(value, 0.65624, TOLERANCE);
 }
+*/
+
 
 TEST_F(UtilitiesTest, Test_tuple_diff)
 {
@@ -132,6 +135,7 @@ TEST_F(UtilitiesTest, Test_UnitSimplifier)
    ASSERT_TRUE((is_same_v<simplified4::newDen, tuple<Seconds, Seconds>>));
 }
 
+/*
 TEST_F(UtilitiesTest, Test_UpdateRealUnits)
 {
    using NumTup1 = tuple<Meters, Seconds, Grams>;
@@ -168,7 +172,9 @@ TEST_F(UtilitiesTest, Test_CancelUnits)
 
    ASSERT_NEAR(value, 2.22222, TOLERANCE);
 }
+*/
 
+/*
 TEST_F(UtilitiesTest, Test_AddUnits)
 {
    using tup1T = tuple<Feet, Minutes>;
@@ -190,3 +196,4 @@ TEST_F(UtilitiesTest, Test_AddUnits)
    GetConvertedValue<0, false, tup2T>(outTup2, value);
    ASSERT_NEAR(value, 1817.28, TOLERANCE);
 }
+*/

@@ -2,7 +2,6 @@
 #define STATIC_DIMENSION_BASE_H
 
 #include <tuple> // For std::tuple and related functions
-#include <limits> // For std::numeric_limits
 #include <type_traits> // For std::is_same
 #include <utility> // For std::make_index_sequence // @todo move this to Utilities
 
@@ -17,63 +16,17 @@ namespace StaticDimension
    ///    such as Meters, Seconds, Grams, etc.
    /// @tparam Unit The derived unit, using CRTP
    template<typename Unit>
-   class BaseUnit
+   struct BaseUnit
    {
    public:
 
       /// @brief Default constructor
       /// @details Default constructor that sets the value to NaN
-      BaseUnit() : value(std::numeric_limits<double>::quiet_NaN()) {}
-
-      /// @brief Constructor setting name
-      BaseUnit(double val) : value(val){}
+      BaseUnit() {}
 
       /// @brief Pure virtual destructor
       virtual ~BaseUnit() = 0;
-
-      /// @brief Return the value
-      double GetValue() const { return value; }
-
-      /// @brief Set the value
-      /// @param[in] val Value to set
-      /// @todo Consider making this private and implications thereof
-      void SetValue(double val) { value = val; }
-      
-   protected:
-      /// @brief Value of this unit object
-      double value = 0;
    };
-
-   /// @brief Convert one unit to another
-   /// @details Return a toUnit type equivalent to the given
-   ///    object of type fromUnit. This will fail at compile-time
-   ///    if the to units do not have a common Dim field.
-   ///    Further, attempting to convert to the same type will simply 
-   ///    return a copy of the same object.
-   /// @tparam fromUnit Unit to convert from, deduced from obj
-   /// @tparam toUnit Unit to convert to, must be provided explicitly
-   /// @param[in] obj Object to convert
-   /// @todo Return the object by reference, if possible.
-   /// @todo After switching to C++20, use a concept to inforce Dim field
-   /// @todo Attempt to print a more meaningful compile-time error when
-   ///    conversion is not possible, including the units being converted.
-   ///    Avoid RTTI for this task.
-   template<typename fromUnit, typename toUnit>
-   toUnit ConvertValue(const fromUnit& obj)
-   {
-      if constexpr (std::is_same_v<fromUnit, toUnit>)
-      {
-         return obj;
-      }
-      else if constexpr (std::is_same_v<fromUnit::Dim, toUnit::Dim>)
-      {
-         return ConvertValue<fromUnit::Primary, toUnit>(obj.GetPrimary());
-      }
-      else
-      {
-         static_assert(false, "No possible conversion for between these types.");
-      }
-   }
 
    /// @brief Destructor implementation
    template<typename Unit>
@@ -109,8 +62,8 @@ namespace StaticDimension
       /// @brief Constructor given value
       BaseDimension(double val) :
          scalar(val),
-         numList(std::make_from_tuple<NumTuple>(make_tuple_of_doubles(std::make_index_sequence<std::tuple_size_v<NumTuple>>{}, 1.0))),
-         denList(std::make_from_tuple<DenTuple>(make_tuple_of_doubles(std::make_index_sequence<std::tuple_size_v<DenTuple>>{}, 1.0)))
+         numList(),
+         denList()
       {
       }
 
@@ -149,8 +102,8 @@ namespace StaticDimension
          numList(),
          denList()
       {
-         CancelUnits(NumTuple1, DenTuple1, numList, denList, scalar);
-         CancelUnits(NumTuple2, DenTuple2, numList, denList, scalar);
+         CancelUnitsNew(NumTuple1, DenTuple1, numList, denList, scalar);
+         CancelUnitsNew(NumTuple2, DenTuple2, numList, denList, scalar);
       }
 
       auto Simplify()
@@ -160,7 +113,7 @@ namespace StaticDimension
          typename simplified::dimType ret{};
          ret.scalar = scalar;
 
-         CancelUnits(numList, denList, ret.numList, ret.denList, ret.scalar);
+         CancelUnitsNew(numList, denList, ret.numList, ret.denList, ret.scalar);
 
          return ret;
       }
@@ -174,8 +127,8 @@ namespace StaticDimension
       {
          double result = scalar;
 
-         GetConvertedValue<0, false, NumTuple>(numList, result);
-         GetConvertedValue<0, true, DenTuple>(denList, result);
+         GetConvertedDouble<0, false, NumTuple>(numList, result);
+         GetConvertedDouble<0, true, DenTuple>(denList, result);
 
          return result;
       }
@@ -421,23 +374,34 @@ namespace StaticDimension
       return BaseDimension<NumTuple1, DenTuple1>{ obj1.GetVal<NumTuple1, DenTuple1>() - obj2.GetVal<NumTuple1, DenTuple1>() };
    }
 
-   /// @brief Implementation to retrieve the primary unit
-   /// @details Retrives the primary unit of the dimension of the
-   ///    given unit type.
-   /// @tparam Unit The unit retrieve from
-   /// @param[in] obj The unit object to retrieve as primary
-   /// return The primary unit representation of the given object
-   /// @todo Attempt to return the object by reference when they match
-   template<typename Unit>
-   inline auto GetPrimaryImpl(const Unit& obj)
+   /// @brief Convert one unit to another TODO: Check this doxygen
+   /// @details Return a toUnit type equivalent to the given
+   ///    object of type fromUnit. This will fail at compile-time
+   ///    if the to units do not have a common Dim field.
+   ///    Further, attempting to convert to the same type will simply 
+   ///    return a copy of the same object.
+   /// @tparam fromUnit Unit to convert from, deduced from obj
+   /// @tparam toUnit Unit to convert to, must be provided explicitly
+   /// @param[in] obj Object to convert
+   /// @todo Return the object by reference, if possible.
+   /// @todo After switching to C++20, use a concept to inforce Dim field
+   /// @todo Attempt to print a more meaningful compile-time error when
+   ///    conversion is not possible, including the units being converted.
+   ///    Avoid RTTI for this task.
+   template<typename fromUnit, typename toUnit>
+   double ConvertDouble(double input)
    {
-      if constexpr (std::is_same_v<Unit, Unit::Primary>)
+      if constexpr (std::is_same_v<fromUnit, toUnit>)
       {
-         return obj;
+         return input;
+      }
+      else if constexpr (std::is_same_v<fromUnit::Dim, toUnit::Dim>)
+      {
+         return ConvertDouble<fromUnit::Primary, toUnit>(ConvertDouble<fromUnit, fromUnit::Primary>(input));
       }
       else
       {
-         return ConvertValue<Unit, Unit::Primary>(obj);
+         static_assert(false, "No possible conversion for between these types.");
       }
    }
 }
