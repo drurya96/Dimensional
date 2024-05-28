@@ -45,6 +45,7 @@ namespace StaticDimension
       }
    };
 
+   /*
    template<>
    inline double Convert<Seconds, Minutes>(double input)
    {
@@ -68,6 +69,13 @@ namespace StaticDimension
    {
       return input * 3600.0;
    }
+   */
+   
+   template<> struct Conversion<Seconds, Minutes> { static constexpr PrecisionType slope = (1.0 / 60.0); };
+   template<> struct Conversion<Minutes, Seconds> { static constexpr PrecisionType slope = 60.0; };
+   template<> struct Conversion<Seconds, Hours> { static constexpr PrecisionType slope = (1.0 / 3600.0); };
+   template<> struct Conversion<Hours, Seconds> { static constexpr PrecisionType slope = 3600.0; };
+
 }
 
 #endif //STATIC_DIMENSION_TIME_H

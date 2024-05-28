@@ -26,6 +26,20 @@ TEST_F(FundamentalConversions, TestLength) {
 
    ASSERT_NEAR(myLength.GetLength<Meters>(), 10.0, TOLERANCE);
    ASSERT_NEAR(myLength.GetLength<Feet>(), 32.8084, TOLERANCE);
+
+
+   ASSERT_NEAR((Conversion<Meters, Feet>::slope), 3.280839895, TOLERANCE);
+   //ASSERT_NEAR((Conversion<Meters, Feet>::offset), 0.0, TOLERANCE);
+   //ASSERT_NEAR((Conversion<Meters, Meters>::slope), 1.0, TOLERANCE);
+
+
+
+   ASSERT_NEAR((GetSlope<Conversion<Meters, Feet>>()), 3.280839895, TOLERANCE);
+   ASSERT_NEAR((GetOffset<Conversion<Meters, Feet>>()), 0.0, TOLERANCE);
+   ASSERT_NEAR((GetSlope<Conversion<Meters, Meters>>()), 1.0, TOLERANCE);
+
+
+   ASSERT_NEAR((ConvertNew<Meters, Feet>(10.0)), 32.8084, TOLERANCE);
 }
 
 

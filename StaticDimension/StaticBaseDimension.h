@@ -27,6 +27,8 @@ namespace StaticDimension
       ///    For now, some template metaprogramming relying on decltype
       ///    requires a default constructor.
       BaseUnit() {}
+
+      constexpr static int ID = 0;
    };
 
    /// @brief A generic Dimension class
@@ -72,7 +74,7 @@ namespace StaticDimension
          using simplified = UnitSimplifier<NumTuple, std::tuple<>, std::tuple<>, DenTuple>;
          PrecisionType newScalar = scalar;
 
-         CancelUnits<NumTuple, DenTuple, simplified::newNum, simplified::newDen>(newScalar);
+         CancelUnits<NumTuple, DenTuple, simplified::newNum, simplified::newDen, simplified::isDelta>(newScalar);
 
          return simplified::dimType(newScalar);
       }
@@ -86,8 +88,10 @@ namespace StaticDimension
       {
          PrecisionType result = scalar;
 
-         ConvertDimension<0, false, ToNumTuple, NumTuple>(result);
-         ConvertDimension<0, true, ToDenTuple, DenTuple>(result);
+         constexpr bool isDelta = !((std::tuple_size_v<ToNumTuple> == 1) && (std::tuple_size_v<ToDenTuple> == 0));
+
+         ConvertDimension<0, false, ToNumTuple, NumTuple, isDelta>(result);
+         ConvertDimension<0, true, ToDenTuple, DenTuple, isDelta>(result);
 
          return result;
       }
@@ -212,8 +216,8 @@ namespace StaticDimension
       using simplified = UnitSimplifier<NumTuple1, DenTuple2, DenTuple1, NumTuple2>;
       PrecisionType newScalar = obj1.scalar / obj2.scalar;
 
-      CancelUnits<NumTuple1, DenTuple2, simplified::newNum, simplified::newDen>(newScalar);
-      CancelUnits<DenTuple1, NumTuple2, simplified::newNum, simplified::newDen>(newScalar);
+      CancelUnits<NumTuple1, DenTuple2, simplified::newNum, simplified::newDen, simplified::isDelta>(newScalar);
+      CancelUnits<DenTuple1, NumTuple2, simplified::newNum, simplified::newDen, simplified::isDelta>(newScalar);
 
       return simplified::dimType(newScalar);
    }
@@ -233,8 +237,8 @@ namespace StaticDimension
       using simplified = UnitSimplifier<NumTuple1, NumTuple2, DenTuple1, DenTuple2>;
       PrecisionType newScalar = obj1.scalar * obj2.scalar;
 
-      CancelUnits<NumTuple1, DenTuple1, simplified::newNum, simplified::newDen>(newScalar);
-      CancelUnits<NumTuple2, DenTuple2, simplified::newNum, simplified::newDen>(newScalar);
+      CancelUnits<NumTuple1, DenTuple1, simplified::newNum, simplified::newDen, simplified::isDelta>(newScalar);
+      CancelUnits<NumTuple2, DenTuple2, simplified::newNum, simplified::newDen, simplified::isDelta>(newScalar);
 
       return simplified::dimType(newScalar);
    }
@@ -318,6 +322,9 @@ namespace StaticDimension
       return BaseDimension<NumTuple1, DenTuple1>{ obj1.GetVal<NumTuple1, DenTuple1>() - obj2.GetVal<NumTuple1, DenTuple1>() };
    }
 
+
+
+   /*
    /// @brief Convert one unit to another TODO: Check this doxygen
    /// @details Return a toUnit type equivalent to the given
    ///    object of type fromUnit. This will fail at compile-time
@@ -348,6 +355,239 @@ namespace StaticDimension
          static_assert(false, "No possible conversion for between these types.");
       }
    }
+   */
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   
+   /*
+   // Base template: handles the failure case
+   template<typename fromUnit, typename toUnit, typename Enable = void>
+   struct ConversionBase {
+      static_assert(sizeof(fromUnit) == -1, "Conversion not defined for these units.");
+   };
+
+   // Partial specialization: handles the case where the two units are the same
+   template<typename Unit>
+   struct ConversionBase<Unit, Unit> {
+      static constexpr PrecisionType slope = 1.0;
+      static constexpr PrecisionType offset = 0.0;
+   };
+
+   // Partial specialization: handles the case where the two units have the same dimension
+   template<typename fromUnit, typename toUnit>
+   struct ConversionBase<fromUnit, toUnit, std::enable_if_t<std::is_same_v<typename fromUnit::Dim, typename toUnit::Dim>>> {
+      static constexpr PrecisionType slope = 5.0;  // Example "special logic"
+      static constexpr PrecisionType offset = 2.0; // Example "special logic"
+   };
+
+   // Conversion struct inheriting from ConversionBase
+   template<typename fromUnit, typename toUnit>
+   struct Conversion : ConversionBase<fromUnit, toUnit>
+   {
+      static constexpr PrecisionType slope = ConversionBase<fromUnit, toUnit>::slope;
+      static constexpr PrecisionType offset = ConversionBase<fromUnit, toUnit>::offset;
+   };
+
+   */
+
+
+
+
+
+
+
+   // Primary template, defaults to false
+   template <typename, typename = std::void_t<>>
+   struct has_slope : std::false_type {};
+
+   // Specialization that detects presence of static constexpr double T::Foo
+   template <typename T>
+   struct has_slope<T, std::void_t<decltype(T::slope)>> : std::integral_constant<bool, std::is_same_v<decltype(T::slope), const double>> {};
+
+
+   // Primary template, defaults to false
+   template <typename, typename = std::void_t<>>
+   struct has_offset : std::false_type {};
+
+   // Specialization that detects presence of static constexpr double T::Foo
+   template <typename T>
+   struct has_offset<T, std::void_t<decltype(T::offset)>> : std::integral_constant<bool, std::is_same_v<decltype(T::offset), const double>> {};
+
+
+
+
+   template<typename T>
+   constexpr PrecisionType GetSlope()
+   {
+      if constexpr (has_slope<T>::value)
+      {
+         return T::slope;
+      }
+      else
+      {
+         return 1.0;
+      }
+   }
+
+   template<typename T>
+   constexpr PrecisionType GetOffset()
+   {
+      if constexpr (has_offset<T>::value)
+      {
+         return T::offset;
+      }
+      else
+      {
+         return 0.0;
+      }
+   }
+
+
+
+
+   
+   // Base template providing default values
+   template<typename fromUnit, typename toUnit, typename Enable = void>
+   struct ConversionBase
+   {
+      static_assert(sizeof(fromUnit) == -1, "Conversion not defined for these units.");
+   };
+
+   /*
+   // Specialized template for same units (fromUnit == toUnit)
+   template<typename Unit>
+   struct ConversionBase<Unit, Unit>
+   {
+      static constexpr PrecisionType slope = 1.0;
+      static constexpr PrecisionType offset = 0.0;
+   };
+   */
+
+   template<typename fromUnit, typename toUnit>
+   struct Conversion;
+
+   // Specialized template for units with the same dimension (fromUnit::Dim == toUnit::Dim)
+   template<typename fromUnit, typename toUnit>
+   struct ConversionBase<fromUnit, toUnit, std::enable_if_t<std::is_same_v<typename fromUnit::Dim, typename toUnit::Dim>>>
+   {
+      using toPrimary = Conversion<fromUnit, typename fromUnit::Primary>;
+      using fromPrimary = Conversion<typename fromUnit::Primary, toUnit>;
+
+      static constexpr PrecisionType slope = GetSlope<toPrimary>() * GetSlope<fromPrimary>();
+      static constexpr PrecisionType offset = GetOffset<toPrimary>() + GetOffset<fromPrimary>();
+
+   };
+
+   // Conversion struct inheriting from ConversionBase
+   template<typename fromUnit, typename toUnit>
+   struct Conversion : ConversionBase<fromUnit, toUnit> {};
+   
+   template<typename Unit>
+   struct Conversion<Unit, Unit>
+   {
+      static constexpr PrecisionType slope = 1.0;
+      static constexpr PrecisionType offset = 0.0;
+   };
+  
+   // This needs to account for inverse
+   // This also needs to account for point vs ratio
+   template<typename fromUnit, typename toUnit, bool isDelta = false, bool inverse = false>
+   PrecisionType ConvertNew(PrecisionType input)
+   {
+      if constexpr (std::is_same_v<fromUnit, toUnit>)
+      {
+         return input;
+      }
+      else if constexpr (std::is_same_v<fromUnit::Dim, toUnit::Dim>)
+      {
+         //return Convert<fromUnit::Primary, toUnit>(Convert<fromUnit, fromUnit::Primary>(input));
+         
+         // Do conversion using Conversion struct
+         using conv = Conversion<fromUnit, toUnit>;
+         constexpr PrecisionType slope = GetSlope<conv>();
+         constexpr PrecisionType offset = GetOffset<conv>();
+         if constexpr (isDelta)
+         {
+            if constexpr (inverse)
+            {
+               return (input / slope);
+            }
+            else
+            {
+               return (input * slope);
+            }
+            
+         }
+         else
+         {
+            return (input * slope) + offset;
+         }
+      }
+      else
+      {
+         static_assert(false, "No possible conversion for between these types.");
+      }
+   }
+
+
+
+   /*
+   template<typename fromUnit, typename toUnit>
+   struct ConversionBase {
+      static constexpr PrecisionType offset = 0.0;
+   };
+
+   template<typename fromUnit, typename toUnit>
+   struct Conversion : ConversionBase<fromUnit, tounit>
+   {
+      if constexpr (std::is_same_v<fromUnit, toUnit>)
+      {
+         constexpr PrecisionType slope = 1.0;
+      }
+      else if constexpr (std::is_same_v<fromUnit::Dim, toUnit::Dim>)
+      {
+         constexpr PrecisionType offset = 0.0; // placeholder, logic will go here
+         constexpr PrecisionType slope = 1.0; // placeholder, logic will go here
+      }
+      else
+      {
+         static_assert(false, "No possible conversion for between these types.");
+      }
+   };
+   */
+
+
+
+
+
+
+
+
 }
 
 // TODO: Implement SI conversions
