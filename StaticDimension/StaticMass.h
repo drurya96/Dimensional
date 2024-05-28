@@ -44,6 +44,7 @@ namespace StaticDimension
       }
    };
 
+   /*
    template<>
    inline double Convert<Grams, Pounds>(double input)
    {
@@ -67,6 +68,13 @@ namespace StaticDimension
    {
       return input / 0.0352739619;
    }
+   */
+
+   template<> struct Conversion<Grams, Pounds> { static constexpr PrecisionType slope = 0.0022046226; };
+   template<> struct Conversion<Pounds, Grams> { static constexpr PrecisionType slope = 453.5923745; };
+   template<> struct Conversion<Grams, Ounces> { static constexpr PrecisionType slope = 0.0352739619; };
+   template<> struct Conversion<Ounces, Grams> { static constexpr PrecisionType slope = 28.349523165; };
+
 }
 
 #endif //STATIC_DIMENSION_MASS_H

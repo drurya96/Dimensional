@@ -53,21 +53,21 @@ TEST_F(UtilitiesTest, Test_GetConvertedValue)
    double value = 10.0;
 
    // Convert only the numerator, to the same type. This is a no-op
-   ConvertDimension<0, false, fromNum, fromNum>(value);
+   ConvertDimension<0, false, fromNum, fromNum, true>(value);
    ASSERT_DOUBLE_EQ(value, 10.0);
 
    // Convert only the denominator, to the same type. This is a no-op
-   ConvertDimension<0, true, fromDen, fromDen>(value);
+   ConvertDimension<0, true, fromDen, fromDen, true>(value);
    ASSERT_DOUBLE_EQ(value, 10.0);
 
    // Convert only the numerator
-   ConvertDimension<0, false, toNum, fromNum>(value);
+   ConvertDimension<0, false, toNum, fromNum, true>(value);
    ASSERT_NEAR(value, 0.5468, TOLERANCE);
 
    value = 10.0; // reset value
 
    // Convert only the denominator
-   ConvertDimension<0, true, toDen, fromDen>(value);
+   ConvertDimension<0, true, toDen, fromDen, true>(value);
    ASSERT_NEAR(value, 23.6246, TOLERANCE);
 }
 
@@ -122,7 +122,7 @@ TEST_F(UtilitiesTest, Test_CancelUnits)
 
    double value = 1.0; // This is used to track the value. Consider adding another utility for this
 
-   CancelUnits<NumTup1, DenTup1, simplified1::newNum, simplified1::newDen>(value);
+   CancelUnits<NumTup1, DenTup1, simplified1::newNum, simplified1::newDen, true>(value);
 
    ASSERT_NEAR(value, 0.11572835, TOLERANCE);
 }

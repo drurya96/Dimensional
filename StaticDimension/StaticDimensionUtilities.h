@@ -33,8 +33,20 @@ namespace StaticDimension
    /// @tparam U Second unit to compare
    /// @typedef value const cool indicating whether the units are the same dimension
    /// @todo When upgrading to C++20 use/replace with concept/require
+   //template<typename T, typename U>
+   //struct is_same_dim : std::is_same<typename std::remove_cv<typename T::Dim>::type, typename std::remove_cv<typename U::Dim>::type> {};
+
    template<typename T, typename U>
-   struct is_same_dim : std::is_same<typename std::remove_cv<typename T::Dim>::type, typename std::remove_cv<typename U::Dim>::type> {};
+   struct is_same_dim : std::integral_constant<
+      bool,
+      std::is_same<typename std::remove_cv<typename T::Dim>::type, typename std::remove_cv<typename U::Dim>::type>::value &&
+      (T::ID == U::ID)
+   > {};
+
+
+
+
+
 
    /// @brief Struct to check if a tuple of units contains a unit of the given Dimension
    template<typename Dim, typename Tuple>
@@ -149,6 +161,8 @@ namespace StaticDimension
       using newNum = tuple_cat_t<typename remainingNum1::type, typename remainingNum2::type>;
       using newDen = tuple_cat_t<typename remainingDen1::type, typename remainingDen2::type>;
       using dimType = BaseDimension<newNum, newDen>;
+
+      constexpr static bool isDelta = !((std::tuple_size_v<newNum> == 1) && (std::tuple_size_v<newDen> == 0));
    };
 
    struct NullUnit
@@ -185,7 +199,7 @@ namespace StaticDimension
 
    /// @brief Unit cancellation implementation
    /// @details recursive base-case
-   template<bool inverse = false, int index = 0, typename RealTupType, typename IncomingTupType>
+   template<bool inverse = false, int index = 0, typename RealTupType, typename IncomingTupType, bool isDelta = false>
    typename std::enable_if < index == std::tuple_size_v<IncomingTupType>, void>::type
       CancelUnitsImpl(PrecisionType& value)
    {
@@ -200,7 +214,7 @@ namespace StaticDimension
    /// @tparam IncomingTupType The types to attempt cancelling
    /// @tparam RealTupType The types to update as needed
    /// @param[in,out] value The value to update when cancelling units
-   template<bool inverse = false, int index = 0, typename RealTupType, typename IncomingTupType>
+   template<bool inverse = false, int index = 0, typename RealTupType, typename IncomingTupType, bool isDelta = false>
    typename std::enable_if < index < std::tuple_size_v<IncomingTupType>, void>::type
       CancelUnitsImpl(PrecisionType& value)
    {
@@ -211,28 +225,32 @@ namespace StaticDimension
 
          if constexpr (inverse)
          {
-            value /= Convert<currentType, get_first_match<currentType, RealTupType>::type>(1.0);
+            value = ConvertNew<currentType, get_first_match<currentType, RealTupType>::type, isDelta, inverse>(value);
+            //value /= ConvertNew<currentType, get_first_match<currentType, RealTupType>::type, isDelta, inverse>(1.0);
          }
          else
          {
-            value *= Convert<currentType, get_first_match<currentType, RealTupType>::type>(1.0);
+            value = ConvertNew<currentType, get_first_match<currentType, RealTupType>::type, isDelta, inverse>(value);
+            //value *= ConvertNew<currentType, get_first_match<currentType, RealTupType>::type, isDelta, inverse>(1.0);
          }
 
 
-         CancelUnitsImpl<inverse, index + 1, RemoveOneInstance<currentType, RealTupType>::type, IncomingTupType>(value);
+         CancelUnitsImpl<inverse, index + 1, RemoveOneInstance<currentType, RealTupType>::type, IncomingTupType, isDelta>(value);
       }
       else
       {
          if constexpr (inverse)
          {
-            value /= Convert<currentType, currentType::Primary>(1.0);
+            value = ConvertNew<currentType, currentType::Primary, isDelta, inverse>(value);
+            //value /= ConvertNew<currentType, currentType::Primary, isDelta, inverse>(1.0);
          }
          else
          {
-            value *= Convert<currentType, currentType::Primary>(1.0);
+            value = ConvertNew<currentType, currentType::Primary, isDelta, inverse>(value);
+            //value *= ConvertNew<currentType, currentType::Primary, isDelta, inverse>(1.0);
          }
 
-         CancelUnitsImpl<inverse, index + 1, RealTupType, IncomingTupType>(value);
+         CancelUnitsImpl<inverse, index + 1, RealTupType, IncomingTupType, isDelta>(value);
       }
    }
 
@@ -242,16 +260,16 @@ namespace StaticDimension
    /// @tparam RealNumTupType Numerator types to update
    /// @tparam RealDenTupType Denominator types to udpate
    /// @param[in,out] value Value to update
-   template<typename NumTupType, typename DenTupType, typename RealNumTupType, typename RealDenTupType>
+   template<typename NumTupType, typename DenTupType, typename RealNumTupType, typename RealDenTupType, bool isDelta = false>
    void CancelUnits(PrecisionType& value)
    {
-      CancelUnitsImpl<false, 0, RealNumTupType, NumTupType>(value);
-      CancelUnitsImpl<true, 0, RealDenTupType, DenTupType>(value);
+      CancelUnitsImpl<false, 0, RealNumTupType, NumTupType, isDelta>(value);
+      CancelUnitsImpl<true, 0, RealDenTupType, DenTupType, isDelta>(value);
    }
 
    /// @brief Convert the given value when units are cancelled out
    /// @details Recursive base-case
-   template <size_t I = 0, bool inverse = false, typename toTuple, typename fromTup>
+   template <size_t I = 0, bool inverse = false, typename toTuple, typename fromTup, bool isDelta = false>
    typename std::enable_if<I == std::tuple_size_v<fromTup>, void>::type
       ConvertDimension(PrecisionType& value)
    {
@@ -264,19 +282,24 @@ namespace StaticDimension
    /// @tparam toTuple The tuple type to convert to
    /// @tparam fromTuple The tuple type to convert from
    /// @param value[in,out] Reference of a value to update
-   template <size_t I = 0, bool inverse = false, typename toTuple, typename fromTup>
+   template <size_t I = 0, bool inverse = false, typename toTuple, typename fromTup, bool isDelta = false>
    typename std::enable_if<I < std::tuple_size_v<fromTup>, void>::type
       ConvertDimension(PrecisionType& value)
    {
+      //constexpr bool isDelta = std::tuple_size_v<toTuple> > 1;
+      //constexpr bool isDelta = (std::tuple_size_v<toTuple> > 1) && (std::tuple_size_v<toTuple> > 0)
+
       if constexpr(inverse)
       {
-         value /= Convert<std::tuple_element_t<I, fromTup>, std::tuple_element_t<I, toTuple>>(1.0);        
+         value = ConvertNew<std::tuple_element_t<I, fromTup>, std::tuple_element_t<I, toTuple>, isDelta, inverse>(value);
+         //value /= ConvertNew<std::tuple_element_t<I, fromTup>, std::tuple_element_t<I, toTuple>, isDelta, inverse>(1.0);
       }
       else
       {
-         value *= Convert<std::tuple_element_t<I, fromTup>, std::tuple_element_t<I, toTuple>>(1.0);
+         value = ConvertNew<std::tuple_element_t<I, fromTup>, std::tuple_element_t<I, toTuple>, isDelta, inverse>(value);
+         //value *= ConvertNew<std::tuple_element_t<I, fromTup>, std::tuple_element_t<I, toTuple>, inverse>(1.0);
       }
-      ConvertDimension<I + 1, inverse, toTuple, fromTup>(value);
+      ConvertDimension<I + 1, inverse, toTuple, fromTup, isDelta>(value);
    }
 }
 #endif // STATIC_DIMENSION_UTILITIES_H
