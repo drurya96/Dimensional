@@ -21,12 +21,17 @@ namespace StaticDimension
    struct BaseUnit
    {
    public:
-
       /// @brief Default constructor
       /// @todo delete this function so units cannot be constructed
       ///    For now, some template metaprogramming relying on decltype
       ///    requires a default constructor.
-      BaseUnit() {}
+      BaseUnit() = delete;
+
+      /// @brief Used to handle subscripting
+      /// @details Units only cancel if this value is the same.
+      ///    This means, creating units with different IDs and combining them
+      ///    into one dimension will prevent them from canelling out.
+      constexpr static int ID = 0;
    };
 
    /// @brief A generic Dimension class
@@ -72,7 +77,7 @@ namespace StaticDimension
          using simplified = UnitSimplifier<NumTuple, std::tuple<>, std::tuple<>, DenTuple>;
          PrecisionType newScalar = scalar;
 
-         CancelUnits<NumTuple, DenTuple, simplified::newNum, simplified::newDen>(newScalar);
+         CancelUnits<NumTuple, DenTuple, simplified::newNum, simplified::newDen, simplified::isDelta>(newScalar);
 
          return simplified::dimType(newScalar);
       }
@@ -86,8 +91,10 @@ namespace StaticDimension
       {
          PrecisionType result = scalar;
 
-         ConvertDimension<0, false, ToNumTuple, NumTuple>(result);
-         ConvertDimension<0, true, ToDenTuple, DenTuple>(result);
+         constexpr bool isDelta = !((std::tuple_size_v<ToNumTuple> == 1) && (std::tuple_size_v<ToDenTuple> == 0));
+
+         ConvertDimension<0, false, ToNumTuple, NumTuple, isDelta>(result);
+         ConvertDimension<0, true, ToDenTuple, DenTuple, isDelta>(result);
 
          return result;
       }
@@ -150,6 +157,7 @@ namespace StaticDimension
       template<typename CompNumTuple, typename CompDenTuple>
       bool operator<=(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return GetVal<NumTuple, DenTuple>() <= rhs.GetVal<NumTuple, DenTuple>(); }
 
+      /// @todo replace this with true ==
       template<typename CompNumTuple, typename CompDenTuple>
       bool operator==(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return fabs(GetVal<NumTuple, DenTuple>() - rhs.GetVal<NumTuple, DenTuple>()) < PLACEHOLDER_EPSILON; }
       
@@ -212,8 +220,8 @@ namespace StaticDimension
       using simplified = UnitSimplifier<NumTuple1, DenTuple2, DenTuple1, NumTuple2>;
       PrecisionType newScalar = obj1.scalar / obj2.scalar;
 
-      CancelUnits<NumTuple1, DenTuple2, simplified::newNum, simplified::newDen>(newScalar);
-      CancelUnits<DenTuple1, NumTuple2, simplified::newNum, simplified::newDen>(newScalar);
+      CancelUnits<NumTuple1, DenTuple2, simplified::newNum, simplified::newDen, simplified::isDelta>(newScalar);
+      CancelUnits<DenTuple1, NumTuple2, simplified::newNum, simplified::newDen, simplified::isDelta>(newScalar);
 
       return simplified::dimType(newScalar);
    }
@@ -233,8 +241,8 @@ namespace StaticDimension
       using simplified = UnitSimplifier<NumTuple1, NumTuple2, DenTuple1, DenTuple2>;
       PrecisionType newScalar = obj1.scalar * obj2.scalar;
 
-      CancelUnits<NumTuple1, DenTuple1, simplified::newNum, simplified::newDen>(newScalar);
-      CancelUnits<NumTuple2, DenTuple2, simplified::newNum, simplified::newDen>(newScalar);
+      CancelUnits<NumTuple1, DenTuple1, simplified::newNum, simplified::newDen, simplified::isDelta>(newScalar);
+      CancelUnits<NumTuple2, DenTuple2, simplified::newNum, simplified::newDen, simplified::isDelta>(newScalar);
 
       return simplified::dimType(newScalar);
    }
@@ -318,21 +326,109 @@ namespace StaticDimension
       return BaseDimension<NumTuple1, DenTuple1>{ obj1.GetVal<NumTuple1, DenTuple1>() - obj2.GetVal<NumTuple1, DenTuple1>() };
    }
 
-   /// @brief Convert one unit to another TODO: Check this doxygen
-   /// @details Return a toUnit type equivalent to the given
-   ///    object of type fromUnit. This will fail at compile-time
-   ///    if the to units do not have a common Dim field.
-   ///    Further, attempting to convert to the same type will simply 
-   ///    return a copy of the same object.
-   /// @tparam fromUnit Unit to convert from, deduced from obj
-   /// @tparam toUnit Unit to convert to, must be provided explicitly
-   /// @param[in] obj Object to convert
-   /// @todo Return the object by reference, if possible.
-   /// @todo After switching to C++20, use a concept to inforce Dim field
-   /// @todo Attempt to print a more meaningful compile-time error when
-   ///    conversion is not possible, including the units being converted.
-   ///    Avoid RTTI for this task.
+   /// @brief Type traid to check if a type has a T::slope attribute
+   template <typename, typename = std::void_t<>>
+   struct has_slope : std::false_type {};
+
+   /// @brief Type traid to check if a type has a T::slope attribute
+   template <typename T>
+   struct has_slope<T, std::void_t<decltype(T::slope)>> : std::integral_constant<bool, std::is_same_v<decltype(T::slope), const double>> {};
+
+   /// @brief Type traid to check if a type has a T::offset attribute
+   template <typename, typename = std::void_t<>>
+   struct has_offset : std::false_type {};
+
+   /// @brief Type traid to check if a type has a T::offset attribute
+   template <typename T>
+   struct has_offset<T, std::void_t<decltype(T::offset)>> : std::integral_constant<bool, std::is_same_v<decltype(T::offset), const double>> {};
+
+   /// @brief Return the slope as a constexpr if one exists,
+   ///    otherwise return 1.0
+   template<typename T>
+   constexpr PrecisionType GetSlope()
+   {
+      if constexpr (has_slope<T>::value)
+      {
+         return T::slope;
+      }
+      else
+      {
+         return 1.0;
+      }
+   }
+
+   /// @brief Return the offset as a constexpr if one exists,
+   ///    otherwise return 0.0
+   template<typename T>
+   constexpr PrecisionType GetOffset()
+   {
+      if constexpr (has_offset<T>::value)
+      {
+         return T::offset;
+      }
+      else
+      {
+         return 0.0;
+      }
+   }
+   
+   /// @brief Conversion implementation
+   /// @details base case when no conversion is defined, throws a compile-time error.
+   template<typename fromUnit, typename toUnit, typename Enable = void>
+   struct ConversionBase
+   {
+      static_assert(sizeof(fromUnit) == -1, "Conversion not defined for these units.");
+   };
+
+   /// @brief Struct defining the linear relationship between two units
+   /// @details This relationship is meant to be specialized for each unit,
+   ///    and by users when extensions are needed.
    template<typename fromUnit, typename toUnit>
+   struct Conversion : ConversionBase<fromUnit, toUnit> {};
+
+   /// @brief Struct defining the linear relationship between two units
+   /// @details This specialization will be used when a final specialization is not provided, but the dimensions
+   ///    are the same. This will step through the primary unit of this dimension.
+   /// @typedef slope The linear relationship between the units
+   /// @typedef offset The intercept between two units.
+   ///    This will typically be 0.0, but there are some special cases, such as temparature.
+   /// @todo Provide some insight to the user when this is used, so they may accurately
+   ///    define useful specializations.
+   template<typename fromUnit, typename toUnit>
+   struct ConversionBase<fromUnit, toUnit, std::enable_if_t<std::is_same_v<typename fromUnit::Dim, typename toUnit::Dim>>>
+   {
+      using toPrimary = Conversion<fromUnit, typename fromUnit::Primary>;
+      using fromPrimary = Conversion<typename fromUnit::Primary, toUnit>;
+
+      static constexpr PrecisionType slope = GetSlope<toPrimary>() * GetSlope<fromPrimary>();
+      static constexpr PrecisionType offset = GetOffset<toPrimary>() + GetOffset<fromPrimary>();
+
+   };
+
+   /// @brief Struct defining the linear relationship between two units
+   /// @details This relationship is meant to be specialized for each unit,
+   ///    and by users when extensions are needed.
+   ///    This specialization is used when converting to the same unit.
+   template<typename Unit>
+   struct Conversion<Unit, Unit>
+   {
+      static constexpr PrecisionType slope = 1.0;
+      static constexpr PrecisionType offset = 0.0;
+   };
+  
+   /// @brief Method to convert a value of fromUnit to a value of toUnit
+   /// @details This method relies on the slope and offset of the necessary conversion.
+   ///    While this method can be specialized to bypass the slope-offset relationship,
+   ///    this should be done with great care as other parts of this library make assumptions
+   ///    about this relationship.
+   /// @tparam fromUnit Unit to convert from
+   /// @tparam toUnit Unit to convert to
+   /// @tparam isDelata Bool indicating whether this conversion is of a single unit in the normator (false)
+   ///    or not (true).
+   /// @tparam inverse Indicates whether value is in denominator (true) or numerator (false)
+   /// @param[in] input Value to convert as a floating-point type
+   /// @return floating-point type after conversion
+   template<typename fromUnit, typename toUnit, bool isDelta = false, bool inverse = false>
    PrecisionType Convert(PrecisionType input)
    {
       if constexpr (std::is_same_v<fromUnit, toUnit>)
@@ -340,8 +436,27 @@ namespace StaticDimension
          return input;
       }
       else if constexpr (std::is_same_v<fromUnit::Dim, toUnit::Dim>)
-      {
-         return Convert<fromUnit::Primary, toUnit>(Convert<fromUnit, fromUnit::Primary>(input));
+      {         
+         // Do conversion using Conversion struct
+         using conv = Conversion<fromUnit, toUnit>;
+         constexpr PrecisionType slope = GetSlope<conv>();
+         constexpr PrecisionType offset = GetOffset<conv>();
+         if constexpr (isDelta)
+         {
+            if constexpr (inverse)
+            {
+               return (input / slope);
+            }
+            else
+            {
+               return (input * slope);
+            }
+            
+         }
+         else
+         {
+            return (input * slope) + offset;
+         }
       }
       else
       {

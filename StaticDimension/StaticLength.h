@@ -44,29 +44,10 @@ namespace StaticDimension
       }
    };
 
-   template<>
-   inline double Convert<Meters, Feet>(double input)
-   {
-      return input * 3.280839895;
-   }
-
-   template<>
-   inline double Convert<Feet, Meters>(double input)
-   {
-      return input / 3.280839895;
-   }
-
-   template<>
-   inline double Convert<Meters, Inches>(double input)
-   {
-      return input * 39.37;
-   }
-
-   template<>
-   inline double Convert<Inches, Meters>(double input)
-   {
-      return input / 39.37;
-   }
+   template<> struct Conversion<Meters, Feet> { static constexpr PrecisionType slope = 3.280839895; };
+   template<> struct Conversion<Feet, Meters> { static constexpr PrecisionType slope = 0.304800000; };
+   template<> struct Conversion<Meters, Inches> { static constexpr PrecisionType slope = 39.37; };
+   template<> struct Conversion<Inches, Meters> { static constexpr PrecisionType slope = 0.0254000508; };
 }
 
 #endif //STATIC_DIMENSION_LENGTH_H
