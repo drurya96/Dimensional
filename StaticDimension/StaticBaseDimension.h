@@ -9,12 +9,6 @@
 
 namespace StaticDimension
 {
-   /// @brief An arbitrary value to use when determining if two dimensions are equal
-   /// @details When checking if two units are equal, they are considered equal if the difference
-   ///    is less than this arbitrary value
-   /// @todo IMPORTANT! Find a better way.. this is only a placeholder to continue development.
-   const PrecisionType PLACEHOLDER_EPSILON = 0.001;
-
    /// @brief A base class representing a unit
    /// @details This abstract class represents a Unit,
    ///    such as Meters, Seconds, Grams, etc.
@@ -157,14 +151,18 @@ namespace StaticDimension
       template<typename CompNumTuple, typename CompDenTuple>
       bool operator<=(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return GetVal<NumTuple, DenTuple>() <= rhs.GetVal<NumTuple, DenTuple>(); }
 
-      /// @todo replace this with true ==
       template<typename CompNumTuple, typename CompDenTuple>
-      bool operator==(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return fabs(GetVal<NumTuple, DenTuple>() - rhs.GetVal<NumTuple, DenTuple>()) < PLACEHOLDER_EPSILON; }
+      bool operator==(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return GetVal<NumTuple, DenTuple>() == rhs.GetVal<NumTuple, DenTuple>(); }
       
       template<typename CompNumTuple, typename CompDenTuple>
       bool operator!=(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return !(*this == rhs); }
       
-      // TODO: Define a NearlyEqual method with custom tolerance
+      /// @brief Check if this object is nearly equal to input object
+      /// @param[in] rhs The object to compare to
+      /// @param[in] Epsilon The acceptable difference between values, in terms of this object's dimension
+      /// @return Bool indicating equality
+      template<typename CompNumTuple, typename CompDenTuple>
+      bool NearlyEqual(const BaseDimension<CompNumTuple, CompDenTuple>& rhs, PrecisionType Epsilon) const { return fabs(GetVal<NumTuple, DenTuple>() - rhs.GetVal<NumTuple, DenTuple>()) < Epsilon; }
 
    protected:
       /// @brief The scalar value of this dimension

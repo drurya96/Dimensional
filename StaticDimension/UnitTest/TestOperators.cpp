@@ -13,6 +13,8 @@ TEST_F(OperatorsTest, Comparisons) {
    Speed<Meters, Seconds> mySpeed1(10.0); // 10.0 m/s == 1968.504 f/m
    Speed<Feet, Minutes> mySpeed2(20.0); // 20.0 f/m == 0.1016 m/s
    Speed<Feet, Minutes> mySpeed3(1968.5);
+   Speed<Meters, Seconds> mySpeedZero1(0.0);
+   Speed<Feet, Minutes> mySpeedZero2(0.0);
 
    std::cout << mySpeed1.GetSpeed<Feet, Minutes>() << std::endl;
    std::cout << mySpeed3.GetSpeed<Meters, Seconds>() << std::endl;
@@ -22,8 +24,9 @@ TEST_F(OperatorsTest, Comparisons) {
    
    ASSERT_TRUE(mySpeed1 > mySpeed2);
    ASSERT_TRUE(mySpeed2 < mySpeed1);
-   ASSERT_TRUE(mySpeed1 == mySpeed3);
-   ASSERT_FALSE(mySpeed1 != mySpeed3);
+   ASSERT_TRUE(mySpeed1.NearlyEqual(mySpeed3, 0.001));
+   ASSERT_FALSE(mySpeedZero2 != mySpeedZero1);
+   ASSERT_TRUE(mySpeedZero1 == mySpeedZero2);
    ASSERT_TRUE(mySpeed1 != mySpeed2);
    ASSERT_FALSE(mySpeed1 == mySpeed2);
    ASSERT_TRUE(mySpeed1 >= mySpeed2 && mySpeed1 >= mySpeed3);
