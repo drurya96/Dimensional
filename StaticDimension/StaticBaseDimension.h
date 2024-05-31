@@ -21,13 +21,16 @@ namespace StaticDimension
    struct BaseUnit
    {
    public:
-
       /// @brief Default constructor
       /// @todo delete this function so units cannot be constructed
       ///    For now, some template metaprogramming relying on decltype
       ///    requires a default constructor.
-      BaseUnit() {}
+      BaseUnit() = delete;
 
+      /// @brief Used to handle subscripting
+      /// @details Units only cancel if this value is the same.
+      ///    This means, creating units with different IDs and combining them
+      ///    into one dimension will prevent them from canelling out.
       constexpr static int ID = 0;
    };
 
@@ -154,6 +157,7 @@ namespace StaticDimension
       template<typename CompNumTuple, typename CompDenTuple>
       bool operator<=(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return GetVal<NumTuple, DenTuple>() <= rhs.GetVal<NumTuple, DenTuple>(); }
 
+      /// @todo replace this with true ==
       template<typename CompNumTuple, typename CompDenTuple>
       bool operator==(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return fabs(GetVal<NumTuple, DenTuple>() - rhs.GetVal<NumTuple, DenTuple>()) < PLACEHOLDER_EPSILON; }
       
@@ -322,125 +326,24 @@ namespace StaticDimension
       return BaseDimension<NumTuple1, DenTuple1>{ obj1.GetVal<NumTuple1, DenTuple1>() - obj2.GetVal<NumTuple1, DenTuple1>() };
    }
 
-
-
-   /*
-   /// @brief Convert one unit to another TODO: Check this doxygen
-   /// @details Return a toUnit type equivalent to the given
-   ///    object of type fromUnit. This will fail at compile-time
-   ///    if the to units do not have a common Dim field.
-   ///    Further, attempting to convert to the same type will simply 
-   ///    return a copy of the same object.
-   /// @tparam fromUnit Unit to convert from, deduced from obj
-   /// @tparam toUnit Unit to convert to, must be provided explicitly
-   /// @param[in] obj Object to convert
-   /// @todo Return the object by reference, if possible.
-   /// @todo After switching to C++20, use a concept to inforce Dim field
-   /// @todo Attempt to print a more meaningful compile-time error when
-   ///    conversion is not possible, including the units being converted.
-   ///    Avoid RTTI for this task.
-   template<typename fromUnit, typename toUnit>
-   PrecisionType Convert(PrecisionType input)
-   {
-      if constexpr (std::is_same_v<fromUnit, toUnit>)
-      {
-         return input;
-      }
-      else if constexpr (std::is_same_v<fromUnit::Dim, toUnit::Dim>)
-      {
-         return Convert<fromUnit::Primary, toUnit>(Convert<fromUnit, fromUnit::Primary>(input));
-      }
-      else
-      {
-         static_assert(false, "No possible conversion for between these types.");
-      }
-   }
-   */
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   
-   /*
-   // Base template: handles the failure case
-   template<typename fromUnit, typename toUnit, typename Enable = void>
-   struct ConversionBase {
-      static_assert(sizeof(fromUnit) == -1, "Conversion not defined for these units.");
-   };
-
-   // Partial specialization: handles the case where the two units are the same
-   template<typename Unit>
-   struct ConversionBase<Unit, Unit> {
-      static constexpr PrecisionType slope = 1.0;
-      static constexpr PrecisionType offset = 0.0;
-   };
-
-   // Partial specialization: handles the case where the two units have the same dimension
-   template<typename fromUnit, typename toUnit>
-   struct ConversionBase<fromUnit, toUnit, std::enable_if_t<std::is_same_v<typename fromUnit::Dim, typename toUnit::Dim>>> {
-      static constexpr PrecisionType slope = 5.0;  // Example "special logic"
-      static constexpr PrecisionType offset = 2.0; // Example "special logic"
-   };
-
-   // Conversion struct inheriting from ConversionBase
-   template<typename fromUnit, typename toUnit>
-   struct Conversion : ConversionBase<fromUnit, toUnit>
-   {
-      static constexpr PrecisionType slope = ConversionBase<fromUnit, toUnit>::slope;
-      static constexpr PrecisionType offset = ConversionBase<fromUnit, toUnit>::offset;
-   };
-
-   */
-
-
-
-
-
-
-
-   // Primary template, defaults to false
+   /// @brief Type traid to check if a type has a T::slope attribute
    template <typename, typename = std::void_t<>>
    struct has_slope : std::false_type {};
 
-   // Specialization that detects presence of static constexpr double T::Foo
+   /// @brief Type traid to check if a type has a T::slope attribute
    template <typename T>
    struct has_slope<T, std::void_t<decltype(T::slope)>> : std::integral_constant<bool, std::is_same_v<decltype(T::slope), const double>> {};
 
-
-   // Primary template, defaults to false
+   /// @brief Type traid to check if a type has a T::offset attribute
    template <typename, typename = std::void_t<>>
    struct has_offset : std::false_type {};
 
-   // Specialization that detects presence of static constexpr double T::Foo
+   /// @brief Type traid to check if a type has a T::offset attribute
    template <typename T>
    struct has_offset<T, std::void_t<decltype(T::offset)>> : std::integral_constant<bool, std::is_same_v<decltype(T::offset), const double>> {};
 
-
-
-
+   /// @brief Return the slope as a constexpr if one exists,
+   ///    otherwise return 1.0
    template<typename T>
    constexpr PrecisionType GetSlope()
    {
@@ -454,6 +357,8 @@ namespace StaticDimension
       }
    }
 
+   /// @brief Return the offset as a constexpr if one exists,
+   ///    otherwise return 0.0
    template<typename T>
    constexpr PrecisionType GetOffset()
    {
@@ -466,32 +371,29 @@ namespace StaticDimension
          return 0.0;
       }
    }
-
-
-
-
    
-   // Base template providing default values
+   /// @brief Conversion implementation
+   /// @details base case when no conversion is defined, throws a compile-time error.
    template<typename fromUnit, typename toUnit, typename Enable = void>
    struct ConversionBase
    {
       static_assert(sizeof(fromUnit) == -1, "Conversion not defined for these units.");
    };
 
-   /*
-   // Specialized template for same units (fromUnit == toUnit)
-   template<typename Unit>
-   struct ConversionBase<Unit, Unit>
-   {
-      static constexpr PrecisionType slope = 1.0;
-      static constexpr PrecisionType offset = 0.0;
-   };
-   */
-
+   /// @brief Struct defining the linear relationship between two units
+   /// @details This relationship is meant to be specialized for each unit,
+   ///    and by users when extensions are needed.
    template<typename fromUnit, typename toUnit>
-   struct Conversion;
+   struct Conversion : ConversionBase<fromUnit, toUnit> {};
 
-   // Specialized template for units with the same dimension (fromUnit::Dim == toUnit::Dim)
+   /// @brief Struct defining the linear relationship between two units
+   /// @details This specialization will be used when a final specialization is not provided, but the dimensions
+   ///    are the same. This will step through the primary unit of this dimension.
+   /// @typedef slope The linear relationship between the units
+   /// @typedef offset The intercept between two units.
+   ///    This will typically be 0.0, but there are some special cases, such as temparature.
+   /// @todo Provide some insight to the user when this is used, so they may accurately
+   ///    define useful specializations.
    template<typename fromUnit, typename toUnit>
    struct ConversionBase<fromUnit, toUnit, std::enable_if_t<std::is_same_v<typename fromUnit::Dim, typename toUnit::Dim>>>
    {
@@ -503,10 +405,10 @@ namespace StaticDimension
 
    };
 
-   // Conversion struct inheriting from ConversionBase
-   template<typename fromUnit, typename toUnit>
-   struct Conversion : ConversionBase<fromUnit, toUnit> {};
-   
+   /// @brief Struct defining the linear relationship between two units
+   /// @details This relationship is meant to be specialized for each unit,
+   ///    and by users when extensions are needed.
+   ///    This specialization is used when converting to the same unit.
    template<typename Unit>
    struct Conversion<Unit, Unit>
    {
@@ -514,19 +416,27 @@ namespace StaticDimension
       static constexpr PrecisionType offset = 0.0;
    };
   
-   // This needs to account for inverse
-   // This also needs to account for point vs ratio
+   /// @brief Method to convert a value of fromUnit to a value of toUnit
+   /// @details This method relies on the slope and offset of the necessary conversion.
+   ///    While this method can be specialized to bypass the slope-offset relationship,
+   ///    this should be done with great care as other parts of this library make assumptions
+   ///    about this relationship.
+   /// @tparam fromUnit Unit to convert from
+   /// @tparam toUnit Unit to convert to
+   /// @tparam isDelata Bool indicating whether this conversion is of a single unit in the normator (false)
+   ///    or not (true).
+   /// @tparam inverse Indicates whether value is in denominator (true) or numerator (false)
+   /// @param[in] input Value to convert as a floating-point type
+   /// @return floating-point type after conversion
    template<typename fromUnit, typename toUnit, bool isDelta = false, bool inverse = false>
-   PrecisionType ConvertNew(PrecisionType input)
+   PrecisionType Convert(PrecisionType input)
    {
       if constexpr (std::is_same_v<fromUnit, toUnit>)
       {
          return input;
       }
       else if constexpr (std::is_same_v<fromUnit::Dim, toUnit::Dim>)
-      {
-         //return Convert<fromUnit::Primary, toUnit>(Convert<fromUnit, fromUnit::Primary>(input));
-         
+      {         
          // Do conversion using Conversion struct
          using conv = Conversion<fromUnit, toUnit>;
          constexpr PrecisionType slope = GetSlope<conv>();
@@ -553,41 +463,6 @@ namespace StaticDimension
          static_assert(false, "No possible conversion for between these types.");
       }
    }
-
-
-
-   /*
-   template<typename fromUnit, typename toUnit>
-   struct ConversionBase {
-      static constexpr PrecisionType offset = 0.0;
-   };
-
-   template<typename fromUnit, typename toUnit>
-   struct Conversion : ConversionBase<fromUnit, tounit>
-   {
-      if constexpr (std::is_same_v<fromUnit, toUnit>)
-      {
-         constexpr PrecisionType slope = 1.0;
-      }
-      else if constexpr (std::is_same_v<fromUnit::Dim, toUnit::Dim>)
-      {
-         constexpr PrecisionType offset = 0.0; // placeholder, logic will go here
-         constexpr PrecisionType slope = 1.0; // placeholder, logic will go here
-      }
-      else
-      {
-         static_assert(false, "No possible conversion for between these types.");
-      }
-   };
-   */
-
-
-
-
-
-
-
-
 }
 
 // TODO: Implement SI conversions
