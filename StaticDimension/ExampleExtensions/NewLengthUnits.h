@@ -41,7 +41,6 @@ namespace StaticDimension
 
    template<int I> struct Conversion<Meters, BarSub<I>> { static constexpr PrecisionType slope = Conversion<Meters, Bar>::slope; };
    template<int I> struct Conversion<BarSub<I>, Meters> { static constexpr PrecisionType slope = Conversion<Bar, Meters>::slope; };
-
 }
 
 #endif // LENGTH_EXTENSION_H

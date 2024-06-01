@@ -439,12 +439,16 @@ namespace StaticDimension
    template<typename fromUnit, typename toUnit>
    struct ConversionBase<fromUnit, toUnit, std::enable_if_t<std::is_same_v<typename fromUnit::Dim, typename toUnit::Dim>>>
    {
+
+      #ifdef REQUIRE_CONVERSIONS
+         static_assert(sizeof(fromUnit) == -1, "No specialized conversion found. See compiler output for more details");
+      #endif
+
       using toPrimary = Conversion<fromUnit, typename fromUnit::Primary>;
       using fromPrimary = Conversion<typename fromUnit::Primary, toUnit>;
 
       static constexpr PrecisionType slope = GetSlope<toPrimary>() * GetSlope<fromPrimary>();
       static constexpr PrecisionType offset = GetOffset<toPrimary>() + GetOffset<fromPrimary>();
-
    };
 
    /// @brief Struct defining the linear relationship between two units
