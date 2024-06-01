@@ -148,3 +148,15 @@ TEST_F(OperatorsTest, DimensionSubtraction)
 
    ASSERT_NEAR((speed4.GetSpeed<Meters, Seconds>()), -0.050799998374399635, TOLERANCE); // TODO: Need to validate precision
 }
+
+// Test Exponent
+TEST_F(OperatorsTest, DimensionExponent)
+{
+   Speed<Meters, Seconds> speed(10.0);
+
+   auto test1 = speed * speed * speed;
+
+   auto test2 = StaticDimension::Pow<3>(speed);
+
+   ASSERT_TRUE(test1 == test2);
+}

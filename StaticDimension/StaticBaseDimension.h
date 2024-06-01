@@ -324,19 +324,63 @@ namespace StaticDimension
       return BaseDimension<NumTuple1, DenTuple1>{ obj1.GetVal<NumTuple1, DenTuple1>() - obj2.GetVal<NumTuple1, DenTuple1>() };
    }
 
-   /// @brief Type traid to check if a type has a T::slope attribute
+   /// @brief Implementation for Pow (exponential)
+   /// @details Uses exponentiation by squares method
+   /// @tparam exponent the exponent to raise to. This must be a positive integer
+   /// @tparam Dim The input dimension type
+   /// @tparam TransitiveDim The dimension type returned from this recursive call of PowImpl
+   /// @param[in] obj The input dimension object
+   /// @param[in] transitiveDim The transitive object from the previous recursive call
+   /// @return transitiveDim multiplied by obj either one or two times
+   ///    for even or odd exponents, respectively.
+   template<unsigned int exponent, typename Dim, typename TransitiveDim>
+   auto PowImpl(const Dim& obj, const TransitiveDim& transitiveDim)
+   {
+      if constexpr (exponent == 0)
+      {
+         return TransitiveDim{0.0};
+      }
+      else if constexpr (exponent == 1)
+      {
+         return transitiveDim;
+      }
+      else if constexpr (exponent % 2 == 0)
+      {
+         auto halfPower = PowImpl<exponent / 2>(obj, transitiveDim);
+         return halfPower * halfPower; // Equivalent to squaring the result
+      }
+      else
+      {
+         auto halfPower = PowImpl<exponent / 2>(obj, transitiveDim); // Note this is truncation division
+         return halfPower * halfPower * obj; // Adjust for odd exponents by multiplying with obj once more
+      }
+   }
+
+   /// @brief Implementation for Pow (exponential)
+   /// @tparam exponent the exponent to raise to. This must be a positive integer
+   /// @tparam Dim The input dimension type
+   /// @param[in] obj The object to raise to exponent power
+   /// @return A dimension object of units raised to exponent power,
+   ///    and a value raised to exponent power
+   template<unsigned int exponent, typename Dim>
+   auto Pow(const Dim& obj)
+   {
+      return PowImpl<exponent>(obj, obj);
+   }
+
+   /// @brief Type trait to check if a type has a T::slope attribute
    template <typename, typename = std::void_t<>>
    struct has_slope : std::false_type {};
 
-   /// @brief Type traid to check if a type has a T::slope attribute
+   /// @brief Type trait to check if a type has a T::slope attribute
    template <typename T>
    struct has_slope<T, std::void_t<decltype(T::slope)>> : std::integral_constant<bool, std::is_same_v<decltype(T::slope), const double>> {};
 
-   /// @brief Type traid to check if a type has a T::offset attribute
+   /// @brief Type trait to check if a type has a T::offset attribute
    template <typename, typename = std::void_t<>>
    struct has_offset : std::false_type {};
 
-   /// @brief Type traid to check if a type has a T::offset attribute
+   /// @brief Type trait to check if a type has a T::offset attribute
    template <typename T>
    struct has_offset<T, std::void_t<decltype(T::offset)>> : std::integral_constant<bool, std::is_same_v<decltype(T::offset), const double>> {};
 
