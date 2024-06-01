@@ -154,7 +154,7 @@ TEST_F(OperatorsTest, DimensionExponent)
 {
    Speed<Meters, Seconds> speed(10.0);
 
-   auto test1 = speed * speed * speed;
+   BaseDimension<std::tuple<Meters, Meters, Meters>, std::tuple<Seconds, Seconds, Seconds>> test1 = speed * speed * speed;
 
    auto test2 = StaticDimension::Pow<3>(speed);
 

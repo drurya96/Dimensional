@@ -10,7 +10,7 @@ TEST_F(FundamentalConversions, TestTime) {
 
    //Time myBadTime = Time<Feet>(10.0); // Correctly fails to compile - Cannot create a Time object using Feet.
 
-   Time myTime = Time(30.0);
+   Time myTime = Time<Seconds>(30.0);
 
    ASSERT_NEAR(myTime.GetTime<Seconds>(), 30.0, TOLERANCE);
    ASSERT_NEAR(myTime.GetTime<Minutes>(), 0.5, TOLERANCE);
@@ -22,7 +22,7 @@ TEST_F(FundamentalConversions, TestTime) {
 
 
 TEST_F(FundamentalConversions, TestLength) {
-   Length myLength = Length(10.0);
+   Length myLength = Length<Meters>(10.0);
 
    ASSERT_NEAR(myLength.GetLength<Meters>(), 10.0, TOLERANCE);
    ASSERT_NEAR(myLength.GetLength<Feet>(), 32.8084, TOLERANCE);
