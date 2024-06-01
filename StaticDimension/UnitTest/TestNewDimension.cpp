@@ -27,7 +27,7 @@ TEST_F(NewDimensionTest, NewDimension) {
 
    auto result2 = length1 / length2;
 
-   Length<Meters> testL = length4;
+   Length testL = length4;
 
    auto result3 = length3 / testL;
 

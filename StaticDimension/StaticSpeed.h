@@ -6,7 +6,7 @@
 
 namespace StaticDimension
 {
-   template<typename LengthUnit = Meters, typename TimeUnit = Seconds>
+   template<typename LengthUnit, typename TimeUnit>
    class Speed : public BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>
    {
    public:
@@ -26,6 +26,12 @@ namespace StaticDimension
          return this->GetVal<std::tuple<LengthUnitRet>, std::tuple<TimeUnitRet>>();
       }
    };
+
+   template<typename LengthUnit, typename TimeUnit>
+   Speed(LengthUnit, TimeUnit) -> Speed<LengthUnit, TimeUnit>;
+
+   template<typename LengthUnit, typename TimeUnit>
+   Speed(BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>) -> Speed<LengthUnit, TimeUnit>;
 }
 
 #endif //STATIC_DIMENSION_SPEED_H

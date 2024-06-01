@@ -12,7 +12,8 @@ TEST_F(CastOperatorTest, CastSpeed) {
    BaseDimension<tuple<Meters>, tuple<Seconds>> testSpeed(10.0);
    BaseDimension<tuple<Meters, Seconds>, tuple<>> testNotSpeed(10.0);
 
-   Speed mySpeed = testSpeed;
+   Speed<Meters, Seconds> mySpeed1 = testSpeed;
+   Speed mySpeed2 = testSpeed; // Uses template deduction guide
 
    Speed<Feet, Minutes> differentSpeed = testSpeed;
 
@@ -26,7 +27,8 @@ TEST_F(CastOperatorTest, CastLength) {
    BaseDimension<tuple<Meters>, tuple<>> testLength(10.0);
    BaseDimension<tuple<Seconds>, tuple<>> testNotLength(10.0);
 
-   Length myLength = testLength;
+   Length<Meters> myLength1 = testLength;
+   Length myLength2 = testLength; // Uses template deduction guide
 
    Length<Feet> differentLength = testLength;
 
@@ -39,7 +41,8 @@ TEST_F(CastOperatorTest, CastTime) {
    BaseDimension<tuple<Seconds>, tuple<>> testTime(10.0);
    BaseDimension<tuple<Meters>, tuple<>> testNotTime(10.0);
 
-   Time myTime = testTime;
+   Time<Seconds> myTime1 = testTime;
+   Time myTime2 = testTime; // Uses template deduction guide
 
    Time<Minutes> differentTime = testTime;
 

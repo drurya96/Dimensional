@@ -24,7 +24,7 @@ namespace StaticDimension
 
    // TODO: Provide reasonable error message for failed conversion due to no primary conversion
 
-   template<typename Unit = Seconds>
+   template<typename Unit>
    class Time : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
    public:
@@ -44,6 +44,12 @@ namespace StaticDimension
          return this->GetVal<std::tuple<T>, std::tuple<>>();
       }
    };
+
+   template<typename T>
+   Time(T) -> Time<T>;
+
+   template<typename TimeUnit>
+   Time(BaseDimension<std::tuple<TimeUnit>, std::tuple<>>) -> Time<TimeUnit>;
 
    template<> struct Conversion<Seconds, Minutes> { static constexpr PrecisionType slope = (1.0 / 60.0); };
    template<> struct Conversion<Minutes, Seconds> { static constexpr PrecisionType slope = 60.0; };

@@ -23,7 +23,7 @@ namespace StaticDimension
    struct Pounds : public MassUnit<Pounds> { public: using MassUnit::MassUnit; };
    struct Ounces : public MassUnit<Ounces> { public: using MassUnit::MassUnit; };
 
-   template<typename Unit = Grams>
+   template<typename Unit>
    class Mass : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
    public:
@@ -43,6 +43,12 @@ namespace StaticDimension
          return this->GetVal<std::tuple<T>, std::tuple<>>();
       }
    };
+
+   template<typename T>
+   Mass(T) -> Mass<T>;
+
+   template<typename MassUnit>
+   Mass(BaseDimension<std::tuple<MassUnit>, std::tuple<>>) -> Mass<MassUnit>;
 
    template<> struct Conversion<Grams, Pounds> { static constexpr PrecisionType slope = 0.0022046226; };
    template<> struct Conversion<Pounds, Grams> { static constexpr PrecisionType slope = 453.5923745; };

@@ -22,7 +22,7 @@ namespace StaticDimension
    struct Inches : public LengthUnit<Inches> { public: using LengthUnit::LengthUnit; };
    struct Meters : public LengthUnit<Meters> { public: using LengthUnit::LengthUnit; };
 
-   template<typename Unit = Meters>
+   template<typename Unit>
    class Length : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
    public:
@@ -43,6 +43,12 @@ namespace StaticDimension
          return this->GetVal<std::tuple<T>, std::tuple<>>();
       }
    };
+
+   template<typename T>
+   Length(T) -> Length<T>;
+
+   template<typename LengthUnit>
+   Length(BaseDimension<std::tuple<LengthUnit>, std::tuple<>>) -> Length<LengthUnit>;
 
    template<> struct Conversion<Meters, Feet> { static constexpr PrecisionType slope = 3.280839895; };
    template<> struct Conversion<Feet, Meters> { static constexpr PrecisionType slope = 0.304800000; };
