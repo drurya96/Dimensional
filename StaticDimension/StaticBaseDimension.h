@@ -368,19 +368,19 @@ namespace StaticDimension
       return PowImpl<exponent>(obj, obj);
    }
 
-   /// @brief Type traid to check if a type has a T::slope attribute
+   /// @brief Type trait to check if a type has a T::slope attribute
    template <typename, typename = std::void_t<>>
    struct has_slope : std::false_type {};
 
-   /// @brief Type traid to check if a type has a T::slope attribute
+   /// @brief Type trait to check if a type has a T::slope attribute
    template <typename T>
    struct has_slope<T, std::void_t<decltype(T::slope)>> : std::integral_constant<bool, std::is_same_v<decltype(T::slope), const double>> {};
 
-   /// @brief Type traid to check if a type has a T::offset attribute
+   /// @brief Type trait to check if a type has a T::offset attribute
    template <typename, typename = std::void_t<>>
    struct has_offset : std::false_type {};
 
-   /// @brief Type traid to check if a type has a T::offset attribute
+   /// @brief Type trait to check if a type has a T::offset attribute
    template <typename T>
    struct has_offset<T, std::void_t<decltype(T::offset)>> : std::integral_constant<bool, std::is_same_v<decltype(T::offset), const double>> {};
 
