@@ -71,17 +71,17 @@ TEST_F(UtilitiesTest, Test_GetConvertedValue)
    ASSERT_NEAR(value, 23.6246, TOLERANCE);
 }
 
-TEST_F(UtilitiesTest, Test_tuple_diff)
+TEST_F(UtilitiesTest, Test_tuple_diff_dim)
 {
-   ASSERT_TRUE((is_same_v<tuple_diff<tuple<Meters>, tuple<Meters>>::type, tuple<>>));
-   ASSERT_TRUE((is_same_v<tuple_diff<tuple<Meters>, tuple<Meters, Seconds>>::type, tuple<>>));
-   ASSERT_TRUE((is_same_v<tuple_diff<tuple<Meters, Seconds>, tuple<Seconds, Meters>>::type, tuple<>>));
-   ASSERT_TRUE((is_same_v<tuple_diff<tuple<Meters, Seconds>, tuple<Meters>>::type, tuple<Seconds>>));
-   ASSERT_TRUE((is_same_v<tuple_diff<tuple<Meters, Seconds, Meters>, tuple<Seconds>>::type, tuple<Meters, Meters>>));
-   ASSERT_TRUE((is_same_v<tuple_diff<tuple<>, tuple<Seconds>>::type, tuple<>>));
-   ASSERT_TRUE((is_same_v<tuple_diff<tuple<>, tuple<>>::type, tuple<>>));
-   ASSERT_TRUE((is_same_v<tuple_diff<tuple<Feet>, tuple<Meters>>::type, tuple<>>));
-   ASSERT_TRUE((is_same_v<tuple_diff<tuple<Feet, Meters>, tuple<Meters>>::type, tuple<Meters>>));
+   ASSERT_TRUE((is_same_v<tuple_diff_dim<tuple<Meters>, tuple<Meters>>::type, tuple<>>));
+   ASSERT_TRUE((is_same_v<tuple_diff_dim<tuple<Meters>, tuple<Meters, Seconds>>::type, tuple<>>));
+   ASSERT_TRUE((is_same_v<tuple_diff_dim<tuple<Meters, Seconds>, tuple<Seconds, Meters>>::type, tuple<>>));
+   ASSERT_TRUE((is_same_v<tuple_diff_dim<tuple<Meters, Seconds>, tuple<Meters>>::type, tuple<Seconds>>));
+   ASSERT_TRUE((is_same_v<tuple_diff_dim<tuple<Meters, Seconds, Meters>, tuple<Seconds>>::type, tuple<Meters, Meters>>));
+   ASSERT_TRUE((is_same_v<tuple_diff_dim<tuple<>, tuple<Seconds>>::type, tuple<>>));
+   ASSERT_TRUE((is_same_v<tuple_diff_dim<tuple<>, tuple<>>::type, tuple<>>));
+   ASSERT_TRUE((is_same_v<tuple_diff_dim<tuple<Feet>, tuple<Meters>>::type, tuple<>>));
+   ASSERT_TRUE((is_same_v<tuple_diff_dim<tuple<Feet, Meters>, tuple<Meters>>::type, tuple<Meters>>));
 }
 
 TEST_F(UtilitiesTest, Test_UnitSimplifier)

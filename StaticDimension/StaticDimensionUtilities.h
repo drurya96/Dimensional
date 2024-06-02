@@ -112,6 +112,51 @@ namespace StaticDimension
 
    /// @brief Find the difference between two type-tuples
    template<typename T, typename ...>
+   struct tuple_diff_dim;
+
+   /// @brief Find the difference between two type-tuples
+   /// @details Specialization for an empty minuend tuple
+   /// @typedef type Empty tuple
+   template<typename ... subtrahendTypes>
+   struct tuple_diff_dim<std::tuple<>, std::tuple<subtrahendTypes...>>
+   {
+      using type = std::tuple<>;
+   };
+
+   /// @brief Find the difference between two type-tuples
+   /// @details Specialization for an empty subtrahend tuple
+   /// @typedef type The entire minuend tuple
+   template<typename... restMinuendTypes>
+   struct tuple_diff_dim<std::tuple<restMinuendTypes...>, std::tuple<>> {
+      using type = std::tuple<restMinuendTypes...>;
+   };
+
+   /// @brief Find the difference between two type-tuples
+   /// @details Computes the multiset difference between two tuples, where the multiset
+   ///    difference of the minuend and subtrahend contains all elements from the
+   ///    minuend except those that also appear in the subtrahend.The multiplicity 
+   ///    of elements is taken into account.
+   /// @tparam T The first type in the minuend tuple
+   /// @tparam restMinuendTypes The remaining types in the minuend tuple
+   /// @tparam subtrahendTypes The types in the subtrahend tuple
+   /// @typedef type A tuple of types contain the multiset different between the minuend and subtrahend
+   template<typename T, typename... restMinuendTypes, typename... subtrahendTypes>
+   struct tuple_diff_dim<std::tuple<T, restMinuendTypes...>, std::tuple<subtrahendTypes...>> {
+      using type = std::conditional_t<
+         has_same_dim<T, std::tuple<subtrahendTypes...>>::value,
+         typename tuple_diff_dim<std::tuple<restMinuendTypes...>, typename RemoveOneInstance<T, std::tuple<subtrahendTypes...>>::type>::type,
+         tuple_cat_t<std::tuple<T>, typename tuple_diff_dim<std::tuple<restMinuendTypes...>, std::tuple<subtrahendTypes...>>::type>
+      >;
+   };
+
+
+
+
+
+
+
+   /// @brief Find the difference between two type-tuples
+   template<typename T, typename ...>
    struct tuple_diff;
 
    /// @brief Find the difference between two type-tuples
@@ -143,7 +188,7 @@ namespace StaticDimension
    template<typename T, typename... restMinuendTypes, typename... subtrahendTypes>
    struct tuple_diff<std::tuple<T, restMinuendTypes...>, std::tuple<subtrahendTypes...>> {
       using type = std::conditional_t<
-         has_same_dim<T, std::tuple<subtrahendTypes...>>::value,
+         std::is_same_v<T, std::tuple<subtrahendTypes...>>,
          typename tuple_diff<std::tuple<restMinuendTypes...>, typename RemoveOneInstance<T, std::tuple<subtrahendTypes...>>::type>::type,
          tuple_cat_t<std::tuple<T>, typename tuple_diff<std::tuple<restMinuendTypes...>, std::tuple<subtrahendTypes...>>::type>
       >;
@@ -165,14 +210,25 @@ namespace StaticDimension
    struct UnitSimplifier<std::tuple<NumTypes1...>, std::tuple<NumTypes2...>, std::tuple<DenTypes1...>, std::tuple<DenTypes2...>>
    {
    private:
-      using remainingNum1 = tuple_diff<std::tuple<NumTypes1...>, std::tuple<DenTypes2...>>;
-      using remainingNum2 = tuple_diff<std::tuple<NumTypes2...>, std::tuple<DenTypes1...>>;
+      using num1AfterSimpleCancel = tuple_diff<std::tuple<NumTypes1...>, std::tuple<DenTypes2...>>;
+      using num2AfterSimpleCancel = tuple_diff<std::tuple<NumTypes2...>, std::tuple<DenTypes1...>>;
 
-      using remainingDen1 = tuple_diff<std::tuple<DenTypes1...>, std::tuple<NumTypes2...>>;
-      using remainingDen2 = tuple_diff<std::tuple<DenTypes2...>, std::tuple<NumTypes1...>>;
+      using den1AfterSimpleCancel = tuple_diff<std::tuple<DenTypes1...>, std::tuple<NumTypes2...>>;
+      using den2AfterSimpleCancel = tuple_diff<std::tuple<DenTypes2...>, std::tuple<NumTypes1...>>;
+
+      using remainingNum1 = tuple_diff_dim<typename num1AfterSimpleCancel::type, typename den2AfterSimpleCancel::type>;
+      using remainingNum2 = tuple_diff_dim<typename num2AfterSimpleCancel::type, typename den1AfterSimpleCancel::type>;
+
+      using remainingDen1 = tuple_diff_dim<typename den1AfterSimpleCancel::type, typename num2AfterSimpleCancel::type>;
+      using remainingDen2 = tuple_diff_dim<typename den2AfterSimpleCancel::type, typename num1AfterSimpleCancel::type>;
+
    public:
       using newNum = tuple_cat_t<typename remainingNum1::type, typename remainingNum2::type>;
       using newDen = tuple_cat_t<typename remainingDen1::type, typename remainingDen2::type>;
+
+      using numSimple = tuple_cat_t<typename num1AfterSimpleCancel::type, typename num2AfterSimpleCancel::type>;
+      using denSimple = tuple_cat_t<typename den1AfterSimpleCancel::type, typename den2AfterSimpleCancel::type>;
+
       using dimType = BaseDimension<newNum, newDen>;
 
       constexpr static bool isDelta = !((std::tuple_size_v<newNum> == 1) && (std::tuple_size_v<newDen> == 0));
