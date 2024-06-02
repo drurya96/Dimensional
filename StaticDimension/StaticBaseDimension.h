@@ -71,7 +71,7 @@ namespace StaticDimension
          using simplified = UnitSimplifier<NumTuple, std::tuple<>, std::tuple<>, DenTuple>;
          PrecisionType newScalar = scalar;
 
-         CancelUnits<NumTuple, DenTuple, simplified::newNum, simplified::newDen, simplified::isDelta>(newScalar);
+         CancelUnits<simplified::numSimple, simplified::denSimple, simplified::newNum, simplified::newDen, simplified::isDelta>(newScalar);
 
          return simplified::dimType(newScalar);
       }
@@ -218,8 +218,7 @@ namespace StaticDimension
       using simplified = UnitSimplifier<NumTuple1, DenTuple2, DenTuple1, NumTuple2>;
       PrecisionType newScalar = obj1.scalar / obj2.scalar;
 
-      CancelUnits<NumTuple1, DenTuple2, simplified::newNum, simplified::newDen, simplified::isDelta>(newScalar);
-      CancelUnits<DenTuple1, NumTuple2, simplified::newNum, simplified::newDen, simplified::isDelta>(newScalar);
+      CancelUnits<simplified::numSimple, simplified::denSimple, simplified::newNum, simplified::newDen, simplified::isDelta>(newScalar);
 
       return simplified::dimType(newScalar);
    }
@@ -239,8 +238,7 @@ namespace StaticDimension
       using simplified = UnitSimplifier<NumTuple1, NumTuple2, DenTuple1, DenTuple2>;
       PrecisionType newScalar = obj1.scalar * obj2.scalar;
 
-      CancelUnits<NumTuple1, DenTuple1, simplified::newNum, simplified::newDen, simplified::isDelta>(newScalar);
-      CancelUnits<NumTuple2, DenTuple2, simplified::newNum, simplified::newDen, simplified::isDelta>(newScalar);
+      CancelUnits<simplified::numSimple, simplified::denSimple, simplified::newNum, simplified::newDen, simplified::isDelta>(newScalar);
 
       return simplified::dimType(newScalar);
    }
