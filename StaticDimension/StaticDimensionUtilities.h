@@ -149,12 +149,6 @@ namespace StaticDimension
       >;
    };
 
-
-
-
-
-
-
    /// @brief Find the difference between two type-tuples
    template<typename T, typename ...>
    struct tuple_diff;
