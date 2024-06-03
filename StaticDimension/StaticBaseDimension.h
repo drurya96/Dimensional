@@ -178,17 +178,17 @@ namespace StaticDimension
       template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
       friend auto operator*(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2);
 
-      template<typename NumTuple, typename DenTuple>
-      friend BaseDimension<NumTuple, DenTuple> operator*(const BaseDimension<NumTuple, DenTuple>& obj, PrecisionType scalar);
+      template<typename NumTup, typename DenTup>
+      friend BaseDimension<NumTup, DenTup> operator*(const BaseDimension<NumTup, DenTup>& obj, PrecisionType scalar);
 
-      template<typename NumTuple, typename DenTuple>
-      friend BaseDimension<NumTuple, DenTuple> operator*(PrecisionType scalar, const BaseDimension<NumTuple, DenTuple>& obj);
+      template<typename NumTup, typename DenTup>
+      friend BaseDimension<NumTup, DenTup> operator*(PrecisionType scalar, const BaseDimension<NumTup, DenTup>& obj);
 
-      template<typename NumTuple, typename DenTuple>
-      friend BaseDimension<NumTuple, DenTuple> operator/(const BaseDimension<NumTuple, DenTuple>& obj, PrecisionType scalar);
+      template<typename NumTup, typename DenTup>
+      friend BaseDimension<NumTup, DenTup> operator/(const BaseDimension<NumTup, DenTup>& obj, PrecisionType scalar);
 
-      template<typename NumTuple, typename DenTuple>
-      friend auto operator/(PrecisionType scalar, const BaseDimension<NumTuple, DenTuple>& obj)->BaseDimension<DenTuple, NumTuple>;
+      template<typename NumTup, typename DenTup>
+      friend auto operator/(PrecisionType scalar, const BaseDimension<NumTup, DenTup>& obj)->BaseDimension<DenTup, NumTup>;
 
       template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
       friend BaseDimension<NumTuple1, DenTuple1> operator+(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2);
