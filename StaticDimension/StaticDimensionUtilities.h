@@ -111,8 +111,17 @@ namespace StaticDimension
    };
 
    /// @brief Find the difference between two type-tuples
-   template<typename T, typename ...>
+   template<typename T, typename U, typename Enable = void>
    struct tuple_diff_dim;
+
+   /// @brief Find the difference between two type-tuples
+   /// @details Specialization for an empty minuend tuple
+   /// @typedef type Empty tuple
+   template<>
+   struct tuple_diff_dim<std::tuple<>, std::tuple<>>
+   {
+      using type = std::tuple<>;
+   };
 
    /// @brief Find the difference between two type-tuples
    /// @details Specialization for an empty minuend tuple
@@ -141,7 +150,7 @@ namespace StaticDimension
    /// @tparam subtrahendTypes The types in the subtrahend tuple
    /// @typedef type A tuple of types contain the multiset different between the minuend and subtrahend
    template<typename T, typename... restMinuendTypes, typename... subtrahendTypes>
-   struct tuple_diff_dim<std::tuple<T, restMinuendTypes...>, std::tuple<subtrahendTypes...>> {
+   struct tuple_diff_dim<std::tuple<T, restMinuendTypes...>, std::tuple<subtrahendTypes...>, std::enable_if_t<(sizeof...(subtrahendTypes) > 0)>> {
       using type = std::conditional_t<
          has_same_dim<T, std::tuple<subtrahendTypes...>>::value,
          typename tuple_diff_dim<std::tuple<restMinuendTypes...>, typename RemoveOneInstance<T, std::tuple<subtrahendTypes...>>::type>::type,
@@ -150,8 +159,17 @@ namespace StaticDimension
    };
 
    /// @brief Find the difference between two type-tuples
-   template<typename T, typename ...>
+   template<typename T, typename U, typename Enable = void>
    struct tuple_diff;
+
+   /// @brief Find the difference between two type-tuples
+   /// @details Specialization for an empty minuend tuple
+   /// @typedef type Empty tuple
+   template<>
+   struct tuple_diff<std::tuple<>, std::tuple<>>
+   {
+      using type = std::tuple<>;
+   };
 
    /// @brief Find the difference between two type-tuples
    /// @details Specialization for an empty minuend tuple
@@ -180,7 +198,7 @@ namespace StaticDimension
    /// @tparam subtrahendTypes The types in the subtrahend tuple
    /// @typedef type A tuple of types contain the multiset different between the minuend and subtrahend
    template<typename T, typename... restMinuendTypes, typename... subtrahendTypes>
-   struct tuple_diff<std::tuple<T, restMinuendTypes...>, std::tuple<subtrahendTypes...>> {
+   struct tuple_diff<std::tuple<T, restMinuendTypes...>, std::tuple<subtrahendTypes...>, std::enable_if_t<(sizeof...(subtrahendTypes) > 0)>> {
       using type = std::conditional_t<
          std::is_same_v<T, std::tuple<subtrahendTypes...>>,
          typename tuple_diff<std::tuple<restMinuendTypes...>, typename RemoveOneInstance<T, std::tuple<subtrahendTypes...>>::type>::type,
@@ -261,6 +279,150 @@ namespace StaticDimension
          typename get_first_match<T, std::tuple<Tail...>>::type>;
    };
 
+
+   /// @brief Type trait to check if a type has a T::slope attribute
+   template <typename, typename = std::void_t<>>
+   struct has_slope : std::false_type {};
+
+   /// @brief Type trait to check if a type has a T::slope attribute
+   template <typename T>
+   struct has_slope<T, std::void_t<decltype(T::slope)>> : std::integral_constant<bool, std::is_same_v<decltype(T::slope), const double>> {};
+
+   /// @brief Type trait to check if a type has a T::offset attribute
+   template <typename, typename = std::void_t<>>
+   struct has_offset : std::false_type {};
+
+   /// @brief Type trait to check if a type has a T::offset attribute
+   template <typename T>
+   struct has_offset<T, std::void_t<decltype(T::offset)>> : std::integral_constant<bool, std::is_same_v<decltype(T::offset), const double>> {};
+
+   /// @brief Return the slope as a constexpr if one exists,
+   ///    otherwise return 1.0
+   template<typename T>
+   constexpr PrecisionType GetSlope()
+   {
+      if constexpr (has_slope<T>::value)
+      {
+         return T::slope;
+      }
+      else
+      {
+         return 1.0;
+      }
+   }
+
+   /// @brief Return the offset as a constexpr if one exists,
+   ///    otherwise return 0.0
+   template<typename T>
+   constexpr PrecisionType GetOffset()
+   {
+      if constexpr (has_offset<T>::value)
+      {
+         return T::offset;
+      }
+      else
+      {
+         return 0.0;
+      }
+   }
+
+
+   /// @brief Conversion implementation
+   /// @details base case when no conversion is defined, throws a compile-time error.
+   template<typename fromUnit, typename toUnit, typename Enable = void>
+   struct ConversionBase
+   {
+      static_assert(sizeof(fromUnit) == -1, "Conversion not defined for these units.");
+   };
+
+   /// @brief Struct defining the linear relationship between two units
+   /// @details This relationship is meant to be specialized for each unit,
+   ///    and by users when extensions are needed.
+   template<typename fromUnit, typename toUnit>
+   struct Conversion : ConversionBase<fromUnit, toUnit> {};
+
+   /// @brief Struct defining the linear relationship between two units
+   /// @details This specialization will be used when a final specialization is not provided, but the dimensions
+   ///    are the same. This will step through the primary unit of this dimension.
+   /// @typedef slope The linear relationship between the units
+   /// @typedef offset The intercept between two units.
+   ///    This will typically be 0.0, but there are some special cases, such as temparature.
+   /// @todo Provide some insight to the user when this is used, so they may accurately
+   ///    define useful specializations.
+   template<typename fromUnit, typename toUnit>
+   struct ConversionBase<fromUnit, toUnit, std::enable_if_t<std::is_same_v<typename fromUnit::Dim, typename toUnit::Dim>>>
+   {
+
+#ifdef REQUIRE_CONVERSIONS
+      static_assert(sizeof(fromUnit) == -1, "No specialized conversion found. See compiler output for more details");
+#endif
+
+      using toPrimary = Conversion<fromUnit, typename fromUnit::Primary>;
+      using fromPrimary = Conversion<typename fromUnit::Primary, toUnit>;
+
+      static constexpr PrecisionType slope = GetSlope<toPrimary>() * GetSlope<fromPrimary>();
+      static constexpr PrecisionType offset = GetOffset<toPrimary>() + GetOffset<fromPrimary>();
+   };
+
+   /// @brief Struct defining the linear relationship between two units
+   /// @details This relationship is meant to be specialized for each unit,
+   ///    and by users when extensions are needed.
+   ///    This specialization is used when converting to the same unit.
+   template<typename Unit>
+   struct Conversion<Unit, Unit>
+   {
+      static constexpr PrecisionType slope = 1.0;
+      static constexpr PrecisionType offset = 0.0;
+   };
+
+   /// @brief Method to convert a value of fromUnit to a value of toUnit
+   /// @details This method relies on the slope and offset of the necessary conversion.
+   ///    While this method can be specialized to bypass the slope-offset relationship,
+   ///    this should be done with great care as other parts of this library make assumptions
+   ///    about this relationship.
+   /// @tparam fromUnit Unit to convert from
+   /// @tparam toUnit Unit to convert to
+   /// @tparam isDelata Bool indicating whether this conversion is of a single unit in the normator (false)
+   ///    or not (true).
+   /// @tparam inverse Indicates whether value is in denominator (true) or numerator (false)
+   /// @param[in] input Value to convert as a floating-point type
+   /// @return floating-point type after conversion
+   template<typename fromUnit, typename toUnit, bool isDelta = false, bool inverse = false>
+   PrecisionType Convert(PrecisionType input)
+   {
+      if constexpr (std::is_same_v<fromUnit, toUnit>)
+      {
+         return input;
+      }
+      else if constexpr (std::is_same_v<typename fromUnit::Dim, typename toUnit::Dim>)
+      {
+         // Do conversion using Conversion struct
+         using conv = Conversion<fromUnit, toUnit>;
+         constexpr PrecisionType slope = GetSlope<conv>();
+         constexpr PrecisionType offset = GetOffset<conv>();
+         if constexpr (isDelta)
+         {
+            if constexpr (inverse)
+            {
+               return (input / slope);
+            }
+            else
+            {
+               return (input * slope);
+            }
+
+         }
+         else
+         {
+            return (input * slope) + offset;
+         }
+      }
+      else
+      {
+         static_assert(sizeof(fromUnit) == -1, "No possible conversion for between these types.");
+      }
+   }
+
    /// @brief Unit cancellation implementation
    /// @details recursive base-case
    template<bool inverse = false, int index = 0, typename RealTupType, typename IncomingTupType, bool isDelta = false>
@@ -287,12 +449,12 @@ namespace StaticDimension
       using currentType = std::tuple_element_t<index, IncomingTupType>;
       if constexpr (has_same_dim<currentType, RealTupType>::value)
       {
-         value = Convert<currentType, get_first_match<currentType, RealTupType>::type, isDelta, inverse>(value);
-         CancelUnitsImpl<inverse, index + 1, RemoveOneInstance<currentType, RealTupType>::type, IncomingTupType, isDelta>(value);
+         value = Convert<currentType, typename get_first_match<currentType, RealTupType>::type, isDelta, inverse>(value);
+         CancelUnitsImpl<inverse, index + 1, typename RemoveOneInstance<currentType, RealTupType>::type, IncomingTupType, isDelta>(value);
       }
       else
       {
-         value = Convert<currentType, currentType::Primary, isDelta, inverse>(value);
+         value = Convert<currentType, typename currentType::Primary, isDelta, inverse>(value);
          CancelUnitsImpl<inverse, index + 1, RealTupType, IncomingTupType, isDelta>(value);
       }
    }
@@ -330,7 +492,7 @@ namespace StaticDimension
    ///    or not (true).
    /// @param value[in,out] Reference of a value to update
    template <size_t I = 0, bool inverse = false, typename toTuple, typename fromTup, bool isDelta = false>
-   typename std::enable_if<I < std::tuple_size_v<fromTup>, void>::type
+   typename std::enable_if < I < std::tuple_size_v<fromTup>, void>::type
       ConvertDimension(PrecisionType& value)
    {
       value = Convert<std::tuple_element_t<I, fromTup>, std::tuple_element_t<I, toTuple>, isDelta, inverse>(value);

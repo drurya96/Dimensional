@@ -28,7 +28,7 @@ namespace StaticDimension
    class Time : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
    public:
-      static_assert(std::is_same_v<Unit::Dim, Seconds::Dim>, "Unit provided does not derive from TimeUnit");
+      static_assert(std::is_same_v<typename Unit::Dim, typename Seconds::Dim>, "Unit provided does not derive from TimeUnit");
       using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
 
       Time() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}
@@ -36,12 +36,12 @@ namespace StaticDimension
       Time(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
 
       template<typename T>
-      Time(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.GetVal<std::tuple<Unit>, std::tuple<>>()) {}
+      Time(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
 
       template<typename T>
       double GetTime()
       {
-         return this->GetVal<std::tuple<T>, std::tuple<>>();
+         return this->template GetVal<std::tuple<T>, std::tuple<>>();
       }
    };
 
