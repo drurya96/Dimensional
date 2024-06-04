@@ -26,7 +26,7 @@ namespace StaticDimension
    class Length : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
    public:
-      static_assert(std::is_same_v<Unit::Dim, Meters::Dim>, "Unit provided does not derive from LengthUnit");
+      static_assert(std::is_same_v<typename Unit::Dim, typename Meters::Dim>, "Unit provided does not derive from LengthUnit");
       using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
 
       Length() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}
@@ -34,13 +34,13 @@ namespace StaticDimension
       Length(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
 
       template<typename T>
-      Length(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.GetVal<std::tuple<Unit>, std::tuple<>>()){}
+      Length(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()){}
 
 
       template<typename T>
       double GetLength()
       {
-         return this->GetVal<std::tuple<T>, std::tuple<>>();
+         return this->template GetVal<std::tuple<T>, std::tuple<>>();
       }
    };
 

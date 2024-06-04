@@ -27,7 +27,7 @@ namespace StaticDimension
    class Mass : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
    public:
-      static_assert(std::is_same_v<Unit::Dim, Grams::Dim>, "Unit provided does not derive from MassUnit");
+      static_assert(std::is_same_v<typename Unit::Dim, typename Grams::Dim>, "Unit provided does not derive from MassUnit");
       using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
 
       Mass() : BaseDimension<std::tuple<Unit>, std::tuple<>>(0.0) {}
@@ -35,12 +35,12 @@ namespace StaticDimension
       Mass(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>(val) {}
 
       template<typename T>
-      Mass(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>(base.GetVal<std::tuple<Unit>, std::tuple<>>()) {}
+      Mass(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
 
       template<typename T>
       double GetMass()
       {
-         return this->GetVal<std::tuple<T>, std::tuple<>>();
+         return this->template GetVal<std::tuple<T>, std::tuple<>>();
       }
    };
 
