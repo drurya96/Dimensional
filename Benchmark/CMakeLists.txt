@@ -11,6 +11,5 @@ target_include_directories(DimensionBenchmarkLib PUBLIC ${CMAKE_CURRENT_LIST_DIR
 target_link_libraries(DimensionBenchmarkLib PUBLIC
     StaticDimension_LIB
     StaticDimension_Extensions
-    DynamicDimension_LIB
     benchmark::benchmark
 )
