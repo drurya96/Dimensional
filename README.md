@@ -103,3 +103,11 @@ This library is open-source, and is licensed under [the MIT license](https://git
 Active development.
 
 This library is in beta release.
+
+## Versioning
+This library follows [Semantic Versioning](https://semver.org/).
+- MAJOR version: incompatible API changes
+- MINOR version: add functionality in a backward compatible manner
+- PATCH version: backward compatible bug fixes
+
+**Disclaimer**: During beta (version 0.3.x), semantic versioning will **NOT** be followed.
