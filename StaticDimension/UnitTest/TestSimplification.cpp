@@ -10,11 +10,11 @@ using namespace std;
 TEST_F(SimplificationTest, SimplificationWithMath) {
 
    // TODO: Consider adding a .Simplify() method to BaseDimension
-   Length<Meters> length1(10);
-   Length<Feet> length2(20);
+   Length<Meters> length1(10.0);
+   Length<Feet> length2(20.0);
 
-   Time<Seconds> time1(5);
-   Time<Minutes> time2(12);
+   Time<Seconds> time1(5.0);
+   Time<Minutes> time2(12.0);
 
    // This is 1.0416666667 Meters-Seconds-Seconds/Feet-Minutes
    // Simplification occurs during division, so this resolves to just Seconds.
@@ -28,11 +28,11 @@ TEST_F(SimplificationTest, SimplificationWithMath) {
 
 TEST_F(SimplificationTest, Simplification) {
 
-   Length<Meters> length1(10);
-   Length<Feet> length2(20);
+   Length<Meters> length1(10.0);
+   Length<Feet> length2(20.0);
 
-   Time<Seconds> time1(5);
-   Time<Minutes> time2(12);
+   Time<Seconds> time1(5.0);
+   Time<Minutes> time2(12.0);
 
    // This is 10.0 (Meters-Mintues / Feet-Seconds-Minutes-Minutes)
    auto test_before = BaseDimension<std::tuple<Meters, Minutes>, std::tuple<Seconds, Feet, Minutes>>(10.0);
