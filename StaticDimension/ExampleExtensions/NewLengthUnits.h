@@ -41,6 +41,13 @@ namespace StaticDimension
 
    template<int I> struct Conversion<Meters, BarSub<I>> { static constexpr PrecisionType slope = Conversion<Meters, Bar>::slope; };
    template<int I> struct Conversion<BarSub<I>, Meters> { static constexpr PrecisionType slope = Conversion<Bar, Meters>::slope; };
+
+   /// @todo Move this to a different example
+   struct grault : public DerivedUnit
+   {
+      using NumTuple = std::tuple<Foo, Bar>;
+      using DenTuple = std::tuple<Baz>;
+   };
 }
 
 #endif // LENGTH_EXTENSION_H

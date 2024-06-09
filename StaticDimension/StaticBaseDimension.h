@@ -44,10 +44,16 @@ namespace StaticDimension
    ///    Note all types in NumTuple must derive from BaseUnit
    /// @tparam DenTuple A tuple of BaseUnits describing the dimension's denominator.
    ///    Note all types in DenTuple must derive from BaseUnit
-   template<typename NumTuple, typename DenTuple>
+   template<typename NumTupleT, typename DenTupleT>
    class BaseDimension
    {
    public:
+
+      // Expand any derived units to their fundamental constiuents
+      using Extractor = FundamentalUnitExtractor<NumTupleT, DenTupleT>;
+      using NumTuple = typename Extractor::Num;
+      using DenTuple = typename Extractor::Den;
+
       // Enforce units deriving from BaseUnit
       static_assert(is_unit_tuple<NumTuple>::value, "NumTuple contains a type not derived from BaseUnit");
       static_assert(is_unit_tuple<DenTuple>::value, "DenTuple contains a type not derived from BaseUnit");
@@ -215,14 +221,20 @@ namespace StaticDimension
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    auto operator/(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
    {
-      using simplified = UnitSimplifier<NumTuple1, DenTuple2, DenTuple1, NumTuple2>;
+      using Num1 = typename BaseDimension<NumTuple1, DenTuple1>::NumTuple;
+      using Num2 = typename BaseDimension<NumTuple2, DenTuple2>::NumTuple;
+
+      using Den1 = typename BaseDimension<NumTuple1, DenTuple1>::DenTuple;
+      using Den2 = typename BaseDimension<NumTuple2, DenTuple2>::DenTuple;
+
+      using simplified = UnitSimplifier<Num1, Den2, Den1, Num2>;
       PrecisionType newScalar = obj1.scalar / obj2.scalar;
 
       CancelUnits<typename simplified::numSimple, typename simplified::denSimple, typename simplified::newNum, typename simplified::newDen, simplified::isDelta>(newScalar);
 
       return typename simplified::dimType(newScalar);
    }
-  
+
    /// @brief Multiplication operator for two Dimensions
    /// @tparam NumTuple1 Tuple of numerator units of obj1
    /// @tparam DenTuple1 Tuple of denominator units of obj1
@@ -235,7 +247,13 @@ namespace StaticDimension
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    auto operator*(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
    {
-      using simplified = UnitSimplifier<NumTuple1, NumTuple2, DenTuple1, DenTuple2>;
+      using Num1 = typename BaseDimension<NumTuple1, DenTuple1>::NumTuple;
+      using Num2 = typename BaseDimension<NumTuple2, DenTuple2>::NumTuple;
+
+      using Den1 = typename BaseDimension<NumTuple1, DenTuple1>::DenTuple;
+      using Den2 = typename BaseDimension<NumTuple2, DenTuple2>::DenTuple;
+
+      using simplified = UnitSimplifier<Num1, Num2, Den1, Den2>;
       PrecisionType newScalar = obj1.scalar * obj2.scalar;
 
       CancelUnits<typename simplified::numSimple, typename simplified::denSimple, typename simplified::newNum, typename simplified::newDen, simplified::isDelta>(newScalar);
