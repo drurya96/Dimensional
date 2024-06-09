@@ -20,8 +20,15 @@ namespace StaticDimension
    };
 
    struct Grams : public MassUnit<Grams> { public: using MassUnit::MassUnit; };
-   struct Pounds : public MassUnit<Pounds> { public: using MassUnit::MassUnit; };
+   struct PoundMass : public MassUnit<PoundMass> { public: using MassUnit::MassUnit; };
    struct Ounces : public MassUnit<Ounces> { public: using MassUnit::MassUnit; };
+
+   struct Slugs : public MassUnit<Slugs> { public: using MassUnit::MassUnit; };
+   struct Grains : public MassUnit<Grains> { public: using MassUnit::MassUnit; };
+   struct Stone : public MassUnit<Stone> { public: using MassUnit::MassUnit; };
+   struct ShortTon : public MassUnit<ShortTon> { public: using MassUnit::MassUnit; };
+   struct LongTon : public MassUnit<LongTon> { public: using MassUnit::MassUnit; };
+   struct Tonne : public MassUnit<Tonne> { public: using MassUnit::MassUnit; };
 
    template<typename Unit>
    class Mass : public BaseDimension<std::tuple<Unit>, std::tuple<>>
@@ -50,10 +57,34 @@ namespace StaticDimension
    template<typename MassUnit>
    Mass(BaseDimension<std::tuple<MassUnit>, std::tuple<>>) -> Mass<MassUnit>;
 
-   template<> struct Conversion<Grams, Pounds> { static constexpr PrecisionType slope = 0.0022046226; };
-   template<> struct Conversion<Pounds, Grams> { static constexpr PrecisionType slope = 453.5923745; };
+   template<> struct Conversion<Grams, PoundMass> { static constexpr PrecisionType slope = 0.0022046226; };
+   template<> struct Conversion<PoundMass, Grams> { static constexpr PrecisionType slope = 453.5923745; };
+
    template<> struct Conversion<Grams, Ounces> { static constexpr PrecisionType slope = 0.0352739619; };
    template<> struct Conversion<Ounces, Grams> { static constexpr PrecisionType slope = 28.349523165; };
+
+
+
+
+   template<> struct Conversion<Grams, Slugs> { static constexpr PrecisionType slope = 0.00006852; };
+   template<> struct Conversion<Slugs, Grams> { static constexpr PrecisionType slope = (1.0 / 0.00006852); };
+
+   template<> struct Conversion<Grams, Grains> { static constexpr PrecisionType slope = 15.4324; };
+   template<> struct Conversion<Grains, Grams> { static constexpr PrecisionType slope = (1.0 / 15.4324); };
+
+   template<> struct Conversion<Grams, Stone> { static constexpr PrecisionType slope = 0.000157473; };
+   template<> struct Conversion<Stone, Grams> { static constexpr PrecisionType slope = (1.0 / 0.000157473); };
+
+   template<> struct Conversion<Grams, ShortTon> { static constexpr PrecisionType slope = 0.00000110231; };
+   template<> struct Conversion<ShortTon, Grams> { static constexpr PrecisionType slope = (1.0 / 0.00000110231); };
+
+   template<> struct Conversion<Grams, LongTon> { static constexpr PrecisionType slope = 0.000000984207; };
+   template<> struct Conversion<LongTon, Grams> { static constexpr PrecisionType slope = (1.0 / 0.000000984207); };
+
+   template<> struct Conversion<Grams, Tonne> { static constexpr PrecisionType slope = 0.000001; };
+   template<> struct Conversion<Tonne, Grams> { static constexpr PrecisionType slope = (1.0 / 0.000001); };
+
+   ALL_SI_PREFIXES(Grams, MassUnit);
 }
 
 #endif //STATIC_DIMENSION_MASS_H
