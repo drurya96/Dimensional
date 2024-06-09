@@ -38,7 +38,10 @@ TEST_F(FundamentalConversions, TestLength) {
 TEST_F(FundamentalConversions, TestMass) {
    Mass<Grams> myMass{1000.0};
 
-   ASSERT_NEAR(myMass.GetMass<Pounds>(), 2.2046226218, TOLERANCE);
+   ASSERT_NEAR(myMass.GetMass<PoundMass>(), 2.2046226218, TOLERANCE);
    ASSERT_NEAR(myMass.GetMass<Ounces>(), 35.273962, TOLERANCE);
 
+
+   ASSERT_NEAR(myMass.GetMass<KiloGrams>(), 1.0, TOLERANCE);
+   ASSERT_NEAR(myMass.GetMass<MilliGrams>(), 1000000.0, TOLERANCE);
 }

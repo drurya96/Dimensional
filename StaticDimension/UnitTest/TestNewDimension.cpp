@@ -31,4 +31,11 @@ TEST_F(NewDimensionTest, NewDimension) {
 
    auto result3 = length3 / testL;
 
+   /// @todo This should move to its own test
+   BaseDimension<std::tuple<grault>, std::tuple<>> OtherDimension{ 10.0 };
+
+   auto divideGrault = OtherDimension / length1;
+
+   ASSERT_TRUE((std::is_same_v<decltype(divideGrault), BaseDimension<std::tuple<Bar>, std::tuple<Baz>>>));
+
 }

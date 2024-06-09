@@ -498,5 +498,88 @@ namespace StaticDimension
       value = Convert<std::tuple_element_t<I, fromTup>, std::tuple_element_t<I, toTuple>, isDelta, inverse>(value);
       ConvertDimension<I + 1, inverse, toTuple, fromTup, isDelta>(value);
    }
+
+   /// @brief Struct to inherit for derived units, used for type-trait
+   /// @details Here, "Derived" means a unit which is made up of other units,
+   ///    for example Newtons (kg-m/s-s), NOT a derived class/struct.
+   struct DerivedUnit {};
+
+   /// @brief Return true it T derives from DerivedUnit
+   template <typename T>
+   using is_derived_unit = std::is_base_of<DerivedUnit, T>;
+
+   /// @brief Alias to get the value of is_derived_unit
+   template <typename T>
+   constexpr bool is_derived_unit_v = is_derived_unit<T>::value;
+
+   /// @brief Extract the numerator and denominator of a unit
+   /// @details When the unit is fundamental, it simply becomes the sole numerator
+   ///    but if its derived, the numerator an denominator may be more complex.
+   ///    Note this struct has no knowledge of whether this unit is, itself, found
+   ///    in the numerator or denominator of a dimension, so flip accordingly.
+   /// @tparam U The unit to extract from
+   /// @typedef Num The numerator tuple of this unit
+   /// @typedef Den The denominator tuple of this unit
+   template<typename U, bool = is_derived_unit_v<U>>
+   struct DerivedHelper {
+      using Num = std::tuple<U>;
+      using Den = std::tuple<>;
+   };
+
+   /// @brief Extract the numerator and denominator of a unit
+   /// @tparam U The unit to extract from
+   /// @typedef Num The numerator tuple of this unit
+   /// @typedef Den The denominator tuple of this unit
+   template<typename U>
+   struct DerivedHelper<U, true> {
+      using Num = typename U::NumTuple;
+      using Den = typename U::DenTuple;
+   };
+
+   /// @brief Resolve all numerators and denominators of a given tuple
+   template<typename Tuple>
+   struct HandleDerived;
+
+   /// @brief Resolve all numerators and denominators of a given tuple
+   /// @details Base case returning empty tuples
+   template<>
+   struct HandleDerived<std::tuple<>> {
+      using Num = std::tuple<>;
+      using Den = std::tuple<>;
+   };
+
+   /// @brief Resolve all numerators and denominators of a given tuple
+   /// @details Base case for the final item.
+   /// @tparam T The unit to split
+   /// @typedef Num The numerator tuple for this unit
+   /// @typedef Den The denominator tuple for this unit
+   template<typename T>
+   struct HandleDerived<std::tuple<T>> {
+      using Num = typename DerivedHelper<T>::Num;
+      using Den = typename DerivedHelper<T>::Den;
+   };
+
+   /// @brief Resolve all numerators and denominators of a given tuple
+   /// @details Recursive case for multiple units
+   /// @tparam T The first unit to split
+   /// @tparam Rest... The remaining items to split
+   /// @typedef Num The numerator tuple for all units, recursive
+   /// @typedef Den The denominator tuple for all units, recursive
+   template<typename T, typename ... Rest>
+   struct HandleDerived<std::tuple<T, Rest...>> {
+      using Num = tuple_cat_t<typename DerivedHelper<T>::Num, typename HandleDerived<std::tuple<Rest...>>::Num>;
+      using Den = tuple_cat_t<typename DerivedHelper<T>::Den, typename HandleDerived<std::tuple<Rest...>>::Den>;
+   };
+
+   /// @brief Extract all fundamental units from a given numerator and denominator
+   /// @tparam NumTuple The numerator tuple of units
+   /// @tparam DenTuple The denominator tuple of units
+   /// @typedef Num The numerator tuple of fundamental units, after handling all derived units
+   /// @typedef Den The denominator tuple of fundamental units, after handling all derived units
+   template<typename NumTuple, typename DenTuple>
+   struct FundamentalUnitExtractor {
+      using Num = tuple_cat_t<typename HandleDerived<NumTuple>::Num, typename HandleDerived<DenTuple>::Den>;
+      using Den = tuple_cat_t<typename HandleDerived<DenTuple>::Num, typename HandleDerived<NumTuple>::Den>;
+   };
 }
 #endif // STATIC_DIMENSION_UTILITIES_H

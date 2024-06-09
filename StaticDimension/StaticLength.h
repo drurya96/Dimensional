@@ -22,6 +22,16 @@ namespace StaticDimension
    struct Inches : public LengthUnit<Inches> { public: using LengthUnit::LengthUnit; };
    struct Meters : public LengthUnit<Meters> { public: using LengthUnit::LengthUnit; };
 
+   struct AstronomicalUnits : public LengthUnit<AstronomicalUnits> { public: using LengthUnit::LengthUnit; };
+   struct DataMiles : public LengthUnit<DataMiles> { public: using LengthUnit::LengthUnit; };
+   struct NauticalMiles : public LengthUnit<NauticalMiles> { public: using LengthUnit::LengthUnit; };
+   struct Miles : public LengthUnit<Miles> { public: using LengthUnit::LengthUnit; };
+   struct Leagues : public LengthUnit<Leagues> { public: using LengthUnit::LengthUnit; };
+   struct Fathoms : public LengthUnit<Fathoms> { public: using LengthUnit::LengthUnit; };
+   struct Furlong : public LengthUnit<Furlong> { public: using LengthUnit::LengthUnit; };
+   struct Yards : public LengthUnit<Yards> { public: using LengthUnit::LengthUnit; };
+   struct US_Survey_Feet : public LengthUnit<US_Survey_Feet> { public: using LengthUnit::LengthUnit; };
+
    template<typename Unit>
    class Length : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
@@ -54,6 +64,35 @@ namespace StaticDimension
    template<> struct Conversion<Feet, Meters> { static constexpr PrecisionType slope = 0.304800000; };
    template<> struct Conversion<Meters, Inches> { static constexpr PrecisionType slope = 39.37; };
    template<> struct Conversion<Inches, Meters> { static constexpr PrecisionType slope = 0.0254000508; };
+
+   template<> struct Conversion<Meters, AstronomicalUnits> { static constexpr PrecisionType slope = 6.68459e-12; };
+   template<> struct Conversion<AstronomicalUnits, Meters> { static constexpr PrecisionType slope = 1.0 / 6.68459e-12; };
+
+   template<> struct Conversion<Meters, DataMiles> { static constexpr PrecisionType slope = 0.000621371; };
+   template<> struct Conversion<DataMiles, Meters> { static constexpr PrecisionType slope = 1.0 / 0.000621371; };
+
+   template<> struct Conversion<Meters, NauticalMiles> { static constexpr PrecisionType slope = 0.000539957; };
+   template<> struct Conversion<NauticalMiles, Meters> { static constexpr PrecisionType slope = 1.0 / 0.000539957; };
+
+   template<> struct Conversion<Meters, Miles> { static constexpr PrecisionType slope = 0.000621371; };
+   template<> struct Conversion<Miles, Meters> { static constexpr PrecisionType slope = 1.0 / 0.000621371; };
+
+   template<> struct Conversion<Meters, Leagues> { static constexpr PrecisionType slope = 0.000207124; };
+   template<> struct Conversion<Leagues, Meters> { static constexpr PrecisionType slope = 1.0 / 0.000207124; };
+
+   template<> struct Conversion<Meters, Fathoms> { static constexpr PrecisionType slope = 0.546807; };
+   template<> struct Conversion<Fathoms, Meters> { static constexpr PrecisionType slope = 1.0 / 0.546807; };
+
+   template<> struct Conversion<Meters, Furlong> { static constexpr PrecisionType slope = 0.00497097; };
+   template<> struct Conversion<Furlong, Meters> { static constexpr PrecisionType slope = 1.0 / 0.00497097; };
+
+   template<> struct Conversion<Meters, Yards> { static constexpr PrecisionType slope = 1.09361; };
+   template<> struct Conversion<Yards, Meters> { static constexpr PrecisionType slope = 1.0 / 1.09361; };
+
+   template<> struct Conversion<Meters, US_Survey_Feet> { static constexpr PrecisionType slope = 3.28084; };
+   template<> struct Conversion<US_Survey_Feet, Meters> { static constexpr PrecisionType slope = 1.0 / 3.28084; };
+
+   ALL_SI_PREFIXES(Meters, LengthUnit);
 }
 
 #endif //STATIC_DIMENSION_LENGTH_H

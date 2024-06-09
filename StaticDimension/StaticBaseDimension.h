@@ -44,10 +44,16 @@ namespace StaticDimension
    ///    Note all types in NumTuple must derive from BaseUnit
    /// @tparam DenTuple A tuple of BaseUnits describing the dimension's denominator.
    ///    Note all types in DenTuple must derive from BaseUnit
-   template<typename NumTuple, typename DenTuple>
+   template<typename NumTupleT, typename DenTupleT>
    class BaseDimension
    {
    public:
+
+      // Expand any derived units to their fundamental constiuents
+      using Extractor = FundamentalUnitExtractor<NumTupleT, DenTupleT>;
+      using NumTuple = typename Extractor::Num;
+      using DenTuple = typename Extractor::Den;
+
       // Enforce units deriving from BaseUnit
       static_assert(is_unit_tuple<NumTuple>::value, "NumTuple contains a type not derived from BaseUnit");
       static_assert(is_unit_tuple<DenTuple>::value, "DenTuple contains a type not derived from BaseUnit");
@@ -215,14 +221,20 @@ namespace StaticDimension
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    auto operator/(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
    {
-      using simplified = UnitSimplifier<NumTuple1, DenTuple2, DenTuple1, NumTuple2>;
+      using Num1 = typename BaseDimension<NumTuple1, DenTuple1>::NumTuple;
+      using Num2 = typename BaseDimension<NumTuple2, DenTuple2>::NumTuple;
+
+      using Den1 = typename BaseDimension<NumTuple1, DenTuple1>::DenTuple;
+      using Den2 = typename BaseDimension<NumTuple2, DenTuple2>::DenTuple;
+
+      using simplified = UnitSimplifier<Num1, Den2, Den1, Num2>;
       PrecisionType newScalar = obj1.scalar / obj2.scalar;
 
       CancelUnits<typename simplified::numSimple, typename simplified::denSimple, typename simplified::newNum, typename simplified::newDen, simplified::isDelta>(newScalar);
 
       return typename simplified::dimType(newScalar);
    }
-  
+
    /// @brief Multiplication operator for two Dimensions
    /// @tparam NumTuple1 Tuple of numerator units of obj1
    /// @tparam DenTuple1 Tuple of denominator units of obj1
@@ -235,7 +247,13 @@ namespace StaticDimension
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    auto operator*(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
    {
-      using simplified = UnitSimplifier<NumTuple1, NumTuple2, DenTuple1, DenTuple2>;
+      using Num1 = typename BaseDimension<NumTuple1, DenTuple1>::NumTuple;
+      using Num2 = typename BaseDimension<NumTuple2, DenTuple2>::NumTuple;
+
+      using Den1 = typename BaseDimension<NumTuple1, DenTuple1>::DenTuple;
+      using Den2 = typename BaseDimension<NumTuple2, DenTuple2>::DenTuple;
+
+      using simplified = UnitSimplifier<Num1, Num2, Den1, Den2>;
       PrecisionType newScalar = obj1.scalar * obj2.scalar;
 
       CancelUnits<typename simplified::numSimple, typename simplified::denSimple, typename simplified::newNum, typename simplified::newDen, simplified::isDelta>(newScalar);
@@ -367,19 +385,49 @@ namespace StaticDimension
    }
 }
 
-// TODO: Implement SI conversions
-// Keep this attempt as a starting point
-
-/*
 // Macro for SI prefixes
+
+struct Pico {};
+struct Nano {};
+struct Micro {};
+struct Milli {};
+struct Centi {};
+struct Deci {};
+struct Deca {};
+struct Hecto {};
+struct Kilo {};
+struct Mega {};
+struct Giga {};
+struct Tera {};
+
+// SI prefix factors
+template <typename Prefix>
+struct SIFactor;
+
+#define DEFINE_SI_FACTOR(Prefix, Factor) \
+template <> struct SIFactor<Prefix> { \
+    static constexpr double value = Factor; \
+};
+
+// Define the conversion factors for SI prefixes
+DEFINE_SI_FACTOR(Pico, 1e-12)
+DEFINE_SI_FACTOR(Nano, 1e-9)
+DEFINE_SI_FACTOR(Micro, 1e-6)
+DEFINE_SI_FACTOR(Milli, 1e-3)
+DEFINE_SI_FACTOR(Centi, 1e-2)
+DEFINE_SI_FACTOR(Deci, 1e-1)
+DEFINE_SI_FACTOR(Deca, 1e1)
+DEFINE_SI_FACTOR(Hecto, 1e2)
+DEFINE_SI_FACTOR(Kilo, 1e3)
+DEFINE_SI_FACTOR(Mega, 1e6)
+DEFINE_SI_FACTOR(Giga, 1e9)
+DEFINE_SI_FACTOR(Tera, 1e12)
 
 // Macro definition to create a prefixed factory function
 #define SI_PREFIX(baseName, UnitType, Prefix) \
-   inline static UnitType& Prefix##baseName() { \
-      static std::string fullName = std::string(#Prefix) + #baseName; \
-      UnitType& unit UnitTypeFactory::GetInstance(fullName); \
-      return unit; \
-    }
+   struct Prefix##baseName : public UnitType<Prefix##baseName> { public: using UnitType::UnitType; }; \
+   template<> struct Conversion<baseName, Prefix##baseName> { static constexpr PrecisionType slope = 1.0 / SIFactor<Prefix>::value; }; \
+   template<> struct Conversion<Prefix##baseName, baseName> { static constexpr PrecisionType slope = SIFactor<Prefix>::value; };
 
 #define ALL_SI_PREFIXES(baseName, UnitType) \
 SI_PREFIX(baseName, UnitType, Pico); \
@@ -389,12 +437,12 @@ SI_PREFIX(baseName, UnitType, Milli); \
 SI_PREFIX(baseName, UnitType, Centi); \
 SI_PREFIX(baseName, UnitType, Deci); \
 SI_PREFIX(baseName, UnitType, Deca); \
-SI_PREFIX(baseName, UnitType, Hepta); \
+SI_PREFIX(baseName, UnitType, Hecto); \
 SI_PREFIX(baseName, UnitType, Kilo); \
 SI_PREFIX(baseName, UnitType, Mega); \
 SI_PREFIX(baseName, UnitType, Giga); \
 SI_PREFIX(baseName, UnitType, Tera);
 
-*/
+
 
 #endif // STATIC_DIMENSION_BASE_H
