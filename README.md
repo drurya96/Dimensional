@@ -37,7 +37,7 @@
 - **IMPORTANT**: Since `Dimensional` is a header-only library, it cannot be pre-compiled as a `STATIC` or `OBJECT` library.
   - Eventually a pre-compiled, "common-uses" version may be provided.
 - Eventually a find package will be added [issue #21](https://gitlab.com/drurya96/dimensional/-/issues/21)
-- TODO: Describe CMake flags
+- Setting the CMake STRING CACHE variable `DIMENSIONAL_PrecisionType` to `USE_DOUBLE`, `USE_FLOAT`, or `USE_LONG_DOUBLE` will store data as `float`, `double`, or `long double`, respectively.
 
 
 ## Usage
