@@ -51,7 +51,7 @@ TEST_F(UtilitiesTest, Test_GetConvertedValue)
    using toNum = tuple<Feet, Minutes>;
    using toDen = tuple<Inches, Ounces>;
 
-   double value = 10.0;
+   PrecisionType value = 10.0;
    
    // Convert only the numerator, to the same type. This is a no-op
    ConvertDimension<0, false, fromNum, fromNum, true>(value);
@@ -122,7 +122,7 @@ TEST_F(UtilitiesTest, Test_CancelUnits)
 
    using simplified1 = UnitSimplifier<NumTup1, tuple<>, tuple<>, DenTup1>;
 
-   double value = 1.0; // This is used to track the value. Consider adding another utility for this
+   PrecisionType value = 1.0; // This is used to track the value. Consider adding another utility for this
 
    CancelUnits<NumTup1, DenTup1, simplified1::newNum, simplified1::newDen, true>(value);
 
