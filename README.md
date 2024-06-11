@@ -97,7 +97,7 @@ When making a branch, please use the `<issue#>-<Custom Description>` syntax.
 If an issue does not exist for the feature being added, please add an issue first, and feel free to assign yourself.
 
 ## License
-This library is open-source, and is licensed under [the MIT license](https://gitlab.com/drurya96/dimensional/-/blob/main/LICENSE)
+This library is open-source, and is licensed under [the Apache License 2.0](https://gitlab.com/drurya96/dimensional/-/blob/main/LICENSE)
 
 ## Project status
 Active development.
