@@ -1,0 +1,56 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 27,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "base_configure",
+            "hidden": false,
+            "binaryDir": "${sourceDir}/build",
+            "generator": "Visual Studio 17 2022",
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "build_project",
+            "displayName": "Build the project",
+            "configurePreset": "base_configure",
+            "hidden": false
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "run_tests",
+            "displayName": "Run Unit Tests",
+            "configurePreset": "base_configure",
+            "hidden": false
+        }
+    ],
+    "workflowPresets": [
+        {
+            "name": "build_and_test",
+            "description": "Build and run tests",
+            "steps": [
+                {
+                    "name": "base_configure",
+                    "type": "configure"
+                },
+                {
+                    "name": "build_project",
+                    "type": "build"
+                },
+                {
+                    "name": "run_tests",
+                    "type": "test"
+                }
+            ]
+        }
+    ]
+}
