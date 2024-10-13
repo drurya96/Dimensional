@@ -25,7 +25,7 @@ namespace StaticDimension
 
       
       template<typename MassUnitRet, typename LengthUnitRet, typename TimeUnitRet1, typename TimeUnitRet2>
-      double GetForce()
+      double GetForce() const
       {
          return this->template GetVal<std::tuple<MassUnitRet, LengthUnitRet>, std::tuple<TimeUnitRet1, TimeUnitRet2>>();
       }

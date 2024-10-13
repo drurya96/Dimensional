@@ -45,7 +45,7 @@ namespace StaticDimension
       Mass(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
 
       template<typename T>
-      double GetMass()
+      double GetMass() const
       {
          return this->template GetVal<std::tuple<T>, std::tuple<>>();
       }

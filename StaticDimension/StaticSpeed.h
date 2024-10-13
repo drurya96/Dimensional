@@ -22,7 +22,7 @@ namespace StaticDimension
 
       
       template<typename LengthUnitRet, typename TimeUnitRet>
-      double GetSpeed()
+      double GetSpeed() const
       {
          return this->template GetVal<std::tuple<LengthUnitRet>, std::tuple<TimeUnitRet>>();
       }

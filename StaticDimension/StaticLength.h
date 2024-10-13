@@ -48,7 +48,7 @@ namespace StaticDimension
 
 
       template<typename T>
-      double GetLength()
+      double GetLength() const
       {
          return this->template GetVal<std::tuple<T>, std::tuple<>>();
       }

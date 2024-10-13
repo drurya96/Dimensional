@@ -39,7 +39,7 @@ namespace StaticDimension
       Time(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
 
       template<typename T>
-      double GetTime()
+      double GetTime() const
       {
          return this->template GetVal<std::tuple<T>, std::tuple<>>();
       }

@@ -23,7 +23,7 @@ namespace StaticDimension
 
       
       template<typename LengthUnit1, typename LengthUnit2, typename LengthUnit3>
-      double GetVolume()
+      double GetVolume() const
       {
          return this->template GetVal<std::tuple<LengthUnit1, LengthUnit2, LengthUnit3>, std::tuple<>>();
       }
