@@ -5,6 +5,11 @@ class TestPackageConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     generators = "cmake"
 
+    requires = [
+        "Dimensional/0.0.2@myuser/testing",
+        "gtest/1.12.1"
+    ]
+
     def configure(self):
         # Enforce C++20
         if self.settings.compiler.cppstd:
@@ -20,11 +25,11 @@ class TestPackageConan(ConanFile):
         if not tools.cross_building(self):
             # Look for the executable in the current directory, or the bin folder
             extension = ".exe" if self.settings.os == "Windows" else ""
-            bin_path = os.path.join("bin", f"test_package{extension}")
+            bin_path = os.path.join("bin", f"StaticDimension_UnitTests{extension}")
 
             # If the binary isn't in 'bin', check the root of the build folder
             if not os.path.isfile(bin_path):
-                bin_path = os.path.join(".", f"test_package{extension}")
+                bin_path = os.path.join(".", f"StaticDimension_UnitTests{extension}")
 
             # Check if we found the file
             if os.path.isfile(bin_path):

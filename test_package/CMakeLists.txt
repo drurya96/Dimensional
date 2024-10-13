@@ -15,11 +15,7 @@ if(NOT DEFINED DIMENSIONAL_PrecisionType)
     set(DIMENSIONAL_PrecisionType USE_DOUBLE CACHE STRING "Precision type")
 endif()
 
-# Add test_package executable
-add_executable(test_package test_package.cpp)
+include(../StaticDimension/UnitTest/UnitTests.cmake)
 
-# Pass precision type as a compile definition (i.e., -DUSE_DOUBLE)
-target_compile_definitions(test_package PRIVATE ${DIMENSIONAL_PrecisionType})
-
-# Link with Conan-provided libraries (this will just provide headers in your case)
-target_link_libraries(test_package ${CONAN_LIBS})
+target_link_libraries(StaticDimension_UnitTests PUBLIC ${CONAN_LIBS})
+target_compile_definitions(StaticDimension_UnitTests PRIVATE ${DIMENSIONAL_PrecisionType})

@@ -10,7 +10,9 @@ class DimensionalConan(ConanFile):
     no_copy_source = True
 
     def package(self):
-        self.copy("*.h", src="StaticDimension", dst="include", excludes=("ExampleExtensions/*", "UnitTest/*", "PhysicsProblemsExamples/*"))
+        self.copy("*.h", src="StaticDimension", dst="include", excludes=("ExampleExtensions/*", "UnitTest/*", "PhysicsProblemsExamples/*"))  
 
     def package_info(self):
         self.info.header_only()  # Indicate this is a header-only library
+        self.cpp_info.components["dimensional_component"].set_property("cmake_target_name", "Dimensional::Dimensional")
+    
