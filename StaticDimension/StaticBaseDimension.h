@@ -392,6 +392,9 @@ namespace StaticDimension
    {
       return PowImpl<exponent>(obj, obj);
    }
+
+
+   using Scalar = BaseDimension<std::tuple<>, std::tuple<>>;
 }
 
 // Macro for SI prefixes
