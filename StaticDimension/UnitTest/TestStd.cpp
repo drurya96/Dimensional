@@ -7,7 +7,6 @@
 #include <algorithm>
 
 using namespace StaticDimension;
-//using namespace std;
 
 
 TEST_F(StdTest, StdMinMaxClamp) {
@@ -29,4 +28,12 @@ TEST_F(StdTest, StdMinMaxClamp) {
    // Consider finding a way to make this work.
    //ASSERT_NEAR((std::clamp(mySpeed1, Speed<Feet, Seconds>(5.0), Speed<Meters, Seconds>(8.0)).GetSpeed<Meters, Seconds>()), 8.0, TOLERANCE);
 
+}
+
+TEST_F(StdTest, DimensionalAbs) {
+
+   using std::tuple;
+   
+   ASSERT_NEAR((abs(Speed<Meters, Seconds>(-10.0)).GetVal<tuple<Meters>, tuple<Seconds>>()), 10.0, TOLERANCE);
+   ASSERT_NEAR((abs(Speed<Meters, Seconds>(10.0)).GetVal<tuple<Meters>, tuple<Seconds>>()), 10.0, TOLERANCE);
 }

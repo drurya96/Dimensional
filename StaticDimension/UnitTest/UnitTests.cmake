@@ -16,6 +16,7 @@ set(TEST_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/TestCastOperators.cpp
     ${CMAKE_CURRENT_LIST_DIR}/TestNewDimension.cpp
     ${CMAKE_CURRENT_LIST_DIR}/TestStd.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/TestTrig.cpp
 )
 
 add_executable(StaticDimension_UnitTests ${TEST_SOURCES})

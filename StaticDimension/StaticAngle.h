@@ -53,6 +53,27 @@ namespace StaticDimension
    template<> struct Conversion<Radian, Degree> { static constexpr PrecisionType slope = 180 / std::numbers::pi; };
    template<> struct Conversion<Degree, Radian> { static constexpr PrecisionType slope = std::numbers::pi / 180; };
 
+   template<typename AngleUnit>
+   PrecisionType cos(Angle<AngleUnit> angle) { return std::cos(angle.GetAngle<Radian>()); }
+
+   template<typename AngleUnit>
+   PrecisionType sin(Angle<AngleUnit> angle) { return std::sin(angle.GetAngle<Radian>()); }
+
+   template<typename AngleUnit>
+   PrecisionType tan(Angle<AngleUnit> angle) { return std::tan(angle.GetAngle<Radian>()); }
+
+   inline Angle<Radian> acos(double ratio) { return Angle<Radian>(std::acos(ratio)); }
+
+   inline Angle<Radian> asin(double ratio) { return Angle<Radian>(std::asin(ratio)); }
+
+   inline Angle<Radian> atan(double ratio) { return Angle<Radian>(std::atan(ratio)); }
+
+   template<typename NumTuple, typename DenTuple>
+   Angle<Radian> atan2(const BaseDimension<NumTuple, DenTuple>& obj1, const BaseDimension<NumTuple, DenTuple>& obj2)
+   {
+      return Angle<Radian>(std::atan2(obj1.GetVal<NumTuple, DenTuple>() , obj2.GetVal<NumTuple, DenTuple>()));
+   }
+
 }
 
 #endif //STATIC_DIMENSION_ANGLE_H

@@ -4,6 +4,7 @@
 #include <tuple> // For std::tuple and related functions
 #include <type_traits> // For std::is_same
 #include <utility> // For std::make_index_sequence // @todo move this to Utilities
+#include <cmath> // For std::hypot // @todo move this to Utilities
 
 #include "StaticDimensionUtilities.h"
 
@@ -393,8 +394,21 @@ namespace StaticDimension
       return PowImpl<exponent>(obj, obj);
    }
 
-
    using Scalar = BaseDimension<std::tuple<>, std::tuple<>>;
+
+   template<typename NumTuple, typename DenTuple>
+   BaseDimension<NumTuple, DenTuple> hypot(const BaseDimension<NumTuple, DenTuple>& obj1, const BaseDimension<NumTuple, DenTuple>& obj2)
+   {
+      return BaseDimension<NumTuple, DenTuple>(std::hypot(obj1.GetVal<NumTuple, DenTuple>(), obj2.GetVal<NumTuple, DenTuple>()));
+   }
+
+   
+   template<typename NumTuple, typename DenTuple>
+   BaseDimension<NumTuple, DenTuple> abs(const BaseDimension<NumTuple, DenTuple>& obj1)
+   {
+      return BaseDimension<NumTuple, DenTuple>(std::abs(obj1.GetVal<NumTuple, DenTuple>()));
+   }
+
 }
 
 // Macro for SI prefixes
