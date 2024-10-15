@@ -73,7 +73,6 @@ namespace StaticDimension
    {
       return Angle<Radian>(std::atan2(obj1.GetVal<NumTuple, DenTuple>() , obj2.GetVal<NumTuple, DenTuple>()));
    }
-
 }
 
 #endif //STATIC_DIMENSION_ANGLE_H

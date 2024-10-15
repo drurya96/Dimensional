@@ -4,7 +4,7 @@
 #include <tuple> // For std::tuple and related functions
 #include <type_traits> // For std::is_same
 #include <utility> // For std::make_index_sequence // @todo move this to Utilities
-#include <cmath> // For std::hypot // @todo move this to Utilities
+#include <cmath> // For std::hypot, std::modf, std::fmod // @todo move this to Utilities
 
 #include "StaticDimensionUtilities.h"
 
@@ -402,11 +402,53 @@ namespace StaticDimension
       return BaseDimension<NumTuple, DenTuple>(std::hypot(obj1.GetVal<NumTuple, DenTuple>(), obj2.GetVal<NumTuple, DenTuple>()));
    }
 
-   
    template<typename NumTuple, typename DenTuple>
-   BaseDimension<NumTuple, DenTuple> abs(const BaseDimension<NumTuple, DenTuple>& obj1)
+   BaseDimension<NumTuple, DenTuple> abs(const BaseDimension<NumTuple, DenTuple>& obj)
    {
-      return BaseDimension<NumTuple, DenTuple>(std::abs(obj1.GetVal<NumTuple, DenTuple>()));
+      return BaseDimension<NumTuple, DenTuple>(std::abs(obj.GetVal<NumTuple, DenTuple>()));
+   }
+
+   template<typename NumTuple, typename DenTuple>
+   BaseDimension<NumTuple, DenTuple> floor(const BaseDimension<NumTuple, DenTuple>& obj)
+   {
+      return BaseDimension<NumTuple, DenTuple>(std::floor(obj.GetVal<NumTuple, DenTuple>()));
+   }
+
+   template<typename NumTuple, typename DenTuple>
+   BaseDimension<NumTuple, DenTuple> ceil(const BaseDimension<NumTuple, DenTuple>& obj)
+   {
+      return BaseDimension<NumTuple, DenTuple>(std::ceil(obj.GetVal<NumTuple, DenTuple>()));
+   }
+
+   template<typename NumTuple, typename DenTuple>
+   BaseDimension<NumTuple, DenTuple> round(const BaseDimension<NumTuple, DenTuple>& obj)
+   {
+      return BaseDimension<NumTuple, DenTuple>(std::round(obj.GetVal<NumTuple, DenTuple>()));
+   }
+
+   template<typename NumTuple, typename DenTuple>
+   BaseDimension<NumTuple, DenTuple> modf(const BaseDimension<NumTuple, DenTuple>& obj, BaseDimension<NumTuple, DenTuple>* intPart = nullptr)
+   {
+      double intPartDouble;
+      double fracPart = std::modf(obj.GetVal<NumTuple, DenTuple>(), &intPartDouble);
+
+      if (intPart) {
+         *intPart = BaseDimension<NumTuple, DenTuple>(intPartDouble);
+      }
+
+      return BaseDimension<NumTuple, DenTuple>(fracPart);
+   }
+
+   template<typename NumTuple, typename DenTuple>
+   BaseDimension<NumTuple, DenTuple> fmod(const BaseDimension<NumTuple, DenTuple>& dividend, 
+                                          const BaseDimension<NumTuple, DenTuple>& divisor)
+   {
+      if (divisor.GetVal<NumTuple, DenTuple>() == 0) {
+         throw std::invalid_argument("Divisor cannot be zero.");
+      }
+
+      // Calculate the fmod result using std::fmod
+      return BaseDimension<NumTuple, DenTuple>(std::fmod(dividend.GetVal<NumTuple, DenTuple>(), divisor.GetVal<NumTuple, DenTuple>()));
    }
 
 }
