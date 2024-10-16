@@ -50,3 +50,11 @@ TEST_F(CastOperatorTest, CastTime) {
    // Time notTime = testNotTime;
 }
 
+TEST_F(CastOperatorTest, CastScalar) {
+
+   BaseDimension<tuple<Seconds>, tuple<>> testTime(10.0);
+
+   BaseDimension<tuple<>, tuple<>> scalar = testTime / Time<Seconds>(5.0);
+
+   ASSERT_NEAR(scalar, 2.0, TOLERANCE);
+}

@@ -99,6 +99,15 @@ namespace StaticDimension
          return result;
       }
       
+      /// @brief Cast to double operator overload for Scalar types
+      /// @details Cast the dimension to a double if unitless (i.e. scalar type) 
+      template<typename T = NumTupleT, typename U = DenTupleT>
+      requires (std::tuple_size_v<T> == 0 && std::tuple_size_v<U> == 0)
+      operator double() const
+      {
+         return scalar;
+      }
+
       /// @brief += operator overload for another Dimension
       /// @tparam NumTuple2 Tuple of numerator types of object being added
       /// @tparam DenTuple2 Tuple of denominator types of object being added
