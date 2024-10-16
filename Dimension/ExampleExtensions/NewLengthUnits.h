@@ -1,9 +1,9 @@
 #ifndef LENGTH_EXTENSION_H
 #define LENGTH_EXTENSION_H
 
-#include "StaticLength.h"
+#include "LengthDimension.h"
 
-namespace StaticDimension
+namespace Dimension
 {
    class Foo : public LengthUnit<Foo> { public: using LengthUnit::LengthUnit; };
 

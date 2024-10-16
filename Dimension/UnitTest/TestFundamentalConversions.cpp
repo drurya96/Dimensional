@@ -1,10 +1,11 @@
 #include "TestFundamentalConversions.h"
 
-#include "StaticTime.h"
-#include "StaticLength.h"
-#include "StaticMass.h"
+#include "TimeDimension.h"
+#include "LengthDimension.h"
+#include "MassDimension.h"
+#include "AngleDimension.h"
 
-using namespace StaticDimension;
+using namespace Dimension;
 
 TEST_F(FundamentalConversions, TestTime) {
 
@@ -44,4 +45,11 @@ TEST_F(FundamentalConversions, TestMass) {
 
    ASSERT_NEAR(myMass.GetMass<KiloGrams>(), 1.0, TOLERANCE);
    ASSERT_NEAR(myMass.GetMass<MilliGrams>(), 1000000.0, TOLERANCE);
+}
+
+TEST_F(FundamentalConversions, TestAngle) {
+   Angle<Radian> myAngle{3.0};
+
+   ASSERT_NEAR(myAngle.GetAngle<Radian>(), 3.0, TOLERANCE);
+   ASSERT_NEAR(myAngle.GetAngle<Degree>(), 171.887, TOLERANCE);
 }

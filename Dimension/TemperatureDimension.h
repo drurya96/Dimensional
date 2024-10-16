@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_TEMPERATURE_H
 #define STATIC_DIMENSION_TEMPERATURE_H
 
-#include "StaticBaseDimension.h"
+#include "BaseDimension.h"
 
-namespace StaticDimension
+namespace Dimension
 {
    struct TemperatureType {};
    struct Celsius;
@@ -37,7 +37,7 @@ namespace StaticDimension
       Temperature(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
 
       template<typename T>
-      double GetTemperature()
+      double GetTemperature() const
       {
          return this->template GetVal<std::tuple<T>, std::tuple<>>();
       }

@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_TIME_H
 #define STATIC_DIMENSION_TIME_H
 
-#include "StaticBaseDimension.h"
+#include "BaseDimension.h"
 
-namespace StaticDimension
+namespace Dimension
 {
    struct TimeType {};
    struct Seconds;
@@ -39,7 +39,10 @@ namespace StaticDimension
       Time(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
 
       template<typename T>
-      double GetTime()
+      friend class Time;
+
+      template<typename T>
+      double GetTime() const
       {
          return this->template GetVal<std::tuple<T>, std::tuple<>>();
       }

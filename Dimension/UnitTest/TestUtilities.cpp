@@ -1,13 +1,13 @@
 #include "TestUtilities.h"
 
-#include "StaticBaseDimension.h"
-#include "StaticDimensionUtilities.h"
+#include "BaseDimension.h"
+#include "DimensionUtilities.h"
 
-#include "StaticTime.h"
-#include "StaticLength.h"
-#include "StaticMass.h"
+#include "TimeDimension.h"
+#include "LengthDimension.h"
+#include "MassDimension.h"
 
-using namespace StaticDimension;
+using namespace Dimension;
 using namespace std;
 
 TEST_F(UtilitiesTest, Test_tuple_cat_t)

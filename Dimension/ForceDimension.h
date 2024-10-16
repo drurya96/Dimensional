@@ -1,11 +1,11 @@
 #ifndef STATIC_DIMENSION_FORCE_H
 #define STATIC_DIMENSION_FORCE_H
 
-#include "StaticMass.h"
-#include "StaticLength.h"
-#include "StaticTime.h"
+#include "MassDimension.h"
+#include "LengthDimension.h"
+#include "TimeDimension.h"
 
-namespace StaticDimension
+namespace Dimension
 {
    template<typename MassUnit, typename LengthUnit, typename TimeUnit1, typename TimeUnit2>
    class Force : public BaseDimension<std::tuple<MassUnit, LengthUnit>, std::tuple<TimeUnit1, TimeUnit2>>
@@ -25,7 +25,7 @@ namespace StaticDimension
 
       
       template<typename MassUnitRet, typename LengthUnitRet, typename TimeUnitRet1, typename TimeUnitRet2>
-      double GetForce()
+      double GetForce() const
       {
          return this->template GetVal<std::tuple<MassUnitRet, LengthUnitRet>, std::tuple<TimeUnitRet1, TimeUnitRet2>>();
       }

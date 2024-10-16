@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_LENGTH_H
 #define STATIC_DIMENSION_LENGTH_H
 
-#include "StaticBaseDimension.h"
+#include "BaseDimension.h"
 
-namespace StaticDimension
+namespace Dimension
 {
    struct LengthType {};
    struct Meters;
@@ -48,7 +48,7 @@ namespace StaticDimension
 
 
       template<typename T>
-      double GetLength()
+      double GetLength() const
       {
          return this->template GetVal<std::tuple<T>, std::tuple<>>();
       }

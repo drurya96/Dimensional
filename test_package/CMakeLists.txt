@@ -15,7 +15,10 @@ if(NOT DEFINED DIMENSIONAL_PrecisionType)
     set(DIMENSIONAL_PrecisionType USE_DOUBLE CACHE STRING "Precision type")
 endif()
 
-include(../StaticDimension/UnitTest/UnitTests.cmake)
+include(../Dimension/UnitTest/UnitTests.cmake)
 
-target_link_libraries(StaticDimension_UnitTests PUBLIC ${CONAN_LIBS})
-target_compile_definitions(StaticDimension_UnitTests PRIVATE ${DIMENSIONAL_PrecisionType})
+message(STATUS "CONAN_LIBS contains: ${CONAN_LIBS}")
+
+#target_link_libraries(Dimension_UnitTests PUBLIC ${CONAN_LIBS})
+target_link_libraries(Dimension_UnitTests PUBLIC)
+target_compile_definitions(Dimension_UnitTests PRIVATE ${DIMENSIONAL_PrecisionType})

@@ -1,10 +1,10 @@
 #include "TestOperators.h"
 
-#include "StaticTime.h"
-#include "StaticLength.h"
-#include "StaticSpeed.h"
+#include "TimeDimension.h"
+#include "LengthDimension.h"
+#include "SpeedDimension.h"
 
-using namespace StaticDimension;
+using namespace Dimension;
 using namespace std;
 
 
@@ -156,7 +156,7 @@ TEST_F(OperatorsTest, DimensionExponent)
 
    BaseDimension<std::tuple<Meters, Meters, Meters>, std::tuple<Seconds, Seconds, Seconds>> test1 = speed * speed * speed;
 
-   auto test2 = StaticDimension::Pow<3>(speed);
+   auto test2 = Dimension::Pow<3>(speed);
 
    ASSERT_TRUE(test1 == test2);
 }

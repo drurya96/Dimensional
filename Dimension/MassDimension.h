@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_MASS_H
 #define STATIC_DIMENSION_MASS_H
 
-#include "StaticBaseDimension.h"
+#include "BaseDimension.h"
 
-namespace StaticDimension
+namespace Dimension
 {
 
    struct MassType {};
@@ -45,7 +45,7 @@ namespace StaticDimension
       Mass(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
 
       template<typename T>
-      double GetMass()
+      double GetMass() const
       {
          return this->template GetVal<std::tuple<T>, std::tuple<>>();
       }

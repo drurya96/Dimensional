@@ -1,10 +1,10 @@
 #ifndef STATIC_DIMENSION_SPEED_H
 #define STATIC_DIMENSION_SPEED_H
 
-#include "StaticLength.h"
-#include "StaticTime.h"
+#include "LengthDimension.h"
+#include "TimeDimension.h"
 
-namespace StaticDimension
+namespace Dimension
 {
    template<typename LengthUnit, typename TimeUnit>
    class Speed : public BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>
@@ -22,7 +22,7 @@ namespace StaticDimension
 
       
       template<typename LengthUnitRet, typename TimeUnitRet>
-      double GetSpeed()
+      double GetSpeed() const
       {
          return this->template GetVal<std::tuple<LengthUnitRet>, std::tuple<TimeUnitRet>>();
       }

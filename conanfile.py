@@ -4,13 +4,13 @@ import os
 class DimensionalConan(ConanFile):
     name = "Dimensional"
     version = "0.0.2"
-    exports_sources = "StaticDimension/*"
+    exports_sources = "Dimension/*"
     
     # Specify that it's a header-only library
     no_copy_source = True
 
     def package(self):
-        self.copy("*.h", src="StaticDimension", dst="include", excludes=("ExampleExtensions/*", "UnitTest/*", "PhysicsProblemsExamples/*"))  
+        self.copy("*.h", src="Dimension", dst="include", excludes=("ExampleExtensions/*", "UnitTest/*", "PhysicsProblemsExamples/*"))  
 
     def package_info(self):
         self.info.header_only()  # Indicate this is a header-only library
