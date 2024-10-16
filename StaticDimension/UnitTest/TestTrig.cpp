@@ -90,37 +90,28 @@ TEST_F(TrigTest, Atan2Test) {
 
 TEST_F(TrigTest, HypotTest) {
 
-   //auto ret = hypot(Length<Meters>(1.0), Length<Meters>(1.0));
-
-
-   //ASSERT_NEAR(StaticDimension::hypot(Length<Meters>(0.0), Length<Meters>(1.0)).GetAngle<Radian>(), 0.0, TOLERANCE);
-
-   using std::tuple;
-
-   // @todo Add a way to call the short-hand getters from the appropriate BaseDimension without casting
-
    // Simple cases
-   ASSERT_NEAR((hypot(Length<Meters>(3.0), Length<Meters>(4.0)).GetVal<tuple<Meters>, tuple<>>()), 5.0, TOLERANCE);
-   ASSERT_NEAR((hypot(Length<Meters>(5.0), Length<Meters>(12.0)).GetVal<tuple<Meters>, tuple<>>()), 13.0, TOLERANCE);
+   ASSERT_NEAR((hypot(Length<Meters>(3.0), Length<Meters>(4.0)).GetLength<Meters>()), 5.0, TOLERANCE);
+   ASSERT_NEAR((hypot(Length<Meters>(5.0), Length<Meters>(12.0)).GetLength<Meters>()), 13.0, TOLERANCE);
    
    // Test when one side is zero
-   ASSERT_NEAR((hypot(Length<Meters>(0.0), Length<Meters>(5.0)).GetVal<tuple<Meters>, tuple<>>()), 5.0, TOLERANCE);
-   ASSERT_NEAR((hypot(Length<Meters>(7.0), Length<Meters>(0.0)).GetVal<tuple<Meters>, tuple<>>()), 7.0, TOLERANCE);
+   ASSERT_NEAR((hypot(Length<Meters>(0.0), Length<Meters>(5.0)).GetLength<Meters>()), 5.0, TOLERANCE);
+   ASSERT_NEAR((hypot(Length<Meters>(7.0), Length<Meters>(0.0)).GetLength<Meters>()), 7.0, TOLERANCE);
 
    // Testing small floating-point values
-   ASSERT_NEAR((hypot(Length<Meters>(1e-10), Length<Meters>(1e-10)).GetVal<tuple<Meters>, tuple<>>()), std::sqrt(2) * 1e-10, TOLERANCE);
+   ASSERT_NEAR((hypot(Length<Meters>(1e-10), Length<Meters>(1e-10)).GetLength<Meters>()), std::sqrt(2) * 1e-10, TOLERANCE);
 
    // Testing larger values to verify stability
-   ASSERT_NEAR((hypot(Length<Meters>(1e10), Length<Meters>(1e10)).GetVal<tuple<Meters>, tuple<>>()), std::sqrt(2.0) * 1e10, TOLERANCE);
+   ASSERT_NEAR((hypot(Length<Meters>(1e10), Length<Meters>(1e10)).GetLength<Meters>()), std::sqrt(2.0) * 1e10, TOLERANCE);
 
    // Diagonal distance in a unit square (1-1 sqrt(2) triangle)
-   ASSERT_NEAR((hypot(Length<Meters>(1.0), Length<Meters>(1.0)).GetVal<tuple<Meters>, tuple<>>()), std::sqrt(2.0), TOLERANCE);
+   ASSERT_NEAR((hypot(Length<Meters>(1.0), Length<Meters>(1.0)).GetLength<Meters>()), std::sqrt(2.0), TOLERANCE);
 
    // Test negative values (hypot treats negative values as positive)
-   ASSERT_NEAR((hypot(Length<Meters>(-3.0), Length<Meters>(4.0)).GetVal<tuple<Meters>, tuple<>>()), 5.0, TOLERANCE);
-   ASSERT_NEAR((hypot(Length<Meters>(5.0), Length<Meters>(-12.0)).GetVal<tuple<Meters>, tuple<>>()), 13.0, TOLERANCE); 
+   ASSERT_NEAR((hypot(Length<Meters>(-3.0), Length<Meters>(4.0)).GetLength<Meters>()), 5.0, TOLERANCE);
+   ASSERT_NEAR((hypot(Length<Meters>(5.0), Length<Meters>(-12.0)).GetLength<Meters>()), 13.0, TOLERANCE); 
 
    // Test for very large differences in magnitude
-   ASSERT_NEAR((hypot(Length<Meters>(1e10), Length<Meters>(1.0)).GetVal<tuple<Meters>, tuple<>>()), 1e10, TOLERANCE);
+   ASSERT_NEAR((hypot(Length<Meters>(1e10), Length<Meters>(1.0)).GetLength<Meters>()), 1e10, TOLERANCE);
    
 }

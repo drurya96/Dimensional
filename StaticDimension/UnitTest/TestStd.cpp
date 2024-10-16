@@ -32,26 +32,21 @@ TEST_F(StdTest, StdMinMaxClamp) {
 }
 
 TEST_F(StdTest, DimensionalAbs) {
-
-   using std::tuple;
    
-   ASSERT_NEAR((abs(Speed<Meters, Seconds>(-10.0)).GetVal<tuple<Meters>, tuple<Seconds>>()), 10.0, TOLERANCE);
-   ASSERT_NEAR((abs(Speed<Meters, Seconds>(10.0)).GetVal<tuple<Meters>, tuple<Seconds>>()), 10.0, TOLERANCE);
+   ASSERT_NEAR((abs(Speed<Meters, Seconds>(-10.0)).GetSpeed<Meters, Seconds>()), 10.0, TOLERANCE);
+   ASSERT_NEAR((abs(Speed<Meters, Seconds>(10.0)).GetSpeed<Meters, Seconds>()), 10.0, TOLERANCE);
 }
 
 TEST_F(StdTest, DimensionalRound) {
-
-   using std::tuple;
    
-   ASSERT_NEAR((floor(Speed<Meters, Seconds>(1.5)).GetVal<tuple<Meters>, tuple<Seconds>>()), 1.0, TOLERANCE);
-   ASSERT_NEAR((ceil(Speed<Meters, Seconds>(1.5)).GetVal<tuple<Meters>, tuple<Seconds>>()), 2.0, TOLERANCE);
-   ASSERT_NEAR((round(Speed<Meters, Seconds>(1.3)).GetVal<tuple<Meters>, tuple<Seconds>>()), 1.0, TOLERANCE);
-   ASSERT_NEAR((round(Speed<Meters, Seconds>(1.8)).GetVal<tuple<Meters>, tuple<Seconds>>()), 2.0, TOLERANCE);
+   ASSERT_NEAR((floor(Speed<Meters, Seconds>(1.5)).GetSpeed<Meters, Seconds>()), 1.0, TOLERANCE);
+   ASSERT_NEAR((ceil(Speed<Meters, Seconds>(1.5)).GetSpeed<Meters, Seconds>()), 2.0, TOLERANCE);
+   ASSERT_NEAR((round(Speed<Meters, Seconds>(1.3)).GetSpeed<Meters, Seconds>()), 1.0, TOLERANCE);
+   ASSERT_NEAR((round(Speed<Meters, Seconds>(1.8)).GetSpeed<Meters, Seconds>()), 2.0, TOLERANCE);
 }
 
 TEST_F(StdTest, DimensionalModf) {
 
-   using std::tuple;
    Speed<Meters, Seconds> value;
    Speed<Meters, Seconds> decSpeed;
    Speed<Meters, Seconds> intSpeed;
@@ -68,9 +63,9 @@ TEST_F(StdTest, DimensionalModf) {
 }
 
 TEST_F(StdTest, DimensionalFmod) {
-   using std::tuple;
+
    using std::numbers::pi;
 
-   ASSERT_NEAR((fmod(Time<Minutes>(130), Time<Minutes>(60)).GetVal<tuple<Minutes>, tuple<>>()), 10.0, TOLERANCE);
-   ASSERT_NEAR((fmod(Angle<Radian>(3*pi), Angle<Radian>(2*pi)).GetVal<tuple<Radian>, tuple<>>()), pi, TOLERANCE);
+   ASSERT_NEAR((fmod(Time<Minutes>(130), Time<Minutes>(60)).GetTime<Minutes>()), 10.0, TOLERANCE);
+   ASSERT_NEAR((fmod(Angle<Radian>(3*pi), Angle<Radian>(2*pi)).GetAngle<Radian>()), pi, TOLERANCE);
 }
