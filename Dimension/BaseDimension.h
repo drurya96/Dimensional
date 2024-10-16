@@ -396,36 +396,63 @@ namespace Dimension
 
    using Scalar = BaseDimension<std::tuple<>, std::tuple<>>;
 
+   /// @brief Calculate hypotenuse from two sides of a right triangle
+   /// @tparam T Side type, must be a BaseDimension
+   /// @param obj1 Side of right triangle
+   /// @param obj2 Side of right triangle
+   /// @return Hypotenuse of right triangle
    template<typename T>
    T hypot(const T& obj1, const T& obj2)
    {
       return T(std::hypot(obj1.GetVal<typename T::NumTuple, typename T::DenTuple>(), obj2.GetVal<typename T::NumTuple, typename T::DenTuple>()));
    }
 
+   /// @brief Calculate absolute value of a dimension
+   /// @tparam T Dimension type
+   /// @param obj Dimension object
+   /// @return Absolute value of the dimension
+   /// @todo consider how this should work for units with offset != 0
    template<typename T>
    T abs(const T& obj)
    {
       return T(std::abs(obj.GetVal<typename T::NumTuple, typename T::DenTuple>()));
    }
 
+   /// @brief Round dimension down to nearest whole number
+   /// @tparam T Dimension type
+   /// @param obj Dimension object
+   /// @return Dimension object rounded down to nearest whole number
    template<typename T>
    T floor(const T& obj)
    {
       return T(std::floor(obj.GetVal<typename T::NumTuple, typename T::DenTuple>()));
    }
 
+   /// @brief Round dimension up to nearest whole number
+   /// @tparam T Dimension type
+   /// @param obj Dimension object
+   /// @return Dimension object rounded up to nearest whole number
    template<typename T>
    T ceil(const T& obj)
    {
       return T(std::ceil(obj.GetVal<typename T::NumTuple, typename T::DenTuple>()));
    }
 
+   /// @brief Round dimension to nearest whole number
+   /// @tparam T Dimension type
+   /// @param obj Dimension object
+   /// @return Dimension object rounded to nearest whole number
    template<typename T>
    T round(const T& obj)
    {
       return T(std::round(obj.GetVal<typename T::NumTuple, typename T::DenTuple>()));
    }
 
+   /// @brief Decompose dimension into integer and floating point type
+   /// @tparam T Dimension type
+   /// @param obj Dimension object to decompose
+   /// @param[out] intPart A pointer to a Dimension object which will store the integer part
+   /// @return The fractional component of the dimension
    template<typename T>
    T modf(const T& obj, T* intPart = nullptr)
    {
@@ -439,6 +466,11 @@ namespace Dimension
       return T(fracPart);
    }
 
+   /// @brief Floating point remainder division of dividend / divisor
+   /// @tparam T Dimension type
+   /// @param dividend Dimension object to be divided
+   /// @param divisor Dimension object to divide by
+   /// @return Dimension object of floating point remainder division (modulus)
    template<typename T>
    T fmod(const T& dividend, const T& divisor)
    {
