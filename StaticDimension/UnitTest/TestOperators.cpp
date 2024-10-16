@@ -30,7 +30,7 @@ TEST_F(OperatorsTest, Comparisons) {
    ASSERT_TRUE(mySpeed1 != mySpeed2);
    ASSERT_FALSE(mySpeed1 == mySpeed2);
    ASSERT_TRUE(mySpeed1 >= mySpeed2 && mySpeed1 >= mySpeed3);
-   ASSERT_TRUE(mySpeed2 <= mySpeed1 && mySpeed3 <= mySpeed1);
+   ASSERT_TRUE(mySpeed2 <= mySpeed1 && mySpeed3 <= mySpeed1); 
 }
 
 
