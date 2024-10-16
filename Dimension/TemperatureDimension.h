@@ -1,7 +1,7 @@
 #ifndef STATIC_DIMENSION_TEMPERATURE_H
 #define STATIC_DIMENSION_TEMPERATURE_H
 
-#include "StaticBaseDimension.h"
+#include "BaseDimension.h"
 
 namespace Dimension
 {

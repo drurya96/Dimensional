@@ -1,9 +1,9 @@
 #include "TestFundamentalConversions.h"
 
 #include "TimeDimension.h"
-#include "Length.h"
-#include "Mass.h"
-#include "Angle.h"
+#include "LengthDimension.h"
+#include "MassDimension.h"
+#include "AngleDimension.h"
 
 using namespace Dimension;
 

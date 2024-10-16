@@ -1,7 +1,7 @@
 #ifndef STATIC_DIMENSION_Volume_H
 #define STATIC_DIMENSION_Volume_H
 
-#include "Length.h"
+#include "LengthDimension.h"
 
 namespace Dimension
 {

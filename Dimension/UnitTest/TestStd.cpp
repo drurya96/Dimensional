@@ -1,9 +1,9 @@
 #include "TestStd.h"
 
 #include "TimeDimension.h"
-#include "Length.h"
-#include "Speed.h"
-#include "Angle.h"
+#include "LengthDimension.h"
+#include "SpeedDimension.h"
+#include "AngleDimension.h"
 
 #include <algorithm>
 

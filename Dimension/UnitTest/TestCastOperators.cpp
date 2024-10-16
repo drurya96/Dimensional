@@ -1,8 +1,8 @@
 #include "TestCastOperators.h"
 
 #include "TimeDimension.h"
-#include "Length.h"
-#include "Speed.h"
+#include "LengthDimension.h"
+#include "SpeedDimension.h"
 
 using namespace Dimension;
 using namespace std;

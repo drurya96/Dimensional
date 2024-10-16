@@ -1,7 +1,7 @@
 #include "TestNewDimension.h"
 
-#include "StaticBaseDimension.h"
-#include "Length.h"
+#include "BaseDimension.h"
+#include "LengthDimension.h"
 
 #include "NewLengthUnits.h"
 

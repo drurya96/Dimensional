@@ -1,11 +1,11 @@
 #include "TestUtilities.h"
 
-#include "StaticBaseDimension.h"
+#include "BaseDimension.h"
 #include "DimensionUtilities.h"
 
 #include "TimeDimension.h"
-#include "Length.h"
-#include "Mass.h"
+#include "LengthDimension.h"
+#include "MassDimension.h"
 
 using namespace Dimension;
 using namespace std;

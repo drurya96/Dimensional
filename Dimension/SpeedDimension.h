@@ -1,7 +1,7 @@
 #ifndef STATIC_DIMENSION_SPEED_H
 #define STATIC_DIMENSION_SPEED_H
 
-#include "Length.h"
+#include "LengthDimension.h"
 #include "TimeDimension.h"
 
 namespace Dimension

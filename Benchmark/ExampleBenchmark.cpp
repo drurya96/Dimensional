@@ -1,5 +1,5 @@
 #include <benchmark/benchmark.h>
-#include "Length.h"
+#include "LengthDimension.h"
 
 static void BM_Multiply_Static_Lengths(benchmark::State& state)
 {

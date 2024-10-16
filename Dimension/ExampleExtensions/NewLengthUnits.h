@@ -1,7 +1,7 @@
 #ifndef LENGTH_EXTENSION_H
 #define LENGTH_EXTENSION_H
 
-#include "Length.h"
+#include "LengthDimension.h"
 
 namespace Dimension
 {

@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_FORCE_H
 #define STATIC_DIMENSION_FORCE_H
 
-#include "Mass.h"
-#include "Length.h"
+#include "MassDimension.h"
+#include "LengthDimension.h"
 #include "TimeDimension.h"
 
 namespace Dimension

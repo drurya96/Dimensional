@@ -1,7 +1,7 @@
 #ifndef STATIC_DIMENSION_ANGLE_H
 #define STATIC_DIMENSION_ANGLE_H
 
-#include "StaticBaseDimension.h"
+#include "BaseDimension.h"
 #include <numbers>
 
 namespace Dimension
