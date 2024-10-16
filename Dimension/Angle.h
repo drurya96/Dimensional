@@ -4,7 +4,7 @@
 #include "StaticBaseDimension.h"
 #include <numbers>
 
-namespace StaticDimension
+namespace Dimension
 {
 
    struct AngleType {};

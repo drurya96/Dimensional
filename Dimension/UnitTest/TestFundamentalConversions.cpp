@@ -1,11 +1,11 @@
 #include "TestFundamentalConversions.h"
 
-#include "StaticTime.h"
-#include "StaticLength.h"
-#include "StaticMass.h"
-#include "StaticAngle.h"
+#include "TimeDimension.h"
+#include "Length.h"
+#include "Mass.h"
+#include "Angle.h"
 
-using namespace StaticDimension;
+using namespace Dimension;
 
 TEST_F(FundamentalConversions, TestTime) {
 

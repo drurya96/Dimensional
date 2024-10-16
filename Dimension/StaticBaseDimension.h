@@ -6,9 +6,9 @@
 #include <utility> // For std::make_index_sequence // @todo move this to Utilities
 #include <cmath> // For std::hypot, std::modf, std::fmod // @todo move this to Utilities
 
-#include "StaticDimensionUtilities.h"
+#include "DimensionUtilities.h"
 
-namespace StaticDimension
+namespace Dimension
 {
    /// @brief A base class representing a unit
    /// @details This abstract class represents a Unit,

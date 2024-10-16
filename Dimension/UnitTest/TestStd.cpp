@@ -1,13 +1,13 @@
 #include "TestStd.h"
 
-#include "StaticTime.h"
-#include "StaticLength.h"
-#include "StaticSpeed.h"
-#include "StaticAngle.h"
+#include "TimeDimension.h"
+#include "Length.h"
+#include "Speed.h"
+#include "Angle.h"
 
 #include <algorithm>
 
-using namespace StaticDimension;
+using namespace Dimension;
 
 
 TEST_F(StdTest, StdMinMaxClamp) {

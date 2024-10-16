@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.27)
 
-add_library(StaticDimension_LIB INTERFACE)
+add_library(Dimension_LIB INTERFACE)
 
-target_include_directories(StaticDimension_LIB INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(Dimension_LIB INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
-target_compile_definitions(StaticDimension_LIB INTERFACE ${DIMENSIONAL_PrecisionType})
+target_compile_definitions(Dimension_LIB INTERFACE ${DIMENSIONAL_PrecisionType})
 
 if(DIMENSIONAL_REQUIRE_CONVERSIONS)
-    target_compile_definitions(StaticDimension_LIB INTERFACE REQUIRE_CONVERSIONS)
+    target_compile_definitions(Dimension_LIB INTERFACE REQUIRE_CONVERSIONS)
 endif()
 
 if(Enable_Dimensional_Tests)

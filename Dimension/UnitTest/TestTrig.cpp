@@ -1,16 +1,16 @@
 #include "TestTrig.h"
 
-#include "StaticTime.h"
-#include "StaticLength.h"
-#include "StaticSpeed.h"
-#include "StaticAngle.h"
+#include "TimeDimension.h"
+#include "Length.h"
+#include "Speed.h"
+#include "Angle.h"
 
 #include <algorithm>
 
-using namespace StaticDimension;
-using StaticDimension::cos;
-using StaticDimension::sin;
-using StaticDimension::tan;
+using namespace Dimension;
+using Dimension::cos;
+using Dimension::sin;
+using Dimension::tan;
 using std::numbers::pi;
 
 // @todo Still need to verify angles outside range [0,2pi]
@@ -47,45 +47,45 @@ TEST_F(TrigTest, TanTest) {
 
 TEST_F(TrigTest, AcosTest) {
    
-   ASSERT_NEAR(StaticDimension::acos(1.0).GetAngle<Radian>(), 0.0, TOLERANCE);
-   ASSERT_NEAR(StaticDimension::acos(0.0).GetAngle<Radian>(), pi / 2.0, TOLERANCE);
-   ASSERT_NEAR(StaticDimension::acos(-1.0).GetAngle<Radian>(), pi, TOLERANCE);
+   ASSERT_NEAR(Dimension::acos(1.0).GetAngle<Radian>(), 0.0, TOLERANCE);
+   ASSERT_NEAR(Dimension::acos(0.0).GetAngle<Radian>(), pi / 2.0, TOLERANCE);
+   ASSERT_NEAR(Dimension::acos(-1.0).GetAngle<Radian>(), pi, TOLERANCE);
 
-   ASSERT_NEAR(StaticDimension::acos(std::sqrt(3.0) / 2.0).GetAngle<Radian>(), pi / 6.0, TOLERANCE);
-   ASSERT_NEAR(StaticDimension::acos(0.5).GetAngle<Radian>(), pi / 3.0, TOLERANCE);
+   ASSERT_NEAR(Dimension::acos(std::sqrt(3.0) / 2.0).GetAngle<Radian>(), pi / 6.0, TOLERANCE);
+   ASSERT_NEAR(Dimension::acos(0.5).GetAngle<Radian>(), pi / 3.0, TOLERANCE);
 }
 
 TEST_F(TrigTest, AsinTest) {
 
-   ASSERT_NEAR(StaticDimension::asin(0.0).GetAngle<Radian>(), 0.0, TOLERANCE);
-   ASSERT_NEAR(StaticDimension::asin(1.0).GetAngle<Radian>(), pi / 2.0, TOLERANCE);
-   ASSERT_NEAR(StaticDimension::asin(-1.0).GetAngle<Radian>(), -pi / 2.0, TOLERANCE);
+   ASSERT_NEAR(Dimension::asin(0.0).GetAngle<Radian>(), 0.0, TOLERANCE);
+   ASSERT_NEAR(Dimension::asin(1.0).GetAngle<Radian>(), pi / 2.0, TOLERANCE);
+   ASSERT_NEAR(Dimension::asin(-1.0).GetAngle<Radian>(), -pi / 2.0, TOLERANCE);
 
-   ASSERT_NEAR(StaticDimension::asin(0.5).GetAngle<Radian>(), pi / 6.0, TOLERANCE);
-   ASSERT_NEAR(StaticDimension::asin(std::sqrt(3.0) / 2.0).GetAngle<Radian>(), pi / 3.0, TOLERANCE);
+   ASSERT_NEAR(Dimension::asin(0.5).GetAngle<Radian>(), pi / 6.0, TOLERANCE);
+   ASSERT_NEAR(Dimension::asin(std::sqrt(3.0) / 2.0).GetAngle<Radian>(), pi / 3.0, TOLERANCE);
 }
 
 TEST_F(TrigTest, AtanTest) {
 
-   ASSERT_NEAR(StaticDimension::atan(0.0).GetAngle<Radian>(), 0.0, TOLERANCE);
-   ASSERT_NEAR(StaticDimension::atan(1.0).GetAngle<Radian>(), pi / 4.0, TOLERANCE);
-   ASSERT_NEAR(StaticDimension::atan(-1.0).GetAngle<Radian>(), -pi / 4.0, TOLERANCE);
+   ASSERT_NEAR(Dimension::atan(0.0).GetAngle<Radian>(), 0.0, TOLERANCE);
+   ASSERT_NEAR(Dimension::atan(1.0).GetAngle<Radian>(), pi / 4.0, TOLERANCE);
+   ASSERT_NEAR(Dimension::atan(-1.0).GetAngle<Radian>(), -pi / 4.0, TOLERANCE);
 
-   ASSERT_NEAR(StaticDimension::atan(std::sqrt(3.0)).GetAngle<Radian>(), pi / 3.0, TOLERANCE);
-   ASSERT_NEAR(StaticDimension::atan(1.0 / std::sqrt(3.0)).GetAngle<Radian>(), pi / 6.0, TOLERANCE);
+   ASSERT_NEAR(Dimension::atan(std::sqrt(3.0)).GetAngle<Radian>(), pi / 3.0, TOLERANCE);
+   ASSERT_NEAR(Dimension::atan(1.0 / std::sqrt(3.0)).GetAngle<Radian>(), pi / 6.0, TOLERANCE);
 }
 
 TEST_F(TrigTest, Atan2Test) {
 
-   ASSERT_NEAR(StaticDimension::atan2(Length<Meters>(0.0), Length<Meters>(1.0)).GetAngle<Radian>(), 0.0, TOLERANCE);
-   ASSERT_NEAR(StaticDimension::atan2(Length<Meters>(1.0), Length<Meters>(0.0)).GetAngle<Radian>(), pi / 2.0, TOLERANCE);
-   ASSERT_NEAR(StaticDimension::atan2(Length<Meters>(-1.0), Length<Meters>(0.0)).GetAngle<Radian>(), -pi / 2.0, TOLERANCE);
-   ASSERT_NEAR(StaticDimension::atan2(Length<Meters>(0.0), Length<Meters>(-1.0)).GetAngle<Radian>(), pi, TOLERANCE);
-   ASSERT_NEAR(StaticDimension::atan2(Length<Meters>(1.0), Length<Meters>(1.0)).GetAngle<Radian>(), pi / 4.0, TOLERANCE);
-   ASSERT_NEAR(StaticDimension::atan2(Length<Meters>(-1.0), Length<Meters>(-1.0)).GetAngle<Radian>(), -3.0 * pi / 4.0, TOLERANCE);
+   ASSERT_NEAR(Dimension::atan2(Length<Meters>(0.0), Length<Meters>(1.0)).GetAngle<Radian>(), 0.0, TOLERANCE);
+   ASSERT_NEAR(Dimension::atan2(Length<Meters>(1.0), Length<Meters>(0.0)).GetAngle<Radian>(), pi / 2.0, TOLERANCE);
+   ASSERT_NEAR(Dimension::atan2(Length<Meters>(-1.0), Length<Meters>(0.0)).GetAngle<Radian>(), -pi / 2.0, TOLERANCE);
+   ASSERT_NEAR(Dimension::atan2(Length<Meters>(0.0), Length<Meters>(-1.0)).GetAngle<Radian>(), pi, TOLERANCE);
+   ASSERT_NEAR(Dimension::atan2(Length<Meters>(1.0), Length<Meters>(1.0)).GetAngle<Radian>(), pi / 4.0, TOLERANCE);
+   ASSERT_NEAR(Dimension::atan2(Length<Meters>(-1.0), Length<Meters>(-1.0)).GetAngle<Radian>(), -3.0 * pi / 4.0, TOLERANCE);
 
    // Ensure resolution of BaseDimension to named dimensions work
-   ASSERT_NEAR(StaticDimension::atan2(Length<Meters>(0.0), BaseDimension<std::tuple<Meters>, std::tuple<>>(1.0)).GetAngle<Radian>(), 0.0, TOLERANCE);
+   ASSERT_NEAR(Dimension::atan2(Length<Meters>(0.0), BaseDimension<std::tuple<Meters>, std::tuple<>>(1.0)).GetAngle<Radian>(), 0.0, TOLERANCE);
 }
 
 TEST_F(TrigTest, HypotTest) {

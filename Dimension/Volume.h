@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_Volume_H
 #define STATIC_DIMENSION_Volume_H
 
-#include "StaticLength.h"
+#include "Length.h"
 
-namespace StaticDimension
+namespace Dimension
 {
    template<typename LengthUnit1, typename LengthUnit2, typename LengthUnit3>
    class Volume : public BaseDimension<std::tuple<LengthUnit1, LengthUnit2, LengthUnit3>, std::tuple<>>

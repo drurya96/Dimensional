@@ -9,7 +9,7 @@ add_executable(DimensionBenchmarkLib ${BENCHMARK_SOURCES})
 target_include_directories(DimensionBenchmarkLib PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 target_link_libraries(DimensionBenchmarkLib PUBLIC
-    StaticDimension_LIB
-    StaticDimension_Extensions
+    Dimension_LIB
+    Dimension_Extensions
     benchmark::benchmark
 )

@@ -3,7 +3,7 @@
 
 #include "StaticBaseDimension.h"
 
-namespace StaticDimension
+namespace Dimension
 {
    struct LengthType {};
    struct Meters;

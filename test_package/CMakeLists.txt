@@ -19,6 +19,6 @@ include(../Dimension/UnitTest/UnitTests.cmake)
 
 message(STATUS "CONAN_LIBS contains: ${CONAN_LIBS}")
 
-#target_link_libraries(StaticDimension_UnitTests PUBLIC ${CONAN_LIBS})
-target_link_libraries(StaticDimension_UnitTests PUBLIC)
-target_compile_definitions(StaticDimension_UnitTests PRIVATE ${DIMENSIONAL_PrecisionType})
+#target_link_libraries(Dimension_UnitTests PUBLIC ${CONAN_LIBS})
+target_link_libraries(Dimension_UnitTests PUBLIC)
+target_compile_definitions(Dimension_UnitTests PRIVATE ${DIMENSIONAL_PrecisionType})

@@ -19,12 +19,12 @@ set(TEST_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/TestTrig.cpp
 )
 
-add_executable(StaticDimension_UnitTests ${TEST_SOURCES})
+add_executable(Dimension_UnitTests ${TEST_SOURCES})
 
-target_include_directories(StaticDimension_UnitTests PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+target_include_directories(Dimension_UnitTests PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
-target_link_libraries(StaticDimension_UnitTests PUBLIC
-    StaticDimension_Extensions
+target_link_libraries(Dimension_UnitTests PUBLIC
+    Dimension_Extensions
     gtest
     gtest_main
 )

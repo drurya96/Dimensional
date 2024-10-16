@@ -1,11 +1,11 @@
 #ifndef STATIC_DIMENSION_FORCE_H
 #define STATIC_DIMENSION_FORCE_H
 
-#include "StaticMass.h"
-#include "StaticLength.h"
-#include "StaticTime.h"
+#include "Mass.h"
+#include "Length.h"
+#include "TimeDimension.h"
 
-namespace StaticDimension
+namespace Dimension
 {
    template<typename MassUnit, typename LengthUnit, typename TimeUnit1, typename TimeUnit2>
    class Force : public BaseDimension<std::tuple<MassUnit, LengthUnit>, std::tuple<TimeUnit1, TimeUnit2>>
