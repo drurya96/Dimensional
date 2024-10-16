@@ -15,7 +15,7 @@ if(NOT DEFINED DIMENSIONAL_PrecisionType)
     set(DIMENSIONAL_PrecisionType USE_DOUBLE CACHE STRING "Precision type")
 endif()
 
-include(../StaticDimension/UnitTest/UnitTests.cmake)
+include(../Dimension/UnitTest/UnitTests.cmake)
 
 message(STATUS "CONAN_LIBS contains: ${CONAN_LIBS}")
 
