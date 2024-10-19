@@ -28,3 +28,7 @@ target_link_libraries(Dimension_UnitTests PUBLIC
     gtest
     gtest_main
 )
+
+if (MSVC)
+    target_compile_options(Dimension_UnitTests PRIVATE /W4 /WX)
+endif()
