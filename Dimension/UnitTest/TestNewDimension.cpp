@@ -24,12 +24,14 @@ TEST_F(NewDimensionTest, NewDimension) {
    Length<BarSub<1>> length4{ 20.0 };
 
    auto result = length3 / length4;
+   ASSERT_NEAR((result.GetVal<tuple<BarSub<0>>, tuple<BarSub<1>>>()), 0.5, TOLERANCE);
 
    auto result2 = length1 / length2;
+   ASSERT_NEAR(double(result2), 1.592356, TOLERANCE);
 
    Length testL = length4;
-
    auto result3 = length3 / testL;
+   ASSERT_NEAR((result3.GetVal<tuple<BarSub<0>>, tuple<BarSub<1>>>()), 0.5, TOLERANCE);
 
    /// @todo This should move to its own test
    BaseDimension<std::tuple<grault>, std::tuple<>> OtherDimension{ 10.0 };

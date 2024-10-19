@@ -437,7 +437,7 @@ namespace Dimension
    /// @details recursive base-case
    template<bool inverse = false, int index = 0, typename RealTupType, typename IncomingTupType, bool isDelta = false>
    typename std::enable_if < index == std::tuple_size_v<IncomingTupType>, void>::type
-      CancelUnitsImpl(PrecisionType& value)
+      CancelUnitsImpl(PrecisionType&)
    {
       return;
    }
@@ -488,7 +488,7 @@ namespace Dimension
    /// @details Recursive base-case
    template <size_t I = 0, bool inverse = false, typename toTuple, typename fromTup, bool isDelta = false>
    typename std::enable_if<I == std::tuple_size_v<fromTup>, void>::type
-      ConvertDimension(PrecisionType& value)
+      ConvertDimension(PrecisionType&)
    {
       return;
    }

@@ -10,43 +10,51 @@ using namespace std;
 TEST_F(CastOperatorTest, CastSpeed) {
 
    BaseDimension<tuple<Meters>, tuple<Seconds>> testSpeed(10.0);
-   BaseDimension<tuple<Meters, Seconds>, tuple<>> testNotSpeed(10.0);
 
    Speed<Meters, Seconds> mySpeed1 = testSpeed;
    Speed mySpeed2 = testSpeed; // Uses template deduction guide
+   Speed<Feet, Minutes> mySpeed3 = testSpeed; // Cast to different unit
 
-   Speed<Feet, Minutes> differentSpeed = testSpeed;
-
+   ASSERT_NEAR((mySpeed1.GetSpeed<Meters, Seconds>()), 10.0, TOLERANCE);
+   ASSERT_NEAR((mySpeed2.GetSpeed<Meters, Seconds>()), 10.0, TOLERANCE);
+   ASSERT_NEAR((mySpeed3.GetSpeed<Meters, Seconds>()), 10.0, TOLERANCE);
 
    // TODO: I need to find a way to ensure the following DOES NOT compile
+   // BaseDimension<tuple<Meters, Seconds>, tuple<>> testNotSpeed(10.0);
    // Speed notSpeed = testNotSpeed;
 }
 
 TEST_F(CastOperatorTest, CastLength) {
 
    BaseDimension<tuple<Meters>, tuple<>> testLength(10.0);
-   BaseDimension<tuple<Seconds>, tuple<>> testNotLength(10.0);
 
    Length<Meters> myLength1 = testLength;
    Length myLength2 = testLength; // Uses template deduction guide
+   Length<Feet> myLength3 = testLength; // Cast to different unit
 
-   Length<Feet> differentLength = testLength;
+   ASSERT_NEAR(myLength1.GetLength<Meters>(), 10.0, TOLERANCE);
+   ASSERT_NEAR(myLength2.GetLength<Meters>(), 10.0, TOLERANCE);
+   ASSERT_NEAR(myLength3.GetLength<Meters>(), 10.0, TOLERANCE);
 
    // TODO: I need to find a way to ensure the following DOES NOT compile
+   // BaseDimension<tuple<Seconds>, tuple<>> testNotLength(10.0);
    // Length notLength = testNotLength;
 }
 
 TEST_F(CastOperatorTest, CastTime) {
 
    BaseDimension<tuple<Seconds>, tuple<>> testTime(10.0);
-   BaseDimension<tuple<Meters>, tuple<>> testNotTime(10.0);
 
    Time<Seconds> myTime1 = testTime;
    Time myTime2 = testTime; // Uses template deduction guide
+   Time<Minutes> myTime3 = testTime; // Cast to different unit
 
-   Time<Minutes> differentTime = testTime;
+   ASSERT_NEAR(myTime1.GetTime<Seconds>(), 10.0, TOLERANCE);
+   ASSERT_NEAR(myTime2.GetTime<Seconds>(), 10.0, TOLERANCE);
+   ASSERT_NEAR(myTime3.GetTime<Seconds>(), 10.0, TOLERANCE);
 
    // TODO: I need to find a way to ensure the following DOES NOT compile
+   // BaseDimension<tuple<Meters>, tuple<>> testNotTime(10.0);
    // Time notTime = testNotTime;
 }
 
