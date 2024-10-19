@@ -1,0 +1,80 @@
+# Define stages
+stages:
+  - build
+
+variables:
+  CONAN_USER_CHANNEL: "myuser/testing"
+
+# Global settings for Conan cache to avoid re-downloading dependencies
+cache:
+  key: conan-cache
+  paths:
+    - .conan/data
+
+# Build job template for Linux
+.build_template_linux: &build_template_linux
+  stage: build
+  tags: 
+    - saas-linux-small-amd64
+  artifacts:
+    paths:
+      - build/ 
+    expire_in: 1 week
+
+# Build job template for Windows
+.build_template_windows: &build_template_windows
+  stage: build
+  tags: 
+    - saas-windows-medium-amd64
+  cache:
+    key: windows-conan-python-cache
+    paths:
+      - C:\Python312  # Cache Python installation
+      - C:\ProgramData\chocolatey  # Cache Chocolatey installation
+      - C:\tools\cmake  # Cache CMake installation (default install path for CMake via Chocolatey)
+      - C:\Users\runneradmin\.conan  # Cache Conan configuration
+  before_script:
+    - if (!(Test-Path "C:\ProgramData\chocolatey\bin\choco.exe")) { Invoke-Expression (New-Object Net.WebClient).DownloadString('https://chocolatey.org/install.ps1') }
+    - if (!(Test-Path "C:\Python312")) { choco install python --version=3.12.0 --no-progress -y --allow-downgrade }
+    - if (!(Test-Path "C:\tools\cmake\bin\cmake.exe")) { choco install cmake --version=3.25.0 --no-progress -y --allow-downgrade }
+    - if (!(Test-Path "C:\Python312\Scripts\conan.exe")) { & C:\Python312\python.exe -m pip install conan==1.65.0 } 
+    - C:\Python312\Scripts\conan.exe profile new msvc_debug --detect
+    - C:\Python312\Scripts\conan.exe profile update settings.build_type=Debug msvc_debug
+    - C:\Python312\Scripts\conan.exe profile update settings.compiler="Visual Studio" msvc_debug  # Set MSVC in Conan profile
+    - C:\Python312\Scripts\conan.exe profile update settings.compiler.version=17 msvc_debug  # MSVC 2022
+    - C:\Python312\Scripts\conan.exe profile update settings.compiler.runtime=MD msvc_debug
+
+  artifacts:
+    paths:
+      - build/
+    expire_in: 1 week
+
+# GCC build job
+build:gcc:
+  <<: *build_template_linux
+  image: registry.gitlab.com/dimensionalanalysis/dimensional/linux-build-env:latest
+  variables:
+    CC: gcc
+    CXX: g++
+  script:
+    - conan create . ${CONAN_USER_CHANNEL} --build=missing --profile gcc_debug
+
+# Clang build job
+build:clang:
+  <<: *build_template_linux
+  image: registry.gitlab.com/dimensionalanalysis/dimensional/linux-build-env:latest
+  variables:
+    CC: clang
+    CXX: clang++
+  script:
+    - conan create . ${CONAN_USER_CHANNEL} --build=missing --profile clang_debug
+
+# MSVC build job
+build:msvc:
+  <<: *build_template_windows
+  variables:
+    COMPILER: "Visual Studio"
+    COMPILER_VERSION: "17"
+    CONAN_EXE: C:\Python312\Scripts\conan.exe
+  script:
+    - C:\Python312\Scripts\conan.exe create . ${CONAN_USER_CHANNEL} --build=missing --profile msvc_debug
