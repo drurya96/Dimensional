@@ -75,8 +75,6 @@ TEST_F(OperatorsTest, ScalarMultiplication)
 {
    Speed<Meters, Seconds> mySpeed(5.0);
 
-   auto t = mySpeed * 2;
-
    mySpeed = mySpeed * 2;
    
    ASSERT_NEAR((mySpeed.GetSpeed<Meters, Seconds>()), 10.0, TOLERANCE);

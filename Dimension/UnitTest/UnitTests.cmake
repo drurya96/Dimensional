@@ -31,4 +31,6 @@ target_link_libraries(Dimension_UnitTests PUBLIC
 
 if (MSVC)
     target_compile_options(Dimension_UnitTests PRIVATE /W4 /WX)
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(Dimension_UnitTests PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()

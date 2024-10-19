@@ -404,7 +404,7 @@ namespace Dimension
    template<typename T>
    T hypot(const T& obj1, const T& obj2)
    {
-      return T(std::hypot(obj1.GetVal<typename T::NumTuple, typename T::DenTuple>(), obj2.GetVal<typename T::NumTuple, typename T::DenTuple>()));
+      return T(std::hypot(obj1.template GetVal<typename T::NumTuple, typename T::DenTuple>(), obj2.template GetVal<typename T::NumTuple, typename T::DenTuple>()));
    }
 
    /// @brief Calculate absolute value of a dimension
@@ -415,7 +415,7 @@ namespace Dimension
    template<typename T>
    T abs(const T& obj)
    {
-      return T(std::abs(obj.GetVal<typename T::NumTuple, typename T::DenTuple>()));
+      return T(std::abs(obj.template GetVal<typename T::NumTuple, typename T::DenTuple>()));
    }
 
    /// @brief Round dimension down to nearest whole number
@@ -425,7 +425,7 @@ namespace Dimension
    template<typename T>
    T floor(const T& obj)
    {
-      return T(std::floor(obj.GetVal<typename T::NumTuple, typename T::DenTuple>()));
+      return T(std::floor(obj.template GetVal<typename T::NumTuple, typename T::DenTuple>()));
    }
 
    /// @brief Round dimension up to nearest whole number
@@ -435,7 +435,7 @@ namespace Dimension
    template<typename T>
    T ceil(const T& obj)
    {
-      return T(std::ceil(obj.GetVal<typename T::NumTuple, typename T::DenTuple>()));
+      return T(std::ceil(obj.template GetVal<typename T::NumTuple, typename T::DenTuple>()));
    }
 
    /// @brief Round dimension to nearest whole number
@@ -445,7 +445,7 @@ namespace Dimension
    template<typename T>
    T round(const T& obj)
    {
-      return T(std::round(obj.GetVal<typename T::NumTuple, typename T::DenTuple>()));
+      return T(std::round(obj.template GetVal<typename T::NumTuple, typename T::DenTuple>()));
    }
 
    /// @brief Decompose dimension into integer and floating point type
@@ -457,7 +457,7 @@ namespace Dimension
    T modf(const T& obj, T* intPart = nullptr)
    {
       double intPartDouble;
-      double fracPart = std::modf(obj.GetVal<typename T::NumTuple, typename T::DenTuple>(), &intPartDouble);
+      double fracPart = std::modf(obj.template GetVal<typename T::NumTuple, typename T::DenTuple>(), &intPartDouble);
 
       if (intPart) {
          *intPart = T(intPartDouble);
@@ -474,11 +474,11 @@ namespace Dimension
    template<typename T>
    T fmod(const T& dividend, const T& divisor)
    {
-      if (divisor.GetVal<typename T::NumTuple, typename T::DenTuple>() == 0) {
+      if (divisor.template GetVal<typename T::NumTuple, typename T::DenTuple>() == 0) {
          throw std::invalid_argument("Divisor cannot be zero.");
       }
 
-      return T(std::fmod(dividend.GetVal<typename T::NumTuple, typename T::DenTuple>(), divisor.GetVal<typename T::NumTuple, typename T::DenTuple>()));
+      return T(std::fmod(dividend.template GetVal<typename T::NumTuple, typename T::DenTuple>(), divisor.template GetVal<typename T::NumTuple, typename T::DenTuple>()));
    }
 
 }
