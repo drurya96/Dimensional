@@ -1,2 +1,5 @@
 build/
+builds/
 test_package/build/
+cache/
+.vscode/
