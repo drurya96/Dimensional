@@ -3,7 +3,7 @@ import os
 
 class DimensionalConan(ConanFile):
     name = "Dimensional"
-    version = "0.0.2"
+    version = "1.0.0"
     exports_sources = "Dimension/*"
     
     # Specify that it's a header-only library
