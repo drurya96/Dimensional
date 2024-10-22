@@ -49,6 +49,19 @@ namespace Dimension
       using DenTuple = std::tuple<Seconds, Seconds>;
    };
 
+   // Type trait for C++17 and older
+   template<typename T>
+   struct is_force : std::is_convertible<T, Force<Grams, Meters, Seconds, Seconds>> {};
+
+   template<typename T>
+   constexpr bool is_force_v = is_force<T>::value;
+
+   // Concept for C++20 and newer
+   #ifdef __cpp_concepts
+   template<typename T>
+   concept force_type = is_force_v<T>;
+   #endif
+
 }
 
 #endif //STATIC_DIMENSION_FORCE_H

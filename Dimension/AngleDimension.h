@@ -73,6 +73,19 @@ namespace Dimension
    {
       return Angle<Radian>(std::atan2(obj1.template GetVal<NumTuple, DenTuple>() , obj2.template GetVal<NumTuple, DenTuple>()));
    }
+
+   // Type trait for C++17 and older
+   template<typename T>
+   struct is_angle : std::is_convertible<T, Angle<Radian>> {};
+
+   template<typename T>
+   constexpr bool is_angle_v = is_angle<T>::value;
+
+   // Concept for C++20 and newer
+   #ifdef __cpp_concepts
+   template<typename T>
+   concept angle_type = is_angle_v<T>;
+   #endif
 }
 
 #endif //STATIC_DIMENSION_ANGLE_H

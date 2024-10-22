@@ -60,6 +60,19 @@ namespace Dimension
    template<> struct Conversion<Hours, Seconds> { static constexpr PrecisionType slope = 3600.0; };
 
    ALL_SI_PREFIXES(Seconds, TimeUnit);
+
+   // Type trait for C++17 and older
+   template<typename T>
+   struct is_time : std::is_convertible<T, Time<Seconds>> {};
+
+   template<typename T>
+   constexpr bool is_time_v = is_time<T>::value;
+
+   // Concept for C++20 and newer
+   #ifdef __cpp_concepts
+   template<typename T>
+   concept time_type = is_time_v<T>;
+   #endif
 }
 
 #endif //STATIC_DIMENSION_TIME_H

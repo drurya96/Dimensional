@@ -33,6 +33,19 @@ namespace Dimension
 
    template<typename LengthUnit, typename TimeUnit>
    Speed(BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>) -> Speed<LengthUnit, TimeUnit>;
+
+   // Type trait for C++17 and older
+   template<typename T>
+   struct is_speed : std::is_convertible<T, Speed<Meters, Seconds>> {};
+
+   template<typename T>
+   constexpr bool is_speed_v = is_speed<T>::value;
+
+   // Concept for C++20 and newer
+   #ifdef __cpp_concepts
+   template<typename T>
+   concept speed_type = is_speed_v<T>;
+   #endif
 }
 
 #endif //STATIC_DIMENSION_SPEED_H
