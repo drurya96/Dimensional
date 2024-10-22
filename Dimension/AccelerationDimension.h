@@ -34,6 +34,19 @@ namespace Dimension
 
    template<typename LengthUnit, typename TimeUnit1, typename TimeUnit2>
    Acceleration(BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit1, TimeUnit2>>) -> Acceleration<LengthUnit, TimeUnit1, TimeUnit2>;
+
+   // Type trait for C++17 and older
+   template<typename T>
+   struct is_acceleration : std::is_convertible<T, Acceleration<Meters, Seconds>> {};
+
+   template<typename T>
+   constexpr bool is_acceleration_v = is_acceleration<T>::value;
+
+   // Concept for C++20 and newer
+   #ifdef __cpp_concepts
+   template<typename T>
+   concept acceleration_type = is_acceleration_v<T>;
+   #endif
 }
 
 #endif //STATIC_DIMENSION_ACCELERATION_H

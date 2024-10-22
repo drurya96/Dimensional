@@ -58,6 +58,19 @@ namespace Dimension
       using DenTuple = std::tuple<>;
    };
 
+   // Type trait for C++17 and older
+   template<typename T>
+   struct is_volume : std::is_convertible<T, Volume<Meters, Meters, Meters>> {};
+
+   template<typename T>
+   constexpr bool is_volume_v = is_volume<T>::value;
+
+   // Concept for C++20 and newer
+   #ifdef __cpp_concepts
+   template<typename T>
+   concept volume_type = is_volume_v<T>;
+   #endif
+
 }
 
 #endif //STATIC_DIMENSION_Volume_H

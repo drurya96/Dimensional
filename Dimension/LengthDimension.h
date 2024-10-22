@@ -93,6 +93,19 @@ namespace Dimension
    template<> struct Conversion<US_Survey_Feet, Meters> { static constexpr PrecisionType slope = 1.0 / 3.28084; };
 
    ALL_SI_PREFIXES(Meters, LengthUnit);
+
+   // Type trait for C++17 and older
+   template<typename T>
+   struct is_length : std::is_convertible<T, Length<Meters>> {};
+
+   template<typename T>
+   constexpr bool is_length_v = is_length<T>::value;
+
+   // Concept for C++20 and newer
+   #ifdef __cpp_concepts
+   template<typename T>
+   concept length_type = is_length_v<T>;
+   #endif
 }
 
 #endif //STATIC_DIMENSION_LENGTH_H

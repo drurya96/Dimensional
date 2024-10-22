@@ -85,6 +85,19 @@ namespace Dimension
    template<> struct Conversion<Tonne, Grams> { static constexpr PrecisionType slope = (1.0 / 0.000001); };
 
    ALL_SI_PREFIXES(Grams, MassUnit);
+
+   // Type trait for C++17 and older
+   template<typename T>
+   struct is_mass : std::is_convertible<T, Mass<Grams>> {};
+
+   template<typename T>
+   constexpr bool is_mass_v = is_mass<T>::value;
+
+   // Concept for C++20 and newer
+   #ifdef __cpp_concepts
+   template<typename T>
+   concept mass_type = is_mass_v<T>;
+   #endif
 }
 
 #endif //STATIC_DIMENSION_MASS_H

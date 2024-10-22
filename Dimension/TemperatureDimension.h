@@ -73,6 +73,19 @@ namespace Dimension
       static constexpr PrecisionType offset = -273.15;
    };
 
+   // Type trait for C++17 and older
+   template<typename T>
+   struct is_temperature : std::is_convertible<T, Temperature<Celsius>> {};
+
+   template<typename T>
+   constexpr bool is_temperature_v = is_temperature<T>::value;
+
+   // Concept for C++20 and newer
+   #ifdef __cpp_concepts
+   template<typename T>
+   concept temperature_type = is_temperature_v<T>;
+   #endif
+
 }
 
 #endif //STATIC_DIMENSION_TEMPERATURE_H
