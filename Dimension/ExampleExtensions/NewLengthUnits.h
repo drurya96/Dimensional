@@ -11,6 +11,12 @@ namespace Dimension
 
    class Baz : public LengthUnit<Baz> { public: using LengthUnit::LengthUnit; };
 
+   class Fail : public LengthUnit<Fail> { public: using LengthUnit::LengthUnit; };
+
+
+   template<> struct Conversion<Feet, Fail> { static constexpr PrecisionType slope = 3.14; };
+   template<> struct Conversion<Fail, Feet> { static constexpr PrecisionType slope = (1.0 / 3.14); };
+
    template<> struct Conversion<Meters, Foo> { static constexpr PrecisionType slope = 3.14; };
    template<> struct Conversion<Foo, Meters> { static constexpr PrecisionType slope = (1.0 / 3.14); };
 
