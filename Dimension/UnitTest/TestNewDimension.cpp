@@ -27,7 +27,7 @@ TEST_F(NewDimensionTest, NewDimension) {
    ASSERT_NEAR((result.GetVal<tuple<BarSub<0>>, tuple<BarSub<1>>>()), 0.5, TOLERANCE);
 
    auto result2 = length1 / length2;
-   ASSERT_NEAR(double(result2), 1.592356, TOLERANCE);
+   ASSERT_NEAR(static_cast<double>(result2), 1.592356, TOLERANCE);
 
    Length testL = length4;
    auto result3 = length3 / testL;
@@ -39,5 +39,12 @@ TEST_F(NewDimensionTest, NewDimension) {
    auto divideGrault = OtherDimension / length1;
 
    ASSERT_TRUE((std::is_same_v<decltype(divideGrault), BaseDimension<std::tuple<Bar>, std::tuple<Baz>>>));
+
+
+
+
+   //Length<Fail> failVar{25.0};
+
+   //ASSERT_NEAR(failVar.GetLength<Meters>(), 25.0, TOLERANCE);
 
 }

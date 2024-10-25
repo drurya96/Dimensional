@@ -2,10 +2,20 @@
 #define STATIC_DIMENSION_ANGLE_H
 
 #include "BaseDimension.h"
+
+#ifdef __cpp_concepts
 #include <numbers>
+#endif
 
 namespace Dimension
 {
+
+   #ifdef __cpp_concepts
+   constexpr double pi = std::numbers::pi;
+   #else
+   constexpr double pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679821480865132823066470938446095505822317253594081284811174502841;
+   #endif
+
 
    struct AngleType {};
    struct Radian;
@@ -50,8 +60,8 @@ namespace Dimension
    template<typename AngleUnit>
    Angle(BaseDimension<std::tuple<AngleUnit>, std::tuple<>>) -> Angle<AngleUnit>;
 
-   template<> struct Conversion<Radian, Degree> { static constexpr PrecisionType slope = 180 / std::numbers::pi; };
-   template<> struct Conversion<Degree, Radian> { static constexpr PrecisionType slope = std::numbers::pi / 180; };
+   template<> struct Conversion<Radian, Degree> { static constexpr PrecisionType slope = 180 / pi; };
+   template<> struct Conversion<Degree, Radian> { static constexpr PrecisionType slope = pi / 180; };
 
    template<typename AngleUnit>
    PrecisionType cos(Angle<AngleUnit> angle) { return std::cos(angle.template GetAngle<Radian>()); }
@@ -86,6 +96,9 @@ namespace Dimension
    template<typename T>
    concept angle_type = is_angle_v<T>;
    #endif
+
+
+
 }
 
 #endif //STATIC_DIMENSION_ANGLE_H

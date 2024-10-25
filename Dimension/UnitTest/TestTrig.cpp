@@ -11,7 +11,7 @@ using namespace Dimension;
 using Dimension::cos;
 using Dimension::sin;
 using Dimension::tan;
-using std::numbers::pi;
+using Dimension::pi;
 
 // @todo Still need to verify angles outside range [0,2pi]
 
