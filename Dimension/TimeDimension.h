@@ -29,6 +29,13 @@ namespace Dimension
    {
    public:
       static_assert(std::is_same_v<typename Unit::Dim, typename Seconds::Dim>, "Unit provided does not derive from TimeUnit");
+
+
+      //static_assert(std::derived_from<Unit, BaseUnit>, "TimeUnit does not derive from BaseUnit.");
+      //static_assert(Has_Dim<Unit>, "TimeUnit does not satisfy the Has_Dim concept.");
+      //static_assert(Has_Primary<Unit>, "TimeUnit does not satisfy the Has_Primary concept.");
+
+
       using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
 
       Time() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}

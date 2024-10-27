@@ -3,7 +3,7 @@ import os
 
 class DimensionalConan(ConanFile):
     name = "Dimensional"
-    version = "1.0.1"
+    version = "2.0.0"
     exports_sources = "Dimension/*"
     
     # Specify that it's a header-only library
@@ -14,5 +14,5 @@ class DimensionalConan(ConanFile):
 
     def package_info(self):
         self.info.header_only()  # Indicate this is a header-only library
-        self.cpp_info.components["dimensional_component"].set_property("cmake_target_name", "Dimensional::Dimensional")
+        self.cpp_info.cxxflags = ["-DUSE_DOUBLE"]
     
