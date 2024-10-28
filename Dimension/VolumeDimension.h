@@ -35,13 +35,13 @@ namespace Dimension
    template<typename MassUnit, typename LengthUnit, typename TimeUnit1, typename TimeUnit2>
    Volume(BaseDimension<std::tuple<LengthUnit1, LengthUnit2, LengthUnit3>, std::tuple<>>) -> Volume<LengthUnit1, LengthUnit2, LengthUnit3>;
 
-   struct Liter : public DerivedUnit
+   struct Liter
    {
       using NumTuple = std::tuple<DeciMeters, DeciMeters, DeciMeters>;
       using DenTuple = std::tuple<>;
    };
 
-   struct MilliLiter : public DerivedUnit
+   struct MilliLiter
    {
       using NumTuple = std::tuple<CentiMeters, CentiMeters, CentiMeters>;
       using DenTuple = std::tuple<>;
@@ -52,7 +52,7 @@ namespace Dimension
    template<> struct Conversion<Meters, GallonLength> { static constexpr PrecisionType slope = (1.0 / 0.15562); };
    template<> struct Conversion<GallonLength, Meters> { static constexpr PrecisionType slope = 0.15562; };
 
-   struct Gallon : public DerivedUnit
+   struct Gallon
    {
       using NumTuple = std::tuple<GallonLength, GallonLength, GallonLength>;
       using DenTuple = std::tuple<>;

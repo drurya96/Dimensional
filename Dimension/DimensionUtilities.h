@@ -5,7 +5,10 @@
 #include <type_traits> // For std::is_same
 
 #include "Dimension_Meta/PrecisionType.h"
-#include "Dimension_Meta/TypeTraits.h"
+
+#include "Dimension_Meta/GenericTypeTraits.h"
+#include "Dimension_Meta/Concepts.h"
+#include "Dimension_Meta/Conversion.h"
 
 namespace Dimension
 {
@@ -13,16 +16,15 @@ namespace Dimension
    template<typename NumTuple, typename DenTuple>
    class BaseDimension;
 
-   //template<typename Unit>
+   template<typename Unit>
    struct BaseUnit;
-
 
    /// @brief Return the slope as a constexpr if one exists,
    ///    otherwise return 1.0
    template<typename T>
    constexpr PrecisionType GetSlope()
    {
-      if constexpr (has_slope<T>::value)
+      if constexpr (HasSlope<T>)
       {
          return T::slope;
       }
@@ -37,7 +39,8 @@ namespace Dimension
    template<typename T>
    constexpr PrecisionType GetOffset()
    {
-      if constexpr (has_offset<T>::value)
+      
+      if constexpr (HasOffset<T>)
       {
          return T::offset;
       }
@@ -122,7 +125,7 @@ namespace Dimension
       using currentType = std::tuple_element_t<index, IncomingTupType>;
       if constexpr (has_same_dim<currentType, RealTupType>::value)
       {
-         value = Convert<currentType, typename get_first_match<currentType, RealTupType>::type, isDelta, inverse>(value);
+         value = Convert<currentType, typename get_first_match<is_same_dim, currentType, RealTupType>::type, isDelta, inverse>(value);
          CancelUnitsImpl<inverse, index + 1, typename RemoveOneInstance<is_same_dim, currentType, RealTupType>::type, IncomingTupType, isDelta>(value);
       }
       else

@@ -5,7 +5,10 @@
 #include <cmath> // For std::hypot, std::modf, std::fmod // @todo move this to Utilities
 
 #include "DimensionUtilities.h"
+
 #include "Dimension_Meta/Concepts.h"
+#include "Dimension_Meta/UnitSimplifier.h"
+#include "Dimension_Meta/FundamentalUnitExtractor.h"
 
 #include "SI_Macro.h"
 
@@ -14,6 +17,7 @@ namespace Dimension
    /// @brief A base class representing a unit
    /// @details This abstract class represents a Unit,
    ///    such as Meters, Seconds, Grams, etc.
+   template<typename Unit>
    struct BaseUnit
    {
    public:
@@ -22,6 +26,9 @@ namespace Dimension
       ///    For now, some template metaprogramming relying on decltype
       ///    requires a default constructor.
       BaseUnit() = delete;
+
+      using NumTuple = std::tuple<Unit>;
+      using DenTuple = std::tuple<>;
 
       /// @brief Used to handle subscripting
       /// @details Units only cancel if this value is the same.
@@ -47,8 +54,6 @@ namespace Dimension
    /// @tparam DenTuple A tuple of BaseUnits describing the dimension's denominator.
    ///    Note all types in DenTuple must derive from BaseUnit
    template<typename NumTupleT, typename DenTupleT>
-   //template<UnitTuple NumTupleT, UnitTuple DenTupleT>
-   //requires IsUnitTuple<typename FundamentalUnitExtractor<NumTupleT, DenTupleT>::Num> && IsUnitTuple<typename FundamentalUnitExtractor<NumTupleT, DenTupleT>::Den>
    class BaseDimension
    {
    public:
@@ -59,9 +64,7 @@ namespace Dimension
       using DenTuple = typename Extractor::Den;
 
       // Enforce units deriving from BaseUnit
-      //static_assert(is_unit_tuple<NumTuple>::value, "NumTuple contains a type not derived from BaseUnit");
-      //static_assert(is_unit_tuple<DenTuple>::value, "DenTuple contains a type not derived from BaseUnit");
-
+      // @todo For now, though it is unclear why, requires cannot be used enforce these constraints. Reevaluate later.
       static_assert(IsUnitTuple<NumTuple>, "NumTuple contains a type not derived from BaseUnit or missing required properties.");
       static_assert(IsUnitTuple<DenTuple>, "DenTuple contains a type not derived from BaseUnit or missing required properties.");
 

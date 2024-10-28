@@ -9,10 +9,10 @@ namespace Dimension
    struct Celsius;
 
    template<typename Unit>
-   struct TemperatureUnit : public BaseUnit
+   struct TemperatureUnit : public BaseUnit<Unit>
    {
    public:
-      using BaseUnit::BaseUnit;
+      using BaseUnit<Unit>::BaseUnit;
 
       using Dim = TemperatureType;
       using Primary = Celsius;

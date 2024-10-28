@@ -9,10 +9,10 @@ namespace Dimension
    struct Seconds;
 
    template<typename Unit>
-   struct TimeUnit : public BaseUnit
+   struct TimeUnit : public BaseUnit<Unit>
    {
    public:
-      using BaseUnit::BaseUnit;
+      using BaseUnit<Unit>::BaseUnit;
 
       using Dim = TimeType;
       using Primary = Seconds;

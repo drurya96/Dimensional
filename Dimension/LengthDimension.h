@@ -9,10 +9,10 @@ namespace Dimension
    struct Meters;
 
    template<typename Unit>
-   struct LengthUnit : public BaseUnit
+   struct LengthUnit : public BaseUnit<Unit>
    { 
    public: 
-      using BaseUnit::BaseUnit;
+      using BaseUnit<Unit>::BaseUnit;
 
       using Dim = LengthType;
       using Primary = Meters;

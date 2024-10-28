@@ -37,13 +37,13 @@ namespace Dimension
    template<typename MassUnit, typename LengthUnit, typename TimeUnit1, typename TimeUnit2>
    Force(BaseDimension<std::tuple<MassUnit, LengthUnit>, std::tuple<TimeUnit1, TimeUnit2>>) -> Force<LengthUnit, TimeUnit1, TimeUnit2>;
 
-   struct Newton : public DerivedUnit
+   struct Newton
    {
       using NumTuple = std::tuple<KiloGrams, Meters>;
       using DenTuple = std::tuple<Seconds, Seconds>;
    };
 
-   struct PoundForce : public DerivedUnit
+   struct PoundForce
    {
       using NumTuple = std::tuple<PoundMass, Feet>;
       using DenTuple = std::tuple<Seconds, Seconds>;
