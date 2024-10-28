@@ -38,10 +38,10 @@ namespace Dimension
 
 
    template<int I = 0>
-   class BarSub : public Bar
+   class BarSub : public LengthUnit<BarSub<I>>
    {
    public:
-      using Bar::Bar;
+      using LengthUnit<BarSub<I>>::LengthUnit;
       static constexpr int ID = I;
    };
 
@@ -49,7 +49,7 @@ namespace Dimension
    template<int I> struct Conversion<BarSub<I>, Meters> { static constexpr PrecisionType slope = Conversion<Bar, Meters>::slope; };
 
    /// @todo Move this to a different example
-   struct grault : public DerivedUnit
+   struct grault
    {
       using NumTuple = std::tuple<Foo, Bar>;
       using DenTuple = std::tuple<Baz>;

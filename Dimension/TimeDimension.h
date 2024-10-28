@@ -9,10 +9,10 @@ namespace Dimension
    struct Seconds;
 
    template<typename Unit>
-   struct TimeUnit : public BaseUnit
+   struct TimeUnit : public BaseUnit<Unit>
    {
    public:
-      using BaseUnit::BaseUnit;
+      using BaseUnit<Unit>::BaseUnit;
 
       using Dim = TimeType;
       using Primary = Seconds;
@@ -29,6 +29,7 @@ namespace Dimension
    {
    public:
       static_assert(std::is_same_v<typename Unit::Dim, typename Seconds::Dim>, "Unit provided does not derive from TimeUnit");
+
       using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
 
       Time() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}

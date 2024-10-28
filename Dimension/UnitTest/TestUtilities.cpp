@@ -1,7 +1,6 @@
 #include "TestUtilities.h"
 
 #include "BaseDimension.h"
-#include "DimensionUtilities.h"
 
 #include "TimeDimension.h"
 #include "LengthDimension.h"
@@ -31,16 +30,18 @@ TEST_F(UtilitiesTest, Test_same_dim)
 
 TEST_F(UtilitiesTest, Test_remove_instance)
 {
-   ASSERT_TRUE((is_same_v<RemoveOneInstance<Meters, tuple<Meters>>::type, tuple<>>));
-   ASSERT_TRUE((is_same_v<RemoveOneInstance<Meters, tuple<Feet>>::type, tuple<>>));
+   
+   ASSERT_TRUE((is_same_v<RemoveOneInstance<is_same_dim, Meters, tuple<Meters>>::type, tuple<>>));
+   ASSERT_TRUE((is_same_v<RemoveOneInstance<is_same_dim, Meters, tuple<Feet>>::type, tuple<>>));
    // Attempting to remove Meters removes the first Length type, which is Feet in this case
-   ASSERT_TRUE((is_same_v<RemoveOneInstance<Meters, tuple<Feet, Seconds, Meters>>::type, tuple<Seconds, Meters>>));
+   ASSERT_TRUE((is_same_v<RemoveOneInstance<is_same_dim, Meters, tuple<Feet, Seconds, Meters>>::type, tuple<Seconds, Meters>>));
 
    // Nothing to remove...
-   ASSERT_TRUE((is_same_v<RemoveOneInstance<Meters, tuple<Seconds>>::type, tuple<Seconds>>));
+   ASSERT_TRUE((is_same_v<RemoveOneInstance<is_same_dim, Meters, tuple<Seconds>>::type, tuple<Seconds>>));
 
    // Remove from empty tuple... no-op
-   ASSERT_TRUE((is_same_v<RemoveOneInstance<Meters, tuple<>>::type, tuple<>>));
+   ASSERT_TRUE((is_same_v<RemoveOneInstance<is_same_dim, Meters, tuple<>>::type, tuple<>>));
+   
 }
 
 TEST_F(UtilitiesTest, Test_GetConvertedValue)
@@ -75,15 +76,15 @@ TEST_F(UtilitiesTest, Test_GetConvertedValue)
 
 TEST_F(UtilitiesTest, Test_tuple_diff_dim)
 {
-   ASSERT_TRUE((is_same_v<tuple_diff_dim<tuple<Meters>, tuple<Meters>>::type, tuple<>>));
-   ASSERT_TRUE((is_same_v<tuple_diff_dim<tuple<Meters>, tuple<Meters, Seconds>>::type, tuple<>>));
-   ASSERT_TRUE((is_same_v<tuple_diff_dim<tuple<Meters, Seconds>, tuple<Seconds, Meters>>::type, tuple<>>));
-   ASSERT_TRUE((is_same_v<tuple_diff_dim<tuple<Meters, Seconds>, tuple<Meters>>::type, tuple<Seconds>>));
-   ASSERT_TRUE((is_same_v<tuple_diff_dim<tuple<Meters, Seconds, Meters>, tuple<Seconds>>::type, tuple<Meters, Meters>>));
-   ASSERT_TRUE((is_same_v<tuple_diff_dim<tuple<>, tuple<Seconds>>::type, tuple<>>));
-   ASSERT_TRUE((is_same_v<tuple_diff_dim<tuple<>, tuple<>>::type, tuple<>>));
-   ASSERT_TRUE((is_same_v<tuple_diff_dim<tuple<Feet>, tuple<Meters>>::type, tuple<>>));
-   ASSERT_TRUE((is_same_v<tuple_diff_dim<tuple<Feet, Meters>, tuple<Meters>>::type, tuple<Meters>>));
+   ASSERT_TRUE((is_same_v<tuple_diff<has_same_dim, tuple<Meters>, tuple<Meters>>::type, tuple<>>));
+   ASSERT_TRUE((is_same_v<tuple_diff<has_same_dim, tuple<Meters>, tuple<Meters, Seconds>>::type, tuple<>>));
+   ASSERT_TRUE((is_same_v<tuple_diff<has_same_dim, tuple<Meters, Seconds>, tuple<Seconds, Meters>>::type, tuple<>>));
+   ASSERT_TRUE((is_same_v<tuple_diff<has_same_dim, tuple<Meters, Seconds>, tuple<Meters>>::type, tuple<Seconds>>));
+   ASSERT_TRUE((is_same_v<tuple_diff<has_same_dim, tuple<Meters, Seconds, Meters>, tuple<Seconds>>::type, tuple<Meters, Meters>>));
+   ASSERT_TRUE((is_same_v<tuple_diff<has_same_dim, tuple<>, tuple<Seconds>>::type, tuple<>>));
+   ASSERT_TRUE((is_same_v<tuple_diff<has_same_dim, tuple<>, tuple<>>::type, tuple<>>));
+   ASSERT_TRUE((is_same_v<tuple_diff<has_same_dim, tuple<Feet>, tuple<Meters>>::type, tuple<>>));
+   ASSERT_TRUE((is_same_v<tuple_diff<has_same_dim, tuple<Feet, Meters>, tuple<Meters>>::type, tuple<Meters>>));
 }
 
 TEST_F(UtilitiesTest, Test_UnitSimplifier)

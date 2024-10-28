@@ -10,10 +10,10 @@ namespace Dimension
    struct Grams;
 
    template<typename Unit>
-   struct MassUnit : public BaseUnit
+   struct MassUnit : public BaseUnit<Unit>
    { 
    public: 
-      using BaseUnit::BaseUnit;
+      using BaseUnit<Unit>::BaseUnit;
 
       using Dim = MassType;
       using Primary = Grams;

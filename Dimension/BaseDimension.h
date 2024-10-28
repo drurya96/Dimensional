@@ -2,17 +2,22 @@
 #define STATIC_DIMENSION_BASE_H
 
 #include <tuple> // For std::tuple and related functions
-#include <type_traits> // For std::is_same
-#include <utility> // For std::make_index_sequence // @todo move this to Utilities
 #include <cmath> // For std::hypot, std::modf, std::fmod // @todo move this to Utilities
 
-#include "DimensionUtilities.h"
+#include "Dimension_Impl/PrecisionType.h"
+#include "Dimension_Impl/UnitValidation.h"
+#include "Dimension_Impl/UnitSimplifier.h"
+#include "Dimension_Impl/FundamentalUnitExtractor.h"
+#include "Dimension_Impl/Conversion.h"
+
+#include "SI_Macro.h"
 
 namespace Dimension
 {
    /// @brief A base class representing a unit
    /// @details This abstract class represents a Unit,
    ///    such as Meters, Seconds, Grams, etc.
+   template<typename Unit>
    struct BaseUnit
    {
    public:
@@ -21,6 +26,9 @@ namespace Dimension
       ///    For now, some template metaprogramming relying on decltype
       ///    requires a default constructor.
       BaseUnit() = delete;
+
+      using NumTuple = std::tuple<Unit>;
+      using DenTuple = std::tuple<>;
 
       /// @brief Used to handle subscripting
       /// @details Units only cancel if this value is the same.
@@ -49,15 +57,18 @@ namespace Dimension
    class BaseDimension
    {
    public:
-
+      
       // Expand any derived units to their fundamental constiuents
       using Extractor = FundamentalUnitExtractor<NumTupleT, DenTupleT>;
       using NumTuple = typename Extractor::Num;
       using DenTuple = typename Extractor::Den;
 
       // Enforce units deriving from BaseUnit
-      static_assert(is_unit_tuple<NumTuple>::value, "NumTuple contains a type not derived from BaseUnit");
-      static_assert(is_unit_tuple<DenTuple>::value, "DenTuple contains a type not derived from BaseUnit");
+      // @todo For now, though it is unclear why, requires cannot be used enforce these constraints. Reevaluate later.
+      static_assert(IsUnitTuple<NumTuple>, "NumTuple contains a type not derived from BaseUnit or missing required properties.");
+      static_assert(IsUnitTuple<DenTuple>, "DenTuple contains a type not derived from BaseUnit or missing required properties.");
+
+
 
       /// @brief Default constructor
       BaseDimension() : 
@@ -100,16 +111,16 @@ namespace Dimension
          return result;
       }
       
+      
       /// @brief Cast to double operator overload for Scalar types
       /// @details Cast the dimension to a double if unitless (i.e. scalar type) 
-      //template<typename T = NumTupleT, typename U = DenTupleT>
-      //requires (std::tuple_size_v<T> == 0 && std::tuple_size_v<U> == 0)
-      template<typename T = NumTupleT, typename U = DenTupleT,
-         typename std::enable_if<std::tuple_size<T>::value == 0 && std::tuple_size<U>::value == 0, int>::type = 0>
+      template<typename T = NumTupleT, typename U = DenTupleT>
+      requires (std::tuple_size_v<T> == 0 && std::tuple_size_v<U> == 0)
       operator double() const
       {
          return scalar;
       }
+
 
       /// @brief += operator overload for another Dimension
       /// @tparam NumTuple2 Tuple of numerator types of object being added
@@ -484,65 +495,5 @@ namespace Dimension
    }
 
 }
-
-// Macro for SI prefixes
-
-struct Pico {};
-struct Nano {};
-struct Micro {};
-struct Milli {};
-struct Centi {};
-struct Deci {};
-struct Deca {};
-struct Hecto {};
-struct Kilo {};
-struct Mega {};
-struct Giga {};
-struct Tera {};
-
-// SI prefix factors
-template <typename Prefix>
-struct SIFactor;
-
-#define DEFINE_SI_FACTOR(Prefix, Factor) \
-template <> struct SIFactor<Prefix> { \
-    static constexpr double value = Factor; \
-};
-
-// Define the conversion factors for SI prefixes
-DEFINE_SI_FACTOR(Pico, 1e-12)
-DEFINE_SI_FACTOR(Nano, 1e-9)
-DEFINE_SI_FACTOR(Micro, 1e-6)
-DEFINE_SI_FACTOR(Milli, 1e-3)
-DEFINE_SI_FACTOR(Centi, 1e-2)
-DEFINE_SI_FACTOR(Deci, 1e-1)
-DEFINE_SI_FACTOR(Deca, 1e1)
-DEFINE_SI_FACTOR(Hecto, 1e2)
-DEFINE_SI_FACTOR(Kilo, 1e3)
-DEFINE_SI_FACTOR(Mega, 1e6)
-DEFINE_SI_FACTOR(Giga, 1e9)
-DEFINE_SI_FACTOR(Tera, 1e12)
-
-// Macro definition to create a prefixed factory function
-#define SI_PREFIX(baseName, UnitType, Prefix) \
-   struct Prefix##baseName : public UnitType<Prefix##baseName> { public: using UnitType::UnitType; }; \
-   template<> struct Conversion<baseName, Prefix##baseName> { static constexpr PrecisionType slope = 1.0 / SIFactor<Prefix>::value; }; \
-   template<> struct Conversion<Prefix##baseName, baseName> { static constexpr PrecisionType slope = SIFactor<Prefix>::value; };
-
-#define ALL_SI_PREFIXES(baseName, UnitType) \
-SI_PREFIX(baseName, UnitType, Pico); \
-SI_PREFIX(baseName, UnitType, Nano); \
-SI_PREFIX(baseName, UnitType, Micro); \
-SI_PREFIX(baseName, UnitType, Milli); \
-SI_PREFIX(baseName, UnitType, Centi); \
-SI_PREFIX(baseName, UnitType, Deci); \
-SI_PREFIX(baseName, UnitType, Deca); \
-SI_PREFIX(baseName, UnitType, Hecto); \
-SI_PREFIX(baseName, UnitType, Kilo); \
-SI_PREFIX(baseName, UnitType, Mega); \
-SI_PREFIX(baseName, UnitType, Giga); \
-SI_PREFIX(baseName, UnitType, Tera);
-
-
 
 #endif // STATIC_DIMENSION_BASE_H

@@ -21,10 +21,10 @@ namespace Dimension
    struct Radian;
 
    template<typename Unit>
-   struct AngleUnit : public BaseUnit
+   struct AngleUnit : public BaseUnit<Unit>
    { 
    public: 
-      using BaseUnit::BaseUnit;
+      using BaseUnit<Unit>::BaseUnit;
 
       using Dim = AngleType;
       using Primary = Radian;
