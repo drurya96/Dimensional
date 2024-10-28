@@ -1,7 +1,6 @@
 #include "TestUtilities.h"
 
 #include "BaseDimension.h"
-#include "DimensionUtilities.h"
 
 #include "TimeDimension.h"
 #include "LengthDimension.h"

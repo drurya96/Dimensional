@@ -82,6 +82,37 @@ namespace Dimension
    template<typename T>
    concept HasOffset = requires { T::offset; } && std::is_arithmetic_v<decltype(T::offset)>;
 
+   /// @brief Return the slope as a constexpr if one exists,
+   ///    otherwise return 1.0
+   template<typename T>
+   constexpr PrecisionType GetSlope()
+   {
+      if constexpr (HasSlope<T>)
+      {
+         return T::slope;
+      }
+      else
+      {
+         return 1.0;
+      }
+   }
+
+   /// @brief Return the offset as a constexpr if one exists,
+   ///    otherwise return 0.0
+   template<typename T>
+   constexpr PrecisionType GetOffset()
+   {
+      
+      if constexpr (HasOffset<T>)
+      {
+         return T::offset;
+      }
+      else
+      {
+         return 0.0;
+      }
+   }
+
 } // end Dimension
 
 #endif // DIMENSION_CONCEPTS_H
