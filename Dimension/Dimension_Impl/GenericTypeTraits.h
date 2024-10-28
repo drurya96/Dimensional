@@ -5,10 +5,38 @@
 #include <type_traits> // For std::is_same, std::remove_cv, std::disjunction, std::conditional
 #include <utility> // For std::declval
 
-#include "Concepts.h" // @todo This should not be a dependency, but it needs to be for Comparable. Consider further refactor
-
 namespace Dimension
 {
+
+   /// @brief A type-trait with void Dim and Primary, only used to satisfy a metaprogramming condition
+   struct NullUnit
+   {
+      using Dim = void;
+      using Primary = void;
+      static constexpr int ID = 0;
+   };
+
+   template<template<typename, typename> typename Compare>
+   concept Comparable = requires
+   {
+      { Compare<NullUnit, NullUnit>::value } -> std::convertible_to<bool>;
+   };
+
+   /// @brief Check if two units are of the same dimension
+   template<typename T, typename U>
+   struct is_same_dim;
+
+   /// @brief Check if two units are of the same dimension
+   /// @tparam T First unit to compare
+   /// @tparam U Second unit to compare
+   /// @typedef value const cool indicating whether the units are the same dimension
+   /// @todo When upgrading to C++20 use/replace with concept/require
+   template<typename T, typename U>
+   struct is_same_dim : std::integral_constant<
+      bool,
+      std::is_same<typename std::remove_cv<typename T::Dim>::type, typename std::remove_cv<typename U::Dim>::type>::value &&
+      (T::ID == U::ID)
+   > {};
 
    /// @brief Convenience alias for retrieving the type of a tuple of types
    /// @tparam Ts Parameter pack to types to concatenate

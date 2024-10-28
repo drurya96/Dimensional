@@ -5,6 +5,45 @@
 
 namespace Dimension
 {
+   /// Concept to check if T has a numeric slope attribute.
+   template<typename T>
+   concept HasSlope = requires { T::slope; } && std::is_arithmetic_v<decltype(T::slope)>;
+
+   /// Concept to check if T has a numeric offset attribute.
+   template<typename T>
+   concept HasOffset = requires { T::offset; } && std::is_arithmetic_v<decltype(T::offset)>;
+
+   /// @brief Return the slope as a constexpr if one exists,
+   ///    otherwise return 1.0
+   template<typename T>
+   constexpr PrecisionType GetSlope()
+   {
+      if constexpr (HasSlope<T>)
+      {
+         return T::slope;
+      }
+      else
+      {
+         return 1.0;
+      }
+   }
+
+   /// @brief Return the offset as a constexpr if one exists,
+   ///    otherwise return 0.0
+   template<typename T>
+   constexpr PrecisionType GetOffset()
+   {
+      
+      if constexpr (HasOffset<T>)
+      {
+         return T::offset;
+      }
+      else
+      {
+         return 0.0;
+      }
+   }
+
    /// @brief Conversion implementation
    /// @details base case when no conversion is defined, throws a compile-time error.
    template<typename fromUnit, typename toUnit, typename Enable = void>

@@ -4,12 +4,11 @@
 #include <tuple> // For std::tuple and related functions
 #include <cmath> // For std::hypot, std::modf, std::fmod // @todo move this to Utilities
 
-#include "Dimension_Meta/PrecisionType.h"
-#include "Dimension_Meta/Concepts.h"
-#include "Dimension_Meta/UnitSimplifier.h"
-#include "Dimension_Meta/FundamentalUnitExtractor.h"
-#include "Dimension_Meta/Conversion.h"
-#include "Dimension_Meta/CancelUnits.h"
+#include "Dimension_Impl/PrecisionType.h"
+#include "Dimension_Impl/UnitValidation.h"
+#include "Dimension_Impl/UnitSimplifier.h"
+#include "Dimension_Impl/FundamentalUnitExtractor.h"
+#include "Dimension_Impl/Conversion.h"
 
 #include "SI_Macro.h"
 
