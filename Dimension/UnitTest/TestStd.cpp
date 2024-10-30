@@ -67,5 +67,5 @@ TEST_F(StdTest, DimensionalFmod) {
    using Dimension::pi;
 
    ASSERT_NEAR((fmod(Time<Minutes>(130), Time<Minutes>(60)).GetTime<Minutes>()), 10.0, TOLERANCE);
-   ASSERT_NEAR((fmod(Angle<Radian>(3*pi), Angle<Radian>(2*pi)).GetAngle<Radian>()), pi, TOLERANCE);
+   ASSERT_NEAR((fmod(Angle<Radians>(3*pi), Angle<Radians>(2*pi)).GetAngle<Radians>()), pi, TOLERANCE);
 }

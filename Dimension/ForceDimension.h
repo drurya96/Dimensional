@@ -57,11 +57,8 @@ namespace Dimension
    constexpr bool is_force_v = is_force<T>::value;
 
    // Concept for C++20 and newer
-   #ifdef __cpp_concepts
    template<typename T>
    concept force_type = is_force_v<T>;
-   #endif
-
 }
 
 #endif //STATIC_DIMENSION_FORCE_H

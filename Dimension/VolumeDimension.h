@@ -66,11 +66,8 @@ namespace Dimension
    constexpr bool is_volume_v = is_volume<T>::value;
 
    // Concept for C++20 and newer
-   #ifdef __cpp_concepts
    template<typename T>
    concept volume_type = is_volume_v<T>;
-   #endif
-
 }
 
 #endif //STATIC_DIMENSION_Volume_H

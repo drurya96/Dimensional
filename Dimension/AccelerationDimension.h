@@ -43,10 +43,8 @@ namespace Dimension
    constexpr bool is_acceleration_v = is_acceleration<T>::value;
 
    // Concept for C++20 and newer
-   #ifdef __cpp_concepts
    template<typename T>
    concept acceleration_type = is_acceleration_v<T>;
-   #endif
 }
 
 #endif //STATIC_DIMENSION_ACCELERATION_H

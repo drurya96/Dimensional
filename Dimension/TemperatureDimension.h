@@ -81,11 +81,8 @@ namespace Dimension
    constexpr bool is_temperature_v = is_temperature<T>::value;
 
    // Concept for C++20 and newer
-   #ifdef __cpp_concepts
    template<typename T>
    concept temperature_type = is_temperature_v<T>;
-   #endif
-
 }
 
 #endif //STATIC_DIMENSION_TEMPERATURE_H
