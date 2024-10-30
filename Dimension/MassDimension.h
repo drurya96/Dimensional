@@ -94,10 +94,8 @@ namespace Dimension
    constexpr bool is_mass_v = is_mass<T>::value;
 
    // Concept for C++20 and newer
-   #ifdef __cpp_concepts
    template<typename T>
    concept mass_type = is_mass_v<T>;
-   #endif
 }
 
 #endif //STATIC_DIMENSION_MASS_H

@@ -48,8 +48,8 @@ TEST_F(FundamentalConversions, TestMass) {
 }
 
 TEST_F(FundamentalConversions, TestAngle) {
-   Angle<Radian> myAngle{3.0};
+   Angle<Radians> myAngle{3.0};
 
-   ASSERT_NEAR(myAngle.GetAngle<Radian>(), 3.0, TOLERANCE);
-   ASSERT_NEAR(myAngle.GetAngle<Degree>(), 171.887, TOLERANCE);
+   ASSERT_NEAR(myAngle.GetAngle<Radians>(), 3.0, TOLERANCE);
+   ASSERT_NEAR(myAngle.GetAngle<Degrees>(), 171.887, TOLERANCE);
 }

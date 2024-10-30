@@ -42,10 +42,8 @@ namespace Dimension
    constexpr bool is_speed_v = is_speed<T>::value;
 
    // Concept for C++20 and newer
-   #ifdef __cpp_concepts
    template<typename T>
    concept speed_type = is_speed_v<T>;
-   #endif
 }
 
 #endif //STATIC_DIMENSION_SPEED_H

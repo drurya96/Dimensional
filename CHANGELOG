@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file. Semantic ve
 ## [Unreleased]
 
 ### Changed
+- Renamed `Degree` to `Degrees` and `Radian` to `Radians`
 - Templated `BaseUnit` for CRTP
 - "Derived" dimensions (Newtons, Gallon, Liter, etc.) do not inherit from `DerivedUnit` in favor of CRTP in `BaseUnit`
 - Split `DimensionUtilities` into several files under the directory `Dimension_Impl`

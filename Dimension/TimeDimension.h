@@ -70,10 +70,8 @@ namespace Dimension
    constexpr bool is_time_v = is_time<T>::value;
 
    // Concept for C++20 and newer
-   #ifdef __cpp_concepts
    template<typename T>
    concept time_type = is_time_v<T>;
-   #endif
 }
 
 #endif //STATIC_DIMENSION_TIME_H

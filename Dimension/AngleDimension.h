@@ -2,23 +2,14 @@
 #define STATIC_DIMENSION_ANGLE_H
 
 #include "BaseDimension.h"
-
-#ifdef __cpp_concepts
 #include <numbers>
-#endif
 
 namespace Dimension
 {
-
-   #ifdef __cpp_concepts
    constexpr double pi = std::numbers::pi;
-   #else
-   constexpr double pi = 3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679821480865132823066470938446095505822317253594081284811174502841;
-   #endif
-
 
    struct AngleType {};
-   struct Radian;
+   struct Radians;
 
    template<typename Unit>
    struct AngleUnit : public BaseUnit<Unit>
@@ -27,17 +18,17 @@ namespace Dimension
       using BaseUnit<Unit>::BaseUnit;
 
       using Dim = AngleType;
-      using Primary = Radian;
+      using Primary = Radians;
    };
 
-   struct Radian : public AngleUnit<Radian> { public: using AngleUnit::AngleUnit; };
-   struct Degree : public AngleUnit<Degree> { public: using AngleUnit::AngleUnit; };
+   struct Radians : public AngleUnit<Radians> { public: using AngleUnit::AngleUnit; };
+   struct Degrees : public AngleUnit<Degrees> { public: using AngleUnit::AngleUnit; };
 
    template<typename Unit>
    class Angle : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
    public:
-      static_assert(std::is_same_v<typename Unit::Dim, typename Radian::Dim>, "Unit provided does not derive from AngleUnit");
+      static_assert(std::is_same_v<typename Unit::Dim, typename Radians::Dim>, "Unit provided does not derive from AngleUnit");
       using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
 
       Angle() : BaseDimension<std::tuple<Unit>, std::tuple<>>(0.0) {}
@@ -60,44 +51,40 @@ namespace Dimension
    template<typename AngleUnit>
    Angle(BaseDimension<std::tuple<AngleUnit>, std::tuple<>>) -> Angle<AngleUnit>;
 
-   template<> struct Conversion<Radian, Degree> { static constexpr PrecisionType slope = 180 / pi; };
-   template<> struct Conversion<Degree, Radian> { static constexpr PrecisionType slope = pi / 180; };
+   template<> struct Conversion<Radians, Degrees> { static constexpr PrecisionType slope = 180 / pi; };
+   template<> struct Conversion<Degrees, Radians> { static constexpr PrecisionType slope = pi / 180; };
 
    template<typename AngleUnit>
-   PrecisionType cos(Angle<AngleUnit> angle) { return std::cos(angle.template GetAngle<Radian>()); }
+   PrecisionType cos(Angle<AngleUnit> angle) { return std::cos(angle.template GetAngle<Radians>()); }
 
    template<typename AngleUnit>
-   PrecisionType sin(Angle<AngleUnit> angle) { return std::sin(angle.template GetAngle<Radian>()); }
+   PrecisionType sin(Angle<AngleUnit> angle) { return std::sin(angle.template GetAngle<Radians>()); }
 
    template<typename AngleUnit>
-   PrecisionType tan(Angle<AngleUnit> angle) { return std::tan(angle.template GetAngle<Radian>()); }
+   PrecisionType tan(Angle<AngleUnit> angle) { return std::tan(angle.template GetAngle<Radians>()); }
 
-   inline Angle<Radian> acos(double ratio) { return Angle<Radian>(std::acos(ratio)); }
+   inline Angle<Radians> acos(double ratio) { return Angle<Radians>(std::acos(ratio)); }
 
-   inline Angle<Radian> asin(double ratio) { return Angle<Radian>(std::asin(ratio)); }
+   inline Angle<Radians> asin(double ratio) { return Angle<Radians>(std::asin(ratio)); }
 
-   inline Angle<Radian> atan(double ratio) { return Angle<Radian>(std::atan(ratio)); }
+   inline Angle<Radians> atan(double ratio) { return Angle<Radians>(std::atan(ratio)); }
 
    template<typename NumTuple, typename DenTuple>
-   Angle<Radian> atan2(const BaseDimension<NumTuple, DenTuple>& obj1, const BaseDimension<NumTuple, DenTuple>& obj2)
+   Angle<Radians> atan2(const BaseDimension<NumTuple, DenTuple>& obj1, const BaseDimension<NumTuple, DenTuple>& obj2)
    {
-      return Angle<Radian>(std::atan2(obj1.template GetVal<NumTuple, DenTuple>() , obj2.template GetVal<NumTuple, DenTuple>()));
+      return Angle<Radians>(std::atan2(obj1.template GetVal<NumTuple, DenTuple>() , obj2.template GetVal<NumTuple, DenTuple>()));
    }
 
    // Type trait for C++17 and older
    template<typename T>
-   struct is_angle : std::is_convertible<T, Angle<Radian>> {};
+   struct is_angle : std::is_convertible<T, Angle<Radians>> {};
 
    template<typename T>
    constexpr bool is_angle_v = is_angle<T>::value;
 
    // Concept for C++20 and newer
-   #ifdef __cpp_concepts
    template<typename T>
    concept angle_type = is_angle_v<T>;
-   #endif
-
-
 
 }
 
