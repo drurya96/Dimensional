@@ -8,6 +8,9 @@ namespace Dimension
    struct TemperatureType {};
    struct Celsius;
 
+   template<typename TemperatureUnit>
+   concept IsTemperatureUnit = std::is_same_v<typename TemperatureUnit::Dim, TemperatureType>;
+
    template<typename Unit>
    struct TemperatureUnit : public BaseUnit<Unit>
    {
@@ -22,31 +25,30 @@ namespace Dimension
    struct Fahrenheit : public TemperatureUnit<Fahrenheit> { public: using TemperatureUnit::TemperatureUnit; };
    struct Kelvin : public TemperatureUnit<Kelvin> { public: using TemperatureUnit::TemperatureUnit; };
 
-   template<typename Unit>
+   template<IsTemperatureUnit Unit>
    class Temperature : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
    public:
-      static_assert(std::is_same_v<typename Unit::Dim, typename Celsius::Dim>, "Unit provided does not derive from TemperatureUnit");
       using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
 
       Temperature() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}
 
       Temperature(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
 
-      template<typename T>
+      template<IsTemperatureUnit T>
       Temperature(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
 
-      template<typename T>
+      template<IsTemperatureUnit T>
       double GetTemperature() const
       {
          return this->template GetVal<std::tuple<T>, std::tuple<>>();
       }
    };
 
-   template<typename T>
+   template<IsTemperatureUnit T>
    Temperature(T) -> Temperature<T>;
 
-   template<typename TemperatureUnit>
+   template<IsTemperatureUnit TemperatureUnit>
    Temperature(BaseDimension<std::tuple<TemperatureUnit>, std::tuple<>>) -> Temperature<TemperatureUnit>;
 
    template<> struct Conversion<Celsius, Fahrenheit>
@@ -73,16 +75,15 @@ namespace Dimension
       static constexpr PrecisionType offset = -273.15;
    };
 
-   // Type trait for C++17 and older
    template<typename T>
    struct is_temperature : std::is_convertible<T, Temperature<Celsius>> {};
 
    template<typename T>
    constexpr bool is_temperature_v = is_temperature<T>::value;
 
-   // Concept for C++20 and newer
    template<typename T>
    concept temperature_type = is_temperature_v<T>;
+
 }
 
 #endif //STATIC_DIMENSION_TEMPERATURE_H

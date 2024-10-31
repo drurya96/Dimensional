@@ -5,14 +5,18 @@
 
 namespace Dimension
 {
+
    template<typename LengthUnit1, typename LengthUnit2, typename LengthUnit3>
+   concept IsVolumeUnits = 
+      std::is_same_v<typename LengthUnit1::Dim, LengthType> &&
+      std::is_same_v<typename LengthUnit2::Dim, LengthType> &&
+      std::is_same_v<typename LengthUnit3::Dim, LengthType>;
+
+   template<typename LengthUnit1, typename LengthUnit2, typename LengthUnit3>
+   requires IsVolumeUnits<LengthUnit1, LengthUnit2, LengthUnit3>
    class Volume : public BaseDimension<std::tuple<LengthUnit1, LengthUnit2, LengthUnit3>, std::tuple<>>
    {
    public:
-      static_assert(std::is_same_v<typename MassUnit::Dim, typename Grams::Dim>, "Unit provided does not derive from MassUnit");
-      static_assert(std::is_same_v<typename LengthUnit::Dim, typename Meters::Dim>, "Unit provided does not derive from LengthUnit");
-      static_assert(std::is_same_v<typename TimeUnit1::Dim, typename Seconds::Dim>, "Unit provided does not derive from TimeUnit");
-      static_assert(std::is_same_v<typename TimeUnit2::Dim, typename Seconds::Dim>, "Unit provided does not derive from TimeUnit");
       using BaseDimension<std::tuple<LengthUnit1, LengthUnit2, LengthUnit3>, std::tuple<>>::BaseDimension;
 
       Volume(double val) : BaseDimension<std::tuple<LengthUnit1, LengthUnit2, LengthUnit3>, std::tuple<>>(val){}
@@ -58,16 +62,15 @@ namespace Dimension
       using DenTuple = std::tuple<>;
    };
 
-   // Type trait for C++17 and older
    template<typename T>
    struct is_volume : std::is_convertible<T, Volume<Meters, Meters, Meters>> {};
 
    template<typename T>
    constexpr bool is_volume_v = is_volume<T>::value;
 
-   // Concept for C++20 and newer
    template<typename T>
    concept volume_type = is_volume_v<T>;
+
 }
 
 #endif //STATIC_DIMENSION_Volume_H

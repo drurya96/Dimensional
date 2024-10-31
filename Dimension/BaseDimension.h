@@ -54,6 +54,7 @@ namespace Dimension
    /// @tparam DenTuple A tuple of BaseUnits describing the dimension's denominator.
    ///    Note all types in DenTuple must derive from BaseUnit
    template<typename NumTupleT, typename DenTupleT>
+   requires IsUnitTuplePair<NumTupleT, DenTupleT>
    class BaseDimension
    {
    public:
@@ -62,13 +63,6 @@ namespace Dimension
       using Extractor = FundamentalUnitExtractor<NumTupleT, DenTupleT>;
       using NumTuple = typename Extractor::Num;
       using DenTuple = typename Extractor::Den;
-
-      // Enforce units deriving from BaseUnit
-      // @todo For now, though it is unclear why, requires cannot be used enforce these constraints. Reevaluate later.
-      static_assert(IsUnitTuple<NumTuple>, "NumTuple contains a type not derived from BaseUnit or missing required properties.");
-      static_assert(IsUnitTuple<DenTuple>, "DenTuple contains a type not derived from BaseUnit or missing required properties.");
-
-
 
       /// @brief Default constructor
       BaseDimension() : 
@@ -235,6 +229,7 @@ namespace Dimension
       // Making all BaseDimensions friends of one-another for access to scalars and
       //    unit list information during construction of new objects
       template<typename NumTupleOther, typename DenTupleOther>
+      requires IsUnitTuplePair<NumTupleOther, DenTupleOther>
       friend class BaseDimension;
    };
 

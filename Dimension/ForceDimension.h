@@ -7,14 +7,19 @@
 
 namespace Dimension
 {
+
    template<typename MassUnit, typename LengthUnit, typename TimeUnit1, typename TimeUnit2>
+   concept IsForceUnits = 
+    std::is_same_v<typename MassUnit::Dim,   MassType> &&
+    std::is_same_v<typename LengthUnit::Dim, LengthType> &&
+    std::is_same_v<typename TimeUnit1::Dim,  TimeType> &&
+    std::is_same_v<typename TimeUnit2::Dim,  TimeType>;
+
+   template<typename MassUnit, typename LengthUnit, typename TimeUnit1, typename TimeUnit2>
+   requires requires IsForceUnits<MassUnit, LengthUnit, TimeUnit1, TimeUnit2>
    class Force : public BaseDimension<std::tuple<MassUnit, LengthUnit>, std::tuple<TimeUnit1, TimeUnit2>>
    {
    public:
-      static_assert(std::is_same_v<typename MassUnit::Dim, typename Grams::Dim>, "Unit provided does not derive from MassUnit");
-      static_assert(std::is_same_v<typename LengthUnit::Dim, typename Meters::Dim>, "Unit provided does not derive from LengthUnit");
-      static_assert(std::is_same_v<typename TimeUnit1::Dim, typename Seconds::Dim>, "Unit provided does not derive from TimeUnit");
-      static_assert(std::is_same_v<typename TimeUnit2::Dim, typename Seconds::Dim>, "Unit provided does not derive from TimeUnit");
       using BaseDimension<std::tuple<MassUnit, LengthUnit>, std::tuple<TimeUnit1, TimeUnit2>>::BaseDimension;
 
       Force(double val) : BaseDimension<std::tuple<MassUnit, LengthUnit>, std::tuple<TimeUnit1, TimeUnit2>>(val){}
@@ -49,16 +54,15 @@ namespace Dimension
       using DenTuple = std::tuple<Seconds, Seconds>;
    };
 
-   // Type trait for C++17 and older
    template<typename T>
    struct is_force : std::is_convertible<T, Force<Grams, Meters, Seconds, Seconds>> {};
 
    template<typename T>
    constexpr bool is_force_v = is_force<T>::value;
 
-   // Concept for C++20 and newer
    template<typename T>
    concept force_type = is_force_v<T>;
+
 }
 
 #endif //STATIC_DIMENSION_FORCE_H

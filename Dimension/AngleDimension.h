@@ -11,6 +11,9 @@ namespace Dimension
    struct AngleType {};
    struct Radians;
 
+   template<typename AngleUnit>
+   concept IsAngleUnit = std::is_same_v<typename AngleUnit::Dim, AngleType>;
+
    template<typename Unit>
    struct AngleUnit : public BaseUnit<Unit>
    { 
@@ -24,31 +27,30 @@ namespace Dimension
    struct Radians : public AngleUnit<Radians> { public: using AngleUnit::AngleUnit; };
    struct Degrees : public AngleUnit<Degrees> { public: using AngleUnit::AngleUnit; };
 
-   template<typename Unit>
+   template<IsAngleUnit Unit>
    class Angle : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
    public:
-      static_assert(std::is_same_v<typename Unit::Dim, typename Radians::Dim>, "Unit provided does not derive from AngleUnit");
       using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
 
       Angle() : BaseDimension<std::tuple<Unit>, std::tuple<>>(0.0) {}
 
       Angle(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>(val) {}
 
-      template<typename T>
+      template<IsAngleUnit T>
       Angle(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
 
-      template<typename T>
+      template<IsAngleUnit T>
       double GetAngle() const
       {
          return this->template GetVal<std::tuple<T>, std::tuple<>>();
       }
    };
 
-   template<typename T>
+   template<IsAngleUnit T>
    Angle(T) -> Angle<T>;
 
-   template<typename AngleUnit>
+   template<IsAngleUnit AngleUnit>
    Angle(BaseDimension<std::tuple<AngleUnit>, std::tuple<>>) -> Angle<AngleUnit>;
 
    template<> struct Conversion<Radians, Degrees> { static constexpr PrecisionType slope = 180 / pi; };
@@ -75,14 +77,12 @@ namespace Dimension
       return Angle<Radians>(std::atan2(obj1.template GetVal<NumTuple, DenTuple>() , obj2.template GetVal<NumTuple, DenTuple>()));
    }
 
-   // Type trait for C++17 and older
    template<typename T>
    struct is_angle : std::is_convertible<T, Angle<Radians>> {};
 
    template<typename T>
    constexpr bool is_angle_v = is_angle<T>::value;
 
-   // Concept for C++20 and newer
    template<typename T>
    concept angle_type = is_angle_v<T>;
 

@@ -8,6 +8,9 @@ namespace Dimension
    struct TimeType {};
    struct Seconds;
 
+   template<typename TimeUnit>
+   concept IsTimeUnit = std::is_same_v<typename TimeUnit::Dim, TimeType>;
+
    template<typename Unit>
    struct TimeUnit : public BaseUnit<Unit>
    {
@@ -24,35 +27,30 @@ namespace Dimension
 
    // TODO: Provide reasonable error message for failed conversion due to no primary conversion
 
-   template<typename Unit>
+   template<IsTimeUnit Unit>
    class Time : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
    public:
-      static_assert(std::is_same_v<typename Unit::Dim, typename Seconds::Dim>, "Unit provided does not derive from TimeUnit");
-
       using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
 
       Time() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}
 
       Time(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
 
-      template<typename T>
+      template<IsTimeUnit T>
       Time(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
 
-      template<typename T>
-      friend class Time;
-
-      template<typename T>
+      template<IsTimeUnit T>
       double GetTime() const
       {
          return this->template GetVal<std::tuple<T>, std::tuple<>>();
       }
    };
 
-   template<typename T>
+   template<IsTimeUnit T>
    Time(T) -> Time<T>;
 
-   template<typename TimeUnit>
+   template<IsTimeUnit TimeUnit>
    Time(BaseDimension<std::tuple<TimeUnit>, std::tuple<>>) -> Time<TimeUnit>;
 
    template<> struct Conversion<Seconds, Minutes> { static constexpr PrecisionType slope = (1.0 / 60.0); };
@@ -62,16 +60,15 @@ namespace Dimension
 
    ALL_SI_PREFIXES(Seconds, TimeUnit);
 
-   // Type trait for C++17 and older
    template<typename T>
    struct is_time : std::is_convertible<T, Time<Seconds>> {};
 
    template<typename T>
    constexpr bool is_time_v = is_time<T>::value;
 
-   // Concept for C++20 and newer
    template<typename T>
    concept time_type = is_time_v<T>;
+
 }
 
 #endif //STATIC_DIMENSION_TIME_H
