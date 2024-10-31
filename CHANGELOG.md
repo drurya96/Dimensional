@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. Semantic versioning is followed.
 
+## [Unreleased]
+
+### Changed
+- 
+
+### Added
+- Negative unary operator (allows `-BaseDimension<...>` syntax)
+
+### Deprecated
+- 
+
+### Removed
+- 
+
+### Fixed
+- 
+
 ## [2.0.0] - 2024-10-30
 
 ### Changed

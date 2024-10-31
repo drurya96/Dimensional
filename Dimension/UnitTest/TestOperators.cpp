@@ -158,3 +158,13 @@ TEST_F(OperatorsTest, DimensionExponent)
 
    ASSERT_TRUE(test1 == test2);
 }
+
+// Test Negative
+TEST_F(OperatorsTest, DimensionNegative)
+{
+   Speed<Meters, Seconds> speed = -Speed<Meters, Seconds>(10.0);
+
+   double test = (speed.GetSpeed<Meters, Seconds>());
+
+   ASSERT_NEAR(test, -10.0, TOLERANCE);
+}
