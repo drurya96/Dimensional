@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. Semantic versioning is followed.
 
-## [Unreleased]
+## [2.0.0] - 2024-10-30
 
 ### Changed
 - Renamed `Degree` to `Degrees` and `Radian` to `Radians`
@@ -29,7 +29,7 @@ All notable changes to this project will be documented in this file. Semantic ve
 - `tuple_diff_dim` (in favor of `tuple_diff<is_same_dim, ...>`)
 
 ### Fixed
-- 
+- Marked `GetAcceleration` `const`
 
 ## [1.0.1] - 2024-10-24
 
