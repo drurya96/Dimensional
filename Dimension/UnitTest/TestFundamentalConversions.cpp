@@ -1,4 +1,4 @@
-#include "TestFundamentalConversions.h"
+#include "DimensionTest.h"
 
 #include "TimeDimension.h"
 #include "LengthDimension.h"
@@ -7,7 +7,7 @@
 
 using namespace Dimension;
 
-TEST_F(FundamentalConversions, TestTime) {
+TEST_F(DimensionTest, TestTimeConversions) {
 
    //Time myBadTime = Time<Feet>(10.0); // Correctly fails to compile - Cannot create a Time object using Feet.
 
@@ -22,7 +22,7 @@ TEST_F(FundamentalConversions, TestTime) {
 }
 
 
-TEST_F(FundamentalConversions, TestLength) {
+TEST_F(DimensionTest, TestLengthConversions) {
    Length myLength = Length<Meters>(10.0);
 
    ASSERT_NEAR(myLength.GetLength<Meters>(), 10.0, TOLERANCE);
@@ -36,7 +36,7 @@ TEST_F(FundamentalConversions, TestLength) {
 }
 
 
-TEST_F(FundamentalConversions, TestMass) {
+TEST_F(DimensionTest, TestMassConversions) {
    Mass<Grams> myMass{1000.0};
 
    ASSERT_NEAR(myMass.GetMass<PoundMass>(), 2.2046226218, TOLERANCE);
@@ -47,9 +47,11 @@ TEST_F(FundamentalConversions, TestMass) {
    ASSERT_NEAR(myMass.GetMass<MilliGrams>(), 1000000.0, TOLERANCE);
 }
 
-TEST_F(FundamentalConversions, TestAngle) {
+TEST_F(DimensionTest, TestAngleConversions) {
    Angle<Radians> myAngle{3.0};
 
    ASSERT_NEAR(myAngle.GetAngle<Radians>(), 3.0, TOLERANCE);
    ASSERT_NEAR(myAngle.GetAngle<Degrees>(), 171.887, TOLERANCE);
 }
+
+// @todo Add temperature tests

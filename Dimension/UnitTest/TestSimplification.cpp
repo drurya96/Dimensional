@@ -1,4 +1,4 @@
-#include "TestSimplification.h"
+#include "DimensionTest.h"
 
 #include "TimeDimension.h"
 #include "LengthDimension.h"
@@ -7,7 +7,7 @@
 using namespace Dimension;
 using namespace std;
 
-TEST_F(SimplificationTest, SimplificationWithMath) {
+TEST_F(DimensionTest, SimplificationWithMath) {
 
    // TODO: Consider adding a .Simplify() method to BaseDimension
    Length<Meters> length1(10.0);
@@ -26,7 +26,7 @@ TEST_F(SimplificationTest, SimplificationWithMath) {
    ASSERT_NEAR((test.GetVal<std::tuple<Seconds>, std::tuple<>>()), 0.056959027777777775, TOLERANCE); // TODO: Double check precision
 }
 
-TEST_F(SimplificationTest, Simplification) {
+TEST_F(DimensionTest, Simplification) {
 
    Length<Meters> length1(10.0);
    Length<Feet> length2(20.0);

@@ -1,4 +1,4 @@
-#include "TestCompoundConversions.h"
+#include "DimensionTest.h"
 
 #include "TimeDimension.h"
 #include "LengthDimension.h"
@@ -6,7 +6,7 @@
 
 using namespace Dimension;
 
-TEST_F(CompoundConversions, TestSpeed) {
+TEST_F(DimensionTest, TestSpeed) {
 
    using namespace std;
 

@@ -1,4 +1,4 @@
-#include "TestNewDimension.h"
+#include "DimensionTest.h"
 
 #include "BaseDimension.h"
 #include "LengthDimension.h"
@@ -8,7 +8,7 @@
 using namespace Dimension;
 using namespace std;
 
-TEST_F(NewDimensionTest, NewDimension) {
+TEST_F(DimensionTest, NewDimension) {
    // TODO: Write tests for creating new dimensions from a user's perspective
 
    Length<Foo> length1{ 100.0 };
