@@ -1,4 +1,4 @@
-#include "TestCastOperators.h"
+#include "DimensionTest.h"
 
 #include "TimeDimension.h"
 #include "LengthDimension.h"
@@ -7,7 +7,7 @@
 using namespace Dimension;
 using namespace std;
 
-TEST_F(CastOperatorTest, CastSpeed) {
+TEST_F(DimensionTest, CastSpeed) {
 
    BaseDimension<tuple<Meters>, tuple<Seconds>> testSpeed(10.0);
 
@@ -24,7 +24,7 @@ TEST_F(CastOperatorTest, CastSpeed) {
    // Speed notSpeed = testNotSpeed;
 }
 
-TEST_F(CastOperatorTest, CastLength) {
+TEST_F(DimensionTest, CastLength) {
 
    BaseDimension<tuple<Meters>, tuple<>> testLength(10.0);
 
@@ -41,7 +41,7 @@ TEST_F(CastOperatorTest, CastLength) {
    // Length notLength = testNotLength;
 }
 
-TEST_F(CastOperatorTest, CastTime) {
+TEST_F(DimensionTest, CastTime) {
 
    BaseDimension<tuple<Seconds>, tuple<>> testTime(10.0);
 
@@ -58,7 +58,7 @@ TEST_F(CastOperatorTest, CastTime) {
    // Time notTime = testNotTime;
 }
 
-TEST_F(CastOperatorTest, CastScalar) {
+TEST_F(DimensionTest, CastScalar) {
 
    BaseDimension<tuple<Seconds>, tuple<>> testTime(10.0);
 

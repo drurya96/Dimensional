@@ -1,4 +1,4 @@
-#include "TestStd.h"
+#include "DimensionTest.h"
 
 #include "TimeDimension.h"
 #include "LengthDimension.h"
@@ -10,7 +10,7 @@
 using namespace Dimension;
 
 
-TEST_F(StdTest, StdMinMaxClamp) {
+TEST_F(DimensionTest, StdMinMaxClamp) {
 
    Speed<Meters, Seconds> mySpeed1(10.0); 
    Speed<Meters, Seconds> mySpeed2(20.0); 
@@ -31,13 +31,13 @@ TEST_F(StdTest, StdMinMaxClamp) {
 
 }
 
-TEST_F(StdTest, DimensionalAbs) {
+TEST_F(DimensionTest, DimensionalAbs) {
    
    ASSERT_NEAR((abs(Speed<Meters, Seconds>(-10.0)).GetSpeed<Meters, Seconds>()), 10.0, TOLERANCE);
    ASSERT_NEAR((abs(Speed<Meters, Seconds>(10.0)).GetSpeed<Meters, Seconds>()), 10.0, TOLERANCE);
 }
 
-TEST_F(StdTest, DimensionalRound) {
+TEST_F(DimensionTest, DimensionalRound) {
    
    ASSERT_NEAR((floor(Speed<Meters, Seconds>(1.5)).GetSpeed<Meters, Seconds>()), 1.0, TOLERANCE);
    ASSERT_NEAR((ceil(Speed<Meters, Seconds>(1.5)).GetSpeed<Meters, Seconds>()), 2.0, TOLERANCE);
@@ -45,7 +45,7 @@ TEST_F(StdTest, DimensionalRound) {
    ASSERT_NEAR((round(Speed<Meters, Seconds>(1.8)).GetSpeed<Meters, Seconds>()), 2.0, TOLERANCE);
 }
 
-TEST_F(StdTest, DimensionalModf) {
+TEST_F(DimensionTest, DimensionalModf) {
 
    Speed<Meters, Seconds> value;
    Speed<Meters, Seconds> decSpeed;
@@ -62,7 +62,7 @@ TEST_F(StdTest, DimensionalModf) {
 
 }
 
-TEST_F(StdTest, DimensionalFmod) {
+TEST_F(DimensionTest, DimensionalFmod) {
 
    using Dimension::pi;
 
