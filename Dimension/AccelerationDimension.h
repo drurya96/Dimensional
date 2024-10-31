@@ -23,7 +23,7 @@ namespace Dimension
 
       
       template<typename LengthUnitRet, typename TimeUnitRet1, typename TimeUnitRet2>
-      double GetAcceleration()
+      double GetAcceleration() const
       {
          return this->template GetVal<std::tuple<LengthUnitRet>, std::tuple<TimeUnitRet1, TimeUnitRet2>>();
       }
