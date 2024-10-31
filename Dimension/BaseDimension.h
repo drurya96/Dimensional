@@ -121,6 +121,12 @@ namespace Dimension
          return scalar;
       }
 
+      /// @brief Negative unary operator
+      /// @return BaseDimension of the same type with opposite sign
+      BaseDimension<NumTuple, DenTuple> operator-() const
+      {
+         return BaseDimension<NumTuple, DenTuple>(-scalar);
+      }
 
       /// @brief += operator overload for another Dimension
       /// @tparam NumTuple2 Tuple of numerator types of object being added
