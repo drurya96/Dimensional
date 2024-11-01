@@ -2,24 +2,6 @@
 
 All notable changes to this project will be documented in this file. Semantic versioning is followed.
 
-## [Unreleased]
-
-### Changed
-- 
-
-### Added
-- Negative unary operator (allows `-BaseDimension<...>` syntax)
-
-### Deprecated
-- 
-
-### Removed
-- 
-
-### Fixed
-- Constrained dimensions so overloads resolve correctly
-  - Prior, overloaded functions that use different dimensions would fail due to ambiguous signatures.
-
 ## [2.1.0] - 2024-10-31
 
 ### Changed
