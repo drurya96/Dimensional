@@ -17,6 +17,7 @@ set(TEST_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/TestNewDimension.cpp
     ${CMAKE_CURRENT_LIST_DIR}/TestStd.cpp
     ${CMAKE_CURRENT_LIST_DIR}/TestTrig.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/TestFunctions.cpp
 )
 
 add_executable(Dimension_UnitTests ${TEST_SOURCES})

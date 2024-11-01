@@ -6,7 +6,15 @@
 
 namespace Dimension
 {
+
    template<typename LengthUnit, typename TimeUnit1, typename TimeUnit2>
+   concept IsAccelerationUnits = 
+      std::is_same_v<typename LengthUnit::Dim, LengthType> &&
+      std::is_same_v<typename TimeUnit1::Dim,  TimeType> &&
+      std::is_same_v<typename TimeUnit2::Dim,  TimeType>;
+
+   template<typename LengthUnit, typename TimeUnit1, typename TimeUnit2>
+   requires IsAccelerationUnits<LengthUnit, TimeUnit1, TimeUnit2>
    class Acceleration : public BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit1, TimeUnit2>>
    {
    public:

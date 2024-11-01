@@ -8,6 +8,9 @@ namespace Dimension
    struct LengthType {};
    struct Meters;
 
+   template<typename LengthUnit>
+   concept IsLengthUnit = std::is_same_v<typename LengthUnit::Dim, LengthType>;
+   
    template<typename Unit>
    struct LengthUnit : public BaseUnit<Unit>
    { 
@@ -32,32 +35,30 @@ namespace Dimension
    struct Yards : public LengthUnit<Yards> { public: using LengthUnit::LengthUnit; };
    struct US_Survey_Feet : public LengthUnit<US_Survey_Feet> { public: using LengthUnit::LengthUnit; };
 
-   template<typename Unit>
+   template<IsLengthUnit Unit>
    class Length : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
    public:
-      static_assert(std::is_same_v<typename Unit::Dim, typename Meters::Dim>, "Unit provided does not derive from LengthUnit");
       using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
 
       Length() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}
 
       Length(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
 
-      template<typename T>
+      template<IsLengthUnit T>
       Length(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()){}
 
-
-      template<typename T>
+      template<IsLengthUnit T>
       double GetLength() const
       {
          return this->template GetVal<std::tuple<T>, std::tuple<>>();
       }
    };
 
-   template<typename T>
+   template<IsLengthUnit T>
    Length(T) -> Length<T>;
 
-   template<typename LengthUnit>
+   template<IsLengthUnit LengthUnit>
    Length(BaseDimension<std::tuple<LengthUnit>, std::tuple<>>) -> Length<LengthUnit>;
 
    template<> struct Conversion<Meters, Feet> { static constexpr PrecisionType slope = 3.280839895; };
@@ -94,16 +95,15 @@ namespace Dimension
 
    ALL_SI_PREFIXES(Meters, LengthUnit);
 
-   // Type trait for C++17 and older
    template<typename T>
    struct is_length : std::is_convertible<T, Length<Meters>> {};
 
    template<typename T>
    constexpr bool is_length_v = is_length<T>::value;
 
-   // Concept for C++20 and newer
    template<typename T>
    concept length_type = is_length_v<T>;
+
 }
 
 #endif //STATIC_DIMENSION_LENGTH_H

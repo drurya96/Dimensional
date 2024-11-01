@@ -6,12 +6,17 @@
 
 namespace Dimension
 {
+
    template<typename LengthUnit, typename TimeUnit>
+   concept IsSpeedUnits = 
+      std::is_same_v<typename LengthUnit::Dim, LengthType> &&
+      std::is_same_v<typename TimeUnit::Dim,   TimeType>;
+
+   template<typename LengthUnit, typename TimeUnit>
+   requires IsSpeedUnits<LengthUnit, TimeUnit>
    class Speed : public BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>
    {
    public:
-      static_assert(std::is_same_v<typename LengthUnit::Dim, typename Meters::Dim>, "Unit provided does not derive from TimeUnit");
-      static_assert(std::is_same_v<typename TimeUnit::Dim, typename Seconds::Dim>, "Unit provided does not derive from TimeUnit");
       using BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>::BaseDimension;
 
       Speed(double val) : BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>(val){}
@@ -34,16 +39,15 @@ namespace Dimension
    template<typename LengthUnit, typename TimeUnit>
    Speed(BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>) -> Speed<LengthUnit, TimeUnit>;
 
-   // Type trait for C++17 and older
    template<typename T>
    struct is_speed : std::is_convertible<T, Speed<Meters, Seconds>> {};
 
    template<typename T>
    constexpr bool is_speed_v = is_speed<T>::value;
 
-   // Concept for C++20 and newer
    template<typename T>
    concept speed_type = is_speed_v<T>;
+
 }
 
 #endif //STATIC_DIMENSION_SPEED_H

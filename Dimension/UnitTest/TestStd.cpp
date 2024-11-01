@@ -22,7 +22,7 @@ TEST_F(DimensionTest, StdMinMaxClamp) {
    ASSERT_NEAR((std::clamp(mySpeed1, Speed<Meters, Seconds>(5.0), Speed<Meters, Seconds>(20.0)).GetSpeed<Meters, Seconds>()), 10.0, TOLERANCE);
    ASSERT_NEAR((std::clamp(mySpeed1, Speed<Meters, Seconds>(12.0), Speed<Meters, Seconds>(20.0)).GetSpeed<Meters, Seconds>()), 12.0, TOLERANCE);
    ASSERT_NEAR((std::clamp(mySpeed1, Speed<Meters, Seconds>(5.0), Speed<Meters, Seconds>(8.0)).GetSpeed<Meters, Seconds>()), 8.0, TOLERANCE);
-
+   
 
    // Below does not work yet.
    // std::clamp requires the lo and hi values be the same type, but Speed<Feet, Seconds> is not the same type as Speed<Meters, Second>, even if these are convertible

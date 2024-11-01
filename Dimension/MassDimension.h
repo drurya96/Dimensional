@@ -9,6 +9,9 @@ namespace Dimension
    struct MassType {};
    struct Grams;
 
+   template<typename MassUnit>
+   concept IsMassUnit = std::is_same_v<typename MassUnit::Dim, MassType>;
+
    template<typename Unit>
    struct MassUnit : public BaseUnit<Unit>
    { 
@@ -30,31 +33,30 @@ namespace Dimension
    struct LongTon : public MassUnit<LongTon> { public: using MassUnit::MassUnit; };
    struct Tonne : public MassUnit<Tonne> { public: using MassUnit::MassUnit; };
 
-   template<typename Unit>
+   template<IsMassUnit Unit>
    class Mass : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
    public:
-      static_assert(std::is_same_v<typename Unit::Dim, typename Grams::Dim>, "Unit provided does not derive from MassUnit");
       using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
 
       Mass() : BaseDimension<std::tuple<Unit>, std::tuple<>>(0.0) {}
 
       Mass(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>(val) {}
 
-      template<typename T>
+      template<IsMassUnit T>
       Mass(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
 
-      template<typename T>
+      template<IsMassUnit T>
       double GetMass() const
       {
          return this->template GetVal<std::tuple<T>, std::tuple<>>();
       }
    };
 
-   template<typename T>
+   template<IsMassUnit T>
    Mass(T) -> Mass<T>;
 
-   template<typename MassUnit>
+   template<IsMassUnit MassUnit>
    Mass(BaseDimension<std::tuple<MassUnit>, std::tuple<>>) -> Mass<MassUnit>;
 
    template<> struct Conversion<Grams, PoundMass> { static constexpr PrecisionType slope = 0.0022046226; };
@@ -62,8 +64,6 @@ namespace Dimension
 
    template<> struct Conversion<Grams, Ounces> { static constexpr PrecisionType slope = 0.0352739619; };
    template<> struct Conversion<Ounces, Grams> { static constexpr PrecisionType slope = 28.349523165; };
-
-
 
 
    template<> struct Conversion<Grams, Slugs> { static constexpr PrecisionType slope = 0.00006852; };
@@ -86,16 +86,15 @@ namespace Dimension
 
    ALL_SI_PREFIXES(Grams, MassUnit);
 
-   // Type trait for C++17 and older
    template<typename T>
    struct is_mass : std::is_convertible<T, Mass<Grams>> {};
 
    template<typename T>
    constexpr bool is_mass_v = is_mass<T>::value;
 
-   // Concept for C++20 and newer
    template<typename T>
    concept mass_type = is_mass_v<T>;
+
 }
 
 #endif //STATIC_DIMENSION_MASS_H

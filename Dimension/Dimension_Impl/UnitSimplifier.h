@@ -3,11 +3,19 @@
 
 #include "GenericTypeTraits.h"
 #include "Conversion.h"
+#include "FundamentalUnitExtractor.h"
+#include "UnitValidation.h"
 
 namespace Dimension
 {
+   
+   template<typename NumTuple, typename DenTuple>
+   concept IsUnitTuplePair = IsUnitTuple<typename FundamentalUnitExtractor<NumTuple, DenTuple>::Num> &&
+                             IsUnitTuple<typename FundamentalUnitExtractor<NumTuple, DenTuple>::Den>;
+
    // Forward declarations
    template<typename NumTuple, typename DenTuple>
+   requires IsUnitTuplePair<NumTuple, DenTuple>
    class BaseDimension;
 
    /// @brief Struct to check if a tuple of units contains a unit of the given Dimension

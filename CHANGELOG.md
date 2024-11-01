@@ -17,7 +17,8 @@ All notable changes to this project will be documented in this file. Semantic ve
 - 
 
 ### Fixed
-- 
+- Constrained dimensions so overloads resolve correctly
+  - Prior, overloaded functions that use different dimensions would fail due to ambiguous signatures.
 
 ## [2.0.0] - 2024-10-30
 
