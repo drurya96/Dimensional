@@ -3,6 +3,7 @@
 
 #include <tuple> // For std::tuple and related functions
 #include <cmath> // For std::hypot, std::modf, std::fmod // @todo move this to Utilities
+#include <stdexcept> // For std::invalid_argument
 
 #include "Dimension_Impl/PrecisionType.h"
 #include "Dimension_Impl/UnitValidation.h"

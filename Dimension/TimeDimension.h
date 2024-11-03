@@ -54,9 +54,7 @@ namespace Dimension
    Time(BaseDimension<std::tuple<TimeUnit>, std::tuple<>>) -> Time<TimeUnit>;
 
    template<> struct Conversion<Seconds, Minutes> { static constexpr PrecisionType slope = (1.0 / 60.0); };
-   template<> struct Conversion<Minutes, Seconds> { static constexpr PrecisionType slope = 60.0; };
    template<> struct Conversion<Seconds, Hours> { static constexpr PrecisionType slope = (1.0 / 3600.0); };
-   template<> struct Conversion<Hours, Seconds> { static constexpr PrecisionType slope = 3600.0; };
 
    ALL_SI_PREFIXES(Seconds, TimeUnit);
 

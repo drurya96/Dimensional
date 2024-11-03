@@ -54,7 +54,6 @@ namespace Dimension
    Angle(BaseDimension<std::tuple<AngleUnit>, std::tuple<>>) -> Angle<AngleUnit>;
 
    template<> struct Conversion<Radians, Degrees> { static constexpr PrecisionType slope = 180 / pi; };
-   template<> struct Conversion<Degrees, Radians> { static constexpr PrecisionType slope = pi / 180; };
 
    template<typename AngleUnit>
    PrecisionType cos(Angle<AngleUnit> angle) { return std::cos(angle.template GetAngle<Radians>()); }

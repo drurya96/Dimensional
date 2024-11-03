@@ -46,5 +46,5 @@ TEST_F(DimensionTest, TestFunctionParameters) {
 
    double ret4 = TestFunction2(test);
    ASSERT_NEAR(ret4, 60.0, TOLERANCE);
-   
+
 }
