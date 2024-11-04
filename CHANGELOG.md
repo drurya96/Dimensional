@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. Semantic versioning is followed.
 
+## [Unreleased]
+
+### Changed
+- **Internal**: Conversions in both direction (to/from) are not needed. Now, if a direct conversion exists in one direction, its inverse will be used for the other direction.
+  - Direct conversions will stil be used if one exists.
+
+### Added
+- **Internal**: Unit tests for every fundamental conversion
+
+### Deprecated
+- 
+
+### Removed
+- 
+
+### Fixed
+- Instantiation of a `BaseDimension` using any units that cannot be converted to the appropriate `Primary` unit results in a compiler error.
+  - In previous behavior, the object could be instantiated but conversion would fail at compile time.
+- Added include for `stdexcept`
+
 ## [2.1.0] - 2024-10-31
 
 ### Changed

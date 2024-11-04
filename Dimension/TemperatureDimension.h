@@ -24,6 +24,7 @@ namespace Dimension
    struct Celsius : public TemperatureUnit<Celsius> { public: using TemperatureUnit::TemperatureUnit; };
    struct Fahrenheit : public TemperatureUnit<Fahrenheit> { public: using TemperatureUnit::TemperatureUnit; };
    struct Kelvin : public TemperatureUnit<Kelvin> { public: using TemperatureUnit::TemperatureUnit; };
+   struct Rankine : public TemperatureUnit<Rankine> { public: using TemperatureUnit::TemperatureUnit; };
 
    template<IsTemperatureUnit Unit>
    class Temperature : public BaseDimension<std::tuple<Unit>, std::tuple<>>
@@ -57,22 +58,16 @@ namespace Dimension
       static constexpr PrecisionType offset = 32;
    };
 
-   template<> struct Conversion<Fahrenheit, Celsius>
-   {
-      static constexpr PrecisionType slope = (5.0 / 9.0);
-      static constexpr PrecisionType offset = (-160.0 / 9.0);
-   };
-
    template<> struct Conversion<Celsius, Kelvin>
    {
       static constexpr PrecisionType slope = 1.0;
       static constexpr PrecisionType offset = 273.15;
    };
 
-   template<> struct Conversion<Kelvin, Celsius>
-   {
-      static constexpr PrecisionType slope = 1.0;
-      static constexpr PrecisionType offset = -273.15;
+   template<> struct Conversion<Celsius, Rankine>
+   { 
+      static constexpr PrecisionType slope = (9.0 / 5.0);
+      static constexpr PrecisionType offset = 491.67;
    };
 
    template<typename T>
