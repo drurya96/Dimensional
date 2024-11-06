@@ -16,7 +16,7 @@ namespace Dimension
     std::is_same_v<typename TimeUnit2::Dim,  TimeType>;
 
    template<typename MassUnit, typename LengthUnit, typename TimeUnit1, typename TimeUnit2>
-   requires requires IsForceUnits<MassUnit, LengthUnit, TimeUnit1, TimeUnit2>
+   requires IsForceUnits<MassUnit, LengthUnit, TimeUnit1, TimeUnit2>
    class Force : public BaseDimension<std::tuple<MassUnit, LengthUnit>, std::tuple<TimeUnit1, TimeUnit2>>
    {
    public:
@@ -25,11 +25,13 @@ namespace Dimension
       Force(double val) : BaseDimension<std::tuple<MassUnit, LengthUnit>, std::tuple<TimeUnit1, TimeUnit2>>(val){}
 
       template<typename MassT, typename LengthT, typename TimeT1, typename TimeT2>
+      requires IsForceUnits<MassT, LengthT, TimeT1, TimeT2>
       Force(const BaseDimension<std::tuple<MassT, LengthT>, std::tuple<TimeT1, TimeT2>>& base) : 
          BaseDimension<std::tuple<MassUnit, LengthUnit>, std::tuple<TimeUnit1, TimeUnit2>>(base.template GetVal<std::tuple<MassUnit, LengthUnit>, std::tuple<TimeUnit1, TimeUnit2>>()) {}
 
       
       template<typename MassUnitRet, typename LengthUnitRet, typename TimeUnitRet1, typename TimeUnitRet2>
+      requires IsForceUnits<MassUnitRet, LengthUnitRet, TimeUnitRet1, TimeUnitRet2>
       double GetForce() const
       {
          return this->template GetVal<std::tuple<MassUnitRet, LengthUnitRet>, std::tuple<TimeUnitRet1, TimeUnitRet2>>();
@@ -37,9 +39,11 @@ namespace Dimension
    };
 
    template<typename MassUnit, typename LengthUnit, typename TimeUnit1, typename TimeUnit2>
+   requires IsForceUnits<MassUnit, LengthUnit, TimeUnit1, TimeUnit2>
    Force(MassUnit, LengthUnit, TimeUnit1, TimeUnit2) -> Force<MassUnit, LengthUnit, TimeUnit1, TimeUnit2>;
 
    template<typename MassUnit, typename LengthUnit, typename TimeUnit1, typename TimeUnit2>
+   requires IsForceUnits<MassUnit, LengthUnit, TimeUnit1, TimeUnit2>
    Force(BaseDimension<std::tuple<MassUnit, LengthUnit>, std::tuple<TimeUnit1, TimeUnit2>>) -> Force<LengthUnit, TimeUnit1, TimeUnit2>;
 
    struct Newton

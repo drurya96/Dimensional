@@ -22,11 +22,13 @@ namespace Dimension
       Speed(double val) : BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>(val){}
 
       template<typename LengthT, typename TimeT>
+      requires IsSpeedUnits<LengthT, TimeT>
       Speed(const BaseDimension<std::tuple<LengthT>, std::tuple<TimeT>>& base) : 
          BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>(base.template GetVal<std::tuple<LengthUnit>, std::tuple<TimeUnit>>()) {}
 
       
       template<typename LengthUnitRet, typename TimeUnitRet>
+      requires IsSpeedUnits<LengthUnitRet, TimeUnitRet>
       double GetSpeed() const
       {
          return this->template GetVal<std::tuple<LengthUnitRet>, std::tuple<TimeUnitRet>>();
@@ -34,9 +36,11 @@ namespace Dimension
    };
 
    template<typename LengthUnit, typename TimeUnit>
+   requires IsSpeedUnits<LengthUnit, TimeUnit>
    Speed(LengthUnit, TimeUnit) -> Speed<LengthUnit, TimeUnit>;
 
    template<typename LengthUnit, typename TimeUnit>
+   requires IsSpeedUnits<LengthUnit, TimeUnit>
    Speed(BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>) -> Speed<LengthUnit, TimeUnit>;
 
    template<typename T>

@@ -26,11 +26,13 @@ namespace Dimension
       Acceleration(double val) : BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit1, TimeUnit2>>(val){}
 
       template<typename LengthT, typename TimeT1, typename TimeT2>
+      requires IsAccelerationUnits<LengthT, TimeT1, TimeT2>
       Acceleration(const BaseDimension<std::tuple<LengthT>, std::tuple<TimeT1, TimeT2>>& base) : 
          BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit1, TimeUnit2>>(base.template GetVal<std::tuple<LengthUnit>, std::tuple<TimeUnit1, TimeUnit2>>()) {}
 
       
       template<typename LengthUnitRet, typename TimeUnitRet1, typename TimeUnitRet2>
+      requires IsAccelerationUnits<LengthUnitRet, TimeUnitRet1, TimeUnitRet2>
       double GetAcceleration() const
       {
          return this->template GetVal<std::tuple<LengthUnitRet>, std::tuple<TimeUnitRet1, TimeUnitRet2>>();
@@ -38,14 +40,16 @@ namespace Dimension
    };
 
    template<typename LengthUnit, typename TimeUnit1, typename TimeUnit2>
+   requires IsAccelerationUnits<LengthUnit, TimeUnit1, TimeUnit2>
    Acceleration(LengthUnit, TimeUnit1, TimeUnit2) -> Acceleration<LengthUnit, TimeUnit1, TimeUnit2>;
 
    template<typename LengthUnit, typename TimeUnit1, typename TimeUnit2>
+   requires IsAccelerationUnits<LengthUnit, TimeUnit1, TimeUnit2>
    Acceleration(BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit1, TimeUnit2>>) -> Acceleration<LengthUnit, TimeUnit1, TimeUnit2>;
 
    // Type trait for C++17 and older
    template<typename T>
-   struct is_acceleration : std::is_convertible<T, Acceleration<Meters, Seconds>> {};
+   struct is_acceleration : std::is_convertible<T, Acceleration<Meters, Seconds, Seconds>> {};
 
    template<typename T>
    constexpr bool is_acceleration_v = is_acceleration<T>::value;

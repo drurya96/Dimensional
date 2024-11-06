@@ -21,12 +21,14 @@ namespace Dimension
 
       Volume(double val) : BaseDimension<std::tuple<LengthUnit1, LengthUnit2, LengthUnit3>, std::tuple<>>(val){}
 
-      template<typename LengthUnit1, typename LengthUnit2, typename LengthUnit3>
+      template<typename LengthT1, typename LengthT2, typename LengthT3>
+      requires IsVolumeUnits<LengthT1, LengthT2, LengthT3>
       Volume(const BaseDimension<std::tuple<LengthUnit1, LengthUnit2, LengthUnit3>, std::tuple<>>& base) : 
          BaseDimension<std::tuple<LengthUnit1, LengthUnit2, LengthUnit3>, std::tuple<>>(base.template GetVal<std::tuple<LengthUnit1, LengthUnit2, LengthUnit3>, std::tuple<>>()) {}
 
       
-      template<typename LengthUnit1, typename LengthUnit2, typename LengthUnit3>
+      template<typename LengthT1, typename LengthT2, typename LengthT3>
+      requires IsVolumeUnits<LengthT1, LengthT2, LengthT3>
       double GetVolume() const
       {
          return this->template GetVal<std::tuple<LengthUnit1, LengthUnit2, LengthUnit3>, std::tuple<>>();
@@ -34,9 +36,11 @@ namespace Dimension
    };
 
    template<typename LengthUnit1, typename LengthUnit2, typename LengthUnit3>
+   requires IsVolumeUnits<LengthUnit1, LengthUnit2, LengthUnit3>
    Volume(LengthUnit1, LengthUnit2, LengthUnit3) -> Volume<LengthUnit1, LengthUnit2, LengthUnit3>;
 
    template<typename MassUnit, typename LengthUnit, typename TimeUnit1, typename TimeUnit2>
+   requires IsVolumeUnits<LengthUnit1, LengthUnit2, LengthUnit3>
    Volume(BaseDimension<std::tuple<LengthUnit1, LengthUnit2, LengthUnit3>, std::tuple<>>) -> Volume<LengthUnit1, LengthUnit2, LengthUnit3>;
 
    struct Liter

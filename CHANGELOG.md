@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file. Semantic ve
 ## [Unreleased]
 
 ### Changed
+- 
+
+### Added
+- 
+
+### Deprecated
+- 
+
+### Removed
+- 
+
+### Fixed
+- Corrected requirements for derived dimensions
+
+## [2.1.1] - 2024-11-3
+
+### Changed
 - **Internal**: Conversions in both direction (to/from) are not needed. Now, if a direct conversion exists in one direction, its inverse will be used for the other direction.
   - Direct conversions will stil be used if one exists.
 
