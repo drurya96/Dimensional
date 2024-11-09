@@ -9,38 +9,38 @@ using namespace Dimension;
 
 Length<Meters> TestFunction1(Time<Seconds> time)
 {
-   return Length<Meters>(time.GetTime<Seconds>());
+   return Length<Meters>(getTime<Seconds>(time));
 }
 
 Length<Meters> TestFunction1(Length<Meters> time)
 {
-   return Length<Meters>(time.GetLength<Meters>());
+   return Length<Meters>(getLength<Meters>(time));
 }
 
 
 template<typename T>
 double TestFunction2(Time<T> time)
 {
-   return time.template GetTime<Seconds>();
+   return getTime<Seconds>(time);
 }
 
 template<typename T>
 double TestFunction2(Length<T> time)
 {
-   return time.template GetLength<Meters>();
+   return getLength<Meters>(time);
 }
 
 
 TEST_F(DimensionTest, TestFunctionParameters) {
 
    Length<Meters> ret1 = TestFunction1(Time<Seconds>(5.0));
-   ASSERT_NEAR((ret1.GetLength<Meters>()), 5.0, TOLERANCE);
+   ASSERT_NEAR((getLength<Meters>(ret1)), 5.0, TOLERANCE);
 
    Length<Meters> ret2 = TestFunction1(Time<Minutes>(1.0));
-   ASSERT_NEAR((ret2.GetLength<Meters>()), 60.0, TOLERANCE);
+   ASSERT_NEAR((getLength<Meters>(ret2)), 60.0, TOLERANCE);
    
    Length<KiloMeters> ret3 = TestFunction1(Time<Seconds>(5.0));
-   ASSERT_NEAR((ret3.GetLength<Meters>()), 5.0, TOLERANCE);
+   ASSERT_NEAR((getLength<Meters>(ret3)), 5.0, TOLERANCE);
 
    Time<Minutes> test(1.0);
 

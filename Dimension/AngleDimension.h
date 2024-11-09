@@ -27,6 +27,21 @@ namespace Dimension
    struct Radians : public AngleUnit<Radians> { public: using AngleUnit::AngleUnit; };
    struct Degrees : public AngleUnit<Degrees> { public: using AngleUnit::AngleUnit; };
 
+   template<typename T>
+   struct is_angle : std::is_convertible<T, BaseDimension<std::tuple<Radians>, std::tuple<>>> {};
+
+   template<typename T>
+   constexpr bool is_angle_v = is_angle<T>::value;
+
+   template<typename T>
+   concept angle_type = is_angle_v<T>;
+
+   template<IsAngleUnit T>
+   PrecisionType getAngle(angle_type auto obj)
+   {
+      return obj.template GetVal<std::tuple<T>, std::tuple<>>();
+   }
+
    template<IsAngleUnit Unit>
    class Angle : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
@@ -41,9 +56,10 @@ namespace Dimension
       Angle(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
 
       template<IsAngleUnit T>
+      [[deprecated("Use the free function getAngle() instead.")]]
       double GetAngle() const
       {
-         return this->template GetVal<std::tuple<T>, std::tuple<>>();
+         return getAngle<T>(*this);
       }
    };
 
@@ -56,13 +72,13 @@ namespace Dimension
    template<> struct Conversion<Radians, Degrees> { static constexpr PrecisionType slope = 180 / pi; };
 
    template<typename AngleUnit>
-   PrecisionType cos(Angle<AngleUnit> angle) { return std::cos(angle.template GetAngle<Radians>()); }
+   PrecisionType cos(Angle<AngleUnit> angle) { return std::cos(getAngle<Radians>(angle)); }
 
    template<typename AngleUnit>
-   PrecisionType sin(Angle<AngleUnit> angle) { return std::sin(angle.template GetAngle<Radians>()); }
+   PrecisionType sin(Angle<AngleUnit> angle) { return std::sin(getAngle<Radians>(angle)); }
 
    template<typename AngleUnit>
-   PrecisionType tan(Angle<AngleUnit> angle) { return std::tan(angle.template GetAngle<Radians>()); }
+   PrecisionType tan(Angle<AngleUnit> angle) { return std::tan(getAngle<Radians>(angle)); }
 
    inline Angle<Radians> acos(double ratio) { return Angle<Radians>(std::acos(ratio)); }
 
@@ -75,15 +91,6 @@ namespace Dimension
    {
       return Angle<Radians>(std::atan2(obj1.template GetVal<NumTuple, DenTuple>() , obj2.template GetVal<NumTuple, DenTuple>()));
    }
-
-   template<typename T>
-   struct is_angle : std::is_convertible<T, Angle<Radians>> {};
-
-   template<typename T>
-   constexpr bool is_angle_v = is_angle<T>::value;
-
-   template<typename T>
-   concept angle_type = is_angle_v<T>;
 
 }
 

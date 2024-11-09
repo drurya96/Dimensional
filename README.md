@@ -20,8 +20,9 @@
 - Compile-time errors: All dimensionality is resolved at compile time, so errors can be addressed earlier in development.
 - Efficiency: `Dimensional` performs on-par with simply using `double` arithematic in benchmarks.
   - TODO: Perform more complex benchmarking [isuee #43](https://gitlab.com/dimensionalanalysis/dimensional/-/issues/43)
-- Extensibility: `Dimensional` was designed with extensions in mind. Adding new Dimensions, Units, and converions simply requires a linking a user-provided header.
-
+- Extensibility: `Dimensional` was designed with extensions in mind. Adding new Dimensions, Units, and converions simply requires including a user-provided header.
+- Compiler support: (tested, others versions likely work): MSVC 19.41, gcc-12, clang-17
+- Language support: C++20 (Prior to version 2.0.0, C++17 and C++20) 
 
 ## Installation
 
@@ -40,7 +41,7 @@
 
 
 ## Usage
-For the most robust usage examples, see the [Unit Tests](https://gitlab.com/drurya96/dimensional/-/tree/main/Dimension/UnitTest?ref_type=heads).
+For the most robust usage examples, see the [Unit Tests](https://gitlab.com/dimensionalanalysis/dimensional/-/tree/main/Dimension/UnitTest?ref_type=heads).
 
 Below is an example usage of `Dimensional`
 
@@ -68,7 +69,7 @@ int main() {
 
     Dimension::Speed speed = distance / duration;
 
-    cout << "Speed: " << speed.GetVal<tuple<Dimension::Feet>, tuple<Dimension::Seconds>>() << " f/s" << endl;
+    cout << "Speed: " << getSpeed<Dimension::Feet, Dimension::Seconds>(speed) << " f/s" << endl;
 
     return 0;
 }
@@ -116,4 +117,4 @@ This library follows [Semantic Versioning](https://semver.org/).
 - MINOR version: add functionality in a backward compatible manner
 - PATCH version: backward compatible bug fixes
 
-**Disclaimer**: Semantic versioning started at 1.0.0, prior versions to **not** follow this standard.
+**Disclaimer**: Semantic versioning started at 1.0.0, prior versions do **not** follow this standard.

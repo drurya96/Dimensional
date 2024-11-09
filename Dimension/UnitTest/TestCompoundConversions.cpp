@@ -12,7 +12,7 @@ TEST_F(DimensionTest, TestSpeed) {
 
    Speed<Meters, Seconds> mySpeed(10.0);
 
-   ASSERT_NEAR((mySpeed.GetSpeed<Feet, Seconds>()), 32.8084, TOLERANCE);
-   ASSERT_NEAR((mySpeed.GetSpeed<Meters, Minutes>()), 600.0, TOLERANCE);
-   ASSERT_NEAR((mySpeed.GetSpeed<Feet, Minutes>()), 1968.504, TOLERANCE);
+   ASSERT_NEAR((getSpeed<Feet, Seconds>(mySpeed)), 32.8084, TOLERANCE);
+   ASSERT_NEAR((getSpeed<Meters, Minutes>(mySpeed)), 600.0, TOLERANCE);
+   ASSERT_NEAR((getSpeed<Feet, Minutes>(mySpeed)), 1968.504, TOLERANCE);
 }

@@ -12,6 +12,22 @@ namespace Dimension
       std::is_same_v<typename LengthUnit::Dim, LengthType> &&
       std::is_same_v<typename TimeUnit::Dim,   TimeType>;
 
+   template<typename T>
+   struct is_speed : std::is_convertible<T, BaseDimension<std::tuple<Meters>, std::tuple<Seconds>>> {};
+
+   template<typename T>
+   constexpr bool is_speed_v = is_speed<T>::value;
+
+   template<typename T>
+   concept speed_type = is_speed_v<T>;
+
+   template<typename LengthT, typename TimeT>
+   requires IsSpeedUnits<LengthT, TimeT>
+   PrecisionType getSpeed(speed_type auto obj)
+   {
+      return obj.template GetVal<std::tuple<LengthT>, std::tuple<TimeT>>();
+   }
+
    template<typename LengthUnit, typename TimeUnit>
    requires IsSpeedUnits<LengthUnit, TimeUnit>
    class Speed : public BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>
@@ -29,9 +45,10 @@ namespace Dimension
       
       template<typename LengthUnitRet, typename TimeUnitRet>
       requires IsSpeedUnits<LengthUnitRet, TimeUnitRet>
+      [[deprecated("Use the free function getSpeed() instead.")]]
       double GetSpeed() const
       {
-         return this->template GetVal<std::tuple<LengthUnitRet>, std::tuple<TimeUnitRet>>();
+         return getSpeed<LengthUnitRet, TimeUnitRet>(*this);
       }
    };
 
@@ -42,15 +59,6 @@ namespace Dimension
    template<typename LengthUnit, typename TimeUnit>
    requires IsSpeedUnits<LengthUnit, TimeUnit>
    Speed(BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>) -> Speed<LengthUnit, TimeUnit>;
-
-   template<typename T>
-   struct is_speed : std::is_convertible<T, Speed<Meters, Seconds>> {};
-
-   template<typename T>
-   constexpr bool is_speed_v = is_speed<T>::value;
-
-   template<typename T>
-   concept speed_type = is_speed_v<T>;
 
 }
 

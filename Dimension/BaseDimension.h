@@ -77,6 +77,14 @@ namespace Dimension
       {
       }
 
+
+      template<typename T, typename U>
+      requires MatchingDimensions<NumTuple, T> && MatchingDimensions<DenTuple, U>
+      BaseDimension(BaseDimension<T, U> obj) :
+         BaseDimension(obj.template GetVal<NumTuple, DenTuple>())
+      {
+      }
+
       /// @brief Return an equivalent dimension with all units simplified
       /// @return Simplified dimension
       auto Simplify()
@@ -94,6 +102,7 @@ namespace Dimension
       /// @tparam DenTuple tuple of Unit types to convert denominator to
       /// @return A PrecisionType representing the value in terms of the given units
       template<typename ToNumTuple, typename ToDenTuple>
+      requires MatchingDimensions<NumTuple, ToNumTuple> && MatchingDimensions<DenTuple, ToDenTuple>
       PrecisionType GetVal() const
       {
          PrecisionType result = scalar;
@@ -128,6 +137,7 @@ namespace Dimension
       /// @tparam DenTuple2 Tuple of denominator types of object being added
       /// @param[in] rhs The object being added
       template<typename NumTuple2, typename DenTuple2>
+      requires MatchingDimensions<NumTuple, NumTuple2> && MatchingDimensions<DenTuple, DenTuple2>
       BaseDimension<NumTuple, DenTuple>& operator+=(const BaseDimension<NumTuple2, DenTuple2>& rhs)
       {
          scalar += rhs.template GetVal<NumTuple, DenTuple>();
@@ -139,6 +149,7 @@ namespace Dimension
       /// @tparam DenTuple2 Tuple of denominator types of object being substracted
       /// @param[in] rhs The object being substracted
       template<typename NumTuple2, typename DenTuple2>
+      requires MatchingDimensions<NumTuple, NumTuple2> && MatchingDimensions<DenTuple, DenTuple2>
       BaseDimension<NumTuple, DenTuple>& operator-=(const BaseDimension<NumTuple2, DenTuple2>& rhs)
       {
          scalar -= rhs.template GetVal<NumTuple, DenTuple>();
@@ -170,21 +181,27 @@ namespace Dimension
       // Comparison Operators
       /// @todo Replace these with <==> operator after switching to C++20
       template<typename CompNumTuple, typename CompDenTuple>
+      requires MatchingDimensions<NumTuple, CompNumTuple> && MatchingDimensions<DenTuple, CompDenTuple>
       bool operator>(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return GetVal<NumTuple, DenTuple>() > rhs.template GetVal<NumTuple, DenTuple>(); }
 
       template<typename CompNumTuple, typename CompDenTuple>
+      requires MatchingDimensions<NumTuple, CompNumTuple> && MatchingDimensions<DenTuple, CompDenTuple>
       bool operator<(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return GetVal<NumTuple, DenTuple>() < rhs.template GetVal<NumTuple, DenTuple>(); }
 
       template<typename CompNumTuple, typename CompDenTuple>
+      requires MatchingDimensions<NumTuple, CompNumTuple> && MatchingDimensions<DenTuple, CompDenTuple>
       bool operator>=(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return GetVal<NumTuple, DenTuple>() >= rhs.template GetVal<NumTuple, DenTuple>(); }
 
       template<typename CompNumTuple, typename CompDenTuple>
+      requires MatchingDimensions<NumTuple, CompNumTuple> && MatchingDimensions<DenTuple, CompDenTuple>
       bool operator<=(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return GetVal<NumTuple, DenTuple>() <= rhs.template GetVal<NumTuple, DenTuple>(); }
 
       template<typename CompNumTuple, typename CompDenTuple>
+      requires MatchingDimensions<NumTuple, CompNumTuple> && MatchingDimensions<DenTuple, CompDenTuple>
       bool operator==(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return GetVal<NumTuple, DenTuple>() == rhs.template GetVal<NumTuple, DenTuple>(); }
       
       template<typename CompNumTuple, typename CompDenTuple>
+      requires MatchingDimensions<NumTuple, CompNumTuple> && MatchingDimensions<DenTuple, CompDenTuple>
       bool operator!=(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return !(*this == rhs); }
       
       /// @brief Check if this object is nearly equal to input object
@@ -192,6 +209,7 @@ namespace Dimension
       /// @param[in] Epsilon The acceptable difference between values, in terms of this object's dimension
       /// @return Bool indicating equality
       template<typename CompNumTuple, typename CompDenTuple>
+      requires MatchingDimensions<NumTuple, CompNumTuple> && MatchingDimensions<DenTuple, CompDenTuple>
       bool NearlyEqual(const BaseDimension<CompNumTuple, CompDenTuple>& rhs, PrecisionType Epsilon) const { return fabs(GetVal<NumTuple, DenTuple>() - rhs.template GetVal<NumTuple, DenTuple>()) < Epsilon; }
 
    protected:
@@ -221,9 +239,11 @@ namespace Dimension
       friend auto operator/(PrecisionType scalar, const BaseDimension<NumTup, DenTup>& obj)->BaseDimension<DenTup, NumTup>;
 
       template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
+      requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
       friend BaseDimension<NumTuple1, DenTuple1> operator+(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2);
 
       template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
+      requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
       friend BaseDimension<NumTuple1, DenTuple1> operator-(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2);
 
 
@@ -346,6 +366,7 @@ namespace Dimension
    ///    The value is the values of obj1 and obj2 added, after converting
    ///    obj2 to the same units as obj1
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
+   requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
    BaseDimension<NumTuple1, DenTuple1> operator+(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
    {
       return BaseDimension<NumTuple1, DenTuple1>{ obj1.template GetVal<NumTuple1, DenTuple1>() + obj2.template GetVal<NumTuple1, DenTuple1>() };
@@ -360,6 +381,7 @@ namespace Dimension
    ///    The value is the difference of values of obj1 and obj2, after 
    ///    converting obj2 to the same units as obj1
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
+   requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
    BaseDimension<NumTuple1, DenTuple1> operator-(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
    {
       return BaseDimension<NumTuple1, DenTuple1>{ obj1.template GetVal<NumTuple1, DenTuple1>() - obj2.template GetVal<NumTuple1, DenTuple1>() };

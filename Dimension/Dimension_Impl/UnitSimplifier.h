@@ -68,6 +68,7 @@ namespace Dimension
       using dimType = BaseDimension<newNum, newDen>;
 
       constexpr static bool isDelta = !((std::tuple_size_v<newNum> == 1) && (std::tuple_size_v<newDen> == 0));
+      constexpr static bool isScalar = (std::tuple_size_v<newNum> == 0) && (std::tuple_size_v<newDen> == 0);
    };
 
    /// @brief Unit cancellation implementation
@@ -120,6 +121,10 @@ namespace Dimension
       CancelUnitsImpl<false, 0, RealNumTupType, NumTupType, isDelta>(value);
       CancelUnitsImpl<true, 0, RealDenTupType, DenTupType, isDelta>(value);
    }
+
+   template<typename Tuple1, typename Tuple2>
+   concept MatchingDimensions = UnitSimplifier<Tuple1, std::tuple<>, std::tuple<>, Tuple2>::isScalar;
+
 } // end Dimension
 
 #endif // DIMENSION_UNIT_SIMPLIFIER_H

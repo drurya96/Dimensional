@@ -16,8 +16,8 @@ TEST_F(DimensionTest, Comparisons) {
    Speed<Meters, Seconds> mySpeedZero1(0.0);
    Speed<Feet, Minutes> mySpeedZero2(0.0);
 
-   std::cout << mySpeed1.GetSpeed<Feet, Minutes>() << std::endl;
-   std::cout << mySpeed3.GetSpeed<Meters, Seconds>() << std::endl;
+   std::cout << getSpeed<Feet, Minutes>(mySpeed1) << std::endl;
+   std::cout << getSpeed<Meters, Seconds>(mySpeed3) << std::endl;
 
    // The ASSERT_GE and ASSERT_LE syntax would work here
    //   but since this is a test of the operators, they are written explicitly
@@ -77,17 +77,17 @@ TEST_F(DimensionTest, ScalarMultiplication)
 
    mySpeed = mySpeed * 2;
    
-   ASSERT_NEAR((mySpeed.GetSpeed<Meters, Seconds>()), 10.0, TOLERANCE);
-   ASSERT_NEAR((mySpeed.GetSpeed<Feet, Seconds>()), 32.8084, TOLERANCE);
-   ASSERT_NEAR((mySpeed.GetSpeed<Meters, Minutes>()), 600.0, TOLERANCE);
-   ASSERT_NEAR((mySpeed.GetSpeed<Feet, Minutes>()), 1968.504, TOLERANCE);
+   ASSERT_NEAR((getSpeed<Meters, Seconds>(mySpeed)), 10.0, TOLERANCE);
+   ASSERT_NEAR((getSpeed<Feet, Seconds>(mySpeed)), 32.8084, TOLERANCE);
+   ASSERT_NEAR((getSpeed<Meters, Minutes>(mySpeed)), 600.0, TOLERANCE);
+   ASSERT_NEAR((getSpeed<Feet, Minutes>(mySpeed)), 1968.504, TOLERANCE);
    
    mySpeed *= 2;
    
-   ASSERT_NEAR((mySpeed.GetSpeed<Meters, Seconds>()), 20.0, TOLERANCE);
-   ASSERT_NEAR((mySpeed.GetSpeed<Feet, Seconds>()), 65.6168, TOLERANCE);
-   ASSERT_NEAR((mySpeed.GetSpeed<Meters, Minutes>()), 1200.0, TOLERANCE);
-   ASSERT_NEAR((mySpeed.GetSpeed<Feet, Minutes>()), 3937.008, TOLERANCE);
+   ASSERT_NEAR((getSpeed<Meters, Seconds>(mySpeed)), 20.0, TOLERANCE);
+   ASSERT_NEAR((getSpeed<Feet, Seconds>(mySpeed)), 65.6168, TOLERANCE);
+   ASSERT_NEAR((getSpeed<Meters, Minutes>(mySpeed)), 1200.0, TOLERANCE);
+   ASSERT_NEAR((getSpeed<Feet, Minutes>(mySpeed)), 3937.008, TOLERANCE);
    
 }
 
@@ -98,17 +98,17 @@ TEST_F(DimensionTest, ScalarDivision)
 
    mySpeed = mySpeed / 2;
 
-   ASSERT_NEAR((mySpeed.GetSpeed<Meters, Seconds>()), 10.0, TOLERANCE);
-   ASSERT_NEAR((mySpeed.GetSpeed<Feet, Seconds>()), 32.8084, TOLERANCE);
-   ASSERT_NEAR((mySpeed.GetSpeed<Meters, Minutes>()), 600.0, TOLERANCE);
-   ASSERT_NEAR((mySpeed.GetSpeed<Feet, Minutes>()), 1968.504, TOLERANCE);
+   ASSERT_NEAR((getSpeed<Meters, Seconds>(mySpeed)), 10.0, TOLERANCE);
+   ASSERT_NEAR((getSpeed<Feet, Seconds>(mySpeed)), 32.8084, TOLERANCE);
+   ASSERT_NEAR((getSpeed<Meters, Minutes>(mySpeed)), 600.0, TOLERANCE);
+   ASSERT_NEAR((getSpeed<Feet, Minutes>(mySpeed)), 1968.504, TOLERANCE);
 
    mySpeed /= 2;
 
-   ASSERT_NEAR((mySpeed.GetSpeed<Meters, Seconds>()), 5.0, TOLERANCE);
-   ASSERT_NEAR((mySpeed.GetSpeed<Feet, Seconds>()), 16.4042, TOLERANCE);
-   ASSERT_NEAR((mySpeed.GetSpeed<Meters, Minutes>()), 300.0, TOLERANCE);
-   ASSERT_NEAR((mySpeed.GetSpeed<Feet, Minutes>()), 984.252, TOLERANCE);
+   ASSERT_NEAR((getSpeed<Meters, Seconds>(mySpeed)), 5.0, TOLERANCE);
+   ASSERT_NEAR((getSpeed<Feet, Seconds>(mySpeed)), 16.4042, TOLERANCE);
+   ASSERT_NEAR((getSpeed<Meters, Minutes>(mySpeed)), 300.0, TOLERANCE);
+   ASSERT_NEAR((getSpeed<Feet, Minutes>(mySpeed)), 984.252, TOLERANCE);
 }
 
 // Test addition
@@ -122,11 +122,11 @@ TEST_F(DimensionTest, DimensionAddition)
 
    ASSERT_TRUE((is_same<decltype(speed3), BaseDimension<tuple<Meters>, tuple<Seconds>>>::value));
 
-   ASSERT_NEAR((speed4.GetSpeed<Meters, Seconds>()), 10.0507999983744, TOLERANCE); // TODO: Need to validate precision
+   ASSERT_NEAR((getSpeed<Meters, Seconds>(speed4)), 10.0507999983744, TOLERANCE); // TODO: Need to validate precision
 
    speed4 += speed1;
 
-   ASSERT_NEAR((speed4.GetSpeed<Meters, Seconds>()), 20.050799998374401, TOLERANCE); // TODO: Need to validate precision
+   ASSERT_NEAR((getSpeed<Meters, Seconds>(speed4)), 20.050799998374401, TOLERANCE); // TODO: Need to validate precision
 }
 
 // Test subtraction
@@ -140,11 +140,11 @@ TEST_F(DimensionTest, DimensionSubtraction)
 
    ASSERT_TRUE((is_same<decltype(speed3), BaseDimension<tuple<Meters>, tuple<Seconds>>>::value));
 
-   ASSERT_NEAR((speed4.GetSpeed<Meters, Seconds>()), 9.9492000016256, TOLERANCE); // TODO: Need to validate precision
+   ASSERT_NEAR((getSpeed<Meters, Seconds>(speed4)), 9.9492000016256, TOLERANCE); // TODO: Need to validate precision
 
    speed4 -= speed1;
 
-   ASSERT_NEAR((speed4.GetSpeed<Meters, Seconds>()), -0.050799998374399635, TOLERANCE); // TODO: Need to validate precision
+   ASSERT_NEAR((getSpeed<Meters, Seconds>(speed4)), -0.050799998374399635, TOLERANCE); // TODO: Need to validate precision
 }
 
 // Test Exponent
@@ -164,7 +164,7 @@ TEST_F(DimensionTest, DimensionNegative)
 {
    Speed<Meters, Seconds> speed = -Speed<Meters, Seconds>(10.0);
 
-   double test = (speed.GetSpeed<Meters, Seconds>());
+   double test = (getSpeed<Meters, Seconds>(speed));
 
    ASSERT_NEAR(test, -10.0, TOLERANCE);
 }

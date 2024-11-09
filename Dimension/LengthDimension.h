@@ -35,6 +35,21 @@ namespace Dimension
    struct Yards : public LengthUnit<Yards> { public: using LengthUnit::LengthUnit; };
    struct US_Survey_Feet : public LengthUnit<US_Survey_Feet> { public: using LengthUnit::LengthUnit; }; // Obsolete as of 2022
 
+   template<typename T>
+   struct is_length : std::is_convertible<T, BaseDimension<std::tuple<Meters>, std::tuple<>>> {};
+
+   template<typename T>
+   constexpr bool is_length_v = is_length<T>::value;
+
+   template<typename T>
+   concept length_type = is_length_v<T>;
+
+   template<IsLengthUnit T>
+   PrecisionType getLength(length_type auto obj)
+   {
+      return obj.template GetVal<std::tuple<T>, std::tuple<>>();
+   }
+
    template<IsLengthUnit Unit>
    class Length : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
@@ -49,9 +64,10 @@ namespace Dimension
       Length(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()){}
 
       template<IsLengthUnit T>
+      [[deprecated("Use the free function getLength() instead.")]]
       double GetLength() const
       {
-         return this->template GetVal<std::tuple<T>, std::tuple<>>();
+         return getLength<T>(*this);
       }
    };
 
@@ -74,15 +90,6 @@ namespace Dimension
    template<> struct Conversion<US_Survey_Feet,    Meters> { static constexpr PrecisionType slope = 0.304800609601; }; // NIST
 
    ALL_SI_PREFIXES(Meters, LengthUnit);
-
-   template<typename T>
-   struct is_length : std::is_convertible<T, Length<Meters>> {};
-
-   template<typename T>
-   constexpr bool is_length_v = is_length<T>::value;
-
-   template<typename T>
-   concept length_type = is_length_v<T>;
 
 }
 

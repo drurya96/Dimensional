@@ -17,7 +17,36 @@ All notable changes to this project will be documented in this file. Semantic ve
 - 
 
 ### Fixed
+- 
+
+## [2.2.0] - 2024-11-9
+
+### Changed
+- 
+
+### Added
+- Constructor from dimension to similar dimension of different units
+- Getters for each named dimension as free functions.
+  - These work on the named dimension and corresponding BaseDimensions
+
+### Deprecated
+- Get<Dimension> member functions of named dimensions. These include
+  - GetLength
+  - GetTime
+  - GetMass
+  - GetAngle
+  - GetTemperature
+  - GetSpeed
+  - GetAcceleration
+  - GetForce
+  - GetVolume
+
+### Removed
+- 
+
+### Fixed
 - Corrected requirements for derived dimensions
+- Added constraints for BaseDimension functions
 
 ## [2.1.1] - 2024-11-3
 

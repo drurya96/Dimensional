@@ -26,6 +26,21 @@ namespace Dimension
    struct Kelvin : public TemperatureUnit<Kelvin> { public: using TemperatureUnit::TemperatureUnit; };
    struct Rankine : public TemperatureUnit<Rankine> { public: using TemperatureUnit::TemperatureUnit; };
 
+   template<typename T>
+   struct is_temperature : std::is_convertible<T, BaseDimension<std::tuple<Celsius>, std::tuple<>>> {};
+
+   template<typename T>
+   constexpr bool is_temperature_v = is_temperature<T>::value;
+
+   template<typename T>
+   concept temperature_type = is_temperature_v<T>;
+
+   template<IsTemperatureUnit T>
+   PrecisionType getTemperature(temperature_type auto obj)
+   {
+      return obj.template GetVal<std::tuple<T>, std::tuple<>>();
+   }
+
    template<IsTemperatureUnit Unit>
    class Temperature : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
@@ -40,9 +55,10 @@ namespace Dimension
       Temperature(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
 
       template<IsTemperatureUnit T>
+      [[deprecated("Use the free function getTemperature() instead.")]]
       double GetTemperature() const
       {
-         return this->template GetVal<std::tuple<T>, std::tuple<>>();
+         return getTemperature<T>(*this);
       }
    };
 
@@ -69,15 +85,6 @@ namespace Dimension
       static constexpr PrecisionType slope = (9.0 / 5.0);
       static constexpr PrecisionType offset = 491.67;
    };
-
-   template<typename T>
-   struct is_temperature : std::is_convertible<T, Temperature<Celsius>> {};
-
-   template<typename T>
-   constexpr bool is_temperature_v = is_temperature<T>::value;
-
-   template<typename T>
-   concept temperature_type = is_temperature_v<T>;
 
 }
 
