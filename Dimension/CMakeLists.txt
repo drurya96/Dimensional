@@ -2,9 +2,10 @@ cmake_minimum_required(VERSION 3.25)
 
 add_library(Dimension_LIB INTERFACE)
 
-target_include_directories(Dimension_LIB INTERFACE
+target_include_directories(Dimension_LIB PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dimension_Meta
+    ${CMAKE_CURRENT_SOURCE_DIR}/FundamentalDimensions
+    ${CMAKE_CURRENT_SOURCE_DIR}/DerivedDimensions
 )
 
 target_compile_definitions(Dimension_LIB INTERFACE ${DIMENSIONAL_PrecisionType})

@@ -5,7 +5,10 @@ All notable changes to this project will be documented in this file. Semantic ve
 ## [Unreleased]
 
 ### Changed
-- 
+- Reorganized implementation headers
+  - `Dimension_Impl` contains implementations for each dimension, nested in either
+    - `FundamentalDimensions` (Mass, Time, etc.)
+    - `DerivedDimensions` which are derived from Fundamental (Speed, Force, etc.)
 
 ### Added
 - 

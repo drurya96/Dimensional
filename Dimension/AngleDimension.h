@@ -1,73 +1,12 @@
 #ifndef STATIC_DIMENSION_ANGLE_H
 #define STATIC_DIMENSION_ANGLE_H
 
-#include "BaseDimension.h"
-#include <numbers>
+#include "Dimension_Impl/FundamentalDimensions/AngleDimension_Impl.h"
 
 namespace Dimension
 {
-   constexpr double pi = std::numbers::pi;
-
-   struct AngleType {};
-   struct Radians;
-
-   template<typename AngleUnit>
-   concept IsAngleUnit = std::is_same_v<typename AngleUnit::Dim, AngleType>;
-
-   template<typename Unit>
-   struct AngleUnit : public BaseUnit<Unit>
-   { 
-   public: 
-      using BaseUnit<Unit>::BaseUnit;
-
-      using Dim = AngleType;
-      using Primary = Radians;
-   };
-
    struct Radians : public AngleUnit<Radians> { public: using AngleUnit::AngleUnit; };
    struct Degrees : public AngleUnit<Degrees> { public: using AngleUnit::AngleUnit; };
-
-   template<typename T>
-   struct is_angle : std::is_convertible<T, BaseDimension<std::tuple<Radians>, std::tuple<>>> {};
-
-   template<typename T>
-   constexpr bool is_angle_v = is_angle<T>::value;
-
-   template<typename T>
-   concept angle_type = is_angle_v<T>;
-
-   template<IsAngleUnit T>
-   PrecisionType getAngle(angle_type auto obj)
-   {
-      return obj.template GetVal<std::tuple<T>, std::tuple<>>();
-   }
-
-   template<IsAngleUnit Unit>
-   class Angle : public BaseDimension<std::tuple<Unit>, std::tuple<>>
-   {
-   public:
-      using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
-
-      Angle() : BaseDimension<std::tuple<Unit>, std::tuple<>>(0.0) {}
-
-      Angle(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>(val) {}
-
-      template<IsAngleUnit T>
-      Angle(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
-
-      template<IsAngleUnit T>
-      [[deprecated("Use the free function getAngle() instead.")]]
-      double GetAngle() const
-      {
-         return getAngle<T>(*this);
-      }
-   };
-
-   template<IsAngleUnit T>
-   Angle(T) -> Angle<T>;
-
-   template<IsAngleUnit AngleUnit>
-   Angle(BaseDimension<std::tuple<AngleUnit>, std::tuple<>>) -> Angle<AngleUnit>;
 
    template<> struct Conversion<Radians, Degrees> { static constexpr PrecisionType slope = 180 / pi; };
 
