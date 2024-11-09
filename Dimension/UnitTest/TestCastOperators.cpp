@@ -15,9 +15,9 @@ TEST_F(DimensionTest, CastSpeed) {
    Speed mySpeed2 = testSpeed; // Uses template deduction guide
    Speed<Feet, Minutes> mySpeed3 = testSpeed; // Cast to different unit
 
-   ASSERT_NEAR((mySpeed1.GetSpeed<Meters, Seconds>()), 10.0, TOLERANCE);
-   ASSERT_NEAR((mySpeed2.GetSpeed<Meters, Seconds>()), 10.0, TOLERANCE);
-   ASSERT_NEAR((mySpeed3.GetSpeed<Meters, Seconds>()), 10.0, TOLERANCE);
+   ASSERT_NEAR((getSpeed<Meters, Seconds>(mySpeed1)), 10.0, TOLERANCE);
+   ASSERT_NEAR((getSpeed<Meters, Seconds>(mySpeed2)), 10.0, TOLERANCE);
+   ASSERT_NEAR((getSpeed<Meters, Seconds>(mySpeed3)), 10.0, TOLERANCE);
 
    // TODO: I need to find a way to ensure the following DOES NOT compile
    // BaseDimension<tuple<Meters, Seconds>, tuple<>> testNotSpeed(10.0);
@@ -32,9 +32,9 @@ TEST_F(DimensionTest, CastLength) {
    Length myLength2 = testLength; // Uses template deduction guide
    Length<Feet> myLength3 = testLength; // Cast to different unit
 
-   ASSERT_NEAR(myLength1.GetLength<Meters>(), 10.0, TOLERANCE);
-   ASSERT_NEAR(myLength2.GetLength<Meters>(), 10.0, TOLERANCE);
-   ASSERT_NEAR(myLength3.GetLength<Meters>(), 10.0, TOLERANCE);
+   ASSERT_NEAR(getLength<Meters>(myLength1), 10.0, TOLERANCE);
+   ASSERT_NEAR(getLength<Meters>(myLength2), 10.0, TOLERANCE);
+   ASSERT_NEAR(getLength<Meters>(myLength3), 10.0, TOLERANCE);
 
    // TODO: I need to find a way to ensure the following DOES NOT compile
    // BaseDimension<tuple<Seconds>, tuple<>> testNotLength(10.0);
@@ -49,9 +49,9 @@ TEST_F(DimensionTest, CastTime) {
    Time myTime2 = testTime; // Uses template deduction guide
    Time<Minutes> myTime3 = testTime; // Cast to different unit
 
-   ASSERT_NEAR(myTime1.GetTime<Seconds>(), 10.0, TOLERANCE);
-   ASSERT_NEAR(myTime2.GetTime<Seconds>(), 10.0, TOLERANCE);
-   ASSERT_NEAR(myTime3.GetTime<Seconds>(), 10.0, TOLERANCE);
+   ASSERT_NEAR(getTime<Seconds>(myTime1), 10.0, TOLERANCE);
+   ASSERT_NEAR(getTime<Seconds>(myTime2), 10.0, TOLERANCE);
+   ASSERT_NEAR(getTime<Seconds>(myTime3), 10.0, TOLERANCE);
 
    // TODO: I need to find a way to ensure the following DOES NOT compile
    // BaseDimension<tuple<Meters>, tuple<>> testNotTime(10.0);

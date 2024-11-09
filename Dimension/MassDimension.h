@@ -33,6 +33,21 @@ namespace Dimension
    struct LongTon : public MassUnit<LongTon> { public: using MassUnit::MassUnit; };
    struct Tonne : public MassUnit<Tonne> { public: using MassUnit::MassUnit; };
 
+   template<typename T>
+   struct is_mass : std::is_convertible<T, BaseDimension<std::tuple<Grams>, std::tuple<>>> {};
+
+   template<typename T>
+   constexpr bool is_mass_v = is_mass<T>::value;
+
+   template<typename T>
+   concept mass_type = is_mass_v<T>;
+
+   template<IsMassUnit T>
+   PrecisionType getMass(mass_type auto obj)
+   {
+      return obj.template GetVal<std::tuple<T>, std::tuple<>>();
+   }
+
    template<IsMassUnit Unit>
    class Mass : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
@@ -47,9 +62,10 @@ namespace Dimension
       Mass(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
 
       template<IsMassUnit T>
+      [[deprecated("Use the free function getMass() instead.")]]
       double GetMass() const
       {
-         return this->template GetVal<std::tuple<T>, std::tuple<>>();
+         return getMass<T>(*this);
       }
    };
 
@@ -69,15 +85,6 @@ namespace Dimension
    template<> struct Conversion<Tonne,     Grams> { static constexpr PrecisionType slope = 1000000.0; }; // NIST
 
    ALL_SI_PREFIXES(Grams, MassUnit);
-
-   template<typename T>
-   struct is_mass : std::is_convertible<T, Mass<Grams>> {};
-
-   template<typename T>
-   constexpr bool is_mass_v = is_mass<T>::value;
-
-   template<typename T>
-   concept mass_type = is_mass_v<T>;
 
 }
 

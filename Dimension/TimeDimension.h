@@ -25,7 +25,20 @@ namespace Dimension
    struct Minutes : public TimeUnit<Minutes> { public: using TimeUnit::TimeUnit; };
    struct Hours : public TimeUnit<Hours> { public: using TimeUnit::TimeUnit; };
 
-   // TODO: Provide reasonable error message for failed conversion due to no primary conversion
+   template<typename T>
+   struct is_time : std::is_convertible<T, BaseDimension<std::tuple<Seconds>, std::tuple<>>> {};
+
+   template<typename T>
+   constexpr bool is_time_v = is_time<T>::value;
+
+   template<typename T>
+   concept time_type = is_time_v<T>;
+
+   template<IsTimeUnit T>
+   PrecisionType getTime(time_type auto obj)
+   {
+      return obj.template GetVal<std::tuple<T>, std::tuple<>>();
+   }
 
    template<IsTimeUnit Unit>
    class Time : public BaseDimension<std::tuple<Unit>, std::tuple<>>
@@ -40,10 +53,12 @@ namespace Dimension
       template<IsTimeUnit T>
       Time(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
 
+      
       template<IsTimeUnit T>
+      [[deprecated("Use the free function getTime() instead.")]]
       double GetTime() const
       {
-         return this->template GetVal<std::tuple<T>, std::tuple<>>();
+         return getTime<T>(*this);
       }
    };
 
@@ -57,15 +72,6 @@ namespace Dimension
    template<> struct Conversion<Seconds, Hours> { static constexpr PrecisionType slope = (1.0 / 3600.0); };
 
    ALL_SI_PREFIXES(Seconds, TimeUnit);
-
-   template<typename T>
-   struct is_time : std::is_convertible<T, Time<Seconds>> {};
-
-   template<typename T>
-   constexpr bool is_time_v = is_time<T>::value;
-
-   template<typename T>
-   concept time_type = is_time_v<T>;
 
 }
 

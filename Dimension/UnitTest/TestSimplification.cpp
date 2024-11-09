@@ -24,6 +24,7 @@ TEST_F(DimensionTest, SimplificationWithMath) {
    ASSERT_TRUE((is_same_v<decltype(test), BaseDimension<tuple<Seconds>, tuple<>>>));
    
    ASSERT_NEAR((test.GetVal<std::tuple<Seconds>, std::tuple<>>()), 0.056959027777777775, TOLERANCE); // TODO: Double check precision
+   ASSERT_NEAR((getTime<Seconds>(test)), 0.056959027777777775, TOLERANCE); // TODO: Double check precision
 }
 
 TEST_F(DimensionTest, Simplification) {

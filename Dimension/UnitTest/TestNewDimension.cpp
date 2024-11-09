@@ -13,12 +13,12 @@ TEST_F(DimensionTest, NewDimension) {
 
    Length<Foo> length1{ 100.0 };
 
-   ASSERT_NEAR(length1.GetLength<Feet>(), 104.485, TOLERANCE);
-   ASSERT_NEAR(length1.GetLength<Meters>(), 31.847133, TOLERANCE);
+   ASSERT_NEAR(getLength<Feet>(length1), 104.485, TOLERANCE);
+   ASSERT_NEAR(getLength<Meters>(length1), 31.847133, TOLERANCE);
 
    Length<Meters> length2{ 20.0 };
 
-   ASSERT_NEAR(length2.GetLength<Baz>(), 68.0, TOLERANCE);
+   ASSERT_NEAR(getLength<Baz>(length2), 68.0, TOLERANCE);
 
    Length<BarSub<0>> length3{ 10.0 };
    Length<BarSub<1>> length4{ 20.0 };
