@@ -1,5 +1,7 @@
 #include "DimensionTest.h"
 
+#include "BaseDimension.h"
+
 #include "TimeDimension.h"
 #include "LengthDimension.h"
 #include "MassDimension.h"
@@ -38,7 +40,7 @@ TEST_F(DimensionTest, TestFunctionParameters) {
 
    Length<Meters> ret2 = TestFunction1(Time<Minutes>(1.0));
    ASSERT_NEAR((getLength<Meters>(ret2)), 60.0, TOLERANCE);
-   
+  
    Length<KiloMeters> ret3 = TestFunction1(Time<Seconds>(5.0));
    ASSERT_NEAR((getLength<Meters>(ret3)), 5.0, TOLERANCE);
 

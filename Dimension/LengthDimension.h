@@ -1,29 +1,14 @@
 #ifndef STATIC_DIMENSION_LENGTH_H
 #define STATIC_DIMENSION_LENGTH_H
 
-#include "BaseDimension.h"
+#include "Dimension_Impl/FundamentalDimensions/LengthDimension_Impl.h"
 
 namespace Dimension
 {
-   struct LengthType {};
-   struct Meters;
 
-   template<typename LengthUnit>
-   concept IsLengthUnit = std::is_same_v<typename LengthUnit::Dim, LengthType>;
-   
-   template<typename Unit>
-   struct LengthUnit : public BaseUnit<Unit>
-   { 
-   public: 
-      using BaseUnit<Unit>::BaseUnit;
-
-      using Dim = LengthType;
-      using Primary = Meters;
-   };
-
+   struct Meters : public LengthUnit<Meters> { public: using LengthUnit::LengthUnit; };
    struct Feet : public LengthUnit<Feet> { public: using LengthUnit::LengthUnit; };
    struct Inches : public LengthUnit<Inches> { public: using LengthUnit::LengthUnit; };
-   struct Meters : public LengthUnit<Meters> { public: using LengthUnit::LengthUnit; };
 
    struct AstronomicalUnits : public LengthUnit<AstronomicalUnits> { public: using LengthUnit::LengthUnit; };
    struct DataMiles : public LengthUnit<DataMiles> { public: using LengthUnit::LengthUnit; };
@@ -35,47 +20,6 @@ namespace Dimension
    struct Yards : public LengthUnit<Yards> { public: using LengthUnit::LengthUnit; };
    struct US_Survey_Feet : public LengthUnit<US_Survey_Feet> { public: using LengthUnit::LengthUnit; }; // Obsolete as of 2022
 
-   template<typename T>
-   struct is_length : std::is_convertible<T, BaseDimension<std::tuple<Meters>, std::tuple<>>> {};
-
-   template<typename T>
-   constexpr bool is_length_v = is_length<T>::value;
-
-   template<typename T>
-   concept length_type = is_length_v<T>;
-
-   template<IsLengthUnit T>
-   PrecisionType getLength(length_type auto obj)
-   {
-      return obj.template GetVal<std::tuple<T>, std::tuple<>>();
-   }
-
-   template<IsLengthUnit Unit>
-   class Length : public BaseDimension<std::tuple<Unit>, std::tuple<>>
-   {
-   public:
-      using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
-
-      Length() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}
-
-      Length(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
-
-      template<IsLengthUnit T>
-      Length(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()){}
-
-      template<IsLengthUnit T>
-      [[deprecated("Use the free function getLength() instead.")]]
-      double GetLength() const
-      {
-         return getLength<T>(*this);
-      }
-   };
-
-   template<IsLengthUnit T>
-   Length(T) -> Length<T>;
-
-   template<IsLengthUnit LengthUnit>
-   Length(BaseDimension<std::tuple<LengthUnit>, std::tuple<>>) -> Length<LengthUnit>;
 
    template<> struct Conversion<Feet,              Meters> { static constexpr PrecisionType slope = 0.3048; }; // NIST
    template<> struct Conversion<Inches,            Meters> { static constexpr PrecisionType slope = 0.0254; }; // NIST

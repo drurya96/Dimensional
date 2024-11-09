@@ -1,26 +1,10 @@
 #ifndef STATIC_DIMENSION_MASS_H
 #define STATIC_DIMENSION_MASS_H
 
-#include "BaseDimension.h"
+#include "Dimension_Impl/FundamentalDimensions/MassDimension_Impl.h"
 
 namespace Dimension
 {
-
-   struct MassType {};
-   struct Grams;
-
-   template<typename MassUnit>
-   concept IsMassUnit = std::is_same_v<typename MassUnit::Dim, MassType>;
-
-   template<typename Unit>
-   struct MassUnit : public BaseUnit<Unit>
-   { 
-   public: 
-      using BaseUnit<Unit>::BaseUnit;
-
-      using Dim = MassType;
-      using Primary = Grams;
-   };
 
    struct Grams : public MassUnit<Grams> { public: using MassUnit::MassUnit; };
    struct PoundMass : public MassUnit<PoundMass> { public: using MassUnit::MassUnit; };
@@ -33,47 +17,6 @@ namespace Dimension
    struct LongTon : public MassUnit<LongTon> { public: using MassUnit::MassUnit; };
    struct Tonne : public MassUnit<Tonne> { public: using MassUnit::MassUnit; };
 
-   template<typename T>
-   struct is_mass : std::is_convertible<T, BaseDimension<std::tuple<Grams>, std::tuple<>>> {};
-
-   template<typename T>
-   constexpr bool is_mass_v = is_mass<T>::value;
-
-   template<typename T>
-   concept mass_type = is_mass_v<T>;
-
-   template<IsMassUnit T>
-   PrecisionType getMass(mass_type auto obj)
-   {
-      return obj.template GetVal<std::tuple<T>, std::tuple<>>();
-   }
-
-   template<IsMassUnit Unit>
-   class Mass : public BaseDimension<std::tuple<Unit>, std::tuple<>>
-   {
-   public:
-      using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
-
-      Mass() : BaseDimension<std::tuple<Unit>, std::tuple<>>(0.0) {}
-
-      Mass(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>(val) {}
-
-      template<IsMassUnit T>
-      Mass(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
-
-      template<IsMassUnit T>
-      [[deprecated("Use the free function getMass() instead.")]]
-      double GetMass() const
-      {
-         return getMass<T>(*this);
-      }
-   };
-
-   template<IsMassUnit T>
-   Mass(T) -> Mass<T>;
-
-   template<IsMassUnit MassUnit>
-   Mass(BaseDimension<std::tuple<MassUnit>, std::tuple<>>) -> Mass<MassUnit>;
 
    template<> struct Conversion<PoundMass, Grams> { static constexpr PrecisionType slope = 453.5924; }; // NIST
    template<> struct Conversion<Ounces,    Grams> { static constexpr PrecisionType slope = 28.34952; }; // NIST

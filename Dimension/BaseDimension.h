@@ -10,8 +10,7 @@
 #include "Dimension_Core/UnitSimplifier.h"
 #include "Dimension_Core/FundamentalUnitExtractor.h"
 #include "Dimension_Core/Conversion.h"
-
-#include "SI_Macro.h"
+#include "Dimension_Core/SI_Macro.h"
 
 namespace Dimension
 {
