@@ -5,11 +5,11 @@
 #include <cmath> // For std::hypot, std::modf, std::fmod // @todo move this to Utilities
 #include <stdexcept> // For std::invalid_argument
 
-#include "Dimension_Impl/PrecisionType.h"
-#include "Dimension_Impl/UnitValidation.h"
-#include "Dimension_Impl/UnitSimplifier.h"
-#include "Dimension_Impl/FundamentalUnitExtractor.h"
-#include "Dimension_Impl/Conversion.h"
+#include "Dimension_Core/PrecisionType.h"
+#include "Dimension_Core/UnitValidation.h"
+#include "Dimension_Core/UnitSimplifier.h"
+#include "Dimension_Core/FundamentalUnitExtractor.h"
+#include "Dimension_Core/Conversion.h"
 
 #include "SI_Macro.h"
 
