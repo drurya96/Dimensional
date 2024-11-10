@@ -11,14 +11,13 @@ namespace Dimension
    template<typename TimeUnit>
    concept IsTimeUnit = std::is_same_v<typename TimeUnit::Dim, TimeType>;
 
-   template<typename Unit>
-   struct TimeUnit : public BaseUnit<Unit>
+   template<typename Unit, StringLiteral Name, StringLiteral Abbreviation>
+   struct TimeUnit : public BaseUnit<Unit, Name, Abbreviation>
    {
    public:
-      using BaseUnit<Unit>::BaseUnit;
-
       using Dim = TimeType;
       using Primary = Seconds;
+      
    };
 
    template<typename T>

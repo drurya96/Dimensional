@@ -11,12 +11,10 @@ namespace Dimension
    template<typename TemperatureUnit>
    concept IsTemperatureUnit = std::is_same_v<typename TemperatureUnit::Dim, TemperatureType>;
 
-   template<typename Unit>
-   struct TemperatureUnit : public BaseUnit<Unit>
+   template<typename Unit, StringLiteral Name, StringLiteral Abbreviation>
+   struct TemperatureUnit : public BaseUnit<Unit, Name, Abbreviation>
    {
    public:
-      using BaseUnit<Unit>::BaseUnit;
-
       using Dim = TemperatureType;
       using Primary = Celsius;
    };

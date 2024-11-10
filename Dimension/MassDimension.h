@@ -6,16 +6,15 @@
 namespace Dimension
 {
 
-   struct Grams : public MassUnit<Grams> { public: using MassUnit::MassUnit; };
-   struct PoundMass : public MassUnit<PoundMass> { public: using MassUnit::MassUnit; };
-   struct Ounces : public MassUnit<Ounces> { public: using MassUnit::MassUnit; };
-
-   struct Slugs : public MassUnit<Slugs> { public: using MassUnit::MassUnit; };
-   struct Grains : public MassUnit<Grains> { public: using MassUnit::MassUnit; };
-   struct Stone : public MassUnit<Stone> { public: using MassUnit::MassUnit; };
-   struct ShortTon : public MassUnit<ShortTon> { public: using MassUnit::MassUnit; };
-   struct LongTon : public MassUnit<LongTon> { public: using MassUnit::MassUnit; };
-   struct Tonne : public MassUnit<Tonne> { public: using MassUnit::MassUnit; };
+   struct Grams     : public MassUnit<Grams, "Grams", "g"> {};
+   struct PoundMass : public MassUnit<PoundMass, "PoundMass", "lb"> {};
+   struct Ounces    : public MassUnit<Ounces, "Ounces", "oz"> {};
+   struct Slugs     : public MassUnit<Slugs, "Slugs", "slug"> {};
+   struct Grains    : public MassUnit<Grains, "Grains", "gr"> {};
+   struct Stone     : public MassUnit<Stone, "Stone", "st"> {};
+   struct ShortTon  : public MassUnit<ShortTon, "ShortTon", "ton"> {};
+   struct LongTon   : public MassUnit<LongTon, "LongTon", "LT"> {};
+   struct Tonne     : public MassUnit<Tonne, "Tonne", "t"> {};
 
 
    template<> struct Conversion<PoundMass, Grams> { static constexpr PrecisionType slope = 453.5924; }; // NIST
@@ -27,7 +26,7 @@ namespace Dimension
    template<> struct Conversion<LongTon,   Grams> { static constexpr PrecisionType slope = 1016047.0; }; // NIST
    template<> struct Conversion<Tonne,     Grams> { static constexpr PrecisionType slope = 1000000.0; }; // NIST
 
-   ALL_SI_PREFIXES(Grams, MassUnit);
+   ALL_SI_PREFIXES(Grams, "g", MassUnit);
 
 }
 

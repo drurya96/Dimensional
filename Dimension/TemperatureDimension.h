@@ -6,10 +6,10 @@
 namespace Dimension
 {
 
-   struct Celsius : public TemperatureUnit<Celsius> { public: using TemperatureUnit::TemperatureUnit; };
-   struct Fahrenheit : public TemperatureUnit<Fahrenheit> { public: using TemperatureUnit::TemperatureUnit; };
-   struct Kelvin : public TemperatureUnit<Kelvin> { public: using TemperatureUnit::TemperatureUnit; };
-   struct Rankine : public TemperatureUnit<Rankine> { public: using TemperatureUnit::TemperatureUnit; };
+   struct Celsius : public TemperatureUnit<Celsius, "Celsius", "C"> {};
+   struct Fahrenheit : public TemperatureUnit<Fahrenheit, "Fahrenheit", "F"> {};
+   struct Kelvin : public TemperatureUnit<Kelvin, "Kelvin", "K"> {};
+   struct Rankine : public TemperatureUnit<Rankine, "Rankine", "R"> {};
 
 
    template<> struct Conversion<Celsius, Fahrenheit>

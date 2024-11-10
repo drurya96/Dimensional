@@ -17,7 +17,7 @@ namespace Dimension
    /// @brief A base class representing a unit
    /// @details This abstract class represents a Unit,
    ///    such as Meters, Seconds, Grams, etc.
-   template<typename Unit>
+   template<typename Unit, StringLiteral Name, StringLiteral Abbreviation>
    struct BaseUnit
    {
    public:
@@ -35,6 +35,13 @@ namespace Dimension
       ///    This means, creating units with different IDs and combining them
       ///    into one dimension will prevent them from canelling out.
       constexpr static int ID = 0;
+
+      static constexpr auto name = Name.value;
+
+      static constexpr auto abbr = Abbreviation.value;
+
+      using name_type = decltype(Name);
+      using abbr_type = decltype(Abbreviation);
    };
 
    /// @brief A generic Dimension class

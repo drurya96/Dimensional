@@ -8,6 +8,15 @@
 namespace Dimension
 {
 
+   template<size_t N>
+   struct StringLiteral {
+      constexpr StringLiteral(const char (&str)[N]) {
+         std::copy_n(str, N, value);
+      }
+      
+      char value[N];
+   };
+
    /// @brief A type-trait with void Dim and Primary, only used to satisfy a metaprogramming condition
    struct NullUnit
    {
