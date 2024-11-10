@@ -18,8 +18,6 @@ namespace Dimension
    struct AngleUnit : public BaseUnit<Unit, Name, Abbreviation>
    { 
    public: 
-      using BaseUnit<Unit, Name, Abbreviation>::BaseUnit;
-
       using Dim = AngleType;
       using Primary = Radians;
    };

@@ -15,8 +15,6 @@ namespace Dimension
    struct LengthUnit : public BaseUnit<Unit, Name, Abbreviation>
    { 
    public: 
-      using BaseUnit<Unit, Name, Abbreviation>::BaseUnit;
-
       using Dim = LengthType;
       using Primary = Meters;
    };

@@ -15,8 +15,6 @@ namespace Dimension
    struct TemperatureUnit : public BaseUnit<Unit, Name, Abbreviation>
    {
    public:
-      using BaseUnit<Unit, Name, Abbreviation>::BaseUnit;
-
       using Dim = TemperatureType;
       using Primary = Celsius;
    };

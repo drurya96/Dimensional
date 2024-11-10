@@ -18,7 +18,7 @@ namespace Dimension
       using DenTuple = std::tuple<>;
    };
 
-   struct GallonLength : public LengthUnit<GallonLength, "GallonLength", "GallonLength"> { public: using LengthUnit::LengthUnit; };
+   struct GallonLength : public LengthUnit<GallonLength, "GallonLength", "GallonLength"> {};
 
    template<> struct Conversion<Meters, GallonLength> { static constexpr PrecisionType slope = (1.0 / 0.15562); };
    template<> struct Conversion<GallonLength, Meters> { static constexpr PrecisionType slope = 0.15562; };

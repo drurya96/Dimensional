@@ -39,6 +39,9 @@ namespace Dimension
       static constexpr auto name = Name.value;
 
       static constexpr auto abbr = Abbreviation.value;
+
+      using name_type = decltype(Name);
+      using abbr_type = decltype(Abbreviation);
    };
 
    /// @brief A generic Dimension class

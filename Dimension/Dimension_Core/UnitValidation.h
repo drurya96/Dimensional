@@ -8,16 +8,21 @@
 
 namespace Dimension
 {
-   // Forward declarations
-   template<typename Unit, StringLiteral Name, StringLiteral Abbreviation>
-   struct BaseUnit;
+   template <typename> struct is_tuple: std::false_type {};
+
+   template <typename ...T> struct is_tuple<std::tuple<T...>>: std::true_type {};
 
    template<typename T>
    concept IsUnitType = requires
    {
       typename T::Dim;
       typename T::Primary;
-      //requires std::is_base_of_v<BaseUnit<T, T::name, T::abbr>, T>;
+      requires std::is_same_v<typename T::Dim, typename T::Primary::Dim>;
+      typename T::NumTuple;
+      typename T::DenTuple;
+      requires is_tuple<typename T::NumTuple>::value;
+      requires is_tuple<typename T::DenTuple>::value;
+      { T::ID } -> std::convertible_to<int>;
       requires PrimaryConvertible<T>;
    };
 

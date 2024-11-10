@@ -5,8 +5,8 @@
 
 namespace Dimension
 {
-   struct Radians : public AngleUnit<Radians, "Radians", "rad"> { public: using AngleUnit::AngleUnit; };
-   struct Degrees : public AngleUnit<Degrees, "Degrees", "deg"> { public: using AngleUnit::AngleUnit; };
+   struct Radians : public AngleUnit<Radians, "Radians", "rad"> {};
+   struct Degrees : public AngleUnit<Degrees, "Degrees", "deg"> {};
 
    template<> struct Conversion<Radians, Degrees> { static constexpr PrecisionType slope = 180 / pi; };
 

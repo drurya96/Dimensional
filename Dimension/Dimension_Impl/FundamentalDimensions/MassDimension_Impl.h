@@ -16,8 +16,6 @@ namespace Dimension
    struct MassUnit : public BaseUnit<Unit, Name, Abbreviation>
    { 
    public: 
-      using BaseUnit<Unit, Name, Abbreviation>::BaseUnit;
-
       using Dim = MassType;
       using Primary = Grams;
    };

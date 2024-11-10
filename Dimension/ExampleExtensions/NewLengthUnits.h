@@ -5,13 +5,13 @@
 
 namespace Dimension
 {
-   class Foo : public LengthUnit<Foo, "Foo", "zzz"> { public: using LengthUnit::LengthUnit; };
+   class Foo : public LengthUnit<Foo, "Foo", "zzz"> {};
 
-   class Bar : public LengthUnit<Bar, "Bar", "zzz"> { public: using LengthUnit::LengthUnit; };
+   class Bar : public LengthUnit<Bar, "Bar", "zzz"> {};
 
-   class Baz : public LengthUnit<Baz, "Baz", "zzz"> { public: using LengthUnit::LengthUnit; };
+   class Baz : public LengthUnit<Baz, "Baz", "zzz"> {};
 
-   class Fail : public LengthUnit<Fail, "Fail", "zzz"> { public: using LengthUnit::LengthUnit; };
+   class Fail : public LengthUnit<Fail, "Fail", "zzz"> {};
 
 
    template<> struct Conversion<Feet, Fail> { static constexpr PrecisionType slope = 3.14; };

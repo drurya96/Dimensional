@@ -15,8 +15,6 @@ namespace Dimension
    struct TimeUnit : public BaseUnit<Unit, Name, Abbreviation>
    {
    public:
-      using BaseUnit<Unit, Name, Abbreviation>::BaseUnit;
-
       using Dim = TimeType;
       using Primary = Seconds;
       

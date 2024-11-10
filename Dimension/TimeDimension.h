@@ -6,9 +6,9 @@
 namespace Dimension
 {
 
-   struct Seconds : public TimeUnit<Seconds, "Seconds", "s"> { public: using TimeUnit::TimeUnit; };
-   struct Minutes : public TimeUnit<Minutes, "Minutes", "min"> { public: using TimeUnit::TimeUnit; };
-   struct Hours : public TimeUnit<Hours, "Hours", "h"> { public: using TimeUnit::TimeUnit; };
+   struct Seconds : public TimeUnit<Seconds, "Seconds", "s"> {};
+   struct Minutes : public TimeUnit<Minutes, "Minutes", "min"> {};
+   struct Hours : public TimeUnit<Hours, "Hours", "h"> {};
 
 
    template<> struct Conversion<Seconds, Minutes> { static constexpr PrecisionType slope = (1.0 / 60.0); };
