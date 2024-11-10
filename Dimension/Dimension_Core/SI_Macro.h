@@ -40,25 +40,28 @@ namespace Dimension
     DEFINE_SI_FACTOR(Giga, 1e9)
     DEFINE_SI_FACTOR(Tera, 1e12)
 
+    #define STRINGIFY(x) #x
+    #define CONCAT_AND_STRINGIFY(x, y) STRINGIFY(x##y)
+
     // Macro definition to create a prefixed factory function
-    #define SI_PREFIX(baseName, UnitType, Prefix) \
-    struct Prefix##baseName : public UnitType<Prefix##baseName> { public: using UnitType::UnitType; }; \
+    #define SI_PREFIX(baseName, baseAbbr, UnitType, Prefix, Abbr) \
+    struct Prefix##baseName : public UnitType<Prefix##baseName, CONCAT_AND_STRINGIFY(Prefix, baseName), Abbr baseAbbr> { public: using UnitType::UnitType; }; \
     template<> struct Conversion<baseName, Prefix##baseName> { static constexpr PrecisionType slope = 1.0 / SIFactor<Prefix>::value; }; \
     template<> struct Conversion<Prefix##baseName, baseName> { static constexpr PrecisionType slope = SIFactor<Prefix>::value; };
 
-    #define ALL_SI_PREFIXES(baseName, UnitType) \
-    SI_PREFIX(baseName, UnitType, Pico); \
-    SI_PREFIX(baseName, UnitType, Nano); \
-    SI_PREFIX(baseName, UnitType, Micro); \
-    SI_PREFIX(baseName, UnitType, Milli); \
-    SI_PREFIX(baseName, UnitType, Centi); \
-    SI_PREFIX(baseName, UnitType, Deci); \
-    SI_PREFIX(baseName, UnitType, Deca); \
-    SI_PREFIX(baseName, UnitType, Hecto); \
-    SI_PREFIX(baseName, UnitType, Kilo); \
-    SI_PREFIX(baseName, UnitType, Mega); \
-    SI_PREFIX(baseName, UnitType, Giga); \
-    SI_PREFIX(baseName, UnitType, Tera);
+    #define ALL_SI_PREFIXES(baseName, baseAbbr, UnitType) \
+    SI_PREFIX(baseName, baseAbbr, UnitType, Pico, "p"); \
+    SI_PREFIX(baseName, baseAbbr, UnitType, Nano, "n"); \
+    SI_PREFIX(baseName, baseAbbr, UnitType, Micro, "u"); \
+    SI_PREFIX(baseName, baseAbbr, UnitType, Milli, "m"); \
+    SI_PREFIX(baseName, baseAbbr, UnitType, Centi, "c"); \
+    SI_PREFIX(baseName, baseAbbr, UnitType, Deci, "d"); \
+    SI_PREFIX(baseName, baseAbbr, UnitType, Deca, "da"); \
+    SI_PREFIX(baseName, baseAbbr, UnitType, Hecto, "h"); \
+    SI_PREFIX(baseName, baseAbbr, UnitType, Kilo, "k"); \
+    SI_PREFIX(baseName, baseAbbr, UnitType, Mega, "M"); \
+    SI_PREFIX(baseName, baseAbbr, UnitType, Giga, "G"); \
+    SI_PREFIX(baseName, baseAbbr, UnitType, Tera, "T");
 
 } // end Dimension
 

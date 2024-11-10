@@ -5,13 +5,13 @@
 
 namespace Dimension
 {
-   class Foo : public LengthUnit<Foo> { public: using LengthUnit::LengthUnit; };
+   class Foo : public LengthUnit<Foo, "Foo", "zzz"> { public: using LengthUnit::LengthUnit; };
 
-   class Bar : public LengthUnit<Bar> { public: using LengthUnit::LengthUnit; };
+   class Bar : public LengthUnit<Bar, "Bar", "zzz"> { public: using LengthUnit::LengthUnit; };
 
-   class Baz : public LengthUnit<Baz> { public: using LengthUnit::LengthUnit; };
+   class Baz : public LengthUnit<Baz, "Baz", "zzz"> { public: using LengthUnit::LengthUnit; };
 
-   class Fail : public LengthUnit<Fail> { public: using LengthUnit::LengthUnit; };
+   class Fail : public LengthUnit<Fail, "Fail", "zzz"> { public: using LengthUnit::LengthUnit; };
 
 
    template<> struct Conversion<Feet, Fail> { static constexpr PrecisionType slope = 3.14; };
@@ -36,10 +36,10 @@ namespace Dimension
    };
 
    template<int I = 0>
-   class BarSub : public LengthUnit<BarSub<I>>
+   class BarSub : public LengthUnit<BarSub<I>, "BarSub", "zzz">
    {
    public:
-      using LengthUnit<BarSub<I>>::LengthUnit;
+      using LengthUnit<BarSub<I>, "BarSub", "zzz">::LengthUnit;
       static constexpr int ID = I;
    };
 

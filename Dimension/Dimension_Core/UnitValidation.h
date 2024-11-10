@@ -9,7 +9,7 @@
 namespace Dimension
 {
    // Forward declarations
-   template<typename Unit>
+   template<typename Unit, StringLiteral Name, StringLiteral Abbreviation>
    struct BaseUnit;
 
    template<typename T>
@@ -17,7 +17,7 @@ namespace Dimension
    {
       typename T::Dim;
       typename T::Primary;
-      requires std::is_base_of_v<BaseUnit<T>, T>;
+      //requires std::is_base_of_v<BaseUnit<T, T::name, T::abbr>, T>;
       requires PrimaryConvertible<T>;
    };
 

@@ -12,11 +12,11 @@ namespace Dimension
    template<typename MassUnit>
    concept IsMassUnit = std::is_same_v<typename MassUnit::Dim, MassType>;
 
-   template<typename Unit>
-   struct MassUnit : public BaseUnit<Unit>
+   template<typename Unit, StringLiteral Name, StringLiteral Abbreviation>
+   struct MassUnit : public BaseUnit<Unit, Name, Abbreviation>
    { 
    public: 
-      using BaseUnit<Unit>::BaseUnit;
+      using BaseUnit<Unit, Name, Abbreviation>::BaseUnit;
 
       using Dim = MassType;
       using Primary = Grams;
