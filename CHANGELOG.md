@@ -5,13 +5,33 @@ All notable changes to this project will be documented in this file. Semantic ve
 ## [Unreleased]
 
 ### Changed
+- 
+
+### Added
+- 
+
+### Deprecated
+- 
+
+### Removed
+- 
+
+### Fixed
+- 
+
+## [2.3.0] - 2024-11-10
+### Changed
 - Reorganized implementation headers
   - `Dimension_Impl` contains implementations for each dimension, nested in either
     - `FundamentalDimensions` (Mass, Time, etc.)
     - `DerivedDimensions` which are derived from Fundamental (Speed, Force, etc.)
+- Constructor inheritance removed from units
+  - Minimal effect since the BaseUnit constructor was already deleted.
+- Units do not need to inherit from BaseUnit anymore, instead they simply must meet the concept `IsUnitType` 
 
 ### Added
-- 
+- All units are templated on two string literals representing Name and Abbreviation
+  - These values are available as constexpr
 
 ### Deprecated
 - 
