@@ -34,12 +34,13 @@ double TestFunction2(Length<T> time)
    return getLength<Meters>(time);
 }
 
-
+/*
 template<typename T>
 void PrintUnit()
 {
    std::cout << T::name << "; " << T::abbr << std::endl;
 }
+*/
 
 namespace Dimension
 {
@@ -75,11 +76,11 @@ TEST_F(DimensionTest, TestFunctionParameters) {
 
    double ret4 = TestFunction2(test);
    ASSERT_NEAR(ret4, 60.0, TOLERANCE);
-
+/*
    PrintUnit<Seconds>();
    PrintUnit<MilliSeconds>();
    PrintUnit<MegaGrams>();
    PrintUnit<Radians>();
    PrintUnit<DataMiles>();
-
+*/
 }

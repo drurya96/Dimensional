@@ -1,7 +1,7 @@
 #ifndef DIMENSION_UNIT_EXTRACTOR_H
 #define DIMENSION_UNIT_EXTRACTOR_H
 
-#include "GenericTypeTraits.h"
+#include "TupleHandling.h"
 #include "UnitValidation.h"
 
 namespace Dimension

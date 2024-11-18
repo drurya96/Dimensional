@@ -13,7 +13,7 @@ namespace Dimension
    concept IsMassUnit = std::is_same_v<typename MassUnit::Dim, MassType>;
 
    template<typename Unit, StringLiteral Name, StringLiteral Abbreviation>
-   struct MassUnit : public BaseUnit<Unit, Name, Abbreviation>
+   struct MassUnit : public BaseUnit<Unit, Name, Abbreviation, "Mass">
    { 
    public: 
       using Dim = MassType;

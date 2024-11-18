@@ -1,7 +1,7 @@
 #ifndef DIMENSION_UNIT_SIMPLIFIER_H
 #define DIMENSION_UNIT_SIMPLIFIER_H
 
-#include "GenericTypeTraits.h"
+#include "TupleHandling.h"
 #include "Conversion.h"
 #include "FundamentalUnitExtractor.h"
 #include "UnitValidation.h"
@@ -28,6 +28,32 @@ namespace Dimension
    /// @typedef value A constexpr bool indicating whether Us contains T
    template<typename Dim, typename... Us>
    struct has_same_dim<Dim, std::tuple<Us...>> : std::disjunction<is_same_dim<Dim, Us>...> {};
+
+   /// @brief get the first unit in the tuple matching the dimension of T
+   template<template<typename, typename> typename Compare, typename T, typename Tuple>
+   struct get_first_match;
+
+   /// @brief get the first unit in the tuple matching the dimension of T
+   /// @details Specialization for no match found, return a NullUnit
+   ///    This should not typical occur and is a sign of problematic code elsewhere
+   /// @tparam T Unit to match against
+   /// @tparam Tuple Tuple of units
+   template<template<typename, typename> typename Compare, typename T>
+   struct get_first_match<Compare, T, std::tuple<>> {
+      using type = NullUnit;
+   };
+
+   /// @brief get the first unit in the tuple matching the dimension of T
+   /// @details Primary specialization
+   /// @tparam T Unit to match against
+   /// @tparam Tuple Tuple of units
+   /// @typedef type The type of unit of matching dimension to T
+   template<template<typename, typename> typename Compare, typename T, typename Head, typename... Tail>
+   struct get_first_match<Compare, T, std::tuple<Head, Tail...>> {
+      using type = std::conditional_t<Compare<T, Head>::value,
+         Head,
+         typename get_first_match<Compare, T, std::tuple<Tail...>>::type>;
+   };
 
    /// @brief Struct to simplify units by cancelling out as necessary
    template<typename NumTypes1, typename NumTypes2, typename DenTypes1, typename DenTypes2>

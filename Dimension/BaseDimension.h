@@ -4,6 +4,11 @@
 #include <tuple> // For std::tuple and related functions
 #include <cmath> // For std::hypot, std::modf, std::fmod // @todo move this to Utilities
 #include <stdexcept> // For std::invalid_argument
+#include <array>
+//#include <format>
+#include <cstdint>
+#include <string_view>
+#include <algorithm>
 
 #include "Dimension_Core/PrecisionType.h"
 #include "Dimension_Core/UnitValidation.h"
@@ -11,20 +16,22 @@
 #include "Dimension_Core/FundamentalUnitExtractor.h"
 #include "Dimension_Core/Conversion.h"
 #include "Dimension_Core/SI_Macro.h"
+#include "Dimension_Core/Hashing.h"
+#include "Dimension_Core/StringLiteral.h"
+#include "Dimension_Core/Stream.h"
+#include "Dimension_Core/Serialization.h"
 
 namespace Dimension
 {
+
    /// @brief A base class representing a unit
    /// @details This abstract class represents a Unit,
    ///    such as Meters, Seconds, Grams, etc.
-   template<typename Unit, StringLiteral Name, StringLiteral Abbreviation>
+   template<typename Unit, StringLiteral Name, StringLiteral Abbreviation, StringLiteral DimName>
    struct BaseUnit
    {
    public:
-      /// @brief Default constructor
-      /// @todo delete this function so units cannot be constructed
-      ///    For now, some template metaprogramming relying on decltype
-      ///    requires a default constructor.
+      /// @brief No constructor
       BaseUnit() = delete;
 
       using NumTuple = std::tuple<Unit>;
@@ -36,12 +43,22 @@ namespace Dimension
       ///    into one dimension will prevent them from canelling out.
       constexpr static int ID = 0;
 
-      static constexpr auto name = Name.value;
+      static constexpr StringLiteral<Name.size> name = Name;
+      static constexpr StringLiteral<Abbreviation.size> abbr = Abbreviation;
+      static constexpr StringLiteral<DimName.size> dimName = DimName;
 
-      static constexpr auto abbr = Abbreviation.value;
+      //static constexpr StringLiteral<3> delim{std::array<char, 3>{':', ':', '\0'}};
+      static constexpr StringLiteral<3> delim = "::"; // Size three due to null terminator
+
+      static constexpr StringLiteral<DimName.size + delim.size - 1> test = concat(dimName, delim); // size - 1 to account for removed null terminator from first param
+      static constexpr StringLiteral<test.size + name.size - 1> qualifiedName = concat(test, name); // size - 1 to account for removed null terminator from first param
 
       using name_type = decltype(Name);
       using abbr_type = decltype(Abbreviation);
+      using dimName_type = decltype(DimName);
+
+      //template<> struct UnitFromString<qualifiedName> { using type = Unit; };
+      //inline static constexpr bool registered = register_unit<qualifiedName, Unit>;
    };
 
    /// @brief A generic Dimension class
@@ -83,7 +100,6 @@ namespace Dimension
       {
       }
 
-
       template<typename T, typename U>
       requires MatchingDimensions<NumTuple, T> && MatchingDimensions<DenTuple, U>
       BaseDimension(BaseDimension<T, U> obj) :
@@ -119,6 +135,18 @@ namespace Dimension
          ConvertDimension<0, true, ToDenTuple, DenTuple, isDelta>(result);
 
          return result;
+      }
+
+      template<typename FromNumTuple, typename FromDenTuple>
+      requires MatchingDimensions<NumTuple, FromNumTuple> && MatchingDimensions<DenTuple, FromDenTuple>
+      void SetVal(PrecisionType newVal)
+      {
+         constexpr bool isDelta = !((std::tuple_size_v<FromNumTuple> == 1) && (std::tuple_size_v<FromDenTuple> == 0));
+
+         ConvertDimension<0, false, NumTuple, FromNumTuple, isDelta>(newVal);
+         ConvertDimension<0, true, DenTuple, FromDenTuple, isDelta>(newVal);
+
+         scalar = newVal;
       }
       
       
