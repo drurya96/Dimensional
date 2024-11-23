@@ -18,9 +18,16 @@ namespace Dimension
    requires IsUnitTuplePair<NumTupleT, DenTupleT>
    class BaseDimension;
 
+   /// @brief Type of string to print
    enum class UnitNameTypes{Name, Abbr, DimName};
 
-   // Modified streamMember function with if-else structure
+   /// @brief Update stream using a string associated with each type in a tuple
+   /// @tparam StreamType Type of stream
+   /// @tparam TupleType Tuple to stream
+   /// @tparam Member Type of string to stream
+   /// @tparam ...Indices Indecies in the tuple
+   /// @param [out] stream Stream to update
+   /// @param [in] delim Delimiter to use between strings
    template <typename StreamType, typename TupleType, UnitNameTypes Member, std::size_t... Indices>
    void streamMember(StreamType& stream, std::index_sequence<Indices...>, const std::string& delim) {
       ((stream << (Indices == 0 ? "" : delim), 
@@ -35,6 +42,12 @@ namespace Dimension
          }()), ...);
    }
 
+   /// @brief Write dimension object to stream
+   /// @tparam NumTuple Numerator unit tuple
+   /// @tparam DenTuple Denominator unit tuple
+   /// @param os stream to write to
+   /// @param obj object to write
+   /// @return reference to stream written
    template<typename NumTuple, typename DenTuple>
    std::ostream& to_stream(std::ostream& os, const BaseDimension<NumTuple, DenTuple>& obj)
    {
@@ -68,6 +81,11 @@ namespace Dimension
       return os;
    }
 
+   /// @brief Write dimension object to std::string
+   /// @tparam NumTuple Numerator unit tuple
+   /// @tparam DenTuple Denominator unit tuple
+   /// @param obj Dimension object to write
+   /// @return string representation of object
    template<typename NumTuple, typename DenTuple>
    std::string to_string(const BaseDimension<NumTuple, DenTuple>& obj)
    {
@@ -76,6 +94,12 @@ namespace Dimension
       return os.str();
    }
 
+   /// @brief Stream operator from BaseDimension to ostream
+   /// @tparam NumTuple Numerator tuple
+   /// @tparam DenTuple Denominator tuple
+   /// @param os stream object
+   /// @param obj dimension object
+   /// @return reference to stream object
    template<typename NumTuple, typename DenTuple>
    std::ostream& operator<<(std::ostream& os, const BaseDimension<NumTuple, DenTuple>& obj)
    {

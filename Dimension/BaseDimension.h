@@ -4,11 +4,7 @@
 #include <tuple> // For std::tuple and related functions
 #include <cmath> // For std::hypot, std::modf, std::fmod // @todo move this to Utilities
 #include <stdexcept> // For std::invalid_argument
-#include <array>
-//#include <format>
-#include <cstdint>
-#include <string_view>
-#include <algorithm>
+//#include <algorithm>
 
 #include "Dimension_Core/PrecisionType.h"
 #include "Dimension_Core/UnitValidation.h"
@@ -47,7 +43,6 @@ namespace Dimension
       static constexpr StringLiteral<Abbreviation.size> abbr = Abbreviation;
       static constexpr StringLiteral<DimName.size> dimName = DimName;
 
-      //static constexpr StringLiteral<3> delim{std::array<char, 3>{':', ':', '\0'}};
       static constexpr StringLiteral<3> delim = "::"; // Size three due to null terminator
 
       static constexpr StringLiteral<DimName.size + delim.size - 1> test = concat(dimName, delim); // size - 1 to account for removed null terminator from first param
@@ -56,9 +51,6 @@ namespace Dimension
       using name_type = decltype(Name);
       using abbr_type = decltype(Abbreviation);
       using dimName_type = decltype(DimName);
-
-      //template<> struct UnitFromString<qualifiedName> { using type = Unit; };
-      //inline static constexpr bool registered = register_unit<qualifiedName, Unit>;
    };
 
    /// @brief A generic Dimension class
@@ -137,6 +129,11 @@ namespace Dimension
          return result;
       }
 
+      /// @brief Set the value using given units
+      /// @details Set value of scalar for an existing object using given dimension.
+      /// @tparam FromNumTuple Numerator tuple corresponding to the value to set
+      /// @tparam FromDenTuple Denominator tuple corresponding to the value to set
+      /// @param newVal Value to set
       template<typename FromNumTuple, typename FromDenTuple>
       requires MatchingDimensions<NumTuple, FromNumTuple> && MatchingDimensions<DenTuple, FromDenTuple>
       void SetVal(PrecisionType newVal)

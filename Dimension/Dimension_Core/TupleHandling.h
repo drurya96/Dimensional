@@ -152,11 +152,14 @@ namespace Dimension
       using type = tuple_cat_t<std::tuple<T>, typename tuple_diff<Compare, std::tuple<restMinuendTypes...>, std::tuple<subtrahendTypes...>>::type>;
    };
 
+   /// @brief Swap two indecies of a tuple type
+   /// @tparam Tuple Tuple type to swap
+   /// @tparam I First index to swap
+   /// @tparam J Second index to swap
    template <typename Tuple, std::size_t I, std::size_t J>
    struct tuple_swap
    {
    private:
-      // Helper to swap types at indices I and J in the tuple
       template <std::size_t Index, typename T>
       using Replace = std::conditional_t<
          Index == I, 
@@ -177,6 +180,9 @@ namespace Dimension
       using type = decltype(rebuild_tuple(std::make_index_sequence<std::tuple_size_v<Tuple>>{}));
    };
 
+   /// @brief Sort tuple type based on qualified name
+   /// @tparam Tuple Tuple type to sort
+   /// @tparam N Current index to evaluate
    template <typename Tuple, std::size_t N = std::tuple_size_v<Tuple>>
    struct tuple_bubble_sort 
    {
@@ -214,6 +220,13 @@ namespace Dimension
    struct tuple_bubble_sort<Tuple, 1>
    {
       using type = Tuple;
+   };
+
+   // Bubble sort empty tuple
+   template <>
+   struct tuple_bubble_sort<std::tuple<>, 0>
+   {
+      using type = std::tuple<>;
    };
 
 } // end Dimension

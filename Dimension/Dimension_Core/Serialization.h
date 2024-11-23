@@ -5,141 +5,114 @@
 
 #include "StringLiteral.h"
 #include "UnitSimplifier.h"
+#include "SerializationPolicies.h"
 #include <vector>
 
 namespace Dimension
 {
 
-   template<typename NumTupleT, typename DenTupleT>
-   requires IsUnitTuplePair<NumTupleT, DenTupleT>
-   class BaseDimension;
-
-   struct DefaultSerializationPolicy
-   {
-      template <typename NumTuple, typename DenTuple, typename InputIt>
-      static BaseDimension<NumTuple, DenTuple> deserialize(InputIt in)
-      {
-         // Read the tag and verify it matches the expected tag
-         std::uint32_t tag;
-         std::memcpy(&tag, &*in, sizeof(tag));
-         in += sizeof(tag);
-
-         constexpr std::uint32_t expected_tag = TypeTagHelper<NumTuple, DenTuple>::value;
-         if (tag != expected_tag) {
-            throw std::invalid_argument("Type tag mismatch during deserialization");
-         }
-
-         // Read the double value
-         double val;
-         std::memcpy(&val, &*in, sizeof(val));
-         
-         return BaseDimension<NumTuple, DenTuple>(val);
-      }
-
-      template <typename NumTuple, typename DenTuple, typename InputIt>
-      static void deserialize(InputIt in, BaseDimension<NumTuple, DenTuple>& obj)
-      {
-         // Read the tag and verify it matches the expected tag
-         std::uint32_t tag;
-         std::memcpy(&tag, &*in, sizeof(tag));
-         in += sizeof(tag);
-
-         constexpr std::uint32_t expected_tag = TypeTagHelper<NumTuple, DenTuple>::value;
-         if (tag != expected_tag) {
-            throw std::invalid_argument("Type tag mismatch during deserialization");
-         }
-
-         // Read the double value
-         double val;
-         std::memcpy(&val, &*in, sizeof(val));
-         
-         //return BaseDimension<NumTuple, DenTuple>(val);
-         obj.template SetVal<NumTuple, DenTuple>(val);
-      }
-
-      // Serialize to a binary buffer
-      template <typename NumTuple, typename DenTuple, typename OutputIt>
-      static void serialize(OutputIt out, const BaseDimension<NumTuple, DenTuple>& obj)
-      {
-         // Generate the unique type tag based on `NumTuple` and `DenTuple`
-         constexpr auto tag = TypeTagHelper<NumTuple, DenTuple>::value;
-         std::memcpy(&*out, &tag, sizeof(tag));
-         out += sizeof(tag);
-
-         // Write the double scalar
-         PrecisionType temp = obj.template GetVal<NumTuple, DenTuple>();
-         std::memcpy(&*out, &temp, sizeof(PrecisionType));
-      }
-
-      template <typename NumTuple, typename DenTuple, typename OutputIt = std::vector<uint8_t>>
-      static OutputIt serialize(const BaseDimension<NumTuple, DenTuple>& obj)
-      {
-         // Generate the unique type tag based on `NumTuple` and `DenTuple`
-
-         OutputIt outBuffer;
-         outBuffer.reserve(sizeof(uint32_t) + sizeof(PrecisionType));
-         auto out = outBuffer.begin();
-
-         constexpr auto tag = TypeTagHelper<NumTuple, DenTuple>::value;
-         std::memcpy(&*out, &tag, sizeof(tag));
-         out += sizeof(tag);
-
-         // Write the double scalar
-         PrecisionType temp = obj.template GetVal<NumTuple, DenTuple>();
-         std::memcpy(&*out, &temp, sizeof(PrecisionType));
-
-         return outBuffer;
-      }
-
-   };
-
-   template <typename NumTuple, typename DenTuple, typename Policy = DefaultSerializationPolicy>
+   /// @brief Serializer to handle serialization and deserialization
+   /// @details Policy-based serialization API allowing user-defined serialization logic
+   /// @tparam NumTuple The numerator tuple for use in serialization
+   /// @tparam DenTuple The denominator tuple for use in serialization
+   /// @tparam Policy The serialization policy. This policy must minimally provide the serialize and/or deserialize
+   ///   methods to use. Generally, the same serialization policy should be used for serialize and deserialize.
+   ///   The defualt policy is itself policy-based, where it is templated on a hashing policy.
+   template <typename NumTuple, typename DenTuple, typename Policy = DefaultSerializationPolicy<FNV_1a_32Bit>>
    struct Serializer
    {
-      // Deserialize from a binary buffer
-      template <typename InputIt>
-      static BaseDimension<NumTuple, DenTuple> deserialize(InputIt in)
+      /// @brief serialize a BaseDimension object into a passed buffer
+      /// @tparam OutputBuf The buffer type
+      /// @param out The buffer to serialize into
+      /// @param obj The object to serialize
+      template<typename OutputBuf>
+      static void serialize(OutputBuf& out, const BaseDimension<NumTuple, DenTuple>& obj)
       {
-         return Policy::template deserialize<NumTuple, DenTuple, InputIt>(in);
+         return Policy::template serialize<NumTuple, DenTuple, OutputBuf>(out, obj);
       }
 
-      template <typename InputIt>
-      static void deserialize(InputIt in, BaseDimension<NumTuple, DenTuple>& obj)
+      /// @brief serialize a BaseDimension object and return the buffer
+      /// @tparam OutputBuf The buffer type
+      /// @param out The buffer to serialize
+      /// @return A new buffer populated with data from serializing obj
+      template<typename OutputBuf = std::vector<uint8_t>>
+      static OutputBuf serialize(const BaseDimension<NumTuple, DenTuple>& obj)
       {
-         return Policy::template deserialize<NumTuple, DenTuple, InputIt>(in, obj);
+         return Policy::template serialize<NumTuple, DenTuple, OutputBuf>(obj);
       }
 
-      template<typename OutputIt>
-      static void serialize(OutputIt out, const BaseDimension<NumTuple, DenTuple>& obj)
+      /// @brief deserialize a buffer and return the corresponding object
+      /// @tparam InputBuf The buffer type
+      /// @param in The buffer to deserialize
+      /// @return A new BaseDimension object populated with data from deserializing input buffer
+      template <typename InputBuf>
+      static BaseDimension<NumTuple, DenTuple> deserialize(const InputBuf& in)
       {
-         return Policy::template serialize<NumTuple, DenTuple, OutputIt>(out, obj);
+         return Policy::template deserialize<NumTuple, DenTuple, InputBuf>(in);
       }
 
-      template<typename OutputIt = std::vector<uint8_t>>
-      static OutputIt serialize(const BaseDimension<NumTuple, DenTuple>& obj)
+      /// @brief deserialize a buffer and update the input object
+      /// @tparam InputBuf The buffer type
+      /// @param in The buffer to deserialize
+      /// @param obj The object to update
+      template <typename InputBuf>
+      static void deserialize(const InputBuf& in, BaseDimension<NumTuple, DenTuple>& obj)
       {
-         return Policy::template serialize<NumTuple, DenTuple, OutputIt>(obj);
+         return Policy::template deserialize<NumTuple, DenTuple, InputBuf>(in, obj);
       }
    };
 
-   template <typename NumTuple, typename DenTuple, typename OutputIt, typename Policy = DefaultSerializationPolicy>
-   void serialize(OutputIt out, const BaseDimension<NumTuple, DenTuple>& obj)
+   /// @brief serialize a BaseDimension object into a passed buffer
+   /// @tparam NumTuple numerator tuple to template Serializer on
+   /// @tparam DenTuple denominator tuple to template Serializer on
+   /// @tparam OutputBuf The buffer type
+   /// @tparam Policy Serialization policy to template Serializer on
+   /// @param out The buffer to serialize into
+   /// @param obj The object to serialize
+   template <typename NumTuple, typename DenTuple, typename OutputBuf, typename Policy = DefaultSerializationPolicy<FNV_1a_32Bit>>
+   void serialize(OutputBuf& out, const BaseDimension<NumTuple, DenTuple>& obj)
    {
       Serializer<NumTuple, DenTuple, Policy>::serialize(out, obj);
    }
 
-   template <typename NumTuple, typename DenTuple, typename OutputIt = std::vector<uint8_t>, typename Policy = DefaultSerializationPolicy>
-   OutputIt serialize(const BaseDimension<NumTuple, DenTuple>& obj)
+   /// @brief serialize a BaseDimension object and return the buffer
+   /// @tparam NumTuple numerator tuple to template Serializer on
+   /// @tparam DenTuple denominator tuple to template Serializer on
+   /// @tparam OutputBuf The buffer type
+   /// @tparam Policy Serialization policy to template Serializer on
+   /// @param obj The object to serialize
+   /// @return A new buffer populated with data from serializing obj
+   template <typename NumTuple, typename DenTuple, typename OutputBuf = std::vector<uint8_t>, typename Policy = DefaultSerializationPolicy<FNV_1a_32Bit>>
+   OutputBuf serialize(const BaseDimension<NumTuple, DenTuple>& obj)
    {
-      return Serializer<NumTuple, DenTuple, Policy>::template serialize<OutputIt>(obj);
+      return Serializer<NumTuple, DenTuple, Policy>::template serialize<OutputBuf>(obj);
    }
 
-   template <typename NumTuple, typename DenTuple, typename InputIt, typename Policy = DefaultSerializationPolicy>
-   void deserialize(InputIt in, BaseDimension<NumTuple, DenTuple>& obj)
+   /// @brief deserialize a buffer and return the corresponding object
+   /// @tparam NumTuple numerator tuple to template Serializer on
+   /// @tparam DenTuple denominator tuple to template Serializer on
+   /// @tparam InputBuf The buffer type
+   /// @tparam Policy Serialization policy to template Serializer on
+   /// @param in The buffer to deserialize
+   /// @return A new BaseDimension object populated with data from deserializing input buffer
+   template <typename NumTuple, typename DenTuple, typename InputBuf, typename Policy = DefaultSerializationPolicy<FNV_1a_32Bit>>
+   BaseDimension<NumTuple, DenTuple> deserialize(const InputBuf& in)
+   {
+      return Serializer<NumTuple, DenTuple, Policy>::deserialize(in);
+   }
+
+   /// @brief deserialize a buffer and update the input object
+   /// @tparam NumTuple numerator tuple to template Serializer on
+   /// @tparam DenTuple denominator tuple to template Serializer on
+   /// @tparam InputBuf The buffer type
+   /// @tparam Policy Serialization policy to template Serializer on
+   /// @param in The buffer to deserialize
+   /// @param obj The object to deserialize into
+   template <typename NumTuple, typename DenTuple, typename InputBuf, typename Policy = DefaultSerializationPolicy<FNV_1a_32Bit>>
+   void deserialize(const InputBuf& in, BaseDimension<NumTuple, DenTuple>& obj)
    {
       Serializer<NumTuple, DenTuple, Policy>::deserialize(in, obj);
    }
-
 
 } // end Dimension
 

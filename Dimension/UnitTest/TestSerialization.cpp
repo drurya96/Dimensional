@@ -15,116 +15,109 @@
 
 using namespace Dimension;
 
+template<typename NumTuple, typename DenTuple>
+void ValidateWrapperWithReturns()
+{
+    BaseDimension<NumTuple, DenTuple> obj(25.0);
+    auto buffer = serialize(obj);
 
+    EXPECT_EQ(buffer.size(), sizeof(uint32_t) + sizeof(PrecisionType));
 
-/*
-template<typename T>
-std::ostream& operator<<(std::ostream& os, const Length<T>& obj) {
-    // Output to the stream
-    os << getLength<T>(obj) << " [" << T::abbr << "]";
-    return os;
+    auto result = deserialize<NumTuple, DenTuple, decltype(buffer)>(buffer);
+    EXPECT_NEAR((result.template GetVal<NumTuple, DenTuple>()), 25.0, TOLERANCE);
 }
-*/
 
+template<typename NumTuple, typename DenTuple, typename BufferType>
+void ValidateWrapperWithRefs()
+{
 
+    using elementType = BufferType::value_type;
+    constexpr size_t requiredSize = (sizeof(uint32_t) + sizeof(PrecisionType) + sizeof(elementType) - 1) / sizeof(elementType);
 
-TEST_F(DimensionTest, TestStreamSerializer) {
+    BufferType buffer;
+    buffer.resize(requiredSize);
 
-   BaseDimension<std::tuple<Feet, Feet>, std::tuple<Seconds, Seconds>> myLen(25);
+    BaseDimension<NumTuple, DenTuple> obj(25.0);
+    serialize(buffer, obj);
 
-   //std::stringstream sstream;
+    EXPECT_EQ(buffer.size() * sizeof(elementType), sizeof(uint32_t) + sizeof(PrecisionType));
 
-   //sstream << myLen;
+    BaseDimension<NumTuple, DenTuple> result;
+    deserialize<NumTuple, DenTuple>(buffer, result);
 
-   std::cout << myLen << std::endl;
+    EXPECT_NEAR((result.template GetVal<NumTuple, DenTuple>()), 25.0, TOLERANCE);
 
-   std::string myStr = to_string(myLen);
+}
 
-   std::cout << myStr << std::endl;
+template<typename NumTuple, typename DenTuple>
+void ValidateNoHash()
+{
 
-   std::cout << Meters::qualifiedName << std::endl;
+    using TestSerializer = Serializer<NumTuple, DenTuple, DefaultSerializationPolicy<NoHash>>;
 
-    constexpr uint32_t hashed = hash_string_literal(Feet::qualifiedName);
+    BaseDimension<NumTuple, DenTuple> obj(25.0);
+    auto buffer = TestSerializer::serialize(obj);
 
+    EXPECT_EQ(buffer.size(), sizeof(PrecisionType));
 
-    std::cout << hashed << std::endl;
-
-    using TupType = typename BaseDimension<std::tuple<Meters, Feet, Meters>, std::tuple<Seconds, Seconds>>::NumTuple;
-    std::cout << "Concatenated String: " << TupleStringConcat<TupType>::value() << std::endl;
-
-    using SortedTuple = tuple_bubble_sort<TupType>::type;
-    std::cout << "Concatenated String: " << TupleStringConcat<SortedTuple>::value() << std::endl;
-
-
-    //std::vector<uint8_t> buffer;
-    //buffer.resize(sizeof(uint32_t) + sizeof(PrecisionType));
-
-    //myLen.serialize(buffer.begin());
-    //Serializer<std::tuple<Feet, Feet>, std::tuple<Seconds, Seconds>>::serialize(buffer.begin(), myLen);
-    //serialize(buffer.begin(), myLen);
-
-    //auto buffer = Serializer<std::tuple<Feet, Feet>, std::tuple<Seconds, Seconds>>::serialize(myLen);
-    auto buffer = serialize(myLen);
-
-
-    std::cout << "Tag: " << TypeTagHelper<decltype(myLen)::NumTuple, decltype(myLen)::DenTuple>::value << std::endl;
-
-    for (uint8_t byte : buffer)
-    {
-        std::cout << std::hex << static_cast<int>(byte) << ' ';
-    }
-    std::cout << std::endl;
-
-
-    
-
-    //BaseDimension<std::tuple<Feet, Feet>, std::tuple<Seconds, Seconds>> deserializedObject = BaseDimension<std::tuple<Feet, Feet>, std::tuple<Seconds, Seconds>>::deserialize(buffer.begin());
-    //auto deserializedObject = BaseDimension<std::tuple<Feet, Feet>, std::tuple<Seconds, Seconds>>::deserialize(buffer.begin());
-
-    //BaseDimension<std::tuple<Feet, Feet>, std::tuple<Seconds, Seconds>> deserializedObject = Serializer<std::tuple<Feet, Feet>, std::tuple<Seconds, Seconds>>::deserialize(buffer.begin());
-    auto deserializedObject2 = Serializer<std::tuple<Feet, Feet>, std::tuple<Seconds, Seconds>>::deserialize(buffer.begin());
-    std::cout << deserializedObject2 << std::endl;
-
-    //auto deserializedObject = deserialize<std::tuple<Feet, Feet>, std::tuple<Seconds, Seconds>, BufferType>(buffer.begin());
-
-
-    BaseDimension<std::tuple<Feet, Feet>, std::tuple<Seconds, Seconds>> deserializedObject3;
-    Serializer<std::tuple<Feet, Feet>, std::tuple<Seconds, Seconds>>::deserialize(buffer.begin(), deserializedObject3);
-    std::cout << deserializedObject3 << std::endl;
-
-    BaseDimension<std::tuple<Feet, Feet>, std::tuple<Seconds, Seconds>> deserializedObject4;
-    deserialize(buffer.begin(), deserializedObject4);
-    std::cout << deserializedObject4 << std::endl;
-
-
-    
-
-
-
-
-    //using t = UnitFromString<"Length::Meters">::type;
-
-   //static_assert(std::is_same_v<t, void>);
-
-   //ASSERT_EQ(sstream.str(), "25 [ft]");
-
-   
-
+    auto result = TestSerializer::deserialize(buffer);
+    EXPECT_NEAR((result.template GetVal<NumTuple, DenTuple>()), 25.0, TOLERANCE);
 }
 
 
 
+template<typename NumTuple, typename DenTuple>
+void ValidateAll()
+{
+    ValidateWrapperWithReturns<NumTuple, DenTuple>();
 
-TEST_F(DimensionTest, TestSetter) {
+    ValidateWrapperWithRefs<NumTuple, DenTuple, std::vector<uint8_t>>();
+    ValidateWrapperWithRefs<NumTuple, DenTuple, std::vector<uint16_t>>();
+    ValidateWrapperWithRefs<NumTuple, DenTuple, std::vector<uint32_t>>();
 
-using namespace std;
+    // In the current state, buffer word size cannot exceed hashed-tag size.
+    // Fix in future serializatio updates.
 
-BaseDimension<tuple<Meters>, tuple<Seconds>> speed(25.0);
+    ValidateNoHash<NumTuple, DenTuple>();
+}
 
-speed.SetVal<tuple<Feet>, tuple<Minutes>>(25.0);
 
-double res = speed.GetVal<tuple<Meters>, tuple<Seconds>>();
+TEST_F(DimensionTest, TestSingleNum)
+{
+    using NumTuple = std::tuple<Feet>;
+    using DenTuple = std::tuple<>;
 
-cout << res << endl;
+    ValidateAll<NumTuple, DenTuple>();
+}
 
+TEST_F(DimensionTest, TestSingleInverse)
+{
+    using NumTuple = std::tuple<>;
+    using DenTuple = std::tuple<Seconds>;
+
+    ValidateAll<NumTuple, DenTuple>();
+}
+
+TEST_F(DimensionTest, TestOneEach)
+{
+    using NumTuple = std::tuple<Grams>;
+    using DenTuple = std::tuple<Radians>;
+
+    ValidateAll<NumTuple, DenTuple>();
+}
+
+TEST_F(DimensionTest, TestMultipleEach)
+{
+    using NumTuple = std::tuple<Grams, Meters>;
+    using DenTuple = std::tuple<Radians, Seconds>;
+
+    ValidateAll<NumTuple, DenTuple>();
+}
+
+TEST_F(DimensionTest, TestShouldCancel)
+{
+    using NumTuple = std::tuple<Meters>;
+    using DenTuple = std::tuple<Meters>;
+
+    ValidateAll<NumTuple, DenTuple>();
 }
