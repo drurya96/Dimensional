@@ -12,7 +12,7 @@ namespace Dimension
    concept IsLengthUnit = std::is_same_v<typename LengthUnit::Dim, LengthType>;
    
    template<typename Unit, StringLiteral Name, StringLiteral Abbreviation>
-   struct LengthUnit : public BaseUnit<Unit, Name, Abbreviation>
+   struct LengthUnit : public BaseUnit<Unit, Name, Abbreviation, "Length">
    { 
    public: 
       using Dim = LengthType;

@@ -1,21 +1,14 @@
-#ifndef DIMENSION_GENERIC_TYPE_TRAITS_H
-#define DIMENSION_GENERIC_TYPE_TRAITS_H
+#ifndef DIMENSION_TUPLE_HANDLING_H
+#define DIMENSION_TUPLE_HANDLING_H
 
 #include <tuple> // For std::tuple and related functions
 #include <type_traits> // For std::is_same, std::remove_cv, std::disjunction, std::conditional
 #include <utility> // For std::declval
 
+#include "StringLiteral.h"
+
 namespace Dimension
 {
-
-   template<size_t N>
-   struct StringLiteral {
-      constexpr StringLiteral(const char (&str)[N]) {
-         std::copy_n(str, N, value);
-      }
-      
-      char value[N];
-   };
 
    /// @brief A type-trait with void Dim and Primary, only used to satisfy a metaprogramming condition
    struct NullUnit
@@ -159,34 +152,83 @@ namespace Dimension
       using type = tuple_cat_t<std::tuple<T>, typename tuple_diff<Compare, std::tuple<restMinuendTypes...>, std::tuple<subtrahendTypes...>>::type>;
    };
 
+   /// @brief Swap two indecies of a tuple type
+   /// @tparam Tuple Tuple type to swap
+   /// @tparam I First index to swap
+   /// @tparam J Second index to swap
+   template <typename Tuple, std::size_t I, std::size_t J>
+   struct tuple_swap
+   {
+   private:
+      template <std::size_t Index, typename T>
+      using Replace = std::conditional_t<
+         Index == I, 
+         std::tuple_element_t<J, Tuple>, 
+         std::conditional_t<
+            Index == J, 
+            std::tuple_element_t<I, Tuple>, 
+            T
+         >
+      >;
 
-   /// @brief get the first unit in the tuple matching the dimension of T
-   template<template<typename, typename> typename Compare, typename T, typename Tuple>
-   struct get_first_match;
+      // Recursively rebuild the tuple with the swapped types
+      template <std::size_t... Indices>
+      static auto rebuild_tuple(std::index_sequence<Indices...>) -> std::tuple<Replace<Indices, std::tuple_element_t<Indices, Tuple>>...>;
 
-   /// @brief get the first unit in the tuple matching the dimension of T
-   /// @details Specialization for no match found, return a NullUnit
-   ///    This should not typical occur and is a sign of problematic code elsewhere
-   /// @tparam T Unit to match against
-   /// @tparam Tuple Tuple of units
-   template<template<typename, typename> typename Compare, typename T>
-   struct get_first_match<Compare, T, std::tuple<>> {
-      using type = NullUnit;
+   public:
+      // The swapped tuple type
+      using type = decltype(rebuild_tuple(std::make_index_sequence<std::tuple_size_v<Tuple>>{}));
    };
 
-   /// @brief get the first unit in the tuple matching the dimension of T
-   /// @details Primary specialization
-   /// @tparam T Unit to match against
-   /// @tparam Tuple Tuple of units
-   /// @typedef type The type of unit of matching dimension to T
-   template<template<typename, typename> typename Compare, typename T, typename Head, typename... Tail>
-   struct get_first_match<Compare, T, std::tuple<Head, Tail...>> {
-      using type = std::conditional_t<Compare<T, Head>::value,
-         Head,
-         typename get_first_match<Compare, T, std::tuple<Tail...>>::type>;
+   /// @brief Sort tuple type based on qualified name
+   /// @tparam Tuple Tuple type to sort
+   /// @tparam N Current index to evaluate
+   template <typename Tuple, std::size_t N = std::tuple_size_v<Tuple>>
+   struct tuple_bubble_sort 
+   {
+   private:
+      // Perform one pass of bubble sort
+      template <std::size_t Index = 0, typename CurrentTuple = Tuple>
+      struct one_pass 
+      {
+
+         using ThisElement = std::tuple_element_t<Index, CurrentTuple>;
+         using NextElement = std::tuple_element_t<Index + 1, CurrentTuple>;
+
+         using type = std::conditional_t<
+            (Index < N - 1) && !(ThisElement::qualifiedName < NextElement::qualifiedName),
+            typename tuple_swap<CurrentTuple, Index, Index + 1>::type, 
+            CurrentTuple>;
+
+         using next_type = typename one_pass<Index + 1, type>::type;
+      };
+
+      // Base case for one_pass recursion
+      template <typename CurrentTuple>
+      struct one_pass<N - 1, CurrentTuple>
+      {
+         using type = CurrentTuple;
+      };
+
+   public:
+      // Apply bubble sort recursively
+      using type = typename tuple_bubble_sort<typename one_pass<0, Tuple>::type, N - 1>::type;
    };
 
+   // Base case for bubble sort recursion
+   template <typename Tuple>
+   struct tuple_bubble_sort<Tuple, 1>
+   {
+      using type = Tuple;
+   };
+
+   // Bubble sort empty tuple
+   template <>
+   struct tuple_bubble_sort<std::tuple<>, 0>
+   {
+      using type = std::tuple<>;
+   };
 
 } // end Dimension
 
-#endif // DIMENSION_GENERIC_TYPE_TRAITS_H
+#endif // DIMENSION_TUPLE_HANDLING_H

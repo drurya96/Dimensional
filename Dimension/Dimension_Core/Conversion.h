@@ -1,7 +1,7 @@
 #ifndef DIMENSION_CONVERSION_H
 #define DIMENSION_CONVERSION_H
 
-#include "GenericTypeTraits.h"
+#include "TupleHandling.h"
 
 namespace Dimension
 {

@@ -12,7 +12,7 @@ namespace Dimension
    concept IsTimeUnit = std::is_same_v<typename TimeUnit::Dim, TimeType>;
 
    template<typename Unit, StringLiteral Name, StringLiteral Abbreviation>
-   struct TimeUnit : public BaseUnit<Unit, Name, Abbreviation>
+   struct TimeUnit : public BaseUnit<Unit, Name, Abbreviation, "Time">
    {
    public:
       using Dim = TimeType;

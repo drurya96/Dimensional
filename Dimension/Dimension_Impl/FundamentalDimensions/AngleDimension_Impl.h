@@ -15,7 +15,7 @@ namespace Dimension
    concept IsAngleUnit = std::is_same_v<typename AngleUnit::Dim, AngleType>;
 
    template<typename Unit, StringLiteral Name, StringLiteral Abbreviation>
-   struct AngleUnit : public BaseUnit<Unit, Name, Abbreviation>
+   struct AngleUnit : public BaseUnit<Unit, Name, Abbreviation, "Angle">
    { 
    public: 
       using Dim = AngleType;

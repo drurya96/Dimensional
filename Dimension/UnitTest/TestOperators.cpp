@@ -168,3 +168,18 @@ TEST_F(DimensionTest, DimensionNegative)
 
    ASSERT_NEAR(test, -10.0, TOLERANCE);
 }
+
+TEST_F(DimensionTest, TestSetter) 
+{
+
+using namespace std;
+
+BaseDimension<tuple<Meters>, tuple<Seconds>> speed(25.0);
+
+speed.SetVal<tuple<Feet>, tuple<Minutes>>(25.0);
+
+double res = speed.GetVal<tuple<Meters>, tuple<Seconds>>();
+
+cout << res << endl;
+
+}
