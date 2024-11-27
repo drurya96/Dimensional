@@ -72,7 +72,7 @@ This is especially useful when designing functions which accept dimensions as pa
 ```cpp
 void printDimension(Length<Feet> length)
 {
-   std::cout << length << std::endl;
+   // Do logic with length
 }
 
 Length<Meters> myLength(5);
@@ -97,7 +97,7 @@ While Dimension objects are not truly immutable, general guidance is to treat th
 
 ---
 
-Finally, template deduction guides are provided that allow instantion of a dimension without explicitly specifying its unit.
+Finally, template deduction guides are provided that allow instantiation of a dimension without explicitly specifying its unit.
 
 ### Type deduction guide
 ```cpp
@@ -260,7 +260,7 @@ length.SetVal<std::tuple<Feet>, std::tuple<>>(5.0); // Sets value based on 5 ft,
 ## Streaming
 
 Dimension objects can be streamed using `<<` syntax to any `ostream` buffer.
-The resulting stream will be formated as `"<value> [(numUnit1*numUnit2<*...>)/(denUnit1*denUnit2<*...>)]"`
+The resulting stream will be formatted as `"<value> [(numUnit1*numUnit2<*...>)/(denUnit1*denUnit2<*...>)]"`
 - `"/"` will be omitted if the denominator is empty
 - `"[]"` will be the unit for scalars
 - Parenthesis will be omitted if only one unit is in either the numerator or denominator

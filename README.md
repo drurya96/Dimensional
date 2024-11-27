@@ -27,8 +27,8 @@
       2. Convert to the desired unit.
 - Compile-time errors: All dimensionality is resolved at compile time, so errors can be addressed earlier in development.
 - Efficiency: `Dimensional` performs on-par with simply using `double` arithmetic in benchmarks.
-  - TODO: Perform more complex benchmarking [isuee #43](https://gitlab.com/dimensionalanalysis/dimensional/-/issues/43)
-- Extensibility: `Dimensional` was designed with extensions in mind. Adding new Dimensions, Units, and converions simply requires including a user-provided header.
+  - TODO: Perform more complex benchmarking [issue #43](https://gitlab.com/dimensionalanalysis/dimensional/-/issues/43)
+- Extensibility: `Dimensional` was designed with extensions in mind. Adding new Dimensions, Units, and conversions simply requires including a user-provided header.
 - Compiler support: (tested, others versions likely work): MSVC 19.41, gcc-12, clang-17
 - Language support: C++20 (Prior to version 2.0.0, C++17 and C++20) 
 
@@ -86,6 +86,10 @@ int main() {
    return 0;
 }
 ```
+
+## Serialization
+
+See [Serialization.md](Dimension/Serialization.md) for information on Serializing Dimension objects
 
 ## Extending Dimensional
 
@@ -145,7 +149,7 @@ See [CONTRIBUTING.md](https://gitlab.com/dimensionalanalysis/dimensional/-/blob/
 This library is open-source, and is licensed under [the Apache License 2.0](https://gitlab.com/dimensionalanalysis/dimensional/-/blob/main/LICENSE)
 
 ## Project Status
-`Dimensional` is under **active development** and is considered **stable for production use**. The library is ready for integration into your projects, but as capabilities are improvided and expanded, minor updates and new features will be added regularly.
+`Dimensional` is under **active development** and is considered **stable for production use**. The library is ready for integration into your projects, but as capabilities are improved and expanded, minor updates and new features will be added regularly.
 
 Planned improvements include:
 - Adding support for additional dimensions and units.
