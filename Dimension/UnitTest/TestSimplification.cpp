@@ -50,5 +50,15 @@ TEST_F(DimensionTest, Simplification) {
    ASSERT_NEAR((test_after.GetVal<std::tuple<>, std::tuple<Minutes>>()), 1968.504, TOLERANCE);
 }
 
+TEST_F(DimensionTest, SimplificationSpeedTypes)
+{
+   Speed<Meters, Seconds> speed(1);
+   Time<Minutes> time(1);
+
+   Length length = speed * time;
+
+   ASSERT_NEAR(getLength<Meters>(length), 60.0, TOLERANCE);
+}
+
 // TODO: Validate simplification resulting in unitless
 // TODO: How to handle unitless?

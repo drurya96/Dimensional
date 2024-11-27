@@ -145,7 +145,7 @@ namespace Dimension
    void CancelUnits(PrecisionType& value)
    {
       CancelUnitsImpl<false, 0, RealNumTupType, NumTupType, isDelta>(value);
-      CancelUnitsImpl<true, 0, RealDenTupType, DenTupType, isDelta>(value);
+      CancelUnitsImpl<true, 0, RealDenTupType, DenTupType, true>(value);  // If denominator must be cancelled, unit must be delta
    }
 
    template<typename Tuple1, typename Tuple2>
