@@ -19,6 +19,30 @@ All notable changes to this project will be documented in this file. Semantic ve
 ### Fixed
 - 
 
+## [2.4.0] - 2024-11-26
+
+### Changed
+- Reorganized core library implementation further
+- Renamed core library implementation as `Dimension_Core`
+- Reorganized Dimension logic
+  - Moved dimension logic to `Dimension_Impl`
+  - Retained units at top-level
+
+### Added
+- Streaming operator to `ostream`
+- Serialization/Deserialization
+- Documentation for Contributing, Usage, Extension, and Serialization
+- `StringLiteral` type and methods for handling string-like types at compile-time
+
+### Deprecated
+- 
+
+### Removed
+- 
+
+### Fixed
+- Bug-fix for unit conversions from a single denominator unit
+
 ## [2.3.0] - 2024-11-10
 ### Changed
 - Reorganized implementation headers
