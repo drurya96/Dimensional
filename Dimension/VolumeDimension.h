@@ -6,13 +6,13 @@
 namespace Dimension
 {
 
-   struct Liter
+   struct Liters
    {
       using NumTuple = std::tuple<DeciMeters, DeciMeters, DeciMeters>;
       using DenTuple = std::tuple<>;
    };
 
-   struct MilliLiter
+   struct MilliLiters
    {
       using NumTuple = std::tuple<CentiMeters, CentiMeters, CentiMeters>;
       using DenTuple = std::tuple<>;
@@ -20,10 +20,9 @@ namespace Dimension
 
    struct GallonLength : public LengthUnit<GallonLength, "GallonLength", "GallonLength"> {};
 
-   template<> struct Conversion<Meters, GallonLength> { static constexpr PrecisionType slope = (1.0 / 0.15562); };
-   template<> struct Conversion<GallonLength, Meters> { static constexpr PrecisionType slope = 0.15562; };
+   template<> struct Conversion<GallonLength, Meters> { static constexpr PrecisionType slope = 0.155849128; };
 
-   struct Gallon
+   struct Gallons
    {
       using NumTuple = std::tuple<GallonLength, GallonLength, GallonLength>;
       using DenTuple = std::tuple<>;

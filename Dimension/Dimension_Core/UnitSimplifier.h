@@ -29,32 +29,6 @@ namespace Dimension
    template<typename Dim, typename... Us>
    struct has_same_dim<Dim, std::tuple<Us...>> : std::disjunction<is_same_dim<Dim, Us>...> {};
 
-   /// @brief get the first unit in the tuple matching the dimension of T
-   template<template<typename, typename> typename Compare, typename T, typename Tuple>
-   struct get_first_match;
-
-   /// @brief get the first unit in the tuple matching the dimension of T
-   /// @details Specialization for no match found, return a NullUnit
-   ///    This should not typical occur and is a sign of problematic code elsewhere
-   /// @tparam T Unit to match against
-   /// @tparam Tuple Tuple of units
-   template<template<typename, typename> typename Compare, typename T>
-   struct get_first_match<Compare, T, std::tuple<>> {
-      using type = NullUnit;
-   };
-
-   /// @brief get the first unit in the tuple matching the dimension of T
-   /// @details Primary specialization
-   /// @tparam T Unit to match against
-   /// @tparam Tuple Tuple of units
-   /// @typedef type The type of unit of matching dimension to T
-   template<template<typename, typename> typename Compare, typename T, typename Head, typename... Tail>
-   struct get_first_match<Compare, T, std::tuple<Head, Tail...>> {
-      using type = std::conditional_t<Compare<T, Head>::value,
-         Head,
-         typename get_first_match<Compare, T, std::tuple<Tail...>>::type>;
-   };
-
    /// @brief Struct to simplify units by cancelling out as necessary
    template<typename NumTypes1, typename NumTypes2, typename DenTypes1, typename DenTypes2>
    struct UnitSimplifier;
@@ -99,7 +73,7 @@ namespace Dimension
 
    /// @brief Unit cancellation implementation
    /// @details recursive base-case
-   template<bool inverse = false, int index = 0, typename RealTupType, typename IncomingTupType, bool isDelta = false>
+   template<bool inverse = false, int index = 0, typename RealTupType, typename IncomingTupType>
    requires (index == std::tuple_size_v<IncomingTupType>)
    void CancelUnitsImpl(PrecisionType&)
    {
@@ -116,20 +90,21 @@ namespace Dimension
    /// @tparam isDelata Bool indicating whether this conversion is of a single unit in the normator (false)
    ///    or not (true).
    /// @param[in,out] value The value to update when cancelling units
-   template<bool inverse = false, int index = 0, typename RealTupType, typename IncomingTupType, bool isDelta = false>
+   template<bool inverse = false, int index = 0, typename RealTupType, typename IncomingTupType>
    requires (index < std::tuple_size_v<IncomingTupType>)
    void CancelUnitsImpl(PrecisionType& value)
    {
+      constexpr bool isDelta = true; // When canceling units, always treat values as delta rather than quantity
       using currentType = std::tuple_element_t<index, IncomingTupType>;
       if constexpr (has_same_dim<currentType, RealTupType>::value)
       {
          value = Convert<currentType, typename get_first_match<is_same_dim, currentType, RealTupType>::type, isDelta, inverse>(value);
-         CancelUnitsImpl<inverse, index + 1, typename RemoveOneInstance<is_same_dim, currentType, RealTupType>::type, IncomingTupType, isDelta>(value);
+         CancelUnitsImpl<inverse, index + 1, typename RemoveOneInstance<is_same_dim, currentType, RealTupType>::type, IncomingTupType>(value);
       }
       else
       {
          value = Convert<currentType, typename currentType::Primary, isDelta, inverse>(value);
-         CancelUnitsImpl<inverse, index + 1, RealTupType, IncomingTupType, isDelta>(value);
+         CancelUnitsImpl<inverse, index + 1, RealTupType, IncomingTupType>(value);
       }
    }
 
@@ -144,8 +119,8 @@ namespace Dimension
    template<typename NumTupType, typename DenTupType, typename RealNumTupType, typename RealDenTupType, bool isDelta = false>
    void CancelUnits(PrecisionType& value)
    {
-      CancelUnitsImpl<false, 0, RealNumTupType, NumTupType, isDelta>(value);
-      CancelUnitsImpl<true, 0, RealDenTupType, DenTupType, true>(value);  // If denominator must be cancelled, unit must be delta
+      CancelUnitsImpl<false, 0, RealNumTupType, NumTupType>(value);
+      CancelUnitsImpl<true, 0, RealDenTupType, DenTupType>(value);
    }
 
    template<typename Tuple1, typename Tuple2>
