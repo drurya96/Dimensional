@@ -127,6 +127,34 @@ TEST_F(DimensionTest, DimensionAddition)
    speed4 += speed1;
 
    ASSERT_NEAR((getSpeed<Meters, Seconds>(speed4)), 20.050799998374401, TOLERANCE); // TODO: Need to validate precision
+
+
+   Quantity<BaseDimension<tuple<Meters>, tuple<>>> lengthQuantity1(10.0);
+   Quantity<BaseDimension<tuple<Feet>, tuple<>>> lengthQuantity2(20.0);
+
+   Quantity<Length<Feet>> lengthQuantity3(20.0);
+
+   Quantity<BaseDimension<tuple<Feet>, tuple<>>> lengthQuantity4 = lengthQuantity3;
+
+   Length<Meters> length(5.0);
+
+   //auto bad = lengthQuantity2 + lengthQuantity1; // Correctly fails
+
+   //Length<Meters> bad2 = lengthQuantity1 + length; // Correctly fails
+
+   Quantity<BaseDimension<tuple<Meters>, tuple<>>> add1 = lengthQuantity1 + length;
+
+   ASSERT_NEAR((add1.GetVal<tuple<Meters>, tuple<>>()), 15.0, TOLERANCE);
+
+   BaseDimension<tuple<Meters>, tuple<>> subtract1 = lengthQuantity1 - lengthQuantity4;
+
+   ASSERT_NEAR((subtract1.GetVal<tuple<Meters>, tuple<>>()), 3.904, TOLERANCE);
+
+   Quantity<BaseDimension<tuple<Meters>, tuple<>>> subtract2 = lengthQuantity1 - length;
+
+   ASSERT_NEAR((subtract2.GetVal<tuple<Meters>, tuple<>>()), 5.0, TOLERANCE);
+
+
 }
 
 // Test subtraction

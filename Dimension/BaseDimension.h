@@ -17,6 +17,8 @@
 #include "Dimension_Core/Stream.h"
 #include "Dimension_Core/Serialization.h"
 
+#include <iostream>
+
 namespace Dimension
 {
 
@@ -129,6 +131,14 @@ namespace Dimension
          return result;
       }
 
+      /// @brief Return the internal value as a double in terms of the object unit templates
+      /// @return A PrecisionType representing the value in terms of the given units
+      template<>
+      PrecisionType GetVal<NumTuple, DenTuple>() const
+      {
+         return scalar;
+      }
+
       /// @brief Set the value using given units
       /// @details Set value of scalar for an existing object using given dimension.
       /// @tparam FromNumTuple Numerator tuple corresponding to the value to set
@@ -143,6 +153,12 @@ namespace Dimension
          ConvertDimension<0, false, NumTuple, FromNumTuple, isDelta>(newVal);
          ConvertDimension<0, true, DenTuple, FromDenTuple, isDelta>(newVal);
 
+         scalar = newVal;
+      }
+
+      template<>
+      void SetVal<NumTuple, DenTuple>(PrecisionType newVal)
+      {
          scalar = newVal;
       }
       
@@ -548,6 +564,231 @@ namespace Dimension
 
       return T(std::fmod(dividend.template GetVal<typename T::NumTuple, typename T::DenTuple>(), divisor.template GetVal<typename T::NumTuple, typename T::DenTuple>()));
    }
+
+
+
+
+
+   template<typename DimensionT>
+   class Quantity
+   {
+   public:
+      Quantity(PrecisionType val) : value(DimensionT{val}){}
+
+      template<typename T>
+      Quantity(Quantity<T> obj) : value(DimensionT{obj.GetVal<typename DimensionT::NumTuple, typename DimensionT::DenTuple>()}) {}
+
+      template<typename NumTuple, typename DenTuple>
+      PrecisionType GetVal() const
+      {
+         PrecisionType result = value.GetVal<typename DimensionT::NumTuple, typename DimensionT::DenTuple>();
+
+         ConvertDimension<0, false, NumTuple, typename DimensionT::NumTuple, false>(result);
+         ConvertDimension<0, true, DenTuple, typename DimensionT::DenTuple, false>(result);
+
+         return result;
+      }
+
+      template<typename NumTuple, typename DenTuple>
+      void SetVal(PrecisionType val)
+      {
+         ConvertDimension<0, false, typename DimensionT::NumTuple, NumTuple, false>(val);
+         ConvertDimension<0, true, typename DimensionT::DenTuple, DenTuple, false>(val);
+
+         value.SetVal<typename DimensionT::NumTuple, typename DimensionT::DenTuple>(val);
+      }
+
+
+   private:
+      DimensionT value;
+   };
+
+
+
+
+
+   // Quantity operators
+
+   // Addition operators
+   // Between Quantities
+   //   Only valid for extensive quantities, delete for now
+   
+   /// @brief Addition operator for two Dimensions
+   /// @tparam NumTuple Tuple of units in the numerator
+   /// @tparam DenTuple Tuple of units in the denominator
+   /// @param[in] obj1 The first BaseDimension object
+   /// @param[in] obj2 The second BaseDimension object
+   /// @return A base dimension object of type matching the inputs.
+   ///    The value is the values of obj1 and obj2 added, after converting
+   ///    obj2 to the same units as obj1
+   template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
+   requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
+   Quantity<BaseDimension<NumTuple1, DenTuple1>> operator+(const Quantity<BaseDimension<NumTuple1, DenTuple1>>& /*obj1*/, const Quantity<BaseDimension<NumTuple2, DenTuple2>>& /*obj2*/)
+   {
+      static_assert(false, "Cannot add quantities!");
+   }
+
+
+   // Delta and quantity
+   //   Yields quantity
+
+   /// @brief Addition operator for two Dimensions
+   /// @tparam NumTuple Tuple of units in the numerator
+   /// @tparam DenTuple Tuple of units in the denominator
+   /// @param[in] obj1 The first BaseDimension object
+   /// @param[in] obj2 The second BaseDimension object
+   /// @return A base dimension object of type matching the inputs.
+   ///    The value is the values of obj1 and obj2 added, after converting
+   ///    obj2 to the same units as obj1
+   template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
+   requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
+   Quantity<BaseDimension<NumTuple1, DenTuple1>> operator+(const Quantity<BaseDimension<NumTuple1, DenTuple1>>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
+   {
+      return Quantity<BaseDimension<NumTuple1, DenTuple1>>{ obj1.template GetVal<NumTuple1, DenTuple1>() + obj2.template GetVal<NumTuple1, DenTuple1>() };
+   }
+
+   /// @brief Addition operator for two Dimensions
+   /// @tparam NumTuple Tuple of units in the numerator
+   /// @tparam DenTuple Tuple of units in the denominator
+   /// @param[in] obj1 The first BaseDimension object
+   /// @param[in] obj2 The second BaseDimension object
+   /// @return A base dimension object of type matching the inputs.
+   ///    The value is the values of obj1 and obj2 added, after converting
+   ///    obj2 to the same units as obj1
+   template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
+   requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
+   Quantity<BaseDimension<NumTuple1, DenTuple1>> operator+(const BaseDimension<NumTuple1, DenTuple1>& obj1, const Quantity<BaseDimension<NumTuple2, DenTuple2>>& obj2)
+   {
+      return Quantity<BaseDimension<NumTuple1, DenTuple1>>{ obj1.template GetVal<NumTuple1, DenTuple1>() + obj2.template GetVal<NumTuple1, DenTuple1>() };
+   }
+
+
+
+
+
+
+   // Subtraction operators
+   // Between Quantities
+   //   Yields delta
+   template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
+   requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
+   BaseDimension<NumTuple1, DenTuple1> operator-(const Quantity<BaseDimension<NumTuple1, DenTuple1>>& obj1, const Quantity<BaseDimension<NumTuple2, DenTuple2>>& obj2)
+   {
+      return BaseDimension<NumTuple1, DenTuple1>{ obj1.template GetVal<NumTuple1, DenTuple1>() - obj2.template GetVal<NumTuple1, DenTuple1>() };
+   }
+
+
+   // Delta from quantity
+   //   Yields quantity
+   template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
+   requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
+   Quantity<BaseDimension<NumTuple1, DenTuple1>> operator-(const Quantity<BaseDimension<NumTuple1, DenTuple1>>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
+   {
+      return Quantity<BaseDimension<NumTuple1, DenTuple1>>{ obj1.template GetVal<NumTuple1, DenTuple1>() - obj2.template GetVal<NumTuple1, DenTuple1>() };
+   }
+
+   // Quantity from Delta
+   //   Invalid
+   template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
+   requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
+   Quantity<BaseDimension<NumTuple1, DenTuple1>> operator-(const BaseDimension<NumTuple1, DenTuple1>& obj1, const Quantity<BaseDimension<NumTuple2, DenTuple2>>& obj2)
+   {
+      static_assert(false, "Cannot subtract a quantity from a delta!");
+   }
+
+
+
+
+
+   // Multiplication operators
+   // Between Quantities
+   //   Only valid for extensive quantities, delete for now
+   template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
+   requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
+   Quantity<BaseDimension<NumTuple1, DenTuple1>> operator*(const Quantity<BaseDimension<NumTuple1, DenTuple1>>& /*obj1*/, const Quantity<BaseDimension<NumTuple2, DenTuple2>>& /*obj2*/)
+   {
+      static_assert(false, "Cannot multiply quantities!");
+   }
+
+
+   // Delta and quantity
+   //   invalid
+   template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
+   void operator*(const BaseDimension<NumTuple1, DenTuple1>& /*obj1*/, const Quantity<BaseDimension<NumTuple2, DenTuple2>>& /*obj2*/)
+   {
+      static_assert(false, "Cannot multiply quantity by delta!");
+   }
+
+   template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
+   void operator*(const Quantity<BaseDimension<NumTuple1, DenTuple1>>& /*obj1*/, const BaseDimension<NumTuple2, DenTuple2>& /*obj2*/)
+   {
+      static_assert(false, "Cannot multiply quantity by delta!");
+   }
+
+
+
+   // Division operators
+   // Between Quantities
+   //   Only valid for extensive quantities, delete for now
+
+   template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
+   requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
+   Quantity<BaseDimension<NumTuple1, DenTuple1>> operator/(const Quantity<BaseDimension<NumTuple1, DenTuple1>>& /*obj1*/, const Quantity<BaseDimension<NumTuple2, DenTuple2>>& /*obj2*/)
+   {
+      static_assert(false, "Cannot divide quantities!");
+   }
+
+
+   // Delta and quantity
+   //   invalid
+   template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
+   void operator/(const BaseDimension<NumTuple1, DenTuple1>& /*obj1*/, const Quantity<BaseDimension<NumTuple2, DenTuple2>>& /*obj2*/)
+   {
+      static_assert(false, "Cannot divide quantity by delta!");
+   }
+
+   template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
+   void operator/(const Quantity<BaseDimension<NumTuple1, DenTuple1>>& /*obj1*/, const BaseDimension<NumTuple2, DenTuple2>& /*obj2*/)
+   {
+      static_assert(false, "Cannot divide quantity by delta!");
+   }
+
+
+   // Comparison operators
+   //    Only valid between like-quantities
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
 
