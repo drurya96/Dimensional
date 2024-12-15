@@ -20,12 +20,12 @@ namespace Dimension
       Quantity(PrecisionType val) : value(DimensionT{val}){}
 
       template<typename T>
-      Quantity(Quantity<T> obj) : value(DimensionT{obj.GetVal<typename DimensionT::NumTuple, typename DimensionT::DenTuple>()}) {}
+      Quantity(Quantity<T> obj) : value(DimensionT{obj.template GetVal<typename DimensionT::NumTuple, typename DimensionT::DenTuple>()}) {}
 
       template<typename NumTuple, typename DenTuple>
       PrecisionType GetVal() const
       {
-         PrecisionType result = value.GetVal<typename DimensionT::NumTuple, typename DimensionT::DenTuple>();
+         PrecisionType result = value.template GetVal<typename DimensionT::NumTuple, typename DimensionT::DenTuple>();
 
          ConvertDimension<0, false, NumTuple, typename DimensionT::NumTuple, false>(result);
          ConvertDimension<0, true, DenTuple, typename DimensionT::DenTuple, false>(result);
@@ -39,7 +39,7 @@ namespace Dimension
          ConvertDimension<0, false, typename DimensionT::NumTuple, NumTuple, false>(val);
          ConvertDimension<0, true, typename DimensionT::DenTuple, DenTuple, false>(val);
 
-         value.SetVal<typename DimensionT::NumTuple, typename DimensionT::DenTuple>(val);
+         value.template SetVal<typename DimensionT::NumTuple, typename DimensionT::DenTuple>(val);
       }
 
 
@@ -137,7 +137,7 @@ namespace Dimension
    //   Invalid
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
-   Quantity<BaseDimension<NumTuple1, DenTuple1>> operator-(const BaseDimension<NumTuple1, DenTuple1>& obj1, const Quantity<BaseDimension<NumTuple2, DenTuple2>>& obj2)
+   Quantity<BaseDimension<NumTuple1, DenTuple1>> operator-(const BaseDimension<NumTuple1, DenTuple1>& /*obj1*/, const Quantity<BaseDimension<NumTuple2, DenTuple2>>& /*obj2*/)
    {
       static_assert(false, "Cannot subtract a quantity from a delta!");
    }
@@ -218,14 +218,14 @@ namespace Dimension
 
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
-   bool operator>(const Quantity<BaseDimension<NumTuple1, DenTuple1>>& obj1, const Quantity<BaseDimension<NumTuple2, DenTuple2>>& obj2)
+   bool operator>(const Quantity<BaseDimension<NumTuple1, DenTuple1>>& /*obj1*/, const Quantity<BaseDimension<NumTuple2, DenTuple2>>& /*obj2*/)
    {
       return true;
    }
 
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
-   bool operator<(const Quantity<BaseDimension<NumTuple1, DenTuple1>>& obj1, const Quantity<BaseDimension<NumTuple2, DenTuple2>>& obj2)
+   bool operator<(const Quantity<BaseDimension<NumTuple1, DenTuple1>>& /*obj1*/, const Quantity<BaseDimension<NumTuple2, DenTuple2>>& /*obj2*/)
    {
       return false;
    }

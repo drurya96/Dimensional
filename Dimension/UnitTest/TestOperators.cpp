@@ -148,7 +148,7 @@ TEST_F(DimensionTest, DimensionAddition)
 
    BaseDimension<tuple<Meters>, tuple<>> subtract1 = lengthQuantity1 - lengthQuantity4;
 
-   //ASSERT_NEAR((subtract1.GetVal<tuple<Meters>, tuple<>>()), 3.904, TOLERANCE);
+   ASSERT_NEAR((subtract1.GetVal<tuple<Meters>, tuple<>>()), 3.904, TOLERANCE);
 
    Quantity<BaseDimension<tuple<Meters>, tuple<>>> subtract2 = lengthQuantity1 - length;
 
