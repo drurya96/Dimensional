@@ -43,7 +43,7 @@ Force<KiloGrams, Meters, Seconds, Seconds> myForce(25.0); // Represents 25.0 kg*
 ```
 
 Named unit combinations can also be provided to further simplify the syntax.
-For example, `Newton` resolves to `kg*m / s*s`
+For example, `Newtons` resolves to `kg*m / s*s`
 
 ### Further simplified instantiation of more complex dimension object
 ```cpp

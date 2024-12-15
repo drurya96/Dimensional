@@ -6,6 +6,8 @@
 #include <ostream> // For std::ostream
 #include <tuple> // For std::tuple and related operations
 
+#include <sstream>
+
 namespace Dimension
 {
    
@@ -95,6 +97,23 @@ namespace Dimension
          }
       }
    };
+
+
+   // Diagnostic Only!
+   template<typename Tuple, size_t index = 0>
+   std::stringstream& PrintUnitTuple(std::stringstream& ss)
+   {
+      if constexpr (index < std::tuple_size_v<Tuple>)
+      {
+         ss << std::tuple_element_t<index, Tuple>::name;
+         return PrintUnitTuple<Tuple, index + 1>(ss);
+      }
+      else
+      {
+         return ss;
+      }
+   }
+
 
    } // end Dimension
 

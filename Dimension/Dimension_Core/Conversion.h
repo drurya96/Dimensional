@@ -3,6 +3,8 @@
 
 #include "TupleHandling.h"
 
+#include <iostream>
+
 namespace Dimension
 {
 

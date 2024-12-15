@@ -6,7 +6,7 @@
 namespace Dimension
 {
 
-   struct Newton
+   struct Newtons
    {
       using NumTuple = std::tuple<KiloGrams, Meters>;
       using DenTuple = std::tuple<Seconds, Seconds>;
@@ -14,7 +14,13 @@ namespace Dimension
 
    struct PoundForce
    {
-      using NumTuple = std::tuple<PoundMass, Feet>;
+      using NumTuple = std::tuple<Slugs, Feet>;
+      using DenTuple = std::tuple<Seconds, Seconds>;
+   };
+
+   struct Dynes
+   {
+      using NumTuple = std::tuple<Grams, CentiMeters>;
       using DenTuple = std::tuple<Seconds, Seconds>;
    };
 

@@ -99,7 +99,7 @@ namespace Dimension
 
    /// @brief Unit cancellation implementation
    /// @details recursive base-case
-   template<bool inverse = false, int index = 0, typename RealTupType, typename IncomingTupType, bool isDelta = false>
+   template<bool inverse = false, int index = 0, typename RealTupType, typename IncomingTupType>
    requires (index == std::tuple_size_v<IncomingTupType>)
    void CancelUnitsImpl(PrecisionType&)
    {
@@ -116,20 +116,21 @@ namespace Dimension
    /// @tparam isDelata Bool indicating whether this conversion is of a single unit in the normator (false)
    ///    or not (true).
    /// @param[in,out] value The value to update when cancelling units
-   template<bool inverse = false, int index = 0, typename RealTupType, typename IncomingTupType, bool isDelta = false>
+   template<bool inverse = false, int index = 0, typename RealTupType, typename IncomingTupType>
    requires (index < std::tuple_size_v<IncomingTupType>)
    void CancelUnitsImpl(PrecisionType& value)
    {
+      constexpr bool isDelta = true; // When canceling units, always treat values as delta rather than quantity
       using currentType = std::tuple_element_t<index, IncomingTupType>;
       if constexpr (has_same_dim<currentType, RealTupType>::value)
       {
          value = Convert<currentType, typename get_first_match<is_same_dim, currentType, RealTupType>::type, isDelta, inverse>(value);
-         CancelUnitsImpl<inverse, index + 1, typename RemoveOneInstance<is_same_dim, currentType, RealTupType>::type, IncomingTupType, isDelta>(value);
+         CancelUnitsImpl<inverse, index + 1, typename RemoveOneInstance<is_same_dim, currentType, RealTupType>::type, IncomingTupType>(value);
       }
       else
       {
          value = Convert<currentType, typename currentType::Primary, isDelta, inverse>(value);
-         CancelUnitsImpl<inverse, index + 1, RealTupType, IncomingTupType, isDelta>(value);
+         CancelUnitsImpl<inverse, index + 1, RealTupType, IncomingTupType>(value);
       }
    }
 
@@ -144,8 +145,8 @@ namespace Dimension
    template<typename NumTupType, typename DenTupType, typename RealNumTupType, typename RealDenTupType, bool isDelta = false>
    void CancelUnits(PrecisionType& value)
    {
-      CancelUnitsImpl<false, 0, RealNumTupType, NumTupType, isDelta>(value);
-      CancelUnitsImpl<true, 0, RealDenTupType, DenTupType, true>(value);  // If denominator must be cancelled, unit must be delta
+      CancelUnitsImpl<false, 0, RealNumTupType, NumTupType>(value);
+      CancelUnitsImpl<true, 0, RealDenTupType, DenTupType>(value);
    }
 
    template<typename Tuple1, typename Tuple2>
