@@ -8,6 +8,32 @@
 namespace Dimension
 {
 
+   /// @brief get the first unit in the tuple matching the dimension of T
+   template<template<typename, typename> typename Compare, typename T, typename Tuple>
+   struct get_first_match;
+
+   /// @brief get the first unit in the tuple matching the dimension of T
+   /// @details Specialization for no match found, return a NullUnit
+   ///    This should not typical occur and is a sign of problematic code elsewhere
+   /// @tparam T Unit to match against
+   /// @tparam Tuple Tuple of units
+   template<template<typename, typename> typename Compare, typename T>
+   struct get_first_match<Compare, T, std::tuple<>> {
+      using type = NullUnit;
+   };
+
+   /// @brief get the first unit in the tuple matching the dimension of T
+   /// @details Primary specialization
+   /// @tparam T Unit to match against
+   /// @tparam Tuple Tuple of units
+   /// @typedef type The type of unit of matching dimension to T
+   template<template<typename, typename> typename Compare, typename T, typename Head, typename... Tail>
+   struct get_first_match<Compare, T, std::tuple<Head, Tail...>> {
+      using type = std::conditional_t<Compare<T, Head>::value,
+         Head,
+         typename get_first_match<Compare, T, std::tuple<Tail...>>::type>;
+   };
+
    /// @brief Concept to check if T has a numeric offset attribute.
    template<typename T>
    concept HasOffset = requires { T::offset; } && std::is_arithmetic_v<decltype(T::offset)>;
@@ -123,6 +149,7 @@ namespace Dimension
          );
       }
 
+//return input;
    }
 
    /// @brief Convert the given value when units are cancelled out
@@ -146,8 +173,19 @@ namespace Dimension
    requires (I < std::tuple_size_v<fromTup>)
    void ConvertDimension(PrecisionType& value)
    {
-      value = Convert<std::tuple_element_t<I, fromTup>, std::tuple_element_t<I, toTuple>, isDelta, inverse>(value);
-      ConvertDimension<I + 1, inverse, toTuple, fromTup, isDelta>(value);
+
+      using fromType = std::tuple_element_t<I, fromTup>;
+      using toType = typename get_first_match<is_same_dim, fromType, toTuple>::type;
+
+      using remainingToTuple = typename RemoveOneInstance<is_same_dim, fromType, toTuple>::type;
+
+      value = Convert<fromType, toType, isDelta, inverse>(value);
+      ConvertDimension<I + 1, inverse, remainingToTuple, fromTup, isDelta>(value);
+
+
+
+      //value = Convert<std::tuple_element_t<I, fromTup>, std::tuple_element_t<I, toTuple>, isDelta, inverse>(value);
+      //ConvertDimension<I + 1, inverse, toTuple, fromTup, isDelta>(value);
    }
 
 } // end Dimension

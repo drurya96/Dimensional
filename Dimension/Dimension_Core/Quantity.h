@@ -12,7 +12,14 @@ namespace Dimension
    requires IsUnitTuplePair<NumTupleT, DenTupleT>
    class BaseDimension;
 
-
+   /// @brief Quantity wrapper for dimensions
+   /// @details Wrap any dimension type (as a template parameter) in Quantity
+   ///   to treat it as a quantity, or point.
+   ///   Quantities behave differently from BaseDimension types (deltas) in that
+   ///   subtracting quantities yields a delta, and many operations cannot be performed
+   ///   on quantities as the operations are not physically meaningful.
+   ///   Further, "offsets", such as those seen in Temperature units, only apply to Quantities.
+   /// @tparam DimensionT Dimension to wrap as a Qauntity
    template<typename DimensionT>
    class Quantity
    {
@@ -47,15 +54,12 @@ namespace Dimension
       DimensionT value;
    };
 
-
-
+   /// @brief simple always-false trait used in static_asserts to disallow functions
+   template<typename T>
+   struct disallowed_operator : std::false_type {};
 
 
    // Quantity operators
-
-   // Addition operators
-   // Between Quantities
-   //   Only valid for extensive quantities, delete for now
    
    /// @brief Addition operator for two Dimensions
    /// @tparam NumTuple Tuple of units in the numerator
@@ -69,12 +73,8 @@ namespace Dimension
    requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
    Quantity<BaseDimension<NumTuple1, DenTuple1>> operator+(const Quantity<BaseDimension<NumTuple1, DenTuple1>>& /*obj1*/, const Quantity<BaseDimension<NumTuple2, DenTuple2>>& /*obj2*/)
    {
-      static_assert(false, "Cannot add quantities!");
+      static_assert(disallowed_operator<NumTuple1>::value, "Cannot add quantities!");
    }
-
-
-   // Delta and quantity
-   //   Yields quantity
 
    /// @brief Addition operator for two Dimensions
    /// @tparam NumTuple Tuple of units in the numerator
@@ -106,26 +106,13 @@ namespace Dimension
       return Quantity<BaseDimension<NumTuple1, DenTuple1>>{ obj1.template GetVal<NumTuple1, DenTuple1>() + obj2.template GetVal<NumTuple1, DenTuple1>() };
    }
 
-
-
-
-
-
-   // Subtraction operators
-   // Between Quantities
-   //   Yields delta
-   /*
-   template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
-   requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
-   BaseDimension<NumTuple1, DenTuple1> operator-(const Quantity<BaseDimension<NumTuple1, DenTuple1>>& obj1, const Quantity<BaseDimension<NumTuple2, DenTuple2>>& obj2)
+   template<typename Dim1, typename Dim2>
+   requires MatchingDimensions<typename Dim1::NumTuple, typename Dim2::NumTuple> && MatchingDimensions<typename Dim1::DenTuple, typename Dim2::DenTuple>
+   BaseDimension<typename Dim1::NumTuple, typename Dim1::DenTuple> operator-(const Quantity<Dim1>& obj1, const Quantity<Dim2>& obj2)
    {
-      return BaseDimension<NumTuple1, DenTuple1>{ obj1.template GetVal<NumTuple1, DenTuple1>() - obj2.template GetVal<NumTuple1, DenTuple1>() };
+      return BaseDimension<typename Dim1::NumTuple, typename Dim1::DenTuple>{ obj1.template GetVal<typename Dim1::NumTuple, typename Dim1::DenTuple>() - obj2.template GetVal<typename Dim1::NumTuple, typename Dim1::DenTuple>() };
    }
-   */
 
-
-   // Delta from quantity
-   //   Yields quantity
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
    Quantity<BaseDimension<NumTuple1, DenTuple1>> operator-(const Quantity<BaseDimension<NumTuple1, DenTuple1>>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
@@ -133,88 +120,73 @@ namespace Dimension
       return Quantity<BaseDimension<NumTuple1, DenTuple1>>{ obj1.template GetVal<NumTuple1, DenTuple1>() - obj2.template GetVal<NumTuple1, DenTuple1>() };
    }
 
-   // Quantity from Delta
-   //   Invalid
+   /// @brief Subtracting a Qauntity from a delta is intentionally not implemented
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
    Quantity<BaseDimension<NumTuple1, DenTuple1>> operator-(const BaseDimension<NumTuple1, DenTuple1>& /*obj1*/, const Quantity<BaseDimension<NumTuple2, DenTuple2>>& /*obj2*/)
    {
-      static_assert(false, "Cannot subtract a quantity from a delta!");
+      static_assert(disallowed_operator<NumTuple1>::value, "Cannot subtract a quantity from a delta!");
    }
 
-
-
-
-
-   template<typename Dim1, typename Dim2>
-   //requires true
-   BaseDimension<typename Dim1::NumTuple, typename Dim1::DenTuple> operator-(const Quantity<Dim1>& obj1, const Quantity<Dim2>& obj2)
-   {
-      return BaseDimension<typename Dim1::NumTuple, typename Dim1::DenTuple>{ obj1.template GetVal<typename Dim1::NumTuple, typename Dim1::DenTuple>() - obj2.template GetVal<typename Dim1::NumTuple, typename Dim1::DenTuple>() };
-   }
-
-
-
-
-
-
-   // Multiplication operators
-   // Between Quantities
-   //   Only valid for extensive quantities, delete for now
+   /// @brief Multiplying quantities is intentionally not implemented
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
    Quantity<BaseDimension<NumTuple1, DenTuple1>> operator*(const Quantity<BaseDimension<NumTuple1, DenTuple1>>& /*obj1*/, const Quantity<BaseDimension<NumTuple2, DenTuple2>>& /*obj2*/)
    {
-      static_assert(false, "Cannot multiply quantities!");
+      static_assert(disallowed_operator<NumTuple1>::value, "Cannot multiply quantities!");
    }
 
-
-   // Delta and quantity
-   //   invalid
+   /// @brief Multiplying a quantity and delta is intentionally not implemented
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    void operator*(const BaseDimension<NumTuple1, DenTuple1>& /*obj1*/, const Quantity<BaseDimension<NumTuple2, DenTuple2>>& /*obj2*/)
    {
-      static_assert(false, "Cannot multiply quantity by delta!");
+      static_assert(disallowed_operator<NumTuple1>::value, "Cannot multiply quantity by delta!");
    }
 
+   /// @brief Multiplying a delta and a quantity is intentionally not implemented
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    void operator*(const Quantity<BaseDimension<NumTuple1, DenTuple1>>& /*obj1*/, const BaseDimension<NumTuple2, DenTuple2>& /*obj2*/)
    {
-      static_assert(false, "Cannot multiply quantity by delta!");
+      static_assert(disallowed_operator<NumTuple1>::value, "Cannot multiply quantity by delta!");
    }
 
-
-
-   // Division operators
-   // Between Quantities
-   //   Only valid for extensive quantities, delete for now
-
+   /// @brief Dividing quantities is intentionally not implemented
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
    Quantity<BaseDimension<NumTuple1, DenTuple1>> operator/(const Quantity<BaseDimension<NumTuple1, DenTuple1>>& /*obj1*/, const Quantity<BaseDimension<NumTuple2, DenTuple2>>& /*obj2*/)
    {
-      static_assert(false, "Cannot divide quantities!");
+         static_assert(disallowed_operator<NumTuple1>::value, "Cannot divide quantities!");
    }
 
+   /// @brief Dividing two quantities is intentionally not implemented by default
+   /// @details Defining the preprocessor value DIMENSIONAL_ENABLE_QUANTITY_DIVISION will
+   ///   allow this division, but only if the units are already identical. This is generally not
+   ///   advised but some real-world cases require this usage.
+   template<typename NumTuple, typename DenTuple>
+   PrecisionType operator/(const Quantity<BaseDimension<NumTuple, DenTuple>>& obj1 [[maybe_unused]], 
+                           const Quantity<BaseDimension<NumTuple, DenTuple>>& obj2 [[maybe_unused]])
+   {
+      #ifdef DIMENSIONAL_ENABLE_QUANTITY_DIVISION
+         return obj1.template GetVal<NumTuple, DenTuple>() / obj2.template GetVal<NumTuple, DenTuple>();
+      #else
+         static_assert(disallowed_operator<NumTuple>::value, "Cannot divide quantities!");
+         return 0.0;
+      #endif
+   }
 
-   // Delta and quantity
-   //   invalid
+   /// @brief Dividing a delta by a quantity is intentionally not implemented
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    void operator/(const BaseDimension<NumTuple1, DenTuple1>& /*obj1*/, const Quantity<BaseDimension<NumTuple2, DenTuple2>>& /*obj2*/)
    {
-      static_assert(false, "Cannot divide quantity by delta!");
+      static_assert(disallowed_operator<NumTuple1>::value, "Cannot divide quantity by delta!");
    }
 
+   /// @brief Dividing a quantity by a delta is intentionally not implemented
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    void operator/(const Quantity<BaseDimension<NumTuple1, DenTuple1>>& /*obj1*/, const BaseDimension<NumTuple2, DenTuple2>& /*obj2*/)
    {
-      static_assert(false, "Cannot divide quantity by delta!");
+      static_assert(disallowed_operator<NumTuple1>::value, "Cannot divide quantity by delta!");
    }
-
-
-   // Comparison operators
-   //    Only valid between like-quantities
-
 
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
@@ -229,7 +201,6 @@ namespace Dimension
    {
       return false;
    }
-
 
 }
 

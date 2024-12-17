@@ -18,7 +18,8 @@ TEST_F(DimensionTest, NewDimension) {
 
    Length<Meters> length2{ 20.0 };
 
-   ASSERT_NEAR(getLength<Baz>(length2), 68.0, TOLERANCE);
+   //ASSERT_NEAR(getLength<Baz>(length2), 68.0, TOLERANCE);
+   ASSERT_NEAR(getLength<Baz>(length2), 36.0, TOLERANCE);
 
    Length<BarSub<0>> length3{ 10.0 };
    Length<BarSub<1>> length4{ 20.0 };

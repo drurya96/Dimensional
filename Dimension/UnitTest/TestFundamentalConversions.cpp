@@ -423,36 +423,39 @@ TEST_F(DimensionTest, TestAngleConversions)
 TEST_F(DimensionTest, TestTemperatureConversions)
 {
 
-   // Test from Celsius to other units
-   Temperature<Celsius> tempInCelsius{100.0};  // 100 degrees Celsius
+   // IMPORTANT!
+   // All of these conversions treat Temperature AS A DELTA RATHER THAN QUANTITY!
 
-   ASSERT_NEAR(getTemperature<Celsius>(tempInCelsius), 100.0, TOLERANCE);
-   ASSERT_NEAR(getTemperature<Fahrenheit>(tempInCelsius), 212.0, TOLERANCE);
-   ASSERT_NEAR(getTemperature<Kelvin>(tempInCelsius), 373.15, TOLERANCE);
-   ASSERT_NEAR(getTemperature<Rankine>(tempInCelsius), 671.67, TOLERANCE);
+   // Test from Celsius to other units
+   Temperature<Celsius> deltaInCelsius{100.0};  // 100-degree difference in Celsius
+
+   ASSERT_NEAR(getTemperature<Celsius>(deltaInCelsius), 100.0, TOLERANCE);
+   ASSERT_NEAR(getTemperature<Fahrenheit>(deltaInCelsius), 180.0, TOLERANCE);  // Delta_F = Delta_C * 9/5
+   ASSERT_NEAR(getTemperature<Kelvin>(deltaInCelsius), 100.0, TOLERANCE);      // Kelvin scales like Celsius for deltas
+   ASSERT_NEAR(getTemperature<Rankine>(deltaInCelsius), 180.0, TOLERANCE);     // Delta_R = Delta_C * 9/5
 
    // Test from Fahrenheit to other units
-   Temperature<Fahrenheit> tempInFahrenheit{32.0};  // 32 degrees Fahrenheit (freezing point of water)
+   Temperature<Fahrenheit> deltaInFahrenheit{180.0};  // 180-degree difference in Fahrenheit
 
-   ASSERT_NEAR(getTemperature<Celsius>(tempInFahrenheit), 0.0, TOLERANCE);
-   ASSERT_NEAR(getTemperature<Fahrenheit>(tempInFahrenheit), 32.0, TOLERANCE);
-   ASSERT_NEAR(getTemperature<Kelvin>(tempInFahrenheit), 273.15, TOLERANCE);
-   ASSERT_NEAR(getTemperature<Rankine>(tempInFahrenheit), 491.67, TOLERANCE);
+   ASSERT_NEAR(getTemperature<Celsius>(deltaInFahrenheit), 100.0, TOLERANCE);  // Delta_C = Delta_F * 5/9
+   ASSERT_NEAR(getTemperature<Fahrenheit>(deltaInFahrenheit), 180.0, TOLERANCE);
+   ASSERT_NEAR(getTemperature<Kelvin>(deltaInFahrenheit), 100.0, TOLERANCE);
+   ASSERT_NEAR(getTemperature<Rankine>(deltaInFahrenheit), 180.0, TOLERANCE);
 
    // Test from Kelvin to other units
-   Temperature<Kelvin> tempInKelvin{0.0};  // Absolute zero in Kelvin
+   Temperature<Kelvin> deltaInKelvin{100.0};  // 100-unit difference in Kelvin
 
-   ASSERT_NEAR(getTemperature<Celsius>(tempInKelvin), -273.15, TOLERANCE);
-   ASSERT_NEAR(getTemperature<Fahrenheit>(tempInKelvin), -459.67, TOLERANCE);
-   ASSERT_NEAR(getTemperature<Kelvin>(tempInKelvin), 0.0, TOLERANCE);
-   ASSERT_NEAR(getTemperature<Rankine>(tempInKelvin), 0.0, TOLERANCE);
+   ASSERT_NEAR(getTemperature<Celsius>(deltaInKelvin), 100.0, TOLERANCE);      // Kelvin deltas are same as Celsius
+   ASSERT_NEAR(getTemperature<Fahrenheit>(deltaInKelvin), 180.0, TOLERANCE);   // Delta_F = Delta_K * 9/5
+   ASSERT_NEAR(getTemperature<Kelvin>(deltaInKelvin), 100.0, TOLERANCE);
+   ASSERT_NEAR(getTemperature<Rankine>(deltaInKelvin), 180.0, TOLERANCE);      // Delta_R = Delta_K * 9/5
 
    // Test from Rankine to other units
-   Temperature<Rankine> tempInRankine{491.67};  // Freezing point of water in Rankine
+   Temperature<Rankine> deltaInRankine{180.0};  // 180-unit difference in Rankine
 
-   ASSERT_NEAR(getTemperature<Celsius>(tempInRankine), 0.0, TOLERANCE);
-   ASSERT_NEAR(getTemperature<Fahrenheit>(tempInRankine), 32.0, TOLERANCE);
-   ASSERT_NEAR(getTemperature<Kelvin>(tempInRankine), 273.15, TOLERANCE);
-   ASSERT_NEAR(getTemperature<Rankine>(tempInRankine), 491.67, TOLERANCE);
+   ASSERT_NEAR(getTemperature<Celsius>(deltaInRankine), 100.0, TOLERANCE);     // Delta_C = Delta_R * 5/9
+   ASSERT_NEAR(getTemperature<Fahrenheit>(deltaInRankine), 180.0, TOLERANCE);
+   ASSERT_NEAR(getTemperature<Kelvin>(deltaInRankine), 100.0, TOLERANCE);      // Delta_K = Delta_R * 5/9
+   ASSERT_NEAR(getTemperature<Rankine>(deltaInRankine), 180.0, TOLERANCE);
 
 }

@@ -100,6 +100,7 @@ namespace Dimension
       requires MatchingDimensions<NumTuple, T> && MatchingDimensions<DenTuple, U>
       BaseDimension(BaseDimension<T, U> obj) :
          BaseDimension(obj.template GetVal<NumTuple, DenTuple>())
+         //BaseDimension(0.0)
       {
       }
 
@@ -150,13 +151,6 @@ namespace Dimension
 
          scalar = newVal;
       }
-
-      template<>
-      void SetVal<NumTuple, DenTuple>(PrecisionType newVal)
-      {
-         scalar = newVal;
-      }
-      
       
       /// @brief Cast to double operator overload for Scalar types
       /// @details Cast the dimension to a double if unitless (i.e. scalar type) 
@@ -305,6 +299,13 @@ namespace Dimension
    {
       return scalar;
    }
+*/
+/*
+      template<>
+      void SetVal<NumTuple, DenTuple>(PrecisionType newVal)
+      {
+         scalar = newVal;
+      }
 */
 
    /// @brief Division operator for two Dimensions

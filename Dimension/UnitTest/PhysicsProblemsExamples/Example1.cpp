@@ -14,6 +14,8 @@
 
 #include <ostream>
 
+#include <iostream>
+
 TEST_F(PhysicsProblemsExample1, SimpleHeatTransfer)
 {
     using namespace Dimension;
@@ -156,16 +158,25 @@ TEST_F(PhysicsProblemsExample1, PressureFromForceAndVolume)
 
     // Step 3: Calculate Pressure: P = F / A
     //BaseDimension<std::tuple<Newtons>, std::tuple<Meters, Meters>> pressure = force / area;
-    //BaseDimension<std::tuple<KiloGrams>, std::tuple<Meters, Seconds, Seconds>> pressure = force / area;
+    BaseDimension<std::tuple<KiloGrams>, std::tuple<Meters, Seconds, Seconds>> pressure = force / area;
+    //auto pressure = force / area;
+    //BaseDimension<std::tuple<KiloGrams>, std::tuple<Meters, Seconds, Seconds>> pressure1{4000.0};
 
     // Expected results
     double expectedVolume = 4.0 * 2.0 * 0.5;       // 4 m * 2 m * 0.5 m = 4.0 m³
     double expectedArea = expectedVolume / 0.5;   // Cross-section: V / h = 8.0 m²
-    //double expectedPressure = 500.0 / expectedArea; // P = F / A = 500 / 8.0 = 62.5 N/m²
+    double expectedPressure = 500.0 / expectedArea; // P = F / A = 500 / 8.0 = 62.5 N/m²
 
     // Assertions
     ASSERT_NEAR((getVolume<Meters, Meters, Meters>(volume)), expectedVolume, TOLERANCE);
     ASSERT_NEAR((area.GetVal<std::tuple<Meters, Meters>, std::tuple<>>()), expectedArea, TOLERANCE);
     //ASSERT_NEAR((pressure.GetVal<std::tuple<Newtons>, std::tuple<Meters, Meters>>()), expectedPressure, TOLERANCE);
-    //ASSERT_NEAR((pressure.GetVal<std::tuple<KiloGrams>, std::tuple<Meters, Seconds, Seconds>>()), expectedPressure, TOLERANCE); 
+    //ASSERT_NEAR((pressure.GetVal<std::tuple<KiloGrams>, std::tuple<Meters, Seconds, Seconds>>()), expectedPressure, TOLERANCE);
+
+    std::cout << pressure << expectedPressure << std::endl;
+
+    //BaseDimension<std::tuple<Meters, Seconds>, std::tuple<>> testObj(10.0);
+    //std::cout << testObj.GetVal<std::tuple<Seconds, Meters>, std::tuple<>>() << std::endl;
+
+    //std::cout << testObj << std::endl;
 }

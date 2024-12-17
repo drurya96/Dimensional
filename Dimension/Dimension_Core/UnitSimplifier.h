@@ -29,32 +29,6 @@ namespace Dimension
    template<typename Dim, typename... Us>
    struct has_same_dim<Dim, std::tuple<Us...>> : std::disjunction<is_same_dim<Dim, Us>...> {};
 
-   /// @brief get the first unit in the tuple matching the dimension of T
-   template<template<typename, typename> typename Compare, typename T, typename Tuple>
-   struct get_first_match;
-
-   /// @brief get the first unit in the tuple matching the dimension of T
-   /// @details Specialization for no match found, return a NullUnit
-   ///    This should not typical occur and is a sign of problematic code elsewhere
-   /// @tparam T Unit to match against
-   /// @tparam Tuple Tuple of units
-   template<template<typename, typename> typename Compare, typename T>
-   struct get_first_match<Compare, T, std::tuple<>> {
-      using type = NullUnit;
-   };
-
-   /// @brief get the first unit in the tuple matching the dimension of T
-   /// @details Primary specialization
-   /// @tparam T Unit to match against
-   /// @tparam Tuple Tuple of units
-   /// @typedef type The type of unit of matching dimension to T
-   template<template<typename, typename> typename Compare, typename T, typename Head, typename... Tail>
-   struct get_first_match<Compare, T, std::tuple<Head, Tail...>> {
-      using type = std::conditional_t<Compare<T, Head>::value,
-         Head,
-         typename get_first_match<Compare, T, std::tuple<Tail...>>::type>;
-   };
-
    /// @brief Struct to simplify units by cancelling out as necessary
    template<typename NumTypes1, typename NumTypes2, typename DenTypes1, typename DenTypes2>
    struct UnitSimplifier;
@@ -70,26 +44,30 @@ namespace Dimension
    template<typename ... NumTypes1, typename ... NumTypes2, typename ... DenTypes1, typename ... DenTypes2>
    struct UnitSimplifier<std::tuple<NumTypes1...>, std::tuple<NumTypes2...>, std::tuple<DenTypes1...>, std::tuple<DenTypes2...>>
    {
+      // NumTypes1 == Kilograms, Meters
+      // NumTypes2 == <>
+      // DenTypes1 == Seconds, Seconds
+      // DenTypes2 == <Meters, Meters>
    private:
-      using num1AfterSimpleCancel = tuple_diff<std::is_same, std::tuple<NumTypes1...>, std::tuple<DenTypes2...>>;
-      using num2AfterSimpleCancel = tuple_diff<std::is_same, std::tuple<NumTypes2...>, std::tuple<DenTypes1...>>;
+      using num1AfterSimpleCancel = tuple_diff<std::is_same, std::tuple<NumTypes1...>, std::tuple<DenTypes2...>>; // KiloGrams
+      using num2AfterSimpleCancel = tuple_diff<std::is_same, std::tuple<NumTypes2...>, std::tuple<DenTypes1...>>; // <>
 
-      using den1AfterSimpleCancel = tuple_diff<std::is_same, std::tuple<DenTypes1...>, std::tuple<NumTypes2...>>;
-      using den2AfterSimpleCancel = tuple_diff<std::is_same, std::tuple<DenTypes2...>, std::tuple<NumTypes1...>>;
+      using den1AfterSimpleCancel = tuple_diff<std::is_same, std::tuple<DenTypes1...>, std::tuple<NumTypes2...>>; // Seconds, Seconds
+      using den2AfterSimpleCancel = tuple_diff<std::is_same, std::tuple<DenTypes2...>, std::tuple<NumTypes1...>>; // Meters
 
-      using remainingNum1 = tuple_diff<has_same_dim, typename num1AfterSimpleCancel::type, typename den2AfterSimpleCancel::type>;
-      using remainingNum2 = tuple_diff<has_same_dim, typename num2AfterSimpleCancel::type, typename den1AfterSimpleCancel::type>;
+      using remainingNum1 = tuple_diff<has_same_dim, typename num1AfterSimpleCancel::type, typename den2AfterSimpleCancel::type>; // KiloGrams
+      using remainingNum2 = tuple_diff<has_same_dim, typename num2AfterSimpleCancel::type, typename den1AfterSimpleCancel::type>; // <>
 
-      using remainingDen1 = tuple_diff<has_same_dim, typename den1AfterSimpleCancel::type, typename num2AfterSimpleCancel::type>;
-      using remainingDen2 = tuple_diff<has_same_dim, typename den2AfterSimpleCancel::type, typename num1AfterSimpleCancel::type>;
+      using remainingDen1 = tuple_diff<has_same_dim, typename den1AfterSimpleCancel::type, typename num2AfterSimpleCancel::type>; // Seconds, Seconds
+      using remainingDen2 = tuple_diff<has_same_dim, typename den2AfterSimpleCancel::type, typename num1AfterSimpleCancel::type>; // Meters
       
 
    public:
-      using newNum = tuple_cat_t<typename remainingNum1::type, typename remainingNum2::type>;
-      using newDen = tuple_cat_t<typename remainingDen1::type, typename remainingDen2::type>;
+      using newNum = tuple_cat_t<typename remainingNum1::type, typename remainingNum2::type>; // KiloGrams
+      using newDen = tuple_cat_t<typename remainingDen1::type, typename remainingDen2::type>; // Seconds, Seconds, Meters
 
-      using numSimple = tuple_cat_t<typename num1AfterSimpleCancel::type, typename num2AfterSimpleCancel::type>;
-      using denSimple = tuple_cat_t<typename den1AfterSimpleCancel::type, typename den2AfterSimpleCancel::type>;
+      using numSimple = tuple_cat_t<typename num1AfterSimpleCancel::type, typename num2AfterSimpleCancel::type>; // KiloGrams
+      using denSimple = tuple_cat_t<typename den1AfterSimpleCancel::type, typename den2AfterSimpleCancel::type>; // Seconds, Seconds, Meters
 
       using dimType = BaseDimension<newNum, newDen>;
 
@@ -145,6 +123,11 @@ namespace Dimension
    template<typename NumTupType, typename DenTupType, typename RealNumTupType, typename RealDenTupType, bool isDelta = false>
    void CancelUnits(PrecisionType& value)
    {
+      //NumTupType == KiloGrams
+      //DenTupType == Seconds, Seconds, Meters
+      //RealNumTupType == KiloGrams
+      //RealDenTupType == Seconds, Seconds, Meters
+
       CancelUnitsImpl<false, 0, RealNumTupType, NumTupType>(value);
       CancelUnitsImpl<true, 0, RealDenTupType, DenTupType>(value);
    }
