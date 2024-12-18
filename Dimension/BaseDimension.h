@@ -121,7 +121,7 @@ namespace Dimension
       {
          PrecisionType result = scalar;
 
-         constexpr bool isDelta = !((std::tuple_size_v<ToNumTuple> == 1) && (std::tuple_size_v<ToDenTuple> == 0));
+         constexpr bool isDelta = true;
 
          ConvertDimension<0, false, ToNumTuple, NumTuple, isDelta>(result);
          ConvertDimension<0, true, ToDenTuple, DenTuple, isDelta>(result);
@@ -145,7 +145,6 @@ namespace Dimension
 
          scalar = newVal;
       }
-      
       
       /// @brief Cast to double operator overload for Scalar types
       /// @details Cast the dimension to a double if unitless (i.e. scalar type) 
@@ -284,6 +283,24 @@ namespace Dimension
       requires IsUnitTuplePair<NumTupleOther, DenTupleOther>
       friend class BaseDimension;
    };
+
+/*
+   /// @brief Return the internal value as a double in terms of the object unit templates
+   /// @return A PrecisionType representing the value in terms of the given units
+   template<typename NumTupleT, typename DenTupleT>
+   template<>
+   PrecisionType BaseDimension<NumTuple, DenTuple, PrecisionType>::GetVal<NumTuple, DenTuple>() const
+   {
+      return scalar;
+   }
+*/
+/*
+      template<>
+      void SetVal<NumTuple, DenTuple>(PrecisionType newVal)
+      {
+         scalar = newVal;
+      }
+*/
 
    /// @brief Division operator for two Dimensions
    /// @tparam NumTuple1 Tuple of numerator units of obj1

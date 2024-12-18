@@ -6,6 +6,8 @@
 #include <ostream> // For std::ostream
 #include <tuple> // For std::tuple and related operations
 
+#include <sstream>
+
 namespace Dimension
 {
    
@@ -96,6 +98,6 @@ namespace Dimension
       }
    };
 
-   } // end Dimension
+} // end Dimension
 
 #endif // DIMENSION_STRING_LITERAL_H

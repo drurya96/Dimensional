@@ -52,7 +52,7 @@ namespace Dimension
       [[deprecated("Use the free function getAcceleration() instead.")]]
       double GetAcceleration() const
       {
-         return getSpeed<LengthUnitRet, TimeUnitRet1, TimeUnitRet2>(*this);
+         return getAcceleration<LengthUnitRet, TimeUnitRet1, TimeUnitRet2>(*this);
       }
    };
 

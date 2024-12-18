@@ -19,11 +19,15 @@ set(TEST_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/TestTrig.cpp
     ${CMAKE_CURRENT_LIST_DIR}/TestFunctions.cpp
     ${CMAKE_CURRENT_LIST_DIR}/TestSerialization.cpp
+
+    ${CMAKE_CURRENT_LIST_DIR}/PhysicsProblemsExamples/PhysicsProblemsBase.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/PhysicsProblemsExamples/Example1.cpp
 )
 
 add_executable(Dimension_UnitTests ${TEST_SOURCES})
 
 target_include_directories(Dimension_UnitTests PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+target_include_directories(Dimension_UnitTests PUBLIC ${CMAKE_CURRENT_LIST_DIR}/PhysicsProblemsExamples)
 
 target_link_libraries(Dimension_UnitTests PUBLIC
     Dimension_Extensions
