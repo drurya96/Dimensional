@@ -13,7 +13,7 @@ namespace Dimension
    template <typename ...T> struct is_tuple<std::tuple<T...>>: std::true_type {};
 
    template<typename T>
-   concept IsUnitType = requires
+   concept IsBasicUnitType = requires
    {
       typename T::Dim;
       typename T::Primary;
@@ -24,7 +24,13 @@ namespace Dimension
       requires is_tuple<typename T::DenTuple>::value;
       { T::ID } -> std::convertible_to<int>;
       requires PrimaryConvertible<T>;
+      requires is_absolute<typename T::Primary>::value;
    };
+
+   template<typename T>
+   concept IsUnitType = 
+      (is_quantity_v<T> && IsBasicUnitType<typename T::unit>) || 
+      IsBasicUnitType<T>;
 
    template<typename Tuple, std::size_t... Is>
    constexpr bool all_satisfy_unit_constraints(std::index_sequence<Is...>) {
@@ -36,6 +42,23 @@ namespace Dimension
    concept IsUnitTuple =
       std::tuple_size_v<Tuple> == 0 || 
       all_satisfy_unit_constraints<Tuple>(std::make_index_sequence<std::tuple_size_v<Tuple>>{});
+
+   template<typename T, typename UnitType>
+   concept IsNonQuantityUnitDimension = 
+      !is_quantity_v<T> &&
+      requires {
+         typename T::Dim; // Ensure T has a Dim member
+      } &&
+      std::is_same_v<typename T::Dim, UnitType>;
+
+   // Helper concept for quantity temperature units
+   template<typename T, typename UnitType>
+   concept IsQuantityUnitDimension = 
+      is_quantity_v<T> &&
+      requires {
+         typename T::unit::Dim; // Ensure T::unit has a Dim member
+      } &&
+      std::is_same_v<typename T::unit::Dim, UnitType>;
 
 }
 

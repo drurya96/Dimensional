@@ -78,23 +78,32 @@ namespace Dimension
       // Expand any derived units to their fundamental constiuents
       using Extractor = FundamentalUnitExtractor<NumTupleT, DenTupleT>;
       using NumTuple = typename Extractor::Num;
-      using DenTuple = typename Extractor::Den;
+      using DenTuple = typename Extractor::Den; 
+
+   private:
+
+      using simplified = UnitSimplifier<NumTuple, std::tuple<>, std::tuple<>, DenTuple>;
+
+   public:
+
+      using simplifiedNumTuple = typename simplified::newNum;
+      using simplifiedDenTuple = typename simplified::newDen;
 
       /// @brief Default constructor
-      BaseDimension() : 
+      constexpr BaseDimension() : 
          scalar(1.0)
       {
       }
 
       /// @brief Constructor given value
-      BaseDimension(PrecisionType val) :
+      constexpr BaseDimension(PrecisionType val) :
          scalar(val)
       {
       }
 
       template<typename T, typename U>
-      requires MatchingDimensions<NumTuple, T> && MatchingDimensions<DenTuple, U>
-      BaseDimension(BaseDimension<T, U> obj) :
+      requires MatchingDimensionsNew<BaseDimension<NumTuple, DenTuple>, BaseDimension<T, U>>
+      constexpr BaseDimension(BaseDimension<T, U> obj) :
          BaseDimension(obj.template GetVal<NumTuple, DenTuple>())
       {
       }
@@ -111,20 +120,30 @@ namespace Dimension
          return typename simplified::dimType(newScalar);
       }
 
+      PrecisionType SimplifiedScalar() const
+      {
+         using simplified = UnitSimplifier<NumTuple, std::tuple<>, std::tuple<>, DenTuple>;
+         PrecisionType newScalar = scalar;
+
+         CancelUnits<typename simplified::numSimple, typename simplified::denSimple, typename simplified::newNum, typename simplified::newDen, simplified::isDelta>(newScalar);
+
+         return newScalar;
+      }
+
       /// @brief Return the internal value as a double in terms of the provided units
       /// @tparam NumTuple tuple of Unit types to convert numerator to
       /// @tparam DenTuple tuple of Unit types to convert denominator to
       /// @return A PrecisionType representing the value in terms of the given units
       template<typename ToNumTuple, typename ToDenTuple>
-      requires MatchingDimensions<NumTuple, ToNumTuple> && MatchingDimensions<DenTuple, ToDenTuple>
+      requires MatchingDimensionsNew<BaseDimension<NumTuple, DenTuple>, BaseDimension<ToNumTuple, ToDenTuple>>
       PrecisionType GetVal() const
       {
-         PrecisionType result = scalar;
+         PrecisionType result = this->SimplifiedScalar();
 
          constexpr bool isDelta = true;
 
-         ConvertDimension<0, false, ToNumTuple, NumTuple, isDelta>(result);
-         ConvertDimension<0, true, ToDenTuple, DenTuple, isDelta>(result);
+         ConvertDimension<0, false, ToNumTuple, simplifiedNumTuple, isDelta>(result);
+         ConvertDimension<0, true, ToDenTuple, simplifiedDenTuple, isDelta>(result);
 
          return result;
       }
@@ -135,7 +154,7 @@ namespace Dimension
       /// @tparam FromDenTuple Denominator tuple corresponding to the value to set
       /// @param newVal Value to set
       template<typename FromNumTuple, typename FromDenTuple>
-      requires MatchingDimensions<NumTuple, FromNumTuple> && MatchingDimensions<DenTuple, FromDenTuple>
+      requires MatchingDimensionsNew<BaseDimension<NumTuple, DenTuple>, BaseDimension<FromNumTuple, FromDenTuple>>
       void SetVal(PrecisionType newVal)
       {
          constexpr bool isDelta = !((std::tuple_size_v<FromNumTuple> == 1) && (std::tuple_size_v<FromDenTuple> == 0));
@@ -167,7 +186,7 @@ namespace Dimension
       /// @tparam DenTuple2 Tuple of denominator types of object being added
       /// @param[in] rhs The object being added
       template<typename NumTuple2, typename DenTuple2>
-      requires MatchingDimensions<NumTuple, NumTuple2> && MatchingDimensions<DenTuple, DenTuple2>
+      requires MatchingDimensionsNew<BaseDimension<NumTuple, DenTuple>, BaseDimension<NumTuple2, DenTuple2>>
       BaseDimension<NumTuple, DenTuple>& operator+=(const BaseDimension<NumTuple2, DenTuple2>& rhs)
       {
          scalar += rhs.template GetVal<NumTuple, DenTuple>();
@@ -179,7 +198,7 @@ namespace Dimension
       /// @tparam DenTuple2 Tuple of denominator types of object being substracted
       /// @param[in] rhs The object being substracted
       template<typename NumTuple2, typename DenTuple2>
-      requires MatchingDimensions<NumTuple, NumTuple2> && MatchingDimensions<DenTuple, DenTuple2>
+      requires MatchingDimensionsNew<BaseDimension<NumTuple, DenTuple>, BaseDimension<NumTuple2, DenTuple2>>
       BaseDimension<NumTuple, DenTuple>& operator-=(const BaseDimension<NumTuple2, DenTuple2>& rhs)
       {
          scalar -= rhs.template GetVal<NumTuple, DenTuple>();
@@ -211,27 +230,27 @@ namespace Dimension
       // Comparison Operators
       /// @todo Replace these with <==> operator after switching to C++20
       template<typename CompNumTuple, typename CompDenTuple>
-      requires MatchingDimensions<NumTuple, CompNumTuple> && MatchingDimensions<DenTuple, CompDenTuple>
+      requires MatchingDimensionsNew<BaseDimension<NumTuple, DenTuple>, BaseDimension<CompNumTuple, CompDenTuple>>
       bool operator>(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return GetVal<NumTuple, DenTuple>() > rhs.template GetVal<NumTuple, DenTuple>(); }
 
       template<typename CompNumTuple, typename CompDenTuple>
-      requires MatchingDimensions<NumTuple, CompNumTuple> && MatchingDimensions<DenTuple, CompDenTuple>
+      requires MatchingDimensionsNew<BaseDimension<NumTuple, DenTuple>, BaseDimension<CompNumTuple, CompDenTuple>>
       bool operator<(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return GetVal<NumTuple, DenTuple>() < rhs.template GetVal<NumTuple, DenTuple>(); }
 
       template<typename CompNumTuple, typename CompDenTuple>
-      requires MatchingDimensions<NumTuple, CompNumTuple> && MatchingDimensions<DenTuple, CompDenTuple>
+      requires MatchingDimensionsNew<BaseDimension<NumTuple, DenTuple>, BaseDimension<CompNumTuple, CompDenTuple>>
       bool operator>=(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return GetVal<NumTuple, DenTuple>() >= rhs.template GetVal<NumTuple, DenTuple>(); }
 
       template<typename CompNumTuple, typename CompDenTuple>
-      requires MatchingDimensions<NumTuple, CompNumTuple> && MatchingDimensions<DenTuple, CompDenTuple>
+      requires MatchingDimensionsNew<BaseDimension<NumTuple, DenTuple>, BaseDimension<CompNumTuple, CompDenTuple>>
       bool operator<=(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return GetVal<NumTuple, DenTuple>() <= rhs.template GetVal<NumTuple, DenTuple>(); }
 
       template<typename CompNumTuple, typename CompDenTuple>
-      requires MatchingDimensions<NumTuple, CompNumTuple> && MatchingDimensions<DenTuple, CompDenTuple>
+      requires MatchingDimensionsNew<BaseDimension<NumTuple, DenTuple>, BaseDimension<CompNumTuple, CompDenTuple>>
       bool operator==(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return GetVal<NumTuple, DenTuple>() == rhs.template GetVal<NumTuple, DenTuple>(); }
       
       template<typename CompNumTuple, typename CompDenTuple>
-      requires MatchingDimensions<NumTuple, CompNumTuple> && MatchingDimensions<DenTuple, CompDenTuple>
+      requires MatchingDimensionsNew<BaseDimension<NumTuple, DenTuple>, BaseDimension<CompNumTuple, CompDenTuple>>
       bool operator!=(const BaseDimension<CompNumTuple, CompDenTuple>& rhs) const { return !(*this == rhs); }
       
       /// @brief Check if this object is nearly equal to input object
@@ -239,7 +258,7 @@ namespace Dimension
       /// @param[in] Epsilon The acceptable difference between values, in terms of this object's dimension
       /// @return Bool indicating equality
       template<typename CompNumTuple, typename CompDenTuple>
-      requires MatchingDimensions<NumTuple, CompNumTuple> && MatchingDimensions<DenTuple, CompDenTuple>
+      requires MatchingDimensionsNew<BaseDimension<NumTuple, DenTuple>, BaseDimension<CompNumTuple, CompDenTuple>>
       bool NearlyEqual(const BaseDimension<CompNumTuple, CompDenTuple>& rhs, PrecisionType Epsilon) const { return fabs(GetVal<NumTuple, DenTuple>() - rhs.template GetVal<NumTuple, DenTuple>()) < Epsilon; }
 
    protected:
@@ -249,7 +268,6 @@ namespace Dimension
    private:
       // Declare operator overloads as friends of this class
       // This is to directly access the raw value for efficiency
-
       template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
       friend auto operator/(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2);
 
@@ -269,12 +287,12 @@ namespace Dimension
       friend auto operator/(PrecisionType scalar, const BaseDimension<NumTup, DenTup>& obj)->BaseDimension<DenTup, NumTup>;
 
       template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
-      requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
-      friend BaseDimension<NumTuple1, DenTuple1> operator+(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2);
+      requires MatchingDimensionsNew<BaseDimension<NumTuple1, DenTuple1>, BaseDimension<NumTuple2, DenTuple2>>
+      friend auto operator+(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2);
 
       template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
-      requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
-      friend BaseDimension<NumTuple1, DenTuple1> operator-(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2);
+      requires MatchingDimensionsNew<BaseDimension<NumTuple1, DenTuple1>, BaseDimension<NumTuple2, DenTuple2>>
+      friend auto operator-(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2);
 
 
       // Making all BaseDimensions friends of one-another for access to scalars and
@@ -289,7 +307,9 @@ namespace Dimension
    /// @return A PrecisionType representing the value in terms of the given units
    template<typename NumTupleT, typename DenTupleT>
    template<>
-   PrecisionType BaseDimension<NumTuple, DenTuple, PrecisionType>::GetVal<NumTuple, DenTuple>() const
+   //requires MatchingDimensions<NumTupleT, NumTupleT> && MatchingDimensions<DenTupleT, DenTupleT>
+   requires true
+   PrecisionType BaseDimension<NumTupleT, DenTupleT>::GetVal<NumTupleT, DenTupleT>() const
    {
       return scalar;
    }
@@ -314,14 +334,39 @@ namespace Dimension
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    auto operator/(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
    {
-      using Num1 = typename BaseDimension<NumTuple1, DenTuple1>::NumTuple;
-      using Num2 = typename BaseDimension<NumTuple2, DenTuple2>::NumTuple;
+      using absolute_quantity_tuple1 = make_tuple_of_single_absolute_quantity<NumTuple1>;
+      using Num1 = std::conditional_t<absolute_quantity_tuple1::value, typename absolute_quantity_tuple1::type, typename BaseDimension<NumTuple1, DenTuple1>::NumTuple>;
+
+      using absolute_quantity_tuple2 = make_tuple_of_single_absolute_quantity<NumTuple2>;
+      using Num2 = std::conditional_t<absolute_quantity_tuple2::value, typename absolute_quantity_tuple2::type, typename BaseDimension<NumTuple2, DenTuple2>::NumTuple>;
 
       using Den1 = typename BaseDimension<NumTuple1, DenTuple1>::DenTuple;
       using Den2 = typename BaseDimension<NumTuple2, DenTuple2>::DenTuple;
 
       using simplified = UnitSimplifier<Num1, Den2, Den1, Num2>;
-      PrecisionType newScalar = obj1.scalar / obj2.scalar;
+
+      PrecisionType scalar1 = obj1.scalar;
+      PrecisionType scalar2 = obj2.scalar;
+
+      if constexpr (absolute_quantity_tuple1::value)
+      {
+         // This emits a compiler warning (deprecation warning) if an implicit cast occurs and persists in the resulting dimension.
+         // Generally, users should make these casts explicitly if the goal is to maintain the unit.
+         // However, if the implicit cast occurs only to "cancel" an existing unit, this is typical and does NOT emit a warning.
+         implicit_cast_to_build_warning<has_same_dim<std::tuple_element_t<0, Num1>, typename simplified::newNum>::value>::call();
+         scalar1 = Convert<std::tuple_element_t<0, NumTuple1>, std::tuple_element_t<0, Num1>>(scalar1);
+      }
+
+      if constexpr (absolute_quantity_tuple2::value)
+      {
+         // This emits a compiler warning (deprecation warning) if an implicit cast occurs and persists in the resulting dimension.
+         // Generally, users should make these casts explicitly if the goal is to maintain the unit.
+         // However, if the implicit cast occurs only to "cancel" an existing unit, this is typical and does NOT emit a warning.
+         implicit_cast_to_build_warning<has_same_dim<std::tuple_element_t<0, Num2>, typename simplified::newDen>::value>::call();
+         scalar2 = Convert<std::tuple_element_t<0, NumTuple2>, std::tuple_element_t<0, Num2>>(scalar2);
+      }
+
+      PrecisionType newScalar = scalar1 / scalar2;
 
       CancelUnits<typename simplified::numSimple, typename simplified::denSimple, typename simplified::newNum, typename simplified::newDen, simplified::isDelta>(newScalar);
 
@@ -340,14 +385,40 @@ namespace Dimension
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
    auto operator*(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
    {
-      using Num1 = typename BaseDimension<NumTuple1, DenTuple1>::NumTuple;
-      using Num2 = typename BaseDimension<NumTuple2, DenTuple2>::NumTuple;
+      using absolute_quantity_tuple1 = make_tuple_of_single_absolute_quantity<NumTuple1>;
+      using Num1 = std::conditional_t<absolute_quantity_tuple1::value, typename absolute_quantity_tuple1::type, typename BaseDimension<NumTuple1, DenTuple1>::NumTuple>;
+
+      using absolute_quantity_tuple2 = make_tuple_of_single_absolute_quantity<NumTuple2>;
+      using Num2 = std::conditional_t<absolute_quantity_tuple2::value, typename absolute_quantity_tuple2::type, typename BaseDimension<NumTuple2, DenTuple2>::NumTuple>;
 
       using Den1 = typename BaseDimension<NumTuple1, DenTuple1>::DenTuple;
       using Den2 = typename BaseDimension<NumTuple2, DenTuple2>::DenTuple;
 
       using simplified = UnitSimplifier<Num1, Num2, Den1, Den2>;
-      PrecisionType newScalar = obj1.scalar * obj2.scalar;
+
+      PrecisionType scalar1 = obj1.scalar;
+      PrecisionType scalar2 = obj2.scalar;
+
+      // Use knowledge of the simplified type to determine whether units where cancelled.
+      if constexpr (absolute_quantity_tuple1::value)
+      {
+         // This emits a compiler warning (deprecation warning) if an implicit cast occurs and persists in the resulting dimension.
+         // Generally, users should make these casts explicitly if the goal is to maintain the unit.
+         // However, if the implicit cast occurs only to "cancel" an existing unit, this is typical and does NOT emit a warning.
+         implicit_cast_to_build_warning<has_same_dim<std::tuple_element_t<0, Num1>, typename simplified::newNum>::value>::call();
+         scalar1 = Convert<std::tuple_element_t<0, NumTuple1>, std::tuple_element_t<0, Num1>>(scalar1);
+      }
+
+      if constexpr (absolute_quantity_tuple2::value)
+      {
+         // This emits a compiler warning (deprecation warning) if an implicit cast occurs and persists in the resulting dimension.
+         // Generally, users should make these casts explicitly if the goal is to maintain the unit.
+         // However, if the implicit cast occurs only to "cancel" an existing unit, this is typical and does NOT emit a warning.
+         implicit_cast_to_build_warning<has_same_dim<std::tuple_element_t<0, Num2>, typename simplified::newNum>::value>::call();
+         scalar2 = Convert<std::tuple_element_t<0, NumTuple2>, std::tuple_element_t<0, Num2>>(scalar2);
+      }
+
+      PrecisionType newScalar = scalar1 * scalar2;
 
       CancelUnits<typename simplified::numSimple, typename simplified::denSimple, typename simplified::newNum, typename simplified::newDen, simplified::isDelta>(newScalar);
 
@@ -414,10 +485,17 @@ namespace Dimension
    ///    The value is the values of obj1 and obj2 added, after converting
    ///    obj2 to the same units as obj1
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
-   requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
-   BaseDimension<NumTuple1, DenTuple1> operator+(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
+   requires MatchingDimensionsNew<BaseDimension<NumTuple1, DenTuple1>, BaseDimension<NumTuple2, DenTuple2>>
+   auto operator+(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
    {
-      return BaseDimension<NumTuple1, DenTuple1>{ obj1.template GetVal<NumTuple1, DenTuple1>() + obj2.template GetVal<NumTuple1, DenTuple1>() };
+      using NumType = add_all<NumTuple1, NumTuple2>;
+      using DenType = add_all<DenTuple1, DenTuple2>;
+
+      return BaseDimension<typename NumType::type, typename DenType::type>{
+         obj1.template GetVal<typename NumType::lhsTypeOrder, typename DenType::lhsTypeOrder>() + 
+         obj2.template GetVal<typename NumType::rhsTypeOrder, typename DenType::rhsTypeOrder>()
+      };
+
    }
 
    /// @brief Subtraction operator for two Dimensions
@@ -429,10 +507,16 @@ namespace Dimension
    ///    The value is the difference of values of obj1 and obj2, after 
    ///    converting obj2 to the same units as obj1
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
-   requires MatchingDimensions<NumTuple1, NumTuple2> && MatchingDimensions<DenTuple1, DenTuple2>
-   BaseDimension<NumTuple1, DenTuple1> operator-(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
+   requires MatchingDimensionsNew<BaseDimension<NumTuple1, DenTuple1>, BaseDimension<NumTuple2, DenTuple2>>
+   auto operator-(const BaseDimension<NumTuple1, DenTuple1>& obj1, const BaseDimension<NumTuple2, DenTuple2>& obj2)
    {
-      return BaseDimension<NumTuple1, DenTuple1>{ obj1.template GetVal<NumTuple1, DenTuple1>() - obj2.template GetVal<NumTuple1, DenTuple1>() };
+      using NumType = subtract_all<NumTuple1, NumTuple2>;
+      using DenType = subtract_all<DenTuple1, DenTuple2>;
+
+      return BaseDimension<typename NumType::type, typename DenType::type>{
+         obj1.template GetVal<typename NumType::lhsTypeOrder, typename DenType::lhsTypeOrder>() - 
+         obj2.template GetVal<typename NumType::rhsTypeOrder, typename DenType::rhsTypeOrder>()
+      };
    }
 
    /// @brief Implementation for Pow (exponential)

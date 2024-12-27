@@ -19,6 +19,7 @@ set(TEST_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/TestTrig.cpp
     ${CMAKE_CURRENT_LIST_DIR}/TestFunctions.cpp
     ${CMAKE_CURRENT_LIST_DIR}/TestSerialization.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/TestQuantityAdditionSubtraction.cpp
 
     ${CMAKE_CURRENT_LIST_DIR}/PhysicsProblemsExamples/PhysicsProblemsBase.cpp
     ${CMAKE_CURRENT_LIST_DIR}/PhysicsProblemsExamples/Example1.cpp

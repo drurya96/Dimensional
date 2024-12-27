@@ -8,26 +8,42 @@
 
 namespace Dimension
 {
-   
+
+   template<typename NumTuple, typename DenTuple, int Index = 0>
+   struct has_matching_quantity;
+
+   template<typename NumTuple, typename DenTuple, int Index>
+   requires (Index == std::tuple_size_v<NumTuple>)
+   struct has_matching_quantity<NumTuple, DenTuple, Index>
+   {
+      static constexpr bool value = false;
+   };
+
+   template<typename NumTuple, typename DenTuple, int Index>
+   requires (Index < std::tuple_size_v<NumTuple>)
+   struct has_matching_quantity<NumTuple, DenTuple, Index>
+   {
+      static constexpr bool value = has_same_quantity_dim<std::tuple_element_t<Index, NumTuple>, DenTuple>::value ||
+         has_matching_quantity<NumTuple, DenTuple, Index + 1>::value;
+   };
+
+   template<typename NumTuple, typename DenTuple>
+   concept NoNonAbsoluteQuantitiesInCompoundDimension = 
+                  (!has_non_absolute_quantity_v<NumTuple> && !has_non_absolute_quantity_v<DenTuple>) ||
+                  (std::tuple_size_v<NumTuple> == 1 && std::tuple_size_v<DenTuple> == 0);
+
    template<typename NumTuple, typename DenTuple>
    concept IsUnitTuplePair = IsUnitTuple<typename FundamentalUnitExtractor<NumTuple, DenTuple>::Num> &&
-                             IsUnitTuple<typename FundamentalUnitExtractor<NumTuple, DenTuple>::Den>;
+                             IsUnitTuple<typename FundamentalUnitExtractor<NumTuple, DenTuple>::Den> &&
+                             NoNonAbsoluteQuantitiesInCompoundDimension<NumTuple, DenTuple> &&
+                             !has_matching_quantity<NumTuple, DenTuple>::value;
 
    // Forward declarations
    template<typename NumTuple, typename DenTuple>
    requires IsUnitTuplePair<NumTuple, DenTuple>
    class BaseDimension;
 
-   /// @brief Struct to check if a tuple of units contains a unit of the given Dimension
-   template<typename Dim, typename Tuple>
-   struct has_same_dim;
 
-   /// @brief Struct to check if a tuple of units contains a unit of the given Dimension
-   /// @tparam T The type to check for
-   /// @tparam Us The types within the tuple
-   /// @typedef value A constexpr bool indicating whether Us contains T
-   template<typename Dim, typename... Us>
-   struct has_same_dim<Dim, std::tuple<Us...>> : std::disjunction<is_same_dim<Dim, Us>...> {};
 
    /// @brief Struct to simplify units by cancelling out as necessary
    template<typename NumTypes1, typename NumTypes2, typename DenTypes1, typename DenTypes2>
@@ -38,8 +54,8 @@ namespace Dimension
    /// @tparam NumTypes2... The types in the second group of numerator types
    /// @tparam DenTypes1... The types in the first group of denominator types
    /// @tparam DenTypes2... The types in the second group of denominator types
-   /// @typedef newNum The simpliefied numerator types
-   /// @typedef newDen The simpliefied denominator types
+   /// @typedef newNum The simplified numerator types
+   /// @typedef newDen The simplified denominator types
    /// @typedef dimType A BaseDimension templated on the simplified types
    template<typename ... NumTypes1, typename ... NumTypes2, typename ... DenTypes1, typename ... DenTypes2>
    struct UnitSimplifier<std::tuple<NumTypes1...>, std::tuple<NumTypes2...>, std::tuple<DenTypes1...>, std::tuple<DenTypes2...>>
@@ -94,16 +110,19 @@ namespace Dimension
    requires (index < std::tuple_size_v<IncomingTupType>)
    void CancelUnitsImpl(PrecisionType& value)
    {
-      constexpr bool isDelta = true; // When canceling units, always treat values as delta rather than quantity
       using currentType = std::tuple_element_t<index, IncomingTupType>;
       if constexpr (has_same_dim<currentType, RealTupType>::value)
       {
-         value = Convert<currentType, typename get_first_match<is_same_dim, currentType, RealTupType>::type, isDelta, inverse>(value);
+         value = Convert<currentType, typename get_first_match<is_same_dim, currentType, RealTupType>::type, inverse>(value);
          CancelUnitsImpl<inverse, index + 1, typename RemoveOneInstance<is_same_dim, currentType, RealTupType>::type, IncomingTupType>(value);
       }
       else
       {
-         value = Convert<currentType, typename currentType::Primary, isDelta, inverse>(value);
+
+         using primary = type_from_quantity_or_delta_t<currentType>::Primary;
+         using realPrimary = std::conditional_t<is_quantity_v<currentType>, Quantity<primary>, primary>;
+
+         value = Convert<currentType, realPrimary, inverse>(value);
          CancelUnitsImpl<inverse, index + 1, RealTupType, IncomingTupType>(value);
       }
    }
@@ -123,8 +142,16 @@ namespace Dimension
       CancelUnitsImpl<true, 0, RealDenTupType, DenTupType>(value);
    }
 
-   template<typename Tuple1, typename Tuple2>
-   concept MatchingDimensions = UnitSimplifier<Tuple1, std::tuple<>, std::tuple<>, Tuple2>::isScalar;
+   template<typename Dim1, typename Dim2>
+   struct is_matching_dimension
+   {
+      using simplified = UnitSimplifier<typename Dim1::simplifiedNumTuple, typename Dim2::simplifiedDenTuple, typename Dim1::simplifiedDenTuple, typename Dim2::simplifiedNumTuple>;
+
+      static constexpr bool value = simplified::isScalar;
+   };
+
+   template<typename Dim1, typename Dim2>
+   concept MatchingDimensionsNew = is_matching_dimension<Dim1, Dim2>::value;
 
 } // end Dimension
 

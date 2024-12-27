@@ -6,17 +6,17 @@
 namespace Dimension
 {
    struct TemperatureType {};
-   struct Celsius;
+   struct Kelvin;
 
-   template<typename TemperatureUnit>
-   concept IsTemperatureUnit = std::is_same_v<typename TemperatureUnit::Dim, TemperatureType>;
+   template<typename T>
+   concept IsTemperatureUnit = IsNonQuantityUnitDimension<T, TemperatureType> || IsQuantityUnitDimension<T, TemperatureType>;
 
    template<typename Unit, StringLiteral Name, StringLiteral Abbreviation>
    struct TemperatureUnit : public BaseUnit<Unit, Name, Abbreviation, "Temperature">
    {
    public:
       using Dim = TemperatureType;
-      using Primary = Celsius;
+      using Primary = Kelvin;
    };
 
    template<typename T>

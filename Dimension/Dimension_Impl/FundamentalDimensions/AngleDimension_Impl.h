@@ -11,8 +11,8 @@ namespace Dimension
    struct AngleType {};
    struct Radians;
 
-   template<typename AngleUnit>
-   concept IsAngleUnit = std::is_same_v<typename AngleUnit::Dim, AngleType>;
+   template<typename T>
+   concept IsAngleUnit = IsNonQuantityUnitDimension<T, AngleType> || IsQuantityUnitDimension<T, AngleType>;
 
    template<typename Unit, StringLiteral Name, StringLiteral Abbreviation>
    struct AngleUnit : public BaseUnit<Unit, Name, Abbreviation, "Angle">
