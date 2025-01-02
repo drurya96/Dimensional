@@ -11,9 +11,11 @@
 #include "SpeedDimension.h"
 #include "AccelerationDimension.h"
 #include "ForceDimension.h"
+#include "PressureDimension.h"
 #include "VolumeDimension.h"
 
 #include "DimensionalConstants.h"
+#include "DimensionalMolarMasses.h"
 
 #include <ostream>
 
@@ -29,11 +31,9 @@ TEST_F(PhysicsProblemsExample1, HeatTransfer)
 
     Temperature<Kelvin> deltaTemp = endingTemp - startingTemp;
 
-    BaseDimension<std::tuple<Joules>, std::tuple<Grams, Celsius>> specific_heat_water(4.184);
-
     Mass<KiloGrams> mass(2.0);
 
-    Energy<Joules> heat = mass * specific_heat_water * deltaTemp;
+    Energy<Joules> heat = mass * Constants::specific_heat_water * deltaTemp;
 
     double expected_heat = 1673600;
 
@@ -207,13 +207,12 @@ TEST_F(PhysicsProblemsExample1, EnergyRequiredToHeatWater)
     Mass<KiloGrams> mass = volumeOfWater * waterDensity;            // Density of water = 1 kg/L
     Temperature<Quantity<Celsius>> initialTemp{20.0};      // Initial temperature in Celsius
     Temperature<Quantity<Celsius>> finalTemp{80.0};        // Final temperature in Celsius
-    BaseDimension<std::tuple<Joules>, std::tuple<Grams, Celsius>> specificHeatWater{4.184}; // Specific heat of water in J/g·°C
 
     // Calculate the temperature difference
     Temperature<Celsius> deltaTemp = finalTemp - initialTemp;
 
     // Calculate the energy required
-    Energy<Joules> energy = mass * specificHeatWater * deltaTemp;
+    Energy<Joules> energy = mass * Constants::specific_heat_water * deltaTemp;
 
     // Validate the result in Joules
     double expectedEnergyJ = 2.0 * 1000.0 * 4.184 * 60.0; // 2 kg * 1000 g/kg * 4.184 J/g°C * 60°C
@@ -228,23 +227,20 @@ TEST_F(PhysicsProblemsExample1, PVEqualsnRT) {
     using namespace Dimension;
 
     // Define the quantities
-    BaseDimension<std::tuple<KiloGrams>, std::tuple<Meters, Seconds, Seconds>> P{101325};           // 1 atm in Pascals
-    Volume<Meters, Meters, Meters> V{0.02241404394303833};            // 0.02241404394303833 cubic meter
+    Volume<Meters, Meters, Meters> V{0.02241404394303833}; // Value calculated manually
     Amount<Moles> n{1.0};
-    Temperature<Quantity<Kelvin>> T{273.15};         // 0°C in Kelvin
 
     // Compute nRT
-    auto nRT = n * ideal_gas_constant * T; // Result should be in Pascals·cubic meters
+    auto nRT = n * Constants::ideal_gas_constant * Constants::standard_temperature;
 
     // Compute PV
-    auto PV = P * V; // Result should be in Pascals·cubic meters
-
-    double PV_double = PV.GetVal<std::tuple<KiloGrams, Meters, Meters>, std::tuple<Seconds, Seconds>>();
-    double nRT_double = nRT.GetVal<std::tuple<KiloGrams, Meters, Meters>, std::tuple<Seconds, Seconds>>();
+    auto PV = Constants::standard_atmospheric_pressure * V;
 
     // Compare PV and nRT
-    ASSERT_NEAR(PV_double, nRT_double, TOLERANCE);
+    ASSERT_NEAR(getEnergy<Joules>(PV), getEnergy<Joules>(nRT), TOLERANCE);
 }
+
+
 
 TEST_F(PhysicsProblemsExample1, PVEqualsnRT_TemperatureInCelsius) {
     using namespace Dimension;
@@ -255,15 +251,11 @@ TEST_F(PhysicsProblemsExample1, PVEqualsnRT_TemperatureInCelsius) {
     Temperature<Quantity<Celsius>> T{25.0}; // 25°C, should convert to 298.15 K
 
     // Compute nRT
-    auto nRT = n * ideal_gas_constant * T; // Should be approximately 2 * 8.314 * 298.15 ≈ 4,957.6382 J
+    auto nRT = n * Constants::ideal_gas_constant * T; // Should be approximately 2 * 8.314 * 298.15 ≈ 4,957.6382 J
 
     // Compute PV
     auto PV = P * V; // Should be approximately 2 * 101325 * 0.0244640424377005 ≈ 4,957.6382 J
 
-    double PV_double = PV.GetVal<std::tuple<KiloGrams, Meters, Meters>, std::tuple<Seconds, Seconds>>();
-    double nRT_double = nRT.GetVal<std::tuple<KiloGrams, Meters, Meters>, std::tuple<Seconds, Seconds>>();
-
     // Compare PV and nRT
-    ASSERT_NEAR(PV_double, nRT_double, 1e-1); // Tolerance set to 0.1 J
-
+    ASSERT_NEAR(getEnergy<Joules>(PV), getEnergy<Joules>(nRT), 1e-1);
 }
