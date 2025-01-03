@@ -37,14 +37,14 @@ namespace Dimension
    // Free function for retrieving Energy values
    template<typename MassT, typename LengthT1, typename LengthT2, typename TimeT1, typename TimeT2, typename EnergyType>
    requires IsEnergyUnits<MassT, LengthT1, LengthT2, TimeT1, TimeT2> && IsEnergyType<EnergyType>
-   PrecisionType getEnergy(const EnergyType& obj)
+   constexpr PrecisionType getEnergy(const EnergyType& obj)
    {
       return obj.template GetVal<std::tuple<MassT, LengthT1, LengthT2>, std::tuple<TimeT1, TimeT2>>();
    }
 
    template<typename NamedEnergy, typename EnergyType>
    requires IsNamedEnergyUnit<NamedEnergy> && IsEnergyType<EnergyType>
-   PrecisionType getEnergy(const EnergyType& obj)
+   constexpr PrecisionType getEnergy(const EnergyType& obj)
    {
       return obj.template GetVal<typename NamedEnergy::NumTuple, typename NamedEnergy::DenTuple>();
    }
@@ -60,11 +60,11 @@ namespace Dimension
       using Base = BaseDimension<std::tuple<MassUnit, LengthUnit1, LengthUnit2>, std::tuple<TimeUnit1, TimeUnit2>>;
       using Base::Base;
 
-      Energy(double val) : Base(val) {}
+      constexpr Energy(double val) : Base(val) {}
 
       template<typename NamedEnergy>
       requires IsNamedEnergyUnit<NamedEnergy>
-      Energy(const NamedEnergy& base) : Base(base) {}
+      constexpr Energy(const NamedEnergy& base) : Base(base) {}
 
       template<typename MassUnitRet, typename LengthUnitRet1, typename LengthUnitRet2, typename TimeUnitRet1, typename TimeUnitRet2>
       requires IsEnergyUnits<MassUnitRet, LengthUnitRet1, LengthUnitRet2, TimeUnitRet1, TimeUnitRet2>
@@ -92,11 +92,11 @@ namespace Dimension
       using Base = BaseDimension<typename NamedEnergy::NumTuple, typename NamedEnergy::DenTuple>;
       using Base::Base;
 
-      Energy(double val) : Base(val) {}
+      constexpr Energy(double val) : Base(val) {}
 
       template<typename OtherEnergy>
       requires IsEnergyType<OtherEnergy>
-      Energy(const OtherEnergy& base)
+      constexpr Energy(const OtherEnergy& base)
          : Base(base.template GetVal<typename NamedEnergy::NumTuple, typename NamedEnergy::DenTuple>()) {}
 
       template<typename MassUnitRet, typename LengthUnitRet1, typename LengthUnitRet2, typename TimeUnitRet1, typename TimeUnitRet2>

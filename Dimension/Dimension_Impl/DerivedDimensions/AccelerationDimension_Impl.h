@@ -27,7 +27,7 @@ namespace Dimension
 
    template<typename LengthT, typename TimeT1, typename TimeT2>
    requires IsAccelerationUnits<LengthT, TimeT1, TimeT2>
-   PrecisionType getAcceleration(acceleration_type auto obj)
+   constexpr PrecisionType getAcceleration(acceleration_type auto obj)
    {
       return obj.template GetVal<std::tuple<LengthT>, std::tuple<TimeT1, TimeT2>>();
    }
@@ -39,11 +39,11 @@ namespace Dimension
    public:
       using BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit1, TimeUnit2>>::BaseDimension;
 
-      Acceleration(double val) : BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit1, TimeUnit2>>(val){}
+      constexpr Acceleration(double val) : BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit1, TimeUnit2>>(val){}
 
       template<typename LengthT, typename TimeT1, typename TimeT2>
       requires IsAccelerationUnits<LengthT, TimeT1, TimeT2>
-      Acceleration(const BaseDimension<std::tuple<LengthT>, std::tuple<TimeT1, TimeT2>>& base) : 
+      constexpr Acceleration(const BaseDimension<std::tuple<LengthT>, std::tuple<TimeT1, TimeT2>>& base) : 
          BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit1, TimeUnit2>>(base.template GetVal<std::tuple<LengthUnit>, std::tuple<TimeUnit1, TimeUnit2>>()) {}
 
       

@@ -32,7 +32,7 @@ namespace Dimension
    concept temperature_type = is_temperature_v<T>;
 
    template<IsTemperatureUnit T>
-   PrecisionType getTemperature(temperature_type auto obj)
+   constexpr PrecisionType getTemperature(temperature_type auto obj)
    {
       return obj.template GetVal<std::tuple<T>, std::tuple<>>();
    }
@@ -43,12 +43,12 @@ namespace Dimension
    public:
       using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
 
-      Temperature() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}
+      constexpr Temperature() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}
 
-      Temperature(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
+      constexpr Temperature(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
 
       template<IsTemperatureUnit T>
-      Temperature(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
+      constexpr Temperature(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
 
       template<IsTemperatureUnit T>
       [[deprecated("Use the free function getTemperature() instead.")]]

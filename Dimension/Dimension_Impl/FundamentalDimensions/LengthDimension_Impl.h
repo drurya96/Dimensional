@@ -32,7 +32,7 @@ namespace Dimension
    concept length_type = is_length_v<T>;
 
    template<IsLengthUnit T>
-   PrecisionType getLength(length_type auto obj)
+   constexpr PrecisionType getLength(length_type auto obj)
    {
       return obj.template GetVal<std::tuple<T>, std::tuple<>>();
    }
@@ -43,12 +43,12 @@ namespace Dimension
    public:
       using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
 
-      Length() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}
+      constexpr Length() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}
 
-      Length(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
+      constexpr Length(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
 
       template<IsLengthUnit T>
-      Length(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()){}
+      constexpr Length(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()){}
 
       template<IsLengthUnit T>
       [[deprecated("Use the free function getLength() instead.")]]

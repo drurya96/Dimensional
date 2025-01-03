@@ -33,7 +33,7 @@ namespace Dimension
    concept mass_type = is_mass_v<T>;
 
    template<IsMassUnit T>
-   PrecisionType getMass(mass_type auto obj)
+   constexpr PrecisionType getMass(mass_type auto obj)
    {
       return obj.template GetVal<std::tuple<T>, std::tuple<>>();
    }
@@ -44,12 +44,12 @@ namespace Dimension
    public:
       using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
 
-      Mass() : BaseDimension<std::tuple<Unit>, std::tuple<>>(0.0) {}
+      constexpr Mass() : BaseDimension<std::tuple<Unit>, std::tuple<>>(0.0) {}
 
-      Mass(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>(val) {}
+      constexpr Mass(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>(val) {}
 
       template<IsMassUnit T>
-      Mass(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
+      constexpr Mass(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
 
       template<IsMassUnit T>
       [[deprecated("Use the free function getMass() instead.")]]

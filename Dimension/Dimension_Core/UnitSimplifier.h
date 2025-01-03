@@ -91,9 +91,9 @@ namespace Dimension
    /// @details recursive base-case
    template<bool inverse = false, int index = 0, typename RealTupType, typename IncomingTupType>
    requires (index == std::tuple_size_v<IncomingTupType>)
-   void CancelUnitsImpl(PrecisionType&)
+   constexpr PrecisionType CancelUnitsImpl(PrecisionType value)
    {
-      return;
+      return value;
    }
 
    /// @brief Unit cancellation implementation
@@ -108,22 +108,21 @@ namespace Dimension
    /// @param[in,out] value The value to update when cancelling units
    template<bool inverse = false, int index = 0, typename RealTupType, typename IncomingTupType>
    requires (index < std::tuple_size_v<IncomingTupType>)
-   void CancelUnitsImpl(PrecisionType& value)
+   constexpr PrecisionType CancelUnitsImpl(PrecisionType value)
    {
       using currentType = std::tuple_element_t<index, IncomingTupType>;
       if constexpr (has_same_dim<currentType, RealTupType>::value)
       {
-         value = Convert<currentType, typename get_first_match<is_same_dim, currentType, RealTupType>::type, inverse>(value);
-         CancelUnitsImpl<inverse, index + 1, typename RemoveOneInstance<is_same_dim, currentType, RealTupType>::type, IncomingTupType>(value);
+         const PrecisionType valueConverted = Convert<currentType, typename get_first_match<is_same_dim, currentType, RealTupType>::type, inverse>(value);
+         return CancelUnitsImpl<inverse, index + 1, typename RemoveOneInstance<is_same_dim, currentType, RealTupType>::type, IncomingTupType>(valueConverted);
       }
       else
       {
-
          using primary = type_from_quantity_or_delta_t<currentType>::Primary;
          using realPrimary = std::conditional_t<is_quantity_v<currentType>, Quantity<primary>, primary>;
 
-         value = Convert<currentType, realPrimary, inverse>(value);
-         CancelUnitsImpl<inverse, index + 1, RealTupType, IncomingTupType>(value);
+         const PrecisionType valueConverted = Convert<currentType, realPrimary, inverse>(value);
+         return CancelUnitsImpl<inverse, index + 1, RealTupType, IncomingTupType>(valueConverted);
       }
    }
 
@@ -136,10 +135,12 @@ namespace Dimension
    ///    or not (true).
    /// @param[in,out] value Value to update
    template<typename NumTupType, typename DenTupType, typename RealNumTupType, typename RealDenTupType, bool isDelta = false>
-   void CancelUnits(PrecisionType& value)
+   constexpr PrecisionType CancelUnits(PrecisionType value)
    {
-      CancelUnitsImpl<false, 0, RealNumTupType, NumTupType>(value);
-      CancelUnitsImpl<true, 0, RealDenTupType, DenTupType>(value);
+      const PrecisionType valueConverted1 = CancelUnitsImpl<false, 0, RealNumTupType, NumTupType>(value);
+      const PrecisionType valueConverted2 = CancelUnitsImpl<true, 0, RealDenTupType, DenTupType>(valueConverted1);
+
+      return valueConverted2;
    }
 
    template<typename Dim1, typename Dim2>

@@ -32,14 +32,14 @@ namespace Dimension
    // Free function for retrieving Volume values
    template<typename LengthT1, typename LengthT2, typename LengthT3, typename VolumeType>
    requires IsVolumeUnits<LengthT1, LengthT2, LengthT3> && IsVolumeType<VolumeType>
-   PrecisionType getVolume(const VolumeType& obj)
+   constexpr PrecisionType getVolume(const VolumeType& obj)
    {
       return obj.template GetVal<std::tuple<LengthT1, LengthT2, LengthT3>, std::tuple<>>();
    }
 
    template<typename NamedVolume, typename VolumeType>
    requires IsNamedVolumeUnit<NamedVolume> && IsVolumeType<VolumeType>
-   PrecisionType getVolume(const VolumeType& obj)
+   constexpr PrecisionType getVolume(const VolumeType& obj)
    {
       return obj.template GetVal<typename NamedVolume::NumTuple, typename NamedVolume::DenTuple>();
    }
@@ -55,11 +55,11 @@ namespace Dimension
       using Base = BaseDimension<std::tuple<LengthT1, LengthT2, LengthT3>, std::tuple<>>;
       using Base::Base;
 
-      Volume(double val) : Base(val) {}
+      constexpr Volume(double val) : Base(val) {}
 
       template<typename NamedVolume>
       requires IsNamedVolumeUnit<NamedVolume>
-      Volume(const NamedVolume& base) : Base(base) {}
+      constexpr Volume(const NamedVolume& base) : Base(base) {}
 
       template<typename LengthUnitRet1, typename LengthUnitRet2, typename LengthUnitRet3>
       requires IsVolumeUnits<LengthUnitRet1, LengthUnitRet2, LengthUnitRet3>
@@ -87,11 +87,11 @@ namespace Dimension
       using Base = BaseDimension<typename NamedVolume::NumTuple, typename NamedVolume::DenTuple>;
       using Base::Base;
 
-      Volume(double val) : Base(val) {}
+      constexpr Volume(double val) : Base(val) {}
 
       template<typename OtherVolume>
       requires IsVolumeType<OtherVolume>
-      Volume(const OtherVolume& base)
+      constexpr Volume(const OtherVolume& base)
          : Base(base.template GetVal<typename NamedVolume::NumTuple, typename NamedVolume::DenTuple>()) {}
 
       template<typename LengthUnitRet1, typename LengthUnitRet2, typename LengthUnitRet3>

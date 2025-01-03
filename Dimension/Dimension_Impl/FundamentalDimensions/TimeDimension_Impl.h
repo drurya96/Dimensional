@@ -33,7 +33,7 @@ namespace Dimension
    concept time_type = is_time_v<T>;
 
    template<IsTimeUnit T>
-   PrecisionType getTime(time_type auto obj)
+   constexpr PrecisionType getTime(time_type auto obj)
    {
       return obj.template GetVal<std::tuple<T>, std::tuple<>>();
    }
@@ -44,12 +44,12 @@ namespace Dimension
    public:
       using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
 
-      Time() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}
+      constexpr Time() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}
 
-      Time(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
+      constexpr Time(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
 
       template<IsTimeUnit T>
-      Time(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
+      constexpr Time(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
 
       
       template<IsTimeUnit T>

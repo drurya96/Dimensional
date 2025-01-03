@@ -26,7 +26,7 @@ namespace Dimension
 
    template<typename LengthT, typename TimeT>
    requires IsSpeedUnits<LengthT, TimeT>
-   PrecisionType getSpeed(speed_type auto obj)
+   constexpr PrecisionType getSpeed(speed_type auto obj)
    {
       return obj.template GetVal<std::tuple<LengthT>, std::tuple<TimeT>>();
    }
@@ -38,11 +38,11 @@ namespace Dimension
    public:
       using BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>::BaseDimension;
 
-      Speed(double val) : BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>(val){}
+      constexpr Speed(double val) : BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>(val){}
 
       template<typename LengthT, typename TimeT>
       requires IsSpeedUnits<LengthT, TimeT>
-      Speed(const BaseDimension<std::tuple<LengthT>, std::tuple<TimeT>>& base) : 
+      constexpr Speed(const BaseDimension<std::tuple<LengthT>, std::tuple<TimeT>>& base) : 
          BaseDimension<std::tuple<LengthUnit>, std::tuple<TimeUnit>>(base.template GetVal<std::tuple<LengthUnit>, std::tuple<TimeUnit>>()) {}
 
       

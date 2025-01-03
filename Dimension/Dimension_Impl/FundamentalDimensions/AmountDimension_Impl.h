@@ -32,7 +32,7 @@ namespace Dimension
    concept amount_type = is_amount_v<T>;
 
    template<IsAmountUnit T>
-   PrecisionType getAmount(amount_type auto obj)
+   constexpr PrecisionType getAmount(amount_type auto obj)
    {
       return obj.template GetVal<std::tuple<T>, std::tuple<>>();
    }
@@ -43,12 +43,12 @@ namespace Dimension
    public:
       using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
 
-      Amount() : BaseDimension<std::tuple<Unit>, std::tuple<>>(0.0) {}
+      constexpr Amount() : BaseDimension<std::tuple<Unit>, std::tuple<>>(0.0) {}
 
-      Amount(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>(val) {}
+      constexpr Amount(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>(val) {}
 
       template<IsAmountUnit T>
-      Amount(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
+      constexpr Amount(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
 
       template<IsAmountUnit T>
       [[deprecated("Use the free function getAmount() instead.")]]

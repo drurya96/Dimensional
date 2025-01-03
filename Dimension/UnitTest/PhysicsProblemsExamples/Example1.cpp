@@ -280,4 +280,55 @@ TEST_F(PhysicsProblemsExample1, PVEqualsnRT_TemperatureInCelsius) {
 
     // Compare PV and nRT
     ASSERT_NEAR(PV_double, nRT_double, 1e-1); // Tolerance set to 0.1 J
+
+}
+
+
+TEST_F(PhysicsProblemsExample1, Diagnostic) {
+
+    using namespace Dimension;
+    using std::tuple;
+    using std::cout;
+    using std::endl;
+
+    constexpr BaseDimension<tuple<Meters>, tuple<>> obj1(10.0);
+    constexpr BaseDimension<tuple<Feet>, tuple<>> obj2(5.0);
+
+    static_assert(obj1.GetVal<tuple<Meters>, tuple<>>() == 10.0, "Fail");
+    static_assert(getLength<Meters>(obj1) == 10.0, "Fail");
+    static_assert(obj1 > obj2, "Fail");
+    static_assert(obj2 < obj1, "Fail");
+
+    constexpr auto obj3 = obj1 + obj2;
+    constexpr auto obj4 = obj1 - obj2;
+    constexpr auto obj5 = obj1 * obj2;
+    constexpr auto obj6 = obj1 / obj2;
+
+
+    static_assert(obj3 > obj1, "Fail");
+    static_assert(obj1 > obj4, "Fail");
+
+    static_assert(obj5.GetVal<tuple<Meters, Meters>, tuple<>>() > 10.0, "Fail");
+    static_assert(obj6.GetVal<tuple<>, tuple<>>() > 0.0, "Fail");
+    static_assert(obj6 > 0.0, "Fail");
+
+    constexpr Length<Meters> obj7(15.0);
+    static_assert(obj7 > obj1, "Fail");
+
+    constexpr Length obj8 = obj1;
+    static_assert(obj8 == obj1, "Fail");
+
+
+
+    constexpr Speed<Meters, Seconds> speed1(10.0);
+    static_assert(speed1.GetVal<tuple<Meters>, tuple<Seconds>>() == 10.0, "Fail");
+
+    constexpr Energy<Joules> energy1(5.0);
+    constexpr Energy<KiloGrams, Meters, Meters, Seconds, Seconds> energy2(5.0);
+
+    static_assert(energy1 == energy2, "Fail");
+
+
+
+
 }

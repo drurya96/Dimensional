@@ -36,14 +36,14 @@ namespace Dimension
    // Free function for retrieving Force values
    template<typename MassT, typename LengthT, typename TimeT1, typename TimeT2, typename ForceType>
    requires IsForceUnits<MassT, LengthT, TimeT1, TimeT2> && IsForceType<ForceType>
-   PrecisionType getForce(const ForceType& obj)
+   constexpr PrecisionType getForce(const ForceType& obj)
    {
       return obj.template GetVal<std::tuple<MassT, LengthT>, std::tuple<TimeT1, TimeT2>>();
    }
 
    template<typename NamedForce, typename ForceType>
    requires IsNamedForceUnit<NamedForce> && IsForceType<ForceType>
-   PrecisionType getForce(const ForceType& obj)
+   constexpr PrecisionType getForce(const ForceType& obj)
    {
       return obj.template GetVal<typename NamedForce::NumTuple, typename NamedForce::DenTuple>();
    }
@@ -59,11 +59,11 @@ namespace Dimension
       using Base = BaseDimension<std::tuple<MassUnit, LengthUnit>, std::tuple<TimeUnit1, TimeUnit2>>;
       using Base::Base;
 
-      Force(double val) : Base(val) {}
+      constexpr Force(double val) : Base(val) {}
 
       template<typename NamedForce>
       requires IsNamedForceUnit<NamedForce>
-      Force(const NamedForce& base) : Base(base) {}
+      constexpr Force(const NamedForce& base) : Base(base) {}
 
       template<typename MassUnitRet, typename LengthUnitRet, typename TimeUnitRet1, typename TimeUnitRet2>
       requires IsForceUnits<MassUnitRet, LengthUnitRet, TimeUnitRet1, TimeUnitRet2>
@@ -91,11 +91,11 @@ namespace Dimension
       using Base = BaseDimension<typename NamedForce::NumTuple, typename NamedForce::DenTuple>;
       using Base::Base;
 
-      Force(double val) : Base(val) {}
+      constexpr Force(double val) : Base(val) {}
 
       template<typename OtherForce>
       requires IsForceType<OtherForce>
-      Force(const OtherForce& base)
+      constexpr Force(const OtherForce& base)
          : Base(base.template GetVal<typename NamedForce::NumTuple, typename NamedForce::DenTuple>()) {}
 
       template<typename MassUnitRet, typename LengthUnitRet, typename TimeUnitRet1, typename TimeUnitRet2>
