@@ -163,8 +163,6 @@ TEST_F(PhysicsProblemsExample1, PressureFromForceAndVolume)
     // Step 3: Calculate Pressure: P = F / A
     //BaseDimension<std::tuple<Newtons>, std::tuple<Meters, Meters>> pressure = force / area;
     BaseDimension<std::tuple<KiloGrams>, std::tuple<Meters, Seconds, Seconds>> pressure = force / area;
-    //auto pressure = force / area;
-    //BaseDimension<std::tuple<KiloGrams>, std::tuple<Meters, Seconds, Seconds>> pressure1{4000.0};
 
     // Expected results
     double expectedVolume = 4.0 * 2.0 * 0.5;       // 4 m * 2 m * 0.5 m = 4.0 m³
@@ -174,15 +172,8 @@ TEST_F(PhysicsProblemsExample1, PressureFromForceAndVolume)
     // Assertions
     ASSERT_NEAR((getVolume<Meters, Meters, Meters>(volume)), expectedVolume, TOLERANCE);
     ASSERT_NEAR((area.GetVal<std::tuple<Meters, Meters>, std::tuple<>>()), expectedArea, TOLERANCE);
-    //ASSERT_NEAR((pressure.GetVal<std::tuple<Newtons>, std::tuple<Meters, Meters>>()), expectedPressure, TOLERANCE);
-    //ASSERT_NEAR((pressure.GetVal<std::tuple<KiloGrams>, std::tuple<Meters, Seconds, Seconds>>()), expectedPressure, TOLERANCE);
+    ASSERT_NEAR((pressure.GetVal<std::tuple<KiloGrams>, std::tuple<Meters, Seconds, Seconds>>()), expectedPressure, TOLERANCE);
 
-    std::cout << pressure << expectedPressure << std::endl;
-
-    //BaseDimension<std::tuple<Meters, Seconds>, std::tuple<>> testObj(10.0);
-    //std::cout << testObj.GetVal<std::tuple<Seconds, Meters>, std::tuple<>>() << std::endl;
-
-    //std::cout << testObj << std::endl;
 }
 
 TEST_F(PhysicsProblemsExample1, WaterBoilingTemperatureChange)
@@ -233,10 +224,6 @@ TEST_F(PhysicsProblemsExample1, EnergyRequiredToHeatWater)
     ASSERT_NEAR(getEnergy<Calories>(energy), expectedEnergyCal, TOLERANCE);
 }
 
-
-
-
-
 TEST_F(PhysicsProblemsExample1, PVEqualsnRT) {
     using namespace Dimension;
 
@@ -259,8 +246,6 @@ TEST_F(PhysicsProblemsExample1, PVEqualsnRT) {
     ASSERT_NEAR(PV_double, nRT_double, TOLERANCE);
 }
 
-
-
 TEST_F(PhysicsProblemsExample1, PVEqualsnRT_TemperatureInCelsius) {
     using namespace Dimension;
     // Define the quantities
@@ -280,4 +265,5 @@ TEST_F(PhysicsProblemsExample1, PVEqualsnRT_TemperatureInCelsius) {
 
     // Compare PV and nRT
     ASSERT_NEAR(PV_double, nRT_double, 1e-1); // Tolerance set to 0.1 J
+
 }

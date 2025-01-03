@@ -3,13 +3,13 @@
 #include "TimeDimension.h"
 #include "LengthDimension.h"
 #include "SpeedDimension.h"
+#include "EnergyDimension.h"
 
 using namespace Dimension;
 using namespace std;
 
 TEST_F(DimensionTest, SimplificationWithMath) {
 
-   // TODO: Consider adding a .Simplify() method to BaseDimension
    Length<Meters> length1(10.0);
    Length<Feet> length2(20.0);
 
@@ -28,12 +28,6 @@ TEST_F(DimensionTest, SimplificationWithMath) {
 }
 
 TEST_F(DimensionTest, Simplification) {
-
-   Length<Meters> length1(10.0);
-   Length<Feet> length2(20.0);
-
-   Time<Seconds> time1(5.0);
-   Time<Minutes> time2(12.0);
 
    // This is 10.0 (Meters-Mintues / Feet-Seconds-Minutes-Minutes)
    auto test_before = BaseDimension<std::tuple<Meters, Minutes>, std::tuple<Seconds, Feet, Minutes>>(10.0);
@@ -62,3 +56,47 @@ TEST_F(DimensionTest, SimplificationSpeedTypes)
 
 // TODO: Validate simplification resulting in unitless
 // TODO: How to handle unitless?
+
+TEST_F(DimensionTest, Validate_constexpr_behavior) {
+
+    using namespace Dimension;
+    using std::tuple;
+    using std::cout;
+    using std::endl;
+
+    constexpr BaseDimension<tuple<Meters>, tuple<>> obj1(10.0);
+    constexpr BaseDimension<tuple<Feet>, tuple<>> obj2(5.0);
+
+    static_assert(obj1.GetVal<tuple<Meters>, tuple<>>() == 10.0, "Fail");
+    static_assert(getLength<Meters>(obj1) == 10.0, "Fail");
+    static_assert(obj1 > obj2, "Fail");
+    static_assert(obj2 < obj1, "Fail");
+
+    constexpr auto obj3 = obj1 + obj2;
+    constexpr auto obj4 = obj1 - obj2;
+    constexpr auto obj5 = obj1 * obj2;
+    constexpr auto obj6 = obj1 / obj2;
+
+
+    static_assert(obj3 > obj1, "Fail");
+    static_assert(obj1 > obj4, "Fail");
+
+    static_assert(obj5.GetVal<tuple<Meters, Meters>, tuple<>>() > 10.0, "Fail");
+    static_assert(obj6.GetVal<tuple<>, tuple<>>() > 0.0, "Fail");
+    static_assert(obj6 > 0.0, "Fail");
+
+    constexpr Length<Meters> obj7(15.0);
+    static_assert(obj7 > obj1, "Fail");
+
+    constexpr Length obj8 = obj1;
+    static_assert(obj8 == obj1, "Fail");
+
+    constexpr Speed<Meters, Seconds> speed1(10.0);
+    static_assert(speed1.GetVal<tuple<Meters>, tuple<Seconds>>() == 10.0, "Fail");
+
+    constexpr Energy<Joules> energy1(5.0);
+    constexpr Energy<KiloGrams, Meters, Meters, Seconds, Seconds> energy2(5.0);
+
+    static_assert(energy1 == energy2, "Fail");
+
+}

@@ -35,7 +35,7 @@ namespace Dimension
    concept angle_type = is_angle_v<T>;
 
    template<IsAngleUnit T>
-   PrecisionType getAngle(angle_type auto obj)
+   constexpr PrecisionType getAngle(angle_type auto obj)
    {
       return obj.template GetVal<std::tuple<T>, std::tuple<>>();
    }
@@ -46,12 +46,12 @@ namespace Dimension
    public:
       using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
 
-      Angle() : BaseDimension<std::tuple<Unit>, std::tuple<>>(0.0) {}
+      constexpr Angle() : BaseDimension<std::tuple<Unit>, std::tuple<>>(0.0) {}
 
-      Angle(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>(val) {}
+      constexpr Angle(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>(val) {}
 
       template<IsAngleUnit T>
-      Angle(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
+      constexpr Angle(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
 
       template<IsAngleUnit T>
       [[deprecated("Use the free function getAngle() instead.")]]

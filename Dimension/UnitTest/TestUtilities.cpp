@@ -52,25 +52,19 @@ TEST_F(DimensionTest, Test_GetConvertedValue)
    using toNum = tuple<Feet, Minutes>;
    using toDen = tuple<Inches, Ounces>;
 
-   PrecisionType value = 10.0;
+   constexpr PrecisionType value = 10.0;
    
    // Convert only the numerator, to the same type. This is a no-op
-   ConvertDimension<0, false, fromNum, fromNum, true>(value);
-   ASSERT_DOUBLE_EQ(value, 10.0);
+   ASSERT_DOUBLE_EQ((ConvertDimension<0, false, fromNum, fromNum, true>(value)), 10.0);
 
    // Convert only the denominator, to the same type. This is a no-op
-   ConvertDimension<0, true, fromDen, fromDen, true>(value);
-   ASSERT_DOUBLE_EQ(value, 10.0);
+   ASSERT_DOUBLE_EQ((ConvertDimension<0, true, fromDen, fromDen, true>(value)), 10.0);
    
    // Convert only the numerator
-   ConvertDimension<0, false, toNum, fromNum, true>(value);
-   ASSERT_NEAR(value, 0.5468, TOLERANCE);
-
-   value = 10.0; // reset value
+   ASSERT_NEAR((ConvertDimension<0, false, toNum, fromNum, true>(value)), 0.5468, TOLERANCE);
 
    // Convert only the denominator
-   ConvertDimension<0, true, toDen, fromDen, true>(value);
-   ASSERT_NEAR(value, 23.6246, TOLERANCE);
+   ASSERT_NEAR((ConvertDimension<0, true, toDen, fromDen, true>(value)), 23.6246, TOLERANCE);
    
 }
 

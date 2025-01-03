@@ -410,7 +410,7 @@ namespace Dimension
    /// @return converted value
    template<typename From, typename To, bool Inverse = false>
    //requires (IsDelta || !Inverse)
-   constexpr PrecisionType Convert(PrecisionType input) 
+   constexpr PrecisionType Convert(PrecisionType input)
    {
 
       constexpr bool IsDelta = !both_quantity<From, To>();
@@ -450,9 +450,9 @@ namespace Dimension
    /// @details Recursive base-case
    template <size_t I = 0, bool inverse = false, typename toTuple, typename fromTup, bool isDelta = false>
    requires (I == std::tuple_size_v<fromTup>)
-   void ConvertDimension(PrecisionType&)
+   constexpr PrecisionType ConvertDimension(PrecisionType value)
    {
-      return;
+      return value;
    }
 
    /// @brief Convert the given value when units are cancelled out
@@ -465,15 +465,15 @@ namespace Dimension
    /// @param value[in,out] Reference of a value to update
    template <size_t I = 0, bool inverse = false, typename toTuple, typename fromTup, bool isDelta = false>
    requires (I < std::tuple_size_v<fromTup>)
-   void ConvertDimension(PrecisionType& value)
+   constexpr PrecisionType ConvertDimension(PrecisionType value)
    {
       using fromType = std::tuple_element_t<I, fromTup>;
       using toType = typename get_first_match<is_same_dim, fromType, toTuple>::type;
 
       using remainingToTuple = typename RemoveOneInstance<is_same_dim, fromType, toTuple>::type;
 
-      value = Convert<fromType, toType, inverse>(value);
-      ConvertDimension<I + 1, inverse, remainingToTuple, fromTup, isDelta>(value);
+      const PrecisionType convertedValue = Convert<fromType, toType, inverse>(value);
+      return ConvertDimension<I + 1, inverse, remainingToTuple, fromTup, isDelta>(convertedValue);
    }
 
    template <bool B>
@@ -482,13 +482,32 @@ namespace Dimension
       static void call() {}
    };
 
-   // Specialized for true => attempt different location for [[deprecated]]
    template <>
    struct implicit_cast_to_build_warning<true>
    {
       [[deprecated("Attempting to create new dimension ...")]]
       static void call() {}
    };
+
+
+
+   template<typename NumTuple, typename NumAfterAbsConversion, typename TupleToCheck, bool ConvertToAbsolute>
+   constexpr PrecisionType MakeAbsoluteQuantity(PrecisionType value)
+   {
+      if constexpr (ConvertToAbsolute)
+      {
+         // This emits a compiler warning (deprecation warning) if an implicit cast occurs and persists in the resulting dimension.
+         // Generally, users should make these casts explicitly if the goal is to maintain the unit.
+         // However, if the implicit cast occurs only to "cancel" an existing unit, this is typical and does NOT emit a warning.
+         implicit_cast_to_build_warning<has_same_dim<std::tuple_element_t<0, NumAfterAbsConversion>, TupleToCheck>::value>::call();
+         return Convert<std::tuple_element_t<0, NumTuple>, std::tuple_element_t<0, NumAfterAbsConversion>>(value);
+      }
+      else
+      {
+         return value;
+      }
+   }
+
 
 } // end Dimension
 
