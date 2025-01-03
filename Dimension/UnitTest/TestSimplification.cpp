@@ -9,7 +9,6 @@ using namespace std;
 
 TEST_F(DimensionTest, SimplificationWithMath) {
 
-   // TODO: Consider adding a .Simplify() method to BaseDimension
    Length<Meters> length1(10.0);
    Length<Feet> length2(20.0);
 
@@ -28,12 +27,6 @@ TEST_F(DimensionTest, SimplificationWithMath) {
 }
 
 TEST_F(DimensionTest, Simplification) {
-
-   Length<Meters> length1(10.0);
-   Length<Feet> length2(20.0);
-
-   Time<Seconds> time1(5.0);
-   Time<Minutes> time2(12.0);
 
    // This is 10.0 (Meters-Mintues / Feet-Seconds-Minutes-Minutes)
    auto test_before = BaseDimension<std::tuple<Meters, Minutes>, std::tuple<Seconds, Feet, Minutes>>(10.0);
