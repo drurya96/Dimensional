@@ -3,6 +3,7 @@
 #include "TimeDimension.h"
 #include "LengthDimension.h"
 #include "SpeedDimension.h"
+#include "TemperatureDimension.h"
 
 using namespace Dimension;
 using namespace std;
@@ -125,7 +126,6 @@ TEST_F(DimensionTest, DimensionAddition)
    ASSERT_NEAR((getSpeed<Meters, Seconds>(speed4)), 10.0507999983744, TOLERANCE); // TODO: Need to validate precision
 
    speed4 += speed1;
-
    ASSERT_NEAR((getSpeed<Meters, Seconds>(speed4)), 20.050799998374401, TOLERANCE); // TODO: Need to validate precision
 }
 
@@ -172,14 +172,44 @@ TEST_F(DimensionTest, DimensionNegative)
 TEST_F(DimensionTest, TestSetter) 
 {
 
-using namespace std;
+   using namespace std;
 
-BaseDimension<tuple<Meters>, tuple<Seconds>> speed(25.0);
+   BaseDimension<tuple<Meters>, tuple<Seconds>> speed(25.0);
 
-speed.SetVal<tuple<Feet>, tuple<Minutes>>(25.0);
+   speed.SetVal<tuple<Feet>, tuple<Minutes>>(25.0);
 
-double res = speed.GetVal<tuple<Meters>, tuple<Seconds>>();
+   double res = speed.GetVal<tuple<Meters>, tuple<Seconds>>();
 
-cout << res << endl;
+   cout << res << endl;
+
+}
+
+TEST_F(DimensionTest, TestImplicitCastToAbsoluteQuantity)
+{
+    using namespace Dimension;
+
+    Temperature<Quantity<Celsius>> temp{10.0};
+
+    BaseDimension<std::tuple<Quantity<Kelvin>, Meters>, std::tuple<Seconds>> obj1;
+
+    auto res1 = obj1 / temp;
+    ASSERT_TRUE((std::is_same_v<typename decltype(res1)::NumTuple, std::tuple<Meters>>));
+
+    auto res2 = temp / obj1;
+    ASSERT_TRUE((std::is_same_v<typename decltype(res2)::NumTuple, std::tuple<Seconds>>));
+
+    //auto res = obj1 * temp; // Correctly fails to compile
+    //auto res = temp * obj1; // Correctly fails to compile
+
+    BaseDimension<std::tuple<Meters>, std::tuple<Quantity<Kelvin>, Seconds>> obj2;
+
+    auto res3 = obj2 * temp;
+    ASSERT_TRUE((std::is_same_v<typename decltype(res3)::DenTuple, std::tuple<Seconds>>));
+
+    auto res4 = temp * obj2;
+    ASSERT_TRUE((std::is_same_v<typename decltype(res4)::DenTuple, std::tuple<Seconds>>));
+
+    //auto res = obj2 / temp; // Correctly fails to compile
+    //auto res = temp / obj2; // Correctly fails to compile
 
 }

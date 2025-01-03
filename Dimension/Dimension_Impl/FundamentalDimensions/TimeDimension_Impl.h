@@ -8,8 +8,8 @@ namespace Dimension
    struct TimeType {};
    struct Seconds;
 
-   template<typename TimeUnit>
-   concept IsTimeUnit = std::is_same_v<typename TimeUnit::Dim, TimeType>;
+   template<typename T>
+   concept IsTimeUnit = IsNonQuantityUnitDimension<T, TimeType> || IsQuantityUnitDimension<T, TimeType>;
 
    template<typename Unit, StringLiteral Name, StringLiteral Abbreviation>
    struct TimeUnit : public BaseUnit<Unit, Name, Abbreviation, "Time">

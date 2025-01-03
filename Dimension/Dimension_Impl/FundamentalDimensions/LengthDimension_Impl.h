@@ -8,9 +8,9 @@ namespace Dimension
    struct LengthType {};
    struct Meters;
 
-   template<typename LengthUnit>
-   concept IsLengthUnit = std::is_same_v<typename LengthUnit::Dim, LengthType>;
-   
+   template<typename T>
+   concept IsLengthUnit = IsNonQuantityUnitDimension<T, LengthType> || IsQuantityUnitDimension<T, LengthType>;
+
    template<typename Unit, StringLiteral Name, StringLiteral Abbreviation>
    struct LengthUnit : public BaseUnit<Unit, Name, Abbreviation, "Length">
    { 

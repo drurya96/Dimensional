@@ -9,8 +9,8 @@ namespace Dimension
    struct MassType {};
    struct Grams;
 
-   template<typename MassUnit>
-   concept IsMassUnit = std::is_same_v<typename MassUnit::Dim, MassType>;
+   template<typename T>
+   concept IsMassUnit = IsNonQuantityUnitDimension<T, MassType> || IsQuantityUnitDimension<T, MassType>;
 
    template<typename Unit, StringLiteral Name, StringLiteral Abbreviation>
    struct MassUnit : public BaseUnit<Unit, Name, Abbreviation, "Mass">

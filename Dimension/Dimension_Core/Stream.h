@@ -33,11 +33,11 @@ namespace Dimension
       ((stream << (Indices == 0 ? "" : delim), 
          [&]() {
             if constexpr (Member == UnitNameTypes::Name) {
-               stream << std::tuple_element_t<Indices, TupleType>::name;
+               stream << type_from_quantity_or_delta<std::tuple_element_t<Indices, TupleType>>::type::name;
             } else if constexpr (Member == UnitNameTypes::Abbr) {
-               stream << std::tuple_element_t<Indices, TupleType>::abbr;
+               stream << type_from_quantity_or_delta<std::tuple_element_t<Indices, TupleType>>::type::abbr;
             } else if constexpr (Member == UnitNameTypes::DimName) {
-               stream << std::tuple_element_t<Indices, TupleType>::dimName;
+               stream << type_from_quantity_or_delta<std::tuple_element_t<Indices, TupleType>>::type::dimName;
             }
          }()), ...);
    }
@@ -48,15 +48,17 @@ namespace Dimension
    /// @param os stream to write to
    /// @param obj object to write
    /// @return reference to stream written
-   template<typename NumTuple, typename DenTuple>
-   std::ostream& to_stream(std::ostream& os, const BaseDimension<NumTuple, DenTuple>& obj)
+   template<typename NumTupleT, typename DenTupleT>
+   std::ostream& to_stream(std::ostream& os, const BaseDimension<NumTupleT, DenTupleT>& obj)
    {
+      using NumTuple = BaseDimension<NumTupleT, DenTupleT>::NumTuple;
+      using DenTuple = BaseDimension<NumTupleT, DenTupleT>::DenTuple;
 
       os << obj.template GetVal<NumTuple, DenTuple>() << " [";
 
       if constexpr(std::tuple_size_v<NumTuple> == 1)
       {
-         os << std::tuple_element_t<0, NumTuple>::abbr;
+         os << type_from_quantity_or_delta<std::tuple_element_t<0, NumTuple>>::type::abbr;
       }
       else if constexpr(std::tuple_size_v<NumTuple> > 1)
       {
@@ -67,7 +69,7 @@ namespace Dimension
 
       if constexpr(std::tuple_size_v<DenTuple> == 1)
       {
-         os << " / " << std::tuple_element_t<0, DenTuple>::abbr;
+         os << " / " << type_from_quantity_or_delta<std::tuple_element_t<0, DenTuple>>::type::abbr;
       }
       else if constexpr(std::tuple_size_v<DenTuple> > 1)
       {

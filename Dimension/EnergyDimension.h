@@ -24,9 +24,13 @@ namespace Dimension
       using DenTuple = std::tuple<Seconds, Seconds>;
    };
 
+   struct CalorieMass : public MassUnit<CalorieMass, "CalorieMass", "CalorieMass">{};
+
+   template<> struct Conversion<CalorieMass, Grams> { static constexpr PrecisionType slope = 4184.0; }; // 1 CalorieMass = 4.184 grams (scaling factor)
+
    struct Calories
    {
-      using NumTuple = std::tuple<Grams, CentiMeters, CentiMeters>;
+      using NumTuple = std::tuple<CalorieMass, Meters, Meters>;
       using DenTuple = std::tuple<Seconds, Seconds>;
    };
 
