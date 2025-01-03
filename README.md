@@ -29,9 +29,11 @@
   - See [Deltas and Quantities section](#deltas-and-quantities)
 - Common constants provided in `DimensionalConstants.h`
   - For example, to use the `ideal_gas_constant`, use `Dimension::Constants::ideal_gas_constant`
+- Molar Mass of every element and some compounds provided in `DimensionalMolarMasses.h`
 - Compile-time errors: All dimensionality is resolved at compile time, so errors can be addressed earlier in development.
 - Efficiency: `Dimensional` performs on-par with simply using `double` arithmetic in benchmarks.
   - TODO: Perform more complex benchmarking [issue #43](https://gitlab.com/dimensionalanalysis/dimensional/-/issues/43)
+- `constexpr`-friendly: Most operations involving dimensions work as `constexpr`.
 - Extensibility: `Dimensional` was designed with extensions in mind. Adding new Dimensions, Units, and conversions simply requires including a user-provided header.
 - Compiler support: (tested, others versions likely work): MSVC 19.41, gcc-12, clang-17
 - Language support: C++20 (Prior to version 2.0.0, C++17 and C++20) 

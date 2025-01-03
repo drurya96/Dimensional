@@ -10,9 +10,9 @@ All notable changes to this project will be documented in this file. Semantic ve
     - Likely didn't behave as expected before
   - Not a major version since this didn't behave as expected, this is a bugfix, but the concept has also been removed.
 - `Kelvin` is the `Primary` temperature unit rather than `Celsius`
-- Made `BaseDimension` constructors `constexpr`.
-  - This allows construction of `BaseDimension` types as `constexpr`, but all other methods and named units are not yet `constexpr`
-    - Others will be updated promptly
+- Marked most functions `constexpr`
+  - This enables compile-time evaluation when possible
+  - Streaming and serialization are not marked `constexpr` 
 
 ### Added
 - Quantity wrapper
@@ -21,8 +21,11 @@ All notable changes to this project will be documented in this file. Semantic ve
 - `is_absolute` to distinguish absolute from non-absolute units
 - `Amount` as a fundamental unit, with `Moles` and `PoundMoles`
 - `Energy` as a named compound unit with `Joules`, `Calories`, etc.
+- `Pressure` as a named compound unit with `Pascals`
 - `DimensionalConstants.h`
-  - This currently only contains `ideal_gas_constant`, but will be populated promptly
+  - Contains many universal and commonly used constants
+- `DimensionalMolarMasses.h`
+  - Contains the molar mass (as `MolarMass<Grams,Moles>`) of every element as well as some common compounds
 
 ### Deprecated
 - 
