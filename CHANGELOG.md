@@ -5,10 +5,24 @@ All notable changes to this project will be documented in this file. Semantic ve
 ## [Unreleased]
 
 ### Changed
-- 
+- Automatic Delta handling removed
+  - **DOUBLE CHECK TEMPERATURE MATH AFTER PULLING THIS VERSION!**
+    - Likely didn't behave as expected before
+  - Not a major version since this didn't behave as expected, this is a bugfix, but the concept has also been removed.
+- `Kelvin` is the `Primary` temperature unit rather than `Celsius`
+- Made `BaseDimension` constructors `constexpr`.
+  - This allows construction of `BaseDimension` types as `constexpr`, but all other methods and named units are not yet `constexpr`
+    - Others will be updated promptly
 
 ### Added
-- 
+- Quantity wrapper
+  - This is a large, but non-breaking change. Strongly recommend reading the section.
+  - See [documentation in README](./README.md#deltas-and-quantities)
+- `is_absolute` to distinguish absolute from non-absolute units
+- `Amount` as a fundamental unit, with `Moles` and `PoundMoles`
+- `Energy` as a named compound unit with `Joules`, `Calories`, etc.
+- `DimensionalConstants.h`
+  - This currently only contains `ideal_gas_constant`, but will be populated promptly
 
 ### Deprecated
 - 
@@ -17,7 +31,7 @@ All notable changes to this project will be documented in this file. Semantic ve
 - 
 
 ### Fixed
-- 
+- Small value error in `Gallon` (factor changed from `0.15562` to `0.155849128`)
 
 ## [2.4.0] - 2024-11-26
 

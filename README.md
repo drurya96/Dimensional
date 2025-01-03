@@ -25,6 +25,10 @@
     - If no direct conversion exists between two units, the library will:
       1. Convert to the "Primary" unit.
       2. Convert to the desired unit.
+- Distinction between Quantity and Delta types.
+  - See [Deltas and Quantities section](#deltas-and-quantities)
+- Common constants provided in `DimensionalConstants.h`
+  - For example, to use the `ideal_gas_constant`, use `Dimension::Constants::ideal_gas_constant`
 - Compile-time errors: All dimensionality is resolved at compile time, so errors can be addressed earlier in development.
 - Efficiency: `Dimensional` performs on-par with simply using `double` arithmetic in benchmarks.
   - TODO: Perform more complex benchmarking [issue #43](https://gitlab.com/dimensionalanalysis/dimensional/-/issues/43)
@@ -85,6 +89,102 @@ int main() {
 
    return 0;
 }
+```
+
+## Deltas and Quantities
+
+### Overview
+
+In the context of this library, units within a dimension are treated as deltas—representing differences or durations—unless explicitly wrapped by the Quantity type.
+For example, `BaseDimension<tuple<Meters>, tuple<Seconds>>` interprets `Meters` and `Seconds` as delta units.
+This default behavior is suitable for most basic applications where only changes or durations are relevant.
+
+However, any fundamental unit can be wrapped by the `Quantity` type to indicate that the unit represents a state rather than a difference.
+For example, `Quantity<Kelvin>` represents a specific temperature, whereas `Kelvin` alone represents a change in temperature.
+Quantities are especially important when dealing with units like Temperature where distinguishing between current temperatures and temperature differences is crucial.
+
+*Note: Named-Compound dimensions, like `Joules`, `Newtons`, `Liters`, etc. cannot (yet) be wrapped by `Quantity`. If this behavior is desired, please [open an issue](https://gitlab.com/dimensionalanalysis/dimensional/-/issues/new)*
+
+### Conversions
+
+When performing unit conversions, quantities and deltas handle offsets differently:
+
+- **Quantity to Quantity Conversion**: Converting between two quantity units (e.g., `Quantity<Celsius>` to `Quantity<Kelvin>`) applies the offset. For instance, `0 C` converts to `273.15 K`.
+- **Delta to Delta Conversion**: Converting between two delta units (e.g., delta `Celsius` to delta `Kelvin`) does not apply the offset. This means that a temperature difference of `10 C` is equivalent to a temperature difference of `10 K`.
+Note: This distinction is only significant for units with non-zero offsets, such as temperature scales like `Celsius` and `Fahrenheit`.
+
+### Addition and Subtraction Rules
+
+Quantities and deltas interact differently during arithmetic operations. For any given dimension, the following rules apply:
+
+#### Subtraction
+
+- **Delta - Delta -> Delta**: Subtracting two differences yields another difference.
+- **Quantity - Quantity -> Delta**: Subtracting two absolute quantities yields a difference.
+- **Quantity - Delta -> Quantity**: Subtracting a difference from an absolute quantity results in an absolute quantity.
+- **Delta - Quantity -> INVALID**: Subtracting an absolute quantity from a difference is undefined and results in a compilation error.
+
+#### Addition
+
+- **Delta + Delta -> Delta**: Adding two differences yields another difference.
+- **Quantity + Delta -> Quantity**: Adding a difference to an absolute quantity results in an absolute quantity.
+- **Delta + Quantity -> Quantity**: Adding an absolute quantity to a difference results in an absolute quantity.
+- **Quantity + Quantity -> INVALID**: Adding two absolute quantities is undefined and results in a compilation error.
+
+These rules **are maintained** for compound units. For example:
+`BaseDimension<tuple<Meters>, tuple<Quantity<Kelvin>>> - BaseDimension<tuple<Meters>, tuple<Quantity<Kelvin>>>` -> `BaseDimension<tuple<Meters>, tuple<Kelvin>>`
+
+### Absolute vs. Non-Absolute Units:
+
+#### Absolute Units
+These units have a defined zero point that represents the absence of the measurement.
+For example, `Kelvin` and `Rankine` are absolute temperature scales where `0 K` and `0 R` represent absolute zero.
+
+#### Non-Absolute Units
+These units do not have an inherent zero point and are defined relative to another scale.
+For example, `Celsius` and `Fahrenheit` are non-absolute temperature scales where `0 C` and `32 F` represent specific points on their respective scales, not the absence of temperature.
+
+### Primary Unit Requirement
+
+The `Primary` unit of any dimension must be an absolute unit. This ensures consistency and correctness in calculations involving absolute quantities.
+
+### Constraints on Compound Dimensions
+
+While compound dimensions can include non-absolute units, they cannot include non-absolute quantities.
+This means that you cannot have a `Quantity` wrapping a non-absolute unit within a compound dimension.
+**Invalid Example**:
+```cpp
+BaseDimension<tuple<Meters>, tuple<Quantity<Celsius>>> // INVALID
+```
+
+Here, `Quantity<Celsius>` is invalid because `Celsius` is a non-absolute unit.
+
+### Multiplication and Division with Quantities
+
+#### General Behavior
+
+Multiplying or dividing units behaves similarly for both deltas and quantities in most scenarios.
+
+#### Non-Absolute Quantities
+
+When performing multiplication or division involving non-absolute quantities (e.g., `Quantity<Celsius>`), the unit will be implicitly cast to its `Primary` unit, which must be absolute, (e.g., `Kelvin`) during the operation.
+- **Cancelling Out**: If the operation results in the non-absolute quantity being canceled out (e.g., multiplying by its reciprocal), the behavior is as expected.
+- **Retained Units**: If the operation results in the non-absolute unit being retained in the result type, a warning will be emitted to alert the user of the potential inconsistency.
+
+### Best Practices:
+
+**Avoid Implicit Casting**: To maintain type consistency and avoid unexpected results, explicitly cast non-absolute quantities to an absolute unit before performing multiplication or division operations.
+- Example:
+```cpp
+Temperature<Quantity<Celsius>> currentTemp(25.0);
+
+Time<Seconds> time(20.0);
+
+// This will emit a warning
+BaseDimension<tuple<Quantity<Kelvin>>, tuple<Seconds>> resultBad = currentTemp / time; // Notice the Kelvin in the result type rather than Celsius
+
+// This is preferred, no warning emitted
+BaseDimension<tuple<Quantity<Kelvin>>, tuple<Seconds>> resultBad = Temperature<Quantity<Kelvin>>(currentTemp) / time;
 ```
 
 ## Serialization
