@@ -1,40 +1,58 @@
 #ifndef STATIC_DIMENSION_MOLARMASS_IMPL_H
 #define STATIC_DIMENSION_MOLARMASS_IMPL_H
 
-#include "../../MassDimension.h"
 #include "../../AmountDimension.h"
+#include "../../MassDimension.h"
 
 namespace Dimension
 {
-   // Concept for a named MolarMass unit
+   /// @brief Concept for a named MolarMass unit.
+   /// @tparam NamedMolarMass The type to be checked as a named MolarMass unit.
    template<typename NamedMolarMass>
    concept IsNamedMolarMassUnit = requires {
       typename NamedMolarMass::NumTuple;
       typename NamedMolarMass::DenTuple;
    };
 
-   // Concept for a MolarMass dimension (basic units)
-   template<typename MassUnit, typename AmountUnit>
+   /// @brief Concept for a MolarMass dimension.
+   /// @details Checks if the provided types satisfy the MolarMass dimension requirements.
+   /// @tparam Mass1 Numerator Mass1 type
+   /// @tparam Amount1 Denominator Amount1 type
+   template<typename Mass1,typename Amount1>
    concept IsMolarMassUnits = 
-      std::is_same_v<typename MassUnit::Dim, MassType> &&
-      std::is_same_v<typename AmountUnit::Dim, AmountType>;
+      std::is_same_v<typename Mass1::Dim, MassType> &&
+        std::is_same_v<typename Amount1::Dim, AmountType>;
 
-   // General concept for an MolarMass type
+   /// @brief Concept for a MolarMass type.
+   /// @details Ensures that the type meets MolarMass type requirements, based on numerator and denominator types.
+   /// @tparam T The type to validate.
    template<typename T>
    concept IsMolarMassType = requires {
       typename T::NumTuple;
       typename T::DenTuple;
-   } && IsMolarMassUnits<typename std::tuple_element_t<0, typename T::NumTuple>,
-                         typename std::tuple_element_t<0, typename T::DenTuple>>;
+   } && std::tuple_size_v<typename T::NumTuple> == 1 && std::tuple_size_v<typename T::DenTuple> == 1 &&
+   IsMolarMassUnits<typename std::tuple_element_t<0, typename T::NumTuple>,typename std::tuple_element_t<0, typename T::DenTuple>>;
 
-   // Free function for retrieving MolarMass values
-   template<typename MassT, typename AmountT, typename MolarMassType>
-   requires IsMolarMassUnits<MassT, AmountT> && IsMolarMassType<MolarMassType>
+   /// @brief Retrieves the value of a MolarMass object.
+   /// @details Provides access to the underlying value represented by a MolarMass object.
+   /// @tparam Mass1 Numerator Mass1 type
+   /// @tparam Amount1 Denominator Amount1 type
+   /// @tparam MolarMassType The type of the object being accessed.
+   /// @param obj The MolarMass object.
+   /// @return The underlying value as `PrecisionType`
+   template<typename Mass1,typename Amount1, typename MolarMassType>
+   requires IsMolarMassUnits<Mass1,Amount1> && IsMolarMassType<MolarMassType>
    constexpr PrecisionType getMolarMass(const MolarMassType& obj)
    {
-      return obj.template GetVal<std::tuple<MassT>, std::tuple<AmountT>>();
+      return obj.template GetVal<std::tuple<Mass1>, std::tuple<Amount1>>();
    }
 
+   /// @brief Retrieves the value of a named MolarMass object.
+   /// @details Provides access to the value represented by a named MolarMass object.
+   /// @tparam NamedMolarMass The named unit type.
+   /// @tparam MolarMassType The type of the object being accessed.
+   /// @param obj The MolarMass object.
+   /// @return The underlying value as `PrecisionType`.
    template<typename NamedMolarMass, typename MolarMassType>
    requires IsNamedMolarMassUnit<NamedMolarMass> && IsMolarMassType<MolarMassType>
    constexpr PrecisionType getMolarMass(const MolarMassType& obj)
@@ -45,28 +63,43 @@ namespace Dimension
    template<typename... Ts>
    class MolarMass;
 
-   template<typename MassUnit, typename AmountUnit>
-   requires IsMolarMassUnits<MassUnit, AmountUnit>
-   class MolarMass<MassUnit, AmountUnit> : public BaseDimension<std::tuple<MassUnit>, std::tuple<AmountUnit>>
+   /// @brief Represents a MolarMass.
+   /// @details Defines operations and data storage for MolarMass dimensions.
+   /// @tparam Mass1 Numerator Mass1 type
+   /// @tparam Amount1 Denominator Amount1 type
+   template<typename Mass1,typename Amount1>
+   requires IsMolarMassUnits<Mass1,Amount1>
+   class MolarMass<Mass1,Amount1> : public BaseDimension<std::tuple<Mass1>, std::tuple<Amount1>>
    {
    public:
-      using Base = BaseDimension<std::tuple<MassUnit>, std::tuple<AmountUnit>>;
+      using Base = BaseDimension<std::tuple<Mass1>, std::tuple<Amount1>>;
       using Base::Base;
 
-      constexpr MolarMass(double val) : Base(val) {}
+      /// @brief Constructs a MolarMass object with a value.
+      /// @param val The value of the MolarMass.
+      constexpr MolarMass(PrecisionType val) : Base(val) {}
 
+      /// @brief Constructs a MolarMass object from a named unit.
+      /// @tparam NamedMolarMass The named unit type.
+      /// @param base The base unit object.
       template<typename NamedMolarMass>
       requires IsNamedMolarMassUnit<NamedMolarMass>
       constexpr MolarMass(const NamedMolarMass& base) : Base(base) {}
 
-      template<typename MassUnitRet, typename AmountUnitRet>
-      requires IsMolarMassUnits<MassUnitRet, AmountUnitRet>
+      /// @brief Deprecated function to get the value of MolarMass.
+      /// @details Prefer using the free function `getMolarMass()` instead.
+      /// @return The value of the MolarMass.
+      template<typename Mass1T,typename Amount1T>
+      requires IsMolarMassUnits<Mass1T,Amount1T>
       [[deprecated("Use the free function getMolarMass() instead.")]]
       double GetMolarMass() const
       {
-         return getMolarMass<MassUnitRet, AmountUnitRet>(*this);
+         return getMolarMass<Mass1T,Amount1T>(*this);
       }
 
+      /// @brief Deprecated function to get the value of MolarMass.
+      /// @details Prefer using the free function `getMolarMass()` instead.
+      /// @return The value of the MolarMass.
       template<typename NamedMolarMass>
       requires IsNamedMolarMassUnit<NamedMolarMass>
       [[deprecated("Use the free function getMolarMass() instead.")]]
@@ -76,7 +109,9 @@ namespace Dimension
       }
    };
 
-   // MolarMass class for named units
+   /// @brief Represents a named MolarMass class.
+   /// @details Provides functionality for named MolarMass units.
+   /// @tparam NamedMolarMass The named unit type.
    template<typename NamedMolarMass>
    requires IsNamedMolarMassUnit<NamedMolarMass>
    class MolarMass<NamedMolarMass> : public BaseDimension<typename NamedMolarMass::NumTuple, typename NamedMolarMass::DenTuple>
@@ -85,41 +120,62 @@ namespace Dimension
       using Base = BaseDimension<typename NamedMolarMass::NumTuple, typename NamedMolarMass::DenTuple>;
       using Base::Base;
 
-      constexpr MolarMass(double val) : Base(val) {}
+      /// @brief Constructs a MolarMass object with a value.
+      /// @param val The value of the MolarMass.
+      constexpr MolarMass(PrecisionType val) : Base(val) {}
 
+      /// @brief Constructs a MolarMass object from another MolarMass object.
+      /// @tparam OtherMolarMass The other MolarMass type.
+      /// @param base The base MolarMass object.
       template<typename OtherMolarMass>
       requires IsMolarMassType<OtherMolarMass>
       constexpr MolarMass(const OtherMolarMass& base)
          : Base(base.template GetVal<typename NamedMolarMass::NumTuple, typename NamedMolarMass::DenTuple>()) {}
 
-      template<typename MassUnitRet, typename AmountUnitRet>
-      requires IsMolarMassUnits<MassUnitRet, AmountUnitRet>
+      /// @brief Deprecated function to get the value of MolarMass.
+      /// @details Prefer using the free function `getMolarMass()` instead.
+      /// @return The value of the MolarMass.
+      template<typename Mass1T,typename Amount1T>
+      requires IsMolarMassUnits<Mass1T,Amount1T>
       [[deprecated("Use the free function getMolarMass() instead.")]]
       double GetMolarMass() const
       {
-         return getMolarMass<MassUnitRet, AmountUnitRet>(*this);
+         return getMolarMass<Mass1T,Amount1T>(*this);
       }
 
+      /// @brief Deprecated function to get the value of MolarMass.
+      /// @details Prefer using the free function `getMolarMass()` instead.
+      /// @return The value of the MolarMass.
       template<typename NamedMolarMassUnit>
       requires IsNamedMolarMassUnit<NamedMolarMassUnit>
       [[deprecated("Use the free function getMolarMass() instead.")]]
       double GetMolarMass() const
       {
          return getMolarMass<NamedMolarMassUnit>(*this);
-      }
+      }         
    };
 
-   template<typename MassUnit, typename AmountUnit>
-   requires IsMolarMassUnits<MassUnit, AmountUnit>
-   MolarMass(MassUnit, AmountUnit) -> MolarMass<MassUnit, AmountUnit>;
+   /// @brief Template deduction guide for MolarMass.
+   /// @tparam Mass1 Numerator Mass1 type
+   /// @tparam Amount1 Denominator Amount1 type
+   template<typename Mass1,typename Amount1>
+   requires IsMolarMassUnits<Mass1,Amount1>
+   MolarMass(Mass1,Amount1) -> MolarMass<Mass1,Amount1>;
 
+   /// @brief Template deduction guide for MolarMass.
+   /// @tparam Mass1 Numerator Mass1 type
+   /// @tparam Amount1 Denominator Amount1 type
    template<typename NamedMolarMass>
    requires IsNamedMolarMassUnit<NamedMolarMass>
    MolarMass(NamedMolarMass) -> MolarMass<NamedMolarMass>;
 
-   template<typename MassUnit, typename AmountUnit>
-   requires IsMolarMassUnits<MassUnit, AmountUnit>
-   MolarMass(BaseDimension<std::tuple<MassUnit>, std::tuple<AmountUnit>>) -> MolarMass<MassUnit, AmountUnit>;
+   /// @brief Template deduction guide for MolarMass.
+   /// @tparam Mass1 Numerator Mass1 type
+   /// @tparam Amount1 Denominator Amount1 type
+   template<typename Mass1,typename Amount1>
+   requires IsMolarMassUnits<Mass1,Amount1>
+   MolarMass(BaseDimension<std::tuple<Mass1>, std::tuple<Amount1>>) -> MolarMass<Mass1,Amount1>;
+
 }
 
-#endif //STATIC_DIMENSION_MOLARMASS_IMPL_H
+#endif // STATIC_DIMENSION_MOLARMASS_IMPL_H

@@ -64,7 +64,7 @@ TEST_F(DimensionTest, DimensionalModf) {
 
 TEST_F(DimensionTest, DimensionalFmod) {
 
-   using Dimension::pi;
+   using std::numbers::pi;
 
    ASSERT_NEAR((getTime<Minutes>(fmod(Time<Minutes>(130), Time<Minutes>(60)))), 10.0, TOLERANCE);
    ASSERT_NEAR(getAngle<Radians>((fmod(Angle<Radians>(3*pi), Angle<Radians>(2*pi)))), pi, TOLERANCE);

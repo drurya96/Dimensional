@@ -1,0 +1,110 @@
+#ifndef STATIC_DIMENSION_{{ dimension_name }}_IMPL_H
+#define STATIC_DIMENSION_{{ dimension_name }}_IMPL_H
+
+#include "../../BaseDimension.h"
+
+namespace Dimension
+{
+   /// @brief Represents the {{ dimension_name }} type tag.
+   struct {{ dimension_name }}Type {};
+
+   /// @brief Represents the primary unit for {{ dimension_name }}.
+   struct {{ primary_name }};
+
+   /// @brief Concept to check if a type is a valid {{ dimension_name }} unit.
+   /// @tparam T The type to check.
+   template<typename T>
+   concept Is{{ dimension_name }}Unit = IsNonQuantityUnitDimension<T, {{ dimension_name }}Type> || IsQuantityUnitDimension<T, {{ dimension_name }}Type>;
+
+   /// @brief Base class for {{ dimension_name }} units.
+   /// @tparam Unit The unit type.
+   /// @tparam Name The name of the unit.
+   /// @tparam Abbreviation The abbreviation of the unit.
+   template<typename Unit, StringLiteral Name, StringLiteral Abbreviation>
+   struct {{ dimension_name }}Unit : public BaseUnit<Unit, Name, Abbreviation, "{{ dimension_name }}">
+   {
+   public:
+      /// @brief The dimension type associated with the unit.
+      using Dim = {{ dimension_name }}Type;
+
+      /// @brief The primary unit type for this dimension.
+      using Primary = {{ primary_name }};
+   };
+
+   /// @brief Trait to check if a type is a {{ dimension_name }} dimension.
+   /// @tparam T The type to check.
+   template<typename T>
+   struct is_{{ dimension_name }} : std::false_type {};
+
+   /// @brief Specialization for BaseDimension types.
+   /// @tparam T The unit type.
+   template<typename T>
+   struct is_{{ dimension_name }}<BaseDimension<std::tuple<T>, std::tuple<>>> : std::bool_constant<Is{{ dimension_name }}Unit<T>> {};
+
+   /// @brief Helper variable template for is_{{ dimension_name }}.
+   /// @tparam T The type to check.
+   template<typename T>
+   constexpr bool is_{{ dimension_name }}_v = is_{{ dimension_name }}<T>::value;
+
+   /// @brief Concept to verify if a type is a valid {{ dimension_name }} type.
+   /// @tparam T The type to check.
+   template<typename T>
+   concept {{ dimension_name }}_type = is_{{ dimension_name }}_v<T>;
+
+   /// @brief Retrieves the value of a {{ dimension_name }} object in the specified unit.
+   /// @tparam T The unit type.
+   /// @param obj The {{ dimension_name }} object.
+   /// @return The value in the specified unit.
+   template<Is{{ dimension_name }}Unit T>
+   constexpr PrecisionType get{{ dimension_name }}({{ dimension_name }}_type auto obj)
+   {
+      return obj.template GetVal<std::tuple<T>, std::tuple<>>();
+   }
+
+   /// @brief Represents a dimension type for {{ dimension_name }}.
+   /// @tparam Unit The primary unit type.
+   template<Is{{ dimension_name }}Unit Unit>
+   class {{ dimension_name }} : public BaseDimension<std::tuple<Unit>, std::tuple<>>
+   {
+   public:
+      /// @brief Default constructor initializing to zero.
+      constexpr {{ dimension_name }}() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}
+
+      /// @brief Constructs a {{ dimension_name }} object with a specific value.
+      /// @param val The value to initialize with.
+      constexpr {{ dimension_name }}(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
+
+      /// @brief Constructs a {{ dimension_name }} object from another BaseDimension.
+      /// @tparam T The unit type of the BaseDimension.
+      /// @param base The BaseDimension object to construct from.
+      template<Is{{ dimension_name }}Unit T>
+      constexpr {{ dimension_name }}(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()){}
+
+      /// @brief Deprecated method to retrieve the value of the dimension.
+      /// @tparam T The unit type.
+      /// @return The value in the specified unit.
+      template<Is{{ dimension_name }}Unit T>
+      [[deprecated("Use the free function get{{ dimension_name }}() instead.")]]
+      double Get{{ dimension_name }}() const
+      {
+         return get{{ dimension_name }}<T>(*this);
+      }
+   };
+
+   /// @brief Deduction guide for {{ dimension_name }} constructor.
+   /// @tparam T The unit type.
+   template<Is{{ dimension_name }}Unit T>
+   {{ dimension_name }}(T) -> {{ dimension_name }}<T>;
+
+   /// @brief Deduction guide for {{ dimension_name }} constructor with BaseDimension.
+   /// @tparam {{ dimension_name }}Unit The unit type.
+   template<Is{{ dimension_name }}Unit {{ dimension_name }}Unit>
+   {{ dimension_name }}(BaseDimension<std::tuple<{{ dimension_name }}Unit>, std::tuple<>>) -> {{ dimension_name }}<{{ dimension_name }}Unit>;
+
+   /// @brief Specialization for is_{{ dimension_name }} trait for {{ dimension_name }} types.
+   /// @tparam T The unit type.
+   template<typename T>
+   struct is_{{ dimension_name }}<{{ dimension_name }}<T>> : std::bool_constant<Is{{ dimension_name }}Unit<T>> {};
+}
+
+#endif //STATIC_DIMENSION_{{ dimension_name }}_IMPL_H
