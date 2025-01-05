@@ -4,6 +4,7 @@
 #include <tuple> // For std::tuple and related functions
 #include <cmath> // For std::hypot, std::modf, std::fmod // @todo move this to Utilities
 #include <stdexcept> // For std::invalid_argument
+#include <numbers> // For std::numbers::pi
 //#include <algorithm>
 
 #include "Dimension_Core/PrecisionType.h"

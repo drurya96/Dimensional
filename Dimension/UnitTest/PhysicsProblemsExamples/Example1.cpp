@@ -66,7 +66,7 @@ TEST_F(PhysicsProblemsExample1, WorkDoneByForce)
     // Given values
     Force<Newtons> force{50.0}; // Force = 50 N (kg·m/s²)
     Length<Meters> displacement{10.0};                      // Displacement = 10 m
-    Angle<Radians> angle{Dimension::pi / 3};                         // Angle = 60 degrees (in radians)
+    Angle<Radians> angle{std::numbers::pi / 3};                         // Angle = 60 degrees (in radians)
 
     // Calculate work done: W = F * d * cos(theta)
     Energy<Joules> workDone = force * displacement * Dimension::cos(angle);
@@ -81,7 +81,7 @@ TEST_F(PhysicsProblemsExample1, ProjectileMotion)
 
     // Given values
     Speed<Meters, Seconds> initialVelocity{50.0};  // Initial velocity = 50 m/s
-    Angle<Radians> launchAngle{Dimension::pi / 4};          // Launch angle = 45 degrees (in radians)
+    Angle<Radians> launchAngle{std::numbers::pi / 4};          // Launch angle = 45 degrees (in radians)
     Acceleration<Meters, Seconds, Seconds> gravity{9.81}; // Gravitational acceleration = 9.81 m/s²
 
     // Calculate Time of Flight: T = (2 * v0 * sin(angle)) / g
@@ -91,8 +91,8 @@ TEST_F(PhysicsProblemsExample1, ProjectileMotion)
     Length<Meters> horizontalRange = initialVelocity * cos(launchAngle) * timeOfFlight;
 
     // Expected results
-    double expectedTimeOfFlight = (2.0 * 50.0 * std::sin(Dimension::pi / 4)) / 9.81; // ~ 7.208 s
-    double expectedRange = 50.0 * std::cos(Dimension::pi / 4) * expectedTimeOfFlight; // ~ 255.1 m
+    double expectedTimeOfFlight = (2.0 * 50.0 * std::sin(std::numbers::pi / 4)) / 9.81; // ~ 7.208 s
+    double expectedRange = 50.0 * std::cos(std::numbers::pi / 4) * expectedTimeOfFlight; // ~ 255.1 m
 
     // Assertions
     ASSERT_NEAR(getTime<Seconds>(timeOfFlight), expectedTimeOfFlight, TOLERANCE);

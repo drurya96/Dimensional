@@ -1,58 +1,88 @@
-#ifndef STATIC_DIMENSION_ANGLE_IMPL_H
-#define STATIC_DIMENSION_ANGLE_IMPL_H
+#ifndef STATIC_DIMENSION_Angle_IMPL_H
+#define STATIC_DIMENSION_Angle_IMPL_H
 
 #include "../../BaseDimension.h"
-#include <numbers>
 
 namespace Dimension
 {
-   constexpr double pi = std::numbers::pi;
-
+   /// @brief Represents the Angle type tag.
    struct AngleType {};
+
+   /// @brief Represents the primary unit for Angle.
    struct Radians;
 
+   /// @brief Concept to check if a type is a valid Angle unit.
+   /// @tparam T The type to check.
    template<typename T>
    concept IsAngleUnit = IsNonQuantityUnitDimension<T, AngleType> || IsQuantityUnitDimension<T, AngleType>;
 
+   /// @brief Base class for Angle units.
+   /// @tparam Unit The unit type.
+   /// @tparam Name The name of the unit.
+   /// @tparam Abbreviation The abbreviation of the unit.
    template<typename Unit, StringLiteral Name, StringLiteral Abbreviation>
    struct AngleUnit : public BaseUnit<Unit, Name, Abbreviation, "Angle">
-   { 
-   public: 
+   {
+   public:
+      /// @brief The dimension type associated with the unit.
       using Dim = AngleType;
+
+      /// @brief The primary unit type for this dimension.
       using Primary = Radians;
    };
 
+   /// @brief Trait to check if a type is a Angle dimension.
+   /// @tparam T The type to check.
    template<typename T>
-   struct is_angle : std::false_type {};
+   struct is_Angle : std::false_type {};
 
+   /// @brief Specialization for BaseDimension types.
+   /// @tparam T The unit type.
    template<typename T>
-   struct is_angle<BaseDimension<std::tuple<T>, std::tuple<>>> : std::bool_constant<IsAngleUnit<T>> {};
+   struct is_Angle<BaseDimension<std::tuple<T>, std::tuple<>>> : std::bool_constant<IsAngleUnit<T>> {};
 
+   /// @brief Helper variable template for is_Angle.
+   /// @tparam T The type to check.
    template<typename T>
-   constexpr bool is_angle_v = is_angle<T>::value;
+   constexpr bool is_Angle_v = is_Angle<T>::value;
 
+   /// @brief Concept to verify if a type is a valid Angle type.
+   /// @tparam T The type to check.
    template<typename T>
-   concept angle_type = is_angle_v<T>;
+   concept Angle_type = is_Angle_v<T>;
 
+   /// @brief Retrieves the value of a Angle object in the specified unit.
+   /// @tparam T The unit type.
+   /// @param obj The Angle object.
+   /// @return The value in the specified unit.
    template<IsAngleUnit T>
-   constexpr PrecisionType getAngle(angle_type auto obj)
+   constexpr PrecisionType getAngle(Angle_type auto obj)
    {
       return obj.template GetVal<std::tuple<T>, std::tuple<>>();
    }
 
+   /// @brief Represents a dimension type for Angle.
+   /// @tparam Unit The primary unit type.
    template<IsAngleUnit Unit>
    class Angle : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
    public:
-      using BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension;
+      /// @brief Default constructor initializing to zero.
+      constexpr Angle() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}
 
-      constexpr Angle() : BaseDimension<std::tuple<Unit>, std::tuple<>>(0.0) {}
+      /// @brief Constructs a Angle object with a specific value.
+      /// @param val The value to initialize with.
+      constexpr Angle(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
 
-      constexpr Angle(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>(val) {}
-
+      /// @brief Constructs a Angle object from another BaseDimension.
+      /// @tparam T The unit type of the BaseDimension.
+      /// @param base The BaseDimension object to construct from.
       template<IsAngleUnit T>
-      constexpr Angle(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>(base.template GetVal<std::tuple<Unit>, std::tuple<>>()) {}
+      constexpr Angle(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()){}
 
+      /// @brief Deprecated method to retrieve the value of the dimension.
+      /// @tparam T The unit type.
+      /// @return The value in the specified unit.
       template<IsAngleUnit T>
       [[deprecated("Use the free function getAngle() instead.")]]
       double GetAngle() const
@@ -61,15 +91,20 @@ namespace Dimension
       }
    };
 
+   /// @brief Deduction guide for Angle constructor.
+   /// @tparam T The unit type.
    template<IsAngleUnit T>
    Angle(T) -> Angle<T>;
 
+   /// @brief Deduction guide for Angle constructor with BaseDimension.
+   /// @tparam AngleUnit The unit type.
    template<IsAngleUnit AngleUnit>
    Angle(BaseDimension<std::tuple<AngleUnit>, std::tuple<>>) -> Angle<AngleUnit>;
 
+   /// @brief Specialization for is_Angle trait for Angle types.
+   /// @tparam T The unit type.
    template<typename T>
-   struct is_angle<Angle<T>> : std::bool_constant<IsAngleUnit<T>> {};
-
+   struct is_Angle<Angle<T>> : std::bool_constant<IsAngleUnit<T>> {};
 }
 
-#endif //STATIC_DIMENSION_ANGLE_IMPL_H
+#endif //STATIC_DIMENSION_Angle_IMPL_H

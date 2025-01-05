@@ -8,7 +8,7 @@ namespace Dimension
    struct Radians : public AngleUnit<Radians, "Radians", "rad"> {};
    struct Degrees : public AngleUnit<Degrees, "Degrees", "deg"> {};
 
-   template<> struct Conversion<Radians, Degrees> { static constexpr PrecisionType slope = 180 / pi; };
+   template<> struct Conversion<Radians, Degrees> { static constexpr PrecisionType slope = 180 / std::numbers::pi; };
 
    template<typename AngleUnit>
    PrecisionType cos(Angle<AngleUnit> angle) { return std::cos(getAngle<Radians>(angle)); }
