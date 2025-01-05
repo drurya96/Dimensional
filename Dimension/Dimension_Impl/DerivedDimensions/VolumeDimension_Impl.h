@@ -5,38 +5,56 @@
 
 namespace Dimension
 {
-
-   // Concept for a named Volume unit (e.g., Liters)
+   /// @brief Concept for a named Volume unit.
+   /// @tparam NamedVolume The type to be checked as a named Volume unit.
    template<typename NamedVolume>
    concept IsNamedVolumeUnit = requires {
       typename NamedVolume::NumTuple;
       typename NamedVolume::DenTuple;
    };
 
-   // Concept for a Volume dimension (basic units)
-   template<typename LengthUnit1, typename LengthUnit2, typename LengthUnit3>
+   /// @brief Concept for a Volume dimension.
+   /// @details Checks if the provided types satisfy the Volume dimension requirements.
+   /// @tparam Length1 Numerator Length1 type
+   /// @tparam Length2 Numerator Length2 type
+   /// @tparam Length3 Numerator Length3 type
+   template<typename Length1, typename Length2, typename Length3>
    concept IsVolumeUnits = 
-      std::is_same_v<typename LengthUnit1::Dim, LengthType> &&
-      std::is_same_v<typename LengthUnit2::Dim, LengthType> &&
-      std::is_same_v<typename LengthUnit3::Dim, LengthType>;
+      std::is_same_v<typename Length1::Dim, LengthType> &&
+        std::is_same_v<typename Length2::Dim, LengthType> &&
+        std::is_same_v<typename Length3::Dim, LengthType>;
 
-   // General concept for a Volume type
+   /// @brief Concept for a Volume type.
+   /// @details Ensures that the type meets Volume type requirements, based on numerator and denominator types.
+   /// @tparam T The type to validate.
    template<typename T>
    concept IsVolumeType = requires {
       typename T::NumTuple;
       typename T::DenTuple;
-   } && IsVolumeUnits<typename std::tuple_element_t<0, typename T::NumTuple>,
-                     typename std::tuple_element_t<1, typename T::NumTuple>,
-                     typename std::tuple_element_t<2, typename T::NumTuple>>;
+   } && std::tuple_size_v<typename T::NumTuple> == 3 && std::tuple_size_v<typename T::DenTuple> == 0 &&
+   IsVolumeUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<2, typename T::NumTuple>>;
 
-   // Free function for retrieving Volume values
-   template<typename LengthT1, typename LengthT2, typename LengthT3, typename VolumeType>
-   requires IsVolumeUnits<LengthT1, LengthT2, LengthT3> && IsVolumeType<VolumeType>
+   /// @brief Retrieves the value of a Volume object.
+   /// @details Provides access to the underlying value represented by a Volume object.
+   /// @tparam Length1 Numerator Length1 type
+   /// @tparam Length2 Numerator Length2 type
+   /// @tparam Length3 Numerator Length3 type
+   /// @tparam VolumeType The type of the object being accessed.
+   /// @param obj The Volume object.
+   /// @return The underlying value as `PrecisionType`
+   template<typename Length1, typename Length2, typename Length3, typename VolumeType>
+   requires IsVolumeUnits<Length1, Length2, Length3> && IsVolumeType<VolumeType>
    constexpr PrecisionType getVolume(const VolumeType& obj)
    {
-      return obj.template GetVal<std::tuple<LengthT1, LengthT2, LengthT3>, std::tuple<>>();
+      return obj.template GetVal<std::tuple<Length1, Length2, Length3>, std::tuple<>>();
    }
 
+   /// @brief Retrieves the value of a named Volume object.
+   /// @details Provides access to the value represented by a named Volume object.
+   /// @tparam NamedVolume The named unit type.
+   /// @tparam VolumeType The type of the object being accessed.
+   /// @param obj The Volume object.
+   /// @return The underlying value as `PrecisionType`.
    template<typename NamedVolume, typename VolumeType>
    requires IsNamedVolumeUnit<NamedVolume> && IsVolumeType<VolumeType>
    constexpr PrecisionType getVolume(const VolumeType& obj)
@@ -47,28 +65,44 @@ namespace Dimension
    template<typename... Ts>
    class Volume;
 
-   template<typename LengthT1, typename LengthT2, typename LengthT3>
-   requires IsVolumeUnits<LengthT1, LengthT2, LengthT3>
-   class Volume<LengthT1, LengthT2, LengthT3> : public BaseDimension<std::tuple<LengthT1, LengthT2, LengthT3>, std::tuple<>>
+   /// @brief Represents a Volume.
+   /// @details Defines operations and data storage for Volume dimensions.
+   /// @tparam Length1 Numerator Length1 type
+   /// @tparam Length2 Numerator Length2 type
+   /// @tparam Length3 Numerator Length3 type
+   template<typename Length1, typename Length2, typename Length3>
+   requires IsVolumeUnits<Length1, Length2, Length3>
+   class Volume<Length1, Length2, Length3> : public BaseDimension<std::tuple<Length1, Length2, Length3>, std::tuple<>>
    {
    public:
-      using Base = BaseDimension<std::tuple<LengthT1, LengthT2, LengthT3>, std::tuple<>>;
+      using Base = BaseDimension<std::tuple<Length1, Length2, Length3>, std::tuple<>>;
       using Base::Base;
 
-      constexpr Volume(double val) : Base(val) {}
+      /// @brief Constructs a Volume object with a value.
+      /// @param val The value of the Volume.
+      constexpr Volume(PrecisionType val) : Base(val) {}
 
+      /// @brief Constructs a Volume object from a named unit.
+      /// @tparam NamedVolume The named unit type.
+      /// @param base The base unit object.
       template<typename NamedVolume>
       requires IsNamedVolumeUnit<NamedVolume>
       constexpr Volume(const NamedVolume& base) : Base(base) {}
 
-      template<typename LengthUnitRet1, typename LengthUnitRet2, typename LengthUnitRet3>
-      requires IsVolumeUnits<LengthUnitRet1, LengthUnitRet2, LengthUnitRet3>
+      /// @brief Deprecated function to get the value of Volume.
+      /// @details Prefer using the free function `getVolume()` instead.
+      /// @return The value of the Volume.
+      template<typename Length1T, typename Length2T, typename Length3T>
+      requires IsVolumeUnits<Length1T, Length2T, Length3T>
       [[deprecated("Use the free function getVolume() instead.")]]
       double GetVolume() const
       {
-         return getVolume<LengthUnitRet1, LengthUnitRet2, LengthUnitRet3>(*this);
+         return getVolume<Length1T, Length2T, Length3T>(*this);
       }
 
+      /// @brief Deprecated function to get the value of Volume.
+      /// @details Prefer using the free function `getVolume()` instead.
+      /// @return The value of the Volume.
       template<typename NamedVolume>
       requires IsNamedVolumeUnit<NamedVolume>
       [[deprecated("Use the free function getVolume() instead.")]]
@@ -78,7 +112,9 @@ namespace Dimension
       }
    };
 
-   // Volume class for named units
+   /// @brief Represents a named Volume class.
+   /// @details Provides functionality for named Volume units.
+   /// @tparam NamedVolume The named unit type.
    template<typename NamedVolume>
    requires IsNamedVolumeUnit<NamedVolume>
    class Volume<NamedVolume> : public BaseDimension<typename NamedVolume::NumTuple, typename NamedVolume::DenTuple>
@@ -87,42 +123,65 @@ namespace Dimension
       using Base = BaseDimension<typename NamedVolume::NumTuple, typename NamedVolume::DenTuple>;
       using Base::Base;
 
-      constexpr Volume(double val) : Base(val) {}
+      /// @brief Constructs a Volume object with a value.
+      /// @param val The value of the Volume.
+      constexpr Volume(PrecisionType val) : Base(val) {}
 
+      /// @brief Constructs a Volume object from another Volume object.
+      /// @tparam OtherVolume The other Volume type.
+      /// @param base The base Volume object.
       template<typename OtherVolume>
       requires IsVolumeType<OtherVolume>
       constexpr Volume(const OtherVolume& base)
          : Base(base.template GetVal<typename NamedVolume::NumTuple, typename NamedVolume::DenTuple>()) {}
 
-      template<typename LengthUnitRet1, typename LengthUnitRet2, typename LengthUnitRet3>
-      requires IsVolumeUnits<LengthUnitRet1, LengthUnitRet2, LengthUnitRet3>
+      /// @brief Deprecated function to get the value of Volume.
+      /// @details Prefer using the free function `getVolume()` instead.
+      /// @return The value of the Volume.
+      template<typename Length1T, typename Length2T, typename Length3T>
+      requires IsVolumeUnits<Length1T, Length2T, Length3T>
       [[deprecated("Use the free function getVolume() instead.")]]
       double GetVolume() const
       {
-         return getVolume<LengthUnitRet1, LengthUnitRet2, LengthUnitRet3>(*this);
+         return getVolume<Length1T, Length2T, Length3T>(*this);
       }
 
+      /// @brief Deprecated function to get the value of Volume.
+      /// @details Prefer using the free function `getVolume()` instead.
+      /// @return The value of the Volume.
       template<typename NamedVolumeUnit>
       requires IsNamedVolumeUnit<NamedVolumeUnit>
       [[deprecated("Use the free function getVolume() instead.")]]
       double GetVolume() const
       {
          return getVolume<NamedVolumeUnit>(*this);
-      }
+      }         
    };
 
-   template<typename LengthUnit1, typename LengthUnit2, typename LengthUnit3>
-   requires IsVolumeUnits<LengthUnit1, LengthUnit2, LengthUnit3>
-   Volume(LengthUnit1, LengthUnit2, LengthUnit3) -> Volume<LengthUnit1, LengthUnit2, LengthUnit3>;
+   /// @brief Template deduction guide for Volume.
+   /// @tparam Length1 Numerator Length1 type
+   /// @tparam Length2 Numerator Length2 type
+   /// @tparam Length3 Numerator Length3 type
+   template<typename Length1, typename Length2, typename Length3>
+   requires IsVolumeUnits<Length1, Length2, Length3>
+   Volume(Length1, Length2, Length3) -> Volume<Length1, Length2, Length3>;
 
+   /// @brief Template deduction guide for Volume.
+   /// @tparam Length1 Numerator Length1 type
+   /// @tparam Length2 Numerator Length2 type
+   /// @tparam Length3 Numerator Length3 type
    template<typename NamedVolume>
    requires IsNamedVolumeUnit<NamedVolume>
    Volume(NamedVolume) -> Volume<NamedVolume>;
 
-   template<typename LengthUnit1, typename LengthUnit2, typename LengthUnit3>
-   requires IsVolumeUnits<LengthUnit1, LengthUnit2, LengthUnit3>
-   Volume(BaseDimension<std::tuple<LengthUnit1, LengthUnit2, LengthUnit3>, std::tuple<>>) -> Volume<LengthUnit1, LengthUnit2, LengthUnit3>;
+   /// @brief Template deduction guide for Volume.
+   /// @tparam Length1 Numerator Length1 type
+   /// @tparam Length2 Numerator Length2 type
+   /// @tparam Length3 Numerator Length3 type
+   template<typename Length1, typename Length2, typename Length3>
+   requires IsVolumeUnits<Length1, Length2, Length3>
+   Volume(BaseDimension<std::tuple<Length1, Length2, Length3>, std::tuple<>>) -> Volume<Length1, Length2, Length3>;
 
 }
 
-#endif //STATIC_DIMENSION_VOLUME_IMPL_H
+#endif // STATIC_DIMENSION_VOLUME_IMPL_H

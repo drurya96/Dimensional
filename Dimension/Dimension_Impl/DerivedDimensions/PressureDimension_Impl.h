@@ -7,39 +7,59 @@
 
 namespace Dimension
 {
-   // Concept for a named Pressure unit (e.g., Pascals)
+   /// @brief Concept for a named Pressure unit.
+   /// @tparam NamedPressure The type to be checked as a named Pressure unit.
    template<typename NamedPressure>
    concept IsNamedPressureUnit = requires {
       typename NamedPressure::NumTuple;
       typename NamedPressure::DenTuple;
    };
 
-   // Concept for a Pressure dimension (basic units)
-   template<typename MassUnit, typename LengthUnit1, typename TimeUnit1, typename TimeUnit2>
+   /// @brief Concept for a Pressure dimension.
+   /// @details Checks if the provided types satisfy the Pressure dimension requirements.
+   /// @tparam Mass1 Numerator Mass1 type
+   /// @tparam Length1 Denominator Length1 type
+   /// @tparam Time1 Denominator Time1 type
+   /// @tparam Time2 Denominator Time2 type
+   template<typename Mass1,typename Length1, typename Time1, typename Time2>
    concept IsPressureUnits = 
-      std::is_same_v<typename MassUnit::Dim, MassType> &&
-      std::is_same_v<typename LengthUnit1::Dim, LengthType> &&
-      std::is_same_v<typename TimeUnit1::Dim, TimeType> &&
-      std::is_same_v<typename TimeUnit2::Dim, TimeType>;
+      std::is_same_v<typename Mass1::Dim, MassType> &&
+        std::is_same_v<typename Length1::Dim, LengthType> &&
+        std::is_same_v<typename Time1::Dim, TimeType> &&
+        std::is_same_v<typename Time2::Dim, TimeType>;
 
-   // General concept for an Pressure type
+   /// @brief Concept for a Pressure type.
+   /// @details Ensures that the type meets Pressure type requirements, based on numerator and denominator types.
+   /// @tparam T The type to validate.
    template<typename T>
    concept IsPressureType = requires {
       typename T::NumTuple;
       typename T::DenTuple;
-   } && IsPressureUnits<typename std::tuple_element_t<0, typename T::NumTuple>,
-                     typename std::tuple_element_t<1, typename T::NumTuple>,
-                     typename std::tuple_element_t<0, typename T::DenTuple>,
-                     typename std::tuple_element_t<1, typename T::DenTuple>>;
+   } && std::tuple_size_v<typename T::NumTuple> == 1 && std::tuple_size_v<typename T::DenTuple> == 3 &&
+   IsPressureUnits<typename std::tuple_element_t<0, typename T::NumTuple>,typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>, typename std::tuple_element_t<2, typename T::DenTuple>>;
 
-   // Free function for retrieving Pressure values
-   template<typename MassT, typename LengthT1, typename TimeT1, typename TimeT2, typename PressureType>
-   requires IsPressureUnits<MassT, LengthT1, TimeT1, TimeT2> && IsPressureType<PressureType>
+   /// @brief Retrieves the value of a Pressure object.
+   /// @details Provides access to the underlying value represented by a Pressure object.
+   /// @tparam Mass1 Numerator Mass1 type
+   /// @tparam Length1 Denominator Length1 type
+   /// @tparam Time1 Denominator Time1 type
+   /// @tparam Time2 Denominator Time2 type
+   /// @tparam PressureType The type of the object being accessed.
+   /// @param obj The Pressure object.
+   /// @return The underlying value as `PrecisionType`
+   template<typename Mass1,typename Length1, typename Time1, typename Time2, typename PressureType>
+   requires IsPressureUnits<Mass1,Length1, Time1, Time2> && IsPressureType<PressureType>
    constexpr PrecisionType getPressure(const PressureType& obj)
    {
-      return obj.template GetVal<std::tuple<MassT, LengthT1>, std::tuple<TimeT1, TimeT2>>();
+      return obj.template GetVal<std::tuple<Mass1>, std::tuple<Length1, Time1, Time2>>();
    }
 
+   /// @brief Retrieves the value of a named Pressure object.
+   /// @details Provides access to the value represented by a named Pressure object.
+   /// @tparam NamedPressure The named unit type.
+   /// @tparam PressureType The type of the object being accessed.
+   /// @param obj The Pressure object.
+   /// @return The underlying value as `PrecisionType`.
    template<typename NamedPressure, typename PressureType>
    requires IsNamedPressureUnit<NamedPressure> && IsPressureType<PressureType>
    constexpr PrecisionType getPressure(const PressureType& obj)
@@ -50,28 +70,45 @@ namespace Dimension
    template<typename... Ts>
    class Pressure;
 
-   template<typename MassUnit, typename LengthUnit1, typename TimeUnit1, typename TimeUnit2>
-   requires IsPressureUnits<MassUnit, LengthUnit1, TimeUnit1, TimeUnit2>
-   class Pressure<MassUnit, LengthUnit1, TimeUnit1, TimeUnit2> : public BaseDimension<std::tuple<MassUnit, LengthUnit1>, std::tuple<TimeUnit1, TimeUnit2>>
+   /// @brief Represents a Pressure.
+   /// @details Defines operations and data storage for Pressure dimensions.
+   /// @tparam Mass1 Numerator Mass1 type
+   /// @tparam Length1 Denominator Length1 type
+   /// @tparam Time1 Denominator Time1 type
+   /// @tparam Time2 Denominator Time2 type
+   template<typename Mass1,typename Length1, typename Time1, typename Time2>
+   requires IsPressureUnits<Mass1,Length1, Time1, Time2>
+   class Pressure<Mass1,Length1, Time1, Time2> : public BaseDimension<std::tuple<Mass1>, std::tuple<Length1, Time1, Time2>>
    {
    public:
-      using Base = BaseDimension<std::tuple<MassUnit, LengthUnit1>, std::tuple<TimeUnit1, TimeUnit2>>;
+      using Base = BaseDimension<std::tuple<Mass1>, std::tuple<Length1, Time1, Time2>>;
       using Base::Base;
 
-      constexpr Pressure(double val) : Base(val) {}
+      /// @brief Constructs a Pressure object with a value.
+      /// @param val The value of the Pressure.
+      constexpr Pressure(PrecisionType val) : Base(val) {}
 
+      /// @brief Constructs a Pressure object from a named unit.
+      /// @tparam NamedPressure The named unit type.
+      /// @param base The base unit object.
       template<typename NamedPressure>
       requires IsNamedPressureUnit<NamedPressure>
       constexpr Pressure(const NamedPressure& base) : Base(base) {}
 
-      template<typename MassUnitRet, typename LengthUnitRet1, typename TimeUnitRet1, typename TimeUnitRet2>
-      requires IsPressureUnits<MassUnitRet, LengthUnitRet1, TimeUnitRet1, TimeUnitRet2>
+      /// @brief Deprecated function to get the value of Pressure.
+      /// @details Prefer using the free function `getPressure()` instead.
+      /// @return The value of the Pressure.
+      template<typename Mass1T,typename Length1T, typename Time1T, typename Time2T>
+      requires IsPressureUnits<Mass1T,Length1T, Time1T, Time2T>
       [[deprecated("Use the free function getPressure() instead.")]]
       double GetPressure() const
       {
-         return getPressure<MassUnitRet, LengthUnitRet1, TimeUnitRet1, TimeUnitRet2>(*this);
+         return getPressure<Mass1T,Length1T, Time1T, Time2T>(*this);
       }
 
+      /// @brief Deprecated function to get the value of Pressure.
+      /// @details Prefer using the free function `getPressure()` instead.
+      /// @return The value of the Pressure.
       template<typename NamedPressure>
       requires IsNamedPressureUnit<NamedPressure>
       [[deprecated("Use the free function getPressure() instead.")]]
@@ -81,7 +118,9 @@ namespace Dimension
       }
    };
 
-   // Pressure class for named units
+   /// @brief Represents a named Pressure class.
+   /// @details Provides functionality for named Pressure units.
+   /// @tparam NamedPressure The named unit type.
    template<typename NamedPressure>
    requires IsNamedPressureUnit<NamedPressure>
    class Pressure<NamedPressure> : public BaseDimension<typename NamedPressure::NumTuple, typename NamedPressure::DenTuple>
@@ -90,41 +129,68 @@ namespace Dimension
       using Base = BaseDimension<typename NamedPressure::NumTuple, typename NamedPressure::DenTuple>;
       using Base::Base;
 
-      constexpr Pressure(double val) : Base(val) {}
+      /// @brief Constructs a Pressure object with a value.
+      /// @param val The value of the Pressure.
+      constexpr Pressure(PrecisionType val) : Base(val) {}
 
+      /// @brief Constructs a Pressure object from another Pressure object.
+      /// @tparam OtherPressure The other Pressure type.
+      /// @param base The base Pressure object.
       template<typename OtherPressure>
       requires IsPressureType<OtherPressure>
       constexpr Pressure(const OtherPressure& base)
          : Base(base.template GetVal<typename NamedPressure::NumTuple, typename NamedPressure::DenTuple>()) {}
 
-      template<typename MassUnitRet, typename LengthUnitRet1, typename TimeUnitRet1, typename TimeUnitRet2>
-      requires IsPressureUnits<MassUnitRet, LengthUnitRet1, TimeUnitRet1, TimeUnitRet2>
+      /// @brief Deprecated function to get the value of Pressure.
+      /// @details Prefer using the free function `getPressure()` instead.
+      /// @return The value of the Pressure.
+      template<typename Mass1T,typename Length1T, typename Time1T, typename Time2T>
+      requires IsPressureUnits<Mass1T,Length1T, Time1T, Time2T>
       [[deprecated("Use the free function getPressure() instead.")]]
       double GetPressure() const
       {
-         return getPressure<MassUnitRet, LengthUnitRet1, TimeUnitRet1, TimeUnitRet2>(*this);
+         return getPressure<Mass1T,Length1T, Time1T, Time2T>(*this);
       }
 
+      /// @brief Deprecated function to get the value of Pressure.
+      /// @details Prefer using the free function `getPressure()` instead.
+      /// @return The value of the Pressure.
       template<typename NamedPressureUnit>
       requires IsNamedPressureUnit<NamedPressureUnit>
       [[deprecated("Use the free function getPressure() instead.")]]
       double GetPressure() const
       {
          return getPressure<NamedPressureUnit>(*this);
-      }
+      }         
    };
 
-   template<typename MassUnit, typename LengthUnit1, typename TimeUnit1, typename TimeUnit2>
-   requires IsPressureUnits<MassUnit, LengthUnit1, TimeUnit1, TimeUnit2>
-   Pressure(MassUnit, LengthUnit1, TimeUnit1, TimeUnit2) -> Pressure<MassUnit, LengthUnit1, TimeUnit1, TimeUnit2>;
+   /// @brief Template deduction guide for Pressure.
+   /// @tparam Mass1 Numerator Mass1 type
+   /// @tparam Length1 Denominator Length1 type
+   /// @tparam Time1 Denominator Time1 type
+   /// @tparam Time2 Denominator Time2 type
+   template<typename Mass1,typename Length1, typename Time1, typename Time2>
+   requires IsPressureUnits<Mass1,Length1, Time1, Time2>
+   Pressure(Mass1,Length1, Time1, Time2) -> Pressure<Mass1,Length1, Time1, Time2>;
 
+   /// @brief Template deduction guide for Pressure.
+   /// @tparam Mass1 Numerator Mass1 type
+   /// @tparam Length1 Denominator Length1 type
+   /// @tparam Time1 Denominator Time1 type
+   /// @tparam Time2 Denominator Time2 type
    template<typename NamedPressure>
    requires IsNamedPressureUnit<NamedPressure>
    Pressure(NamedPressure) -> Pressure<NamedPressure>;
 
-   template<typename MassUnit, typename LengthUnit1, typename TimeUnit1, typename TimeUnit2>
-   requires IsPressureUnits<MassUnit, LengthUnit1, TimeUnit1, TimeUnit2>
-   Pressure(BaseDimension<std::tuple<MassUnit, LengthUnit1>, std::tuple<TimeUnit1, TimeUnit2>>) -> Pressure<MassUnit, LengthUnit1, TimeUnit1, TimeUnit2>;
+   /// @brief Template deduction guide for Pressure.
+   /// @tparam Mass1 Numerator Mass1 type
+   /// @tparam Length1 Denominator Length1 type
+   /// @tparam Time1 Denominator Time1 type
+   /// @tparam Time2 Denominator Time2 type
+   template<typename Mass1,typename Length1, typename Time1, typename Time2>
+   requires IsPressureUnits<Mass1,Length1, Time1, Time2>
+   Pressure(BaseDimension<std::tuple<Mass1>, std::tuple<Length1, Time1, Time2>>) -> Pressure<Mass1,Length1, Time1, Time2>;
+
 }
 
-#endif //STATIC_DIMENSION_PRESSURE_IMPL_H
+#endif // STATIC_DIMENSION_PRESSURE_IMPL_H
