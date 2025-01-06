@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. Semantic versioning is followed.
 
-## [Unreleased]
+## [2.5.0] - 2025-1-5
 
 ### Changed
 - Automatic Delta handling removed
@@ -26,6 +26,11 @@ All notable changes to this project will be documented in this file. Semantic ve
   - Contains many universal and commonly used constants
 - `DimensionalMolarMasses.h`
   - Contains the molar mass (as `MolarMass<Grams,Moles>`) of every element as well as some common compounds
+- Python scripts to autogenerate Fundamental and Derived units
+  - Generate fundamental dimensions by calling `python GenerateFundamentalDimension <dimension name> <primary unit>` (e.g. `python GenerateFundamentalDimension Length Meters`)
+  - Generate derived dimensions by calling `python GenerateDerivedDimension <dimension name> <numerator> <denominator>` (e.g. `python GenerateFundamentalDimension Force Mass,Length Time,Time`)
+- Added fundamental dimension `Charge` with base unit `Coulombs`
+- Added many new derived dimensions
 
 ### Deprecated
 - 

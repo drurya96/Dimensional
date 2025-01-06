@@ -128,6 +128,18 @@ namespace Dimension
 
 Dimensions which represent combinations of other dimensions are considered "Derived".
 
+### Autogeneration
+
+The simplest way to add a new derived dimension is by calling the python-based autogeneration script
+
+`python GenerateDerivedDimension <dimension name> <numerator dimension list> <denominator dimension list>` 
+
+For example: `python GenerateFundamentalDimension Force Mass,Length Time,Time`
+
+If the numerator or denominator are empty, use `[]`.
+
+For example: `python GenerateFundamentalDimension Frequency [] Time`
+
 ### Alias for Derived Dimension
 
 For simple usage, a `using` alias is sufficient to get started
