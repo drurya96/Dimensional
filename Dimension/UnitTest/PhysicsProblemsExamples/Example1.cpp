@@ -259,3 +259,269 @@ TEST_F(PhysicsProblemsExample1, PVEqualsnRT_TemperatureInCelsius) {
     // Compare PV and nRT
     ASSERT_NEAR(getEnergy<Joules>(PV), getEnergy<Joules>(nRT), 1e-1);
 }
+
+TEST_F(PhysicsProblemsExample1, VerifyFaraday) {
+    using namespace Dimension;
+
+    auto chargePerMole = Charge<ElementaryCharges>(1.0) * Constants::avogadro_number;
+
+    double val_chargePerMole = chargePerMole.GetVal<std::tuple<Coulombs>, std::tuple<Moles>>();
+    double val_faraday = Constants::faraday.GetVal<std::tuple<Coulombs>, std::tuple<Moles>>();
+
+    ASSERT_NEAR(val_chargePerMole, val_faraday, 1e-1);
+
+}
+
+TEST_F(PhysicsProblemsExample1, AreaCalculation)
+{
+    using namespace Dimension;
+
+    Length<Meters> length{5.0};
+    Length<Meters> width{3.0};
+
+    Area<Meters, Meters> area = length * width;
+
+    ASSERT_NEAR((getArea<Meters, Meters>(area)), 15.0, TOLERANCE);
+}
+
+TEST_F(PhysicsProblemsExample1, FrequencyFromPeriod)
+{
+    using namespace Dimension;
+
+    Time<Seconds> period{2.0}; // 2 seconds
+    Frequency<Hertz> frequency = 1.0 / period;
+
+    ASSERT_NEAR((getFrequency<Hertz>(frequency)), 0.5, TOLERANCE); // 0.5 Hz
+}
+
+TEST_F(PhysicsProblemsExample1, MomentumCalculation)
+{
+    using namespace Dimension;
+
+    Mass<KiloGrams> mass{2.0};
+    Speed<Meters, Seconds> velocity{3.0};
+
+    Momentum<KiloGrams, Meters, Seconds> momentum = mass * velocity;
+
+    ASSERT_NEAR((getMomentum<KiloGrams, Meters, Seconds>(momentum)), 6.0, TOLERANCE);
+}
+
+TEST_F(PhysicsProblemsExample1, PowerFromWorkAndTime2)
+{
+    using namespace Dimension;
+
+    Energy<Joules> work{100.0};
+    Time<Seconds> time{5.0};
+
+    Power<Watts> power = work / time;
+
+    ASSERT_NEAR((getPower<Watts>(power)), 20.0, TOLERANCE); // 100 J / 5 s = 20 W
+}
+
+TEST_F(PhysicsProblemsExample1, CurrentCalculation)
+{
+    using namespace Dimension;
+
+    Charge<Coulombs> charge{10.0};
+    Time<Seconds> time{2.0};
+
+    Current<Amperes> current = charge / time;
+
+    ASSERT_NEAR((getCurrent<Amperes>(current)), 5.0, TOLERANCE); // 10 C / 2 s = 5 A
+}
+
+TEST_F(PhysicsProblemsExample1, ElectricPotentialFromWorkAndCharge)
+{
+    using namespace Dimension;
+
+    Energy<Joules> work{50.0};
+    Charge<Coulombs> charge{2.0};
+
+    ElectricPotential<Volts> voltage = work / charge;
+
+    ASSERT_NEAR((getElectricPotential<Volts>(voltage)), 25.0, TOLERANCE); // 50 J / 2 C = 25 V
+}
+
+TEST_F(PhysicsProblemsExample1, ResistanceFromVoltageAndCurrent)
+{
+    using namespace Dimension;
+
+    ElectricPotential<Volts> voltage{120.0};
+    Current<Amperes> current{10.0};
+
+    Resistance<Ohms> resistance = voltage / current;
+    //Resistance<Ohms> resistance(12.0);
+    
+
+    ASSERT_NEAR((getResistance<Ohms>(resistance)), 12.0, TOLERANCE); // 120 V / 10 A = 12 Ohms
+}
+
+TEST_F(PhysicsProblemsExample1, CapacitanceCalculation)
+{
+    using namespace Dimension;
+
+    Charge<Coulombs> charge{5.0};
+    ElectricPotential<Volts> voltage{10.0};
+
+    Capacitance<Farads> capacitance = charge / voltage;
+
+    ASSERT_NEAR((getCapacitance<Farads>(capacitance)), 0.5, TOLERANCE); // 5 C / 10 V = 0.5 F
+}
+
+TEST_F(PhysicsProblemsExample1, InductanceCalculation)
+{
+    using namespace Dimension;
+
+    MagneticFlux<Webers> flux{2.0};
+    Current<Amperes> current{4.0};
+
+    Inductance<Henrys> inductance = flux / current;
+
+    ASSERT_NEAR((getInductance<Henrys>(inductance)), 0.5, TOLERANCE); // 2 Wb / 4 A = 0.5 H
+}
+
+TEST_F(PhysicsProblemsExample1, MagneticFluxCalculation)
+{
+    using namespace Dimension;
+
+    ElectricPotential<Volts> voltage{10.0};
+    Time<Seconds> time{2.0};
+
+    MagneticFlux<Webers> flux = voltage * time;
+
+    ASSERT_NEAR((getMagneticFlux<Webers>(flux)), 20.0, TOLERANCE); // 10 V * 2 s = 20 Wb
+}
+
+TEST_F(PhysicsProblemsExample1, MagneticFieldCalculation)
+{
+    using namespace Dimension;
+
+    MagneticFlux<Webers> flux{5.0};
+    Area<Meters, Meters> area{2.0};
+
+    MagneticField<Teslas> field = flux / area;
+
+    ASSERT_NEAR((getMagneticField<Teslas>(field)), 2.5, TOLERANCE); // 5 Wb / 2 m² = 2.5 T
+}
+
+TEST_F(PhysicsProblemsExample1, ElectricFieldCalculation)
+{
+    using namespace Dimension;
+
+    ElectricPotential<Volts> voltage{100.0};
+    Length<Meters> distance{2.0};
+
+    ElectricField<KiloGrams, Meters, Seconds, Seconds, Coulombs> field = voltage / distance;
+
+    ASSERT_NEAR((getElectricField<KiloGrams, Meters, Seconds, Seconds, Coulombs>(field)), 50.0, TOLERANCE); // 100 V / 2 m = 50 N/C
+}
+
+TEST_F(PhysicsProblemsExample1, ConductanceCalculation)
+{
+    using namespace Dimension;
+
+    Resistance<Ohms> resistance{10.0};
+
+    Conductance<Siemens> conductance = 1.0 / resistance;
+
+    ASSERT_NEAR((getConductance<Siemens>(conductance)), 0.1, TOLERANCE); // 1 / 10 Ohms = 0.1 S
+}
+
+TEST_F(PhysicsProblemsExample1, DynamicViscosityCalculation)
+{
+    using namespace Dimension;
+
+    Force<Newtons> force{10.0};
+    Area<Meters, Meters> area{2.0};
+    Speed<Meters, Seconds> velocity{4.0};
+    Length<Meters> distance{1.0};
+
+    DynamicViscosity<Poises> viscosity = (force / area) * (distance / velocity);
+
+    ASSERT_NEAR(getDynamicViscosity<Poises>(viscosity), 12.5, TOLERANCE);
+}
+
+TEST_F(PhysicsProblemsExample1, DensityCalculation2)
+{
+    using namespace Dimension;
+
+    Mass<KiloGrams> mass{10.0};
+    Volume<Meters, Meters, Meters> volume{2.0};
+
+    Density<KiloGrams, Meters, Meters, Meters> density = mass / volume;
+
+    ASSERT_NEAR((getDensity<KiloGrams, Meters, Meters, Meters>(density)), 5.0, TOLERANCE); // 10 kg / 2 m³ = 5 kg/m³
+}
+
+TEST_F(PhysicsProblemsExample1, VolumetricFlowRateCalculation)
+{
+    using namespace Dimension;
+
+    Volume<Meters, Meters, Meters> volume{1.0};
+    Time<Seconds> time{2.0};
+
+    VolumetricFlowRate<Meters, Meters, Meters, Seconds> flowRate = volume / time;
+
+    ASSERT_NEAR((getVolumetricFlowRate<Meters, Meters, Meters, Seconds>(flowRate)), 0.5, TOLERANCE); // 1 m³ / 2 s = 0.5 m³/s
+}
+
+TEST_F(PhysicsProblemsExample1, MassFlowRateCalculation)
+{
+    using namespace Dimension;
+
+    Mass<KiloGrams> mass{20.0};
+    Time<Seconds> time{4.0};
+
+    MassFlowRate<KiloGrams, Seconds> flowRate = mass / time;
+
+    ASSERT_NEAR((getMassFlowRate<KiloGrams, Seconds>(flowRate)), 5.0, TOLERANCE); // 20 kg / 4 s = 5 kg/s
+}
+
+TEST_F(PhysicsProblemsExample1, SpecificVolumeCalculation)
+{
+    using namespace Dimension;
+
+    Volume<Meters, Meters, Meters> volume{1.0};
+    Mass<KiloGrams> mass{4.0};
+
+    SpecificVolume<Meters, Meters, Meters, KiloGrams> specificVolume = volume / mass;
+
+    ASSERT_NEAR((getSpecificVolume<Meters, Meters, Meters, KiloGrams>(specificVolume)), 0.25, TOLERANCE); // 1 m³ / 4 kg = 0.25 m³/kg
+}
+
+TEST_F(PhysicsProblemsExample1, MomentOfInertiaCalculation)
+{
+    using namespace Dimension;
+
+    Mass<KiloGrams> mass{10.0};
+    Length<Meters> radius{2.0};
+
+    MomentOfInertia<KiloGrams, Meters, Meters> inertia = mass * radius * radius;
+
+    ASSERT_NEAR((getMomentOfInertia<KiloGrams, Meters, Meters>(inertia)), 40.0, TOLERANCE); // 10 kg * 2 m * 2 m = 40 kg·m²
+}
+
+TEST_F(PhysicsProblemsExample1, AngularSpeedCalculation)
+{
+    using namespace Dimension;
+
+    Angle<Radians> angle{std::numbers::pi}; // Half a rotation (180 degrees)
+    Time<Seconds> time{2.0};
+
+    AngularSpeed<Radians, Seconds> angularSpeed = angle / time;
+
+    ASSERT_NEAR((getAngularSpeed<Radians, Seconds>(angularSpeed)), std::numbers::pi / 2.0, TOLERANCE); // π radians / 2 s = π/2 rad/s
+}
+
+TEST_F(PhysicsProblemsExample1, AngularAccelerationCalculation)
+{
+    using namespace Dimension;
+
+    AngularSpeed<Radians, Seconds> initialSpeed{2.0};
+    AngularSpeed<Radians, Seconds> finalSpeed{6.0};
+    Time<Seconds> time{2.0};
+
+    AngularAcceleration<Radians, Seconds, Seconds> angularAcceleration = (finalSpeed - initialSpeed) / time;
+
+    ASSERT_NEAR((getAngularAcceleration<Radians, Seconds, Seconds>(angularAcceleration)), 2.0, TOLERANCE); // (6 rad/s - 2 rad/s) / 2 s = 2 rad/s²
+}

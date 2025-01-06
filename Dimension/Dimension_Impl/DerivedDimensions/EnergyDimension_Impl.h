@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_ENERGY_IMPL_H
 #define STATIC_DIMENSION_ENERGY_IMPL_H
 
-#include "../../TimeDimension.h"
 #include "../../LengthDimension.h"
 #include "../../MassDimension.h"
+#include "../../TimeDimension.h"
 
 namespace Dimension
 {
