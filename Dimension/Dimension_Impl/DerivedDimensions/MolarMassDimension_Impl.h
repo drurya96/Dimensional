@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_MOLARMASS_IMPL_H
 #define STATIC_DIMENSION_MOLARMASS_IMPL_H
 
-#include "../../AmountDimension.h"
 #include "../../MassDimension.h"
+#include "../../AmountDimension.h"
 
 namespace Dimension
 {

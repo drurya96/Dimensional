@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_PRESSURE_IMPL_H
 #define STATIC_DIMENSION_PRESSURE_IMPL_H
 
-#include "../../MassDimension.h"
 #include "../../LengthDimension.h"
 #include "../../TimeDimension.h"
+#include "../../MassDimension.h"
 
 namespace Dimension
 {

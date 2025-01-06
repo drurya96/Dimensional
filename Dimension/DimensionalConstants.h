@@ -4,6 +4,7 @@
 // Fundamental Dimensions
 #include "AmountDimension.h"
 #include "AngleDimension.h"
+#include "ChargeDimension.h"
 #include "LengthDimension.h"
 #include "MassDimension.h"
 #include "TemperatureDimension.h"
@@ -11,11 +12,37 @@
 
 // Derived Dimensions
 #include "AccelerationDimension.h"
+#include "AreaDimension.h"
+#include "CapacitanceDimension.h"
+#include "ConductanceDimension.h"
+#include "CurrentDimension.h"
+#include "ElectricFieldDimension.h"
 #include "EnergyDimension.h"
 #include "ForceDimension.h"
+#include "FrequencyDimension.h"
+#include "InductanceDimension.h"
+#include "MagneticFieldDimension.h"
+#include "MagneticFluxDimension.h"
+#include "MomentumDimension.h"
+#include "PowerDimension.h"
 #include "PressureDimension.h"
+#include "ResistanceDimension.h"
 #include "SpeedDimension.h"
+#include "ElectricPotentialDimension.h"
 #include "VolumeDimension.h"
+
+#include "EntropyDimension.h"
+#include "HeatFluxDimension.h"
+#include "SpecificHeatCapacityDimension.h"
+#include "DiffusionCoefficientDimension.h"
+#include "DynamicViscosityDimension.h"
+#include "DensityDimension.h"
+#include "VolumetricFlowRateDimension.h"
+#include "MassFlowRateDimension.h"
+#include "SpecificVolumeDimension.h"
+#include "MomentOfInertiaDimension.h"
+#include "AngularSpeedDimension.h"
+#include "AngularAccelerationDimension.h"
 
 namespace Dimension::Constants
 {
@@ -62,6 +89,24 @@ namespace Dimension::Constants
     static constexpr BaseDimension<std::tuple<Joules>, std::tuple<KiloGrams, Quantity<Kelvin>>> entropy_vaporization_water(1000.0);
 
     static constexpr BaseDimension<std::tuple<>, std::tuple<Meters>> rydberg_constant(1.0973731568160e7);
+
+    static constexpr BaseDimension<std::tuple<Coulombs>, std::tuple<Moles>> faraday(9.64853321233100184e4);
+    
+    static constexpr BaseDimension<std::tuple<Coulombs, Coulombs>, std::tuple<Newtons, Meters, Meters>> permittivity_vacuum(8.854187817e-12);
+
+    static constexpr BaseDimension<std::tuple<Newtons>, std::tuple<Coulombs, Coulombs>> permeability_vacuum(4 * std::numbers::pi * 1e-7);
+
+    static constexpr BaseDimension<std::tuple<Newtons, Seconds>, std::tuple<Coulombs, Coulombs>> vacuum_impedance(376.730313668);
+
+    static constexpr BaseDimension<std::tuple<Newtons, Meters, Meters>, std::tuple<Coulombs, Coulombs>> coulombs_constant(8.9875517923e9);
+
+    static constexpr BaseDimension<std::tuple<Joules>, std::tuple<Newtons, Meters, Coulombs>> bohr_magneton(9.2740100783e-24);
+
+    static constexpr BaseDimension<std::tuple<PicoGrams>, std::tuple<>> electron_mass(9.1093837015e-16);
+
+    static constexpr BaseDimension<std::tuple<PicoGrams>, std::tuple<>> proton_mass(1.67262192369e-12);
+
+    static constexpr BaseDimension<std::tuple<Joules>, std::tuple<>> electron_volt(1.602176634e-19);
 
 }
 

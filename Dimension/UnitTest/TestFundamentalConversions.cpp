@@ -5,6 +5,7 @@
 #include "MassDimension.h"
 #include "AngleDimension.h"
 #include "TemperatureDimension.h"
+#include "ChargeDimension.h"
 
 using namespace Dimension;
 
@@ -457,5 +458,31 @@ TEST_F(DimensionTest, TestTemperatureConversions)
    ASSERT_NEAR(getTemperature<Fahrenheit>(deltaInRankine), 180.0, TOLERANCE);
    ASSERT_NEAR(getTemperature<Kelvin>(deltaInRankine), 100.0, TOLERANCE);      // Delta_K = Delta_R * 5/9
    ASSERT_NEAR(getTemperature<Rankine>(deltaInRankine), 180.0, TOLERANCE);
+
+}
+
+TEST_F(DimensionTest, TestChargeConversions)
+{
+
+   // Test from Coulombs to other units
+   Charge<Coulombs> chargeInCoulombs{100.0};
+
+   ASSERT_NEAR(getCharge<Coulombs>(chargeInCoulombs), 100.0, TOLERANCE);
+   ASSERT_NEAR(getCharge<StatCoulombs>(chargeInCoulombs), 299792457999.96, TOLERANCE);
+   ASSERT_NEAR(getCharge<ElementaryCharges>(chargeInCoulombs), 6.241506363094e+20, TOLERANCE);
+
+   // Test from StatCoulombs to other units
+   Charge<StatCoulombs> chargeInStatCoulombs{100.0};
+
+   ASSERT_NEAR(getCharge<Coulombs>(chargeInStatCoulombs), 3.335640951E-8, TOLERANCE);
+   ASSERT_NEAR(getCharge<StatCoulombs>(chargeInStatCoulombs), 100.0, TOLERANCE);
+   ASSERT_NEAR(getCharge<ElementaryCharges>(chargeInStatCoulombs), 208194242268, 0.1); // Large numbers, so higher tolerance
+
+   // Test from ElementaryCharges to other units
+   Charge<ElementaryCharges> chargeInElementaryCharges{100.0};
+
+   ASSERT_NEAR(getCharge<Coulombs>(chargeInElementaryCharges), 1.60217733E-17, TOLERANCE);
+   ASSERT_NEAR(getCharge<StatCoulombs>(chargeInElementaryCharges), 4.803206799E-8, TOLERANCE);
+   ASSERT_NEAR(getCharge<ElementaryCharges>(chargeInElementaryCharges), 100.0, TOLERANCE);
 
 }

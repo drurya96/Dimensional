@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_ACCELERATION_IMPL_H
 #define STATIC_DIMENSION_ACCELERATION_IMPL_H
 
-#include "../../TimeDimension.h"
 #include "../../LengthDimension.h"
+#include "../../TimeDimension.h"
 
 namespace Dimension
 {

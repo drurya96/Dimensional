@@ -11,7 +11,7 @@ namespace Dimension
       using NumTuple = std::tuple<KiloGrams>;
       using DenTuple = std::tuple<Meters, Seconds, Seconds>;
    };
-
+   
 }
 
 #endif //STATIC_DIMENSION_PRESSURE_H
