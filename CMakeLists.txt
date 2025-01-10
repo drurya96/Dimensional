@@ -8,9 +8,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Check if Conan is available
 find_program(CONAN_CMD conan)
-if(NOT CONAN_CMD)
-    message(FATAL_ERROR "Conan not found. Please install Conan.")
-endif()
+#if(NOT CONAN_CMD)
+#    message(FATAL_ERROR "Conan not found. Please install Conan.")
+#endif()
 
 # Run Conan install
 execute_process(

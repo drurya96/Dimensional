@@ -4,6 +4,8 @@ stages:
 
 variables:
   CONAN_USER_CHANNEL: "myuser/testing"
+  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
+  GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
 
 # Global settings for Conan cache to avoid re-downloading dependencies
 cache:
@@ -14,36 +16,39 @@ cache:
 # Build job template for Linux
 .build_template_linux: &build_template_linux
   stage: build
-  tags: 
+  tags:
     - saas-linux-small-amd64
   artifacts:
     paths:
-      - build/ 
+      - build/
     expire_in: 1 week
+  cache:
+    paths:
+      - build-wrapper/
+      - sonar-scanner/
 
 # Build job template for Windows
 .build_template_windows: &build_template_windows
   stage: build
-  tags: 
+  tags:
     - saas-windows-medium-amd64
   cache:
     key: windows-conan-python-cache
     paths:
-      - C:\Python312  # Cache Python installation
-      - C:\ProgramData\chocolatey  # Cache Chocolatey installation
-      - C:\tools\cmake  # Cache CMake installation (default install path for CMake via Chocolatey)
-      - C:\Users\runneradmin\.conan  # Cache Conan configuration
+      - C:\Python312
+      - C:\ProgramData\chocolatey
+      - C:\tools\cmake
+      - C:\Users\runneradmin\.conan
   before_script:
     - if (!(Test-Path "C:\ProgramData\chocolatey\bin\choco.exe")) { Invoke-Expression (New-Object Net.WebClient).DownloadString('https://chocolatey.org/install.ps1') }
     - if (!(Test-Path "C:\Python312")) { choco install python --version=3.12.0 --no-progress -y --allow-downgrade }
     - if (!(Test-Path "C:\tools\cmake\bin\cmake.exe")) { choco install cmake --version=3.25.0 --no-progress -y --allow-downgrade }
-    - if (!(Test-Path "C:\Python312\Scripts\conan.exe")) { & C:\Python312\python.exe -m pip install conan==1.65.0 } 
+    - if (!(Test-Path "C:\Python312\Scripts\conan.exe")) { & C:\Python312\python.exe -m pip install conan==1.65.0 }
     - C:\Python312\Scripts\conan.exe profile new msvc_debug --detect
     - C:\Python312\Scripts\conan.exe profile update settings.build_type=Debug msvc_debug
-    - C:\Python312\Scripts\conan.exe profile update settings.compiler="Visual Studio" msvc_debug  # Set MSVC in Conan profile
-    - C:\Python312\Scripts\conan.exe profile update settings.compiler.version=17 msvc_debug  # MSVC 2022
+    - C:\Python312\Scripts\conan.exe profile update settings.compiler="Visual Studio" msvc_debug
+    - C:\Python312\Scripts\conan.exe profile update settings.compiler.version=17 msvc_debug
     - C:\Python312\Scripts\conan.exe profile update settings.compiler.runtime=MD msvc_debug
-
   artifacts:
     paths:
       - build/
@@ -52,17 +57,20 @@ cache:
 # GCC build job
 build:gcc:
   <<: *build_template_linux
-  image: registry.gitlab.com/dimensionalanalysis/dimensional/linux-build-env:latest
+  #image: registry.gitlab.com/dimensionalanalysis/dimensional/linux-build-env:latest
+  image: registry.gitlab.com/dimensionalanalysis/dimensional/dev-container:linux-build-env
   variables:
     CC: gcc
     CXX: g++
   script:
-    - conan create . ${CONAN_USER_CHANNEL} --build=missing --profile gcc_debug
+    - /build-wrapper/build-wrapper-linux-x86-64 --out-dir bw-output conan create . ${CONAN_USER_CHANNEL} --build=missing --profile gcc_debug
+    - /sonar-scanner/bin/sonar-scanner -Dsonar.host.url="https://sonarcloud.io" -Dsonar.token="${SONAR_TOKEN}" -Dsonar.cfamily.compile-commands=bw-output/compile_commands.json
 
 # Clang build job
 build:clang:
   <<: *build_template_linux
-  image: registry.gitlab.com/dimensionalanalysis/dimensional/linux-build-env:latest
+  #image: registry.gitlab.com/dimensionalanalysis/dimensional/linux-build-env:latest
+  image: registry.gitlab.com/dimensionalanalysis/dimensional/dev-container:linux-build-env
   variables:
     CC: clang
     CXX: clang++
@@ -78,3 +86,4 @@ build:msvc:
     CONAN_EXE: C:\Python312\Scripts\conan.exe
   script:
     - C:\Python312\Scripts\conan.exe create . ${CONAN_USER_CHANNEL} --build=missing --profile msvc_debug
+
