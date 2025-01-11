@@ -3,6 +3,8 @@ FROM ubuntu:latest
 # Install dependencies
 RUN apt-get update && apt-get install -y \
     wget \
+    curl \
+    unzip \
     software-properties-common \
     && wget https://apt.llvm.org/llvm.sh \
     && chmod +x llvm.sh \
@@ -13,6 +15,7 @@ RUN apt-get update && apt-get install -y \
     cmake \
     python3-pip \
     python3.12-venv \
+    clang-tidy \
     && apt-get clean
 
 # Set GCC 12 as default
@@ -53,5 +56,11 @@ ENV PATH="/root/conan-env/bin:$PATH"
 
 # Verify installation (using the full path to the virtual environment)
 RUN gcc --version && clang --version && cmake --version && ~/conan-env/bin/conan --version
+
+RUN curl -sSLo ./sonar-scanner.zip 'https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-linux-x64.zip' && \
+    unzip -o sonar-scanner.zip && \
+    mv sonar-scanner-6.2.1.4610-linux-x64 sonar-scanner && \
+    curl -sSLo ./build-wrapper-linux-x86.zip "https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip" && \
+    unzip -oj build-wrapper-linux-x86.zip -d ./build-wrapper
 
 WORKDIR /workspace
