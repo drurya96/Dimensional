@@ -89,6 +89,16 @@ namespace Dimension
       {
          return HashPolicy::template hash_string_literal(FullString);
       }
+
+      // Duplicated logic to simulate a smell
+      static constexpr HashPolicy::tag_type duplicate_value()
+      {
+         return HashPolicy::template hash_string_literal(FullString);
+      }
+
+      // Introduced redundant variable
+      static constexpr auto redundant_value = FullString; // Not used anywhere in the code
+
    };
 
 } // end Dimension
