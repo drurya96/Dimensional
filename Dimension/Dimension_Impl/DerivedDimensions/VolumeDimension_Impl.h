@@ -80,13 +80,15 @@ namespace Dimension
 
       /// @brief Constructs a Volume object with a value.
       /// @param val The value of the Volume.
-      constexpr Volume(PrecisionType val) : Base(val) {}
+      explicit constexpr Volume(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Volume object from a named unit.
       /// @tparam NamedVolume The named unit type.
       /// @param base The base unit object.
       template<typename NamedVolume>
       requires IsNamedVolumeUnit<NamedVolume>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Volume(const NamedVolume& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of Volume.
@@ -95,6 +97,7 @@ namespace Dimension
       template<typename Length1T, typename Length2T, typename Length3T>
       requires IsVolumeUnits<Length1T, Length2T, Length3T>
       [[deprecated("Use the free function getVolume() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetVolume() const
       {
          return getVolume<Length1T, Length2T, Length3T>(*this);
@@ -106,6 +109,7 @@ namespace Dimension
       template<typename NamedVolume>
       requires IsNamedVolumeUnit<NamedVolume>
       [[deprecated("Use the free function getVolume() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetVolume() const
       {
          return getVolume<NamedVolume>(*this);
@@ -125,13 +129,15 @@ namespace Dimension
 
       /// @brief Constructs a Volume object with a value.
       /// @param val The value of the Volume.
-      constexpr Volume(PrecisionType val) : Base(val) {}
+      explicit constexpr Volume(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Volume object from another Volume object.
       /// @tparam OtherVolume The other Volume type.
       /// @param base The base Volume object.
       template<typename OtherVolume>
       requires IsVolumeType<OtherVolume>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Volume(const OtherVolume& base)
          : Base(base.template GetVal<typename NamedVolume::NumTuple, typename NamedVolume::DenTuple>()) {}
 
@@ -141,6 +147,7 @@ namespace Dimension
       template<typename Length1T, typename Length2T, typename Length3T>
       requires IsVolumeUnits<Length1T, Length2T, Length3T>
       [[deprecated("Use the free function getVolume() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetVolume() const
       {
          return getVolume<Length1T, Length2T, Length3T>(*this);
@@ -152,6 +159,7 @@ namespace Dimension
       template<typename NamedVolumeUnit>
       requires IsNamedVolumeUnit<NamedVolumeUnit>
       [[deprecated("Use the free function getVolume() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetVolume() const
       {
          return getVolume<NamedVolumeUnit>(*this);

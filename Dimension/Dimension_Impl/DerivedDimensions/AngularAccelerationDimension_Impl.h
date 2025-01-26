@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_ANGULARACCELERATION_IMPL_H
 #define STATIC_DIMENSION_ANGULARACCELERATION_IMPL_H
 
-#include "../../AngleDimension.h"
 #include "../../TimeDimension.h"
+#include "../../AngleDimension.h"
 
 namespace Dimension
 {
@@ -81,13 +81,15 @@ namespace Dimension
 
       /// @brief Constructs a AngularAcceleration object with a value.
       /// @param val The value of the AngularAcceleration.
-      constexpr AngularAcceleration(PrecisionType val) : Base(val) {}
+      explicit constexpr AngularAcceleration(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a AngularAcceleration object from a named unit.
       /// @tparam NamedAngularAcceleration The named unit type.
       /// @param base The base unit object.
       template<typename NamedAngularAcceleration>
       requires IsNamedAngularAccelerationUnit<NamedAngularAcceleration>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr AngularAcceleration(const NamedAngularAcceleration& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of AngularAcceleration.
@@ -96,6 +98,7 @@ namespace Dimension
       template<typename Angle1T,typename Time1T, typename Time2T>
       requires IsAngularAccelerationUnits<Angle1T,Time1T, Time2T>
       [[deprecated("Use the free function getAngularAcceleration() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetAngularAcceleration() const
       {
          return getAngularAcceleration<Angle1T,Time1T, Time2T>(*this);
@@ -107,6 +110,7 @@ namespace Dimension
       template<typename NamedAngularAcceleration>
       requires IsNamedAngularAccelerationUnit<NamedAngularAcceleration>
       [[deprecated("Use the free function getAngularAcceleration() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetAngularAcceleration() const
       {
          return getAngularAcceleration<NamedAngularAcceleration>(*this);
@@ -126,13 +130,15 @@ namespace Dimension
 
       /// @brief Constructs a AngularAcceleration object with a value.
       /// @param val The value of the AngularAcceleration.
-      constexpr AngularAcceleration(PrecisionType val) : Base(val) {}
+      explicit constexpr AngularAcceleration(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a AngularAcceleration object from another AngularAcceleration object.
       /// @tparam OtherAngularAcceleration The other AngularAcceleration type.
       /// @param base The base AngularAcceleration object.
       template<typename OtherAngularAcceleration>
       requires IsAngularAccelerationType<OtherAngularAcceleration>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr AngularAcceleration(const OtherAngularAcceleration& base)
          : Base(base.template GetVal<typename NamedAngularAcceleration::NumTuple, typename NamedAngularAcceleration::DenTuple>()) {}
 
@@ -142,6 +148,7 @@ namespace Dimension
       template<typename Angle1T,typename Time1T, typename Time2T>
       requires IsAngularAccelerationUnits<Angle1T,Time1T, Time2T>
       [[deprecated("Use the free function getAngularAcceleration() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetAngularAcceleration() const
       {
          return getAngularAcceleration<Angle1T,Time1T, Time2T>(*this);
@@ -153,6 +160,7 @@ namespace Dimension
       template<typename NamedAngularAccelerationUnit>
       requires IsNamedAngularAccelerationUnit<NamedAngularAccelerationUnit>
       [[deprecated("Use the free function getAngularAcceleration() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetAngularAcceleration() const
       {
          return getAngularAcceleration<NamedAngularAccelerationUnit>(*this);

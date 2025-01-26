@@ -20,8 +20,8 @@ namespace Dimension
    /// @tparam Unit The unit type.
    /// @tparam Name The name of the unit.
    /// @tparam Abbreviation The abbreviation of the unit.
-   template<typename Unit, StringLiteral Name, StringLiteral Abbreviation>
-   struct TimeUnit : public BaseUnit<Unit, Name, Abbreviation, "Time">
+   template<typename Unit, StringLiteral Name, StringLiteral Abbreviation, int ID = 0>
+   struct TimeUnit : public BaseUnit<Unit, Name, Abbreviation, "Time", ID>
    {
    public:
       /// @brief The dimension type associated with the unit.
@@ -72,12 +72,14 @@ namespace Dimension
 
       /// @brief Constructs a Time object with a specific value.
       /// @param val The value to initialize with.
-      constexpr Time(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
+      explicit constexpr Time(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
 
       /// @brief Constructs a Time object from another BaseDimension.
       /// @tparam T The unit type of the BaseDimension.
       /// @param base The BaseDimension object to construct from.
       template<IsTimeUnit T>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Time(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()){}
 
       /// @brief Deprecated method to retrieve the value of the dimension.
@@ -85,6 +87,7 @@ namespace Dimension
       /// @return The value in the specified unit.
       template<IsTimeUnit T>
       [[deprecated("Use the free function getTime() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetTime() const
       {
          return getTime<T>(*this);

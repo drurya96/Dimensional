@@ -42,7 +42,7 @@ cache:
   before_script:
     - if (!(Test-Path "C:\ProgramData\chocolatey\bin\choco.exe")) { Invoke-Expression (New-Object Net.WebClient).DownloadString('https://chocolatey.org/install.ps1') }
     - if (!(Test-Path "C:\Python312")) { choco install python --version=3.12.0 --no-progress -y --allow-downgrade }
-    - if (!(Test-Path "C:\tools\cmake\bin\cmake.exe")) { choco install cmake --version=3.25.0 --no-progress -y --allow-downgrade }
+    - if (!(Test-Path "C:\tools\cmake\bin\cmake.exe")) { choco install cmake --version=3.27.0 --no-progress -y --allow-downgrade }
     - if (!(Test-Path "C:\Python312\Scripts\conan.exe")) { & C:\Python312\python.exe -m pip install conan==1.65.0 }
     - C:\Python312\Scripts\conan.exe profile new msvc_debug --detect
     - C:\Python312\Scripts\conan.exe profile update settings.build_type=Debug msvc_debug
@@ -57,25 +57,31 @@ cache:
 # GCC build job
 build:gcc:
   <<: *build_template_linux
-  #image: registry.gitlab.com/dimensionalanalysis/dimensional/linux-build-env:latest
-  image: registry.gitlab.com/dimensionalanalysis/dimensional/dev-container:linux-build-env
+  image: registry.gitlab.com/dimensionalanalysis/dimensional/dev-container:latest
   variables:
     CC: gcc
     CXX: g++
   script:
     - /build-wrapper/build-wrapper-linux-x86-64 --out-dir bw-output conan create . ${CONAN_USER_CHANNEL} --build=missing --profile gcc_debug
     - /sonar-scanner/bin/sonar-scanner -Dsonar.host.url="https://sonarcloud.io" -Dsonar.token="${SONAR_TOKEN}" -Dsonar.cfamily.compile-commands=bw-output/compile_commands.json
+    - cmake --workflow --preset build_and_test_linux
 
 # Clang build job
 build:clang:
   <<: *build_template_linux
-  #image: registry.gitlab.com/dimensionalanalysis/dimensional/linux-build-env:latest
-  image: registry.gitlab.com/dimensionalanalysis/dimensional/dev-container:linux-build-env
+  image: registry.gitlab.com/dimensionalanalysis/dimensional/dev-container:latest
   variables:
     CC: clang
     CXX: clang++
   script:
     - conan create . ${CONAN_USER_CHANNEL} --build=missing --profile clang_debug
+    - cmake --workflow --preset build_and_test_linux
+    - cppcheck --enable=all,style,warning --inconclusive --suppressions-list=suppressions.txt --inline-suppr -ibuild/_deps/ --project=build/compile_commands.json --error-exitcode=1 $(find . -type d -exec printf '-I%s ' {} \;) 2> cppcheck-report.xml
+  artifacts:
+    paths:
+      - cppcheck-report.xml
+    when: always
+    expire_in: 1 week
 
 # MSVC build job
 build:msvc:
@@ -86,4 +92,5 @@ build:msvc:
     CONAN_EXE: C:\Python312\Scripts\conan.exe
   script:
     - C:\Python312\Scripts\conan.exe create . ${CONAN_USER_CHANNEL} --build=missing --profile msvc_debug
+    - cmake --workflow --preset build_and_test_windows
 

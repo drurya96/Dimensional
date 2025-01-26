@@ -1,10 +1,10 @@
 #ifndef STATIC_DIMENSION_MAGNETICFLUX_IMPL_H
 #define STATIC_DIMENSION_MAGNETICFLUX_IMPL_H
 
+#include "../../LengthDimension.h"
 #include "../../MassDimension.h"
 #include "../../TimeDimension.h"
 #include "../../ChargeDimension.h"
-#include "../../LengthDimension.h"
 
 namespace Dimension
 {
@@ -91,13 +91,15 @@ namespace Dimension
 
       /// @brief Constructs a MagneticFlux object with a value.
       /// @param val The value of the MagneticFlux.
-      constexpr MagneticFlux(PrecisionType val) : Base(val) {}
+      explicit constexpr MagneticFlux(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a MagneticFlux object from a named unit.
       /// @tparam NamedMagneticFlux The named unit type.
       /// @param base The base unit object.
       template<typename NamedMagneticFlux>
       requires IsNamedMagneticFluxUnit<NamedMagneticFlux>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr MagneticFlux(const NamedMagneticFlux& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of MagneticFlux.
@@ -106,6 +108,7 @@ namespace Dimension
       template<typename Mass1T, typename Length1T, typename Length2T,typename Time1T, typename Charge1T>
       requires IsMagneticFluxUnits<Mass1T, Length1T, Length2T,Time1T, Charge1T>
       [[deprecated("Use the free function getMagneticFlux() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMagneticFlux() const
       {
          return getMagneticFlux<Mass1T, Length1T, Length2T,Time1T, Charge1T>(*this);
@@ -117,6 +120,7 @@ namespace Dimension
       template<typename NamedMagneticFlux>
       requires IsNamedMagneticFluxUnit<NamedMagneticFlux>
       [[deprecated("Use the free function getMagneticFlux() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMagneticFlux() const
       {
          return getMagneticFlux<NamedMagneticFlux>(*this);
@@ -136,13 +140,15 @@ namespace Dimension
 
       /// @brief Constructs a MagneticFlux object with a value.
       /// @param val The value of the MagneticFlux.
-      constexpr MagneticFlux(PrecisionType val) : Base(val) {}
+      explicit constexpr MagneticFlux(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a MagneticFlux object from another MagneticFlux object.
       /// @tparam OtherMagneticFlux The other MagneticFlux type.
       /// @param base The base MagneticFlux object.
       template<typename OtherMagneticFlux>
       requires IsMagneticFluxType<OtherMagneticFlux>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr MagneticFlux(const OtherMagneticFlux& base)
          : Base(base.template GetVal<typename NamedMagneticFlux::NumTuple, typename NamedMagneticFlux::DenTuple>()) {}
 
@@ -152,6 +158,7 @@ namespace Dimension
       template<typename Mass1T, typename Length1T, typename Length2T,typename Time1T, typename Charge1T>
       requires IsMagneticFluxUnits<Mass1T, Length1T, Length2T,Time1T, Charge1T>
       [[deprecated("Use the free function getMagneticFlux() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMagneticFlux() const
       {
          return getMagneticFlux<Mass1T, Length1T, Length2T,Time1T, Charge1T>(*this);
@@ -163,6 +170,7 @@ namespace Dimension
       template<typename NamedMagneticFluxUnit>
       requires IsNamedMagneticFluxUnit<NamedMagneticFluxUnit>
       [[deprecated("Use the free function getMagneticFlux() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMagneticFlux() const
       {
          return getMagneticFlux<NamedMagneticFluxUnit>(*this);

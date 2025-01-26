@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_SPECIFICHEATCAPACITY_IMPL_H
 #define STATIC_DIMENSION_SPECIFICHEATCAPACITY_IMPL_H
 
-#include "../../TemperatureDimension.h"
 #include "../../TimeDimension.h"
 #include "../../LengthDimension.h"
+#include "../../TemperatureDimension.h"
 
 namespace Dimension
 {
@@ -90,13 +90,15 @@ namespace Dimension
 
       /// @brief Constructs a SpecificHeatCapacity object with a value.
       /// @param val The value of the SpecificHeatCapacity.
-      constexpr SpecificHeatCapacity(PrecisionType val) : Base(val) {}
+      explicit constexpr SpecificHeatCapacity(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a SpecificHeatCapacity object from a named unit.
       /// @tparam NamedSpecificHeatCapacity The named unit type.
       /// @param base The base unit object.
       template<typename NamedSpecificHeatCapacity>
       requires IsNamedSpecificHeatCapacityUnit<NamedSpecificHeatCapacity>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr SpecificHeatCapacity(const NamedSpecificHeatCapacity& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of SpecificHeatCapacity.
@@ -105,6 +107,7 @@ namespace Dimension
       template<typename Length1T, typename Length2T,typename Time1T, typename Time2T, typename Temperature1T>
       requires IsSpecificHeatCapacityUnits<Length1T, Length2T,Time1T, Time2T, Temperature1T>
       [[deprecated("Use the free function getSpecificHeatCapacity() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetSpecificHeatCapacity() const
       {
          return getSpecificHeatCapacity<Length1T, Length2T,Time1T, Time2T, Temperature1T>(*this);
@@ -116,6 +119,7 @@ namespace Dimension
       template<typename NamedSpecificHeatCapacity>
       requires IsNamedSpecificHeatCapacityUnit<NamedSpecificHeatCapacity>
       [[deprecated("Use the free function getSpecificHeatCapacity() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetSpecificHeatCapacity() const
       {
          return getSpecificHeatCapacity<NamedSpecificHeatCapacity>(*this);
@@ -135,13 +139,15 @@ namespace Dimension
 
       /// @brief Constructs a SpecificHeatCapacity object with a value.
       /// @param val The value of the SpecificHeatCapacity.
-      constexpr SpecificHeatCapacity(PrecisionType val) : Base(val) {}
+      explicit constexpr SpecificHeatCapacity(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a SpecificHeatCapacity object from another SpecificHeatCapacity object.
       /// @tparam OtherSpecificHeatCapacity The other SpecificHeatCapacity type.
       /// @param base The base SpecificHeatCapacity object.
       template<typename OtherSpecificHeatCapacity>
       requires IsSpecificHeatCapacityType<OtherSpecificHeatCapacity>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr SpecificHeatCapacity(const OtherSpecificHeatCapacity& base)
          : Base(base.template GetVal<typename NamedSpecificHeatCapacity::NumTuple, typename NamedSpecificHeatCapacity::DenTuple>()) {}
 
@@ -151,6 +157,7 @@ namespace Dimension
       template<typename Length1T, typename Length2T,typename Time1T, typename Time2T, typename Temperature1T>
       requires IsSpecificHeatCapacityUnits<Length1T, Length2T,Time1T, Time2T, Temperature1T>
       [[deprecated("Use the free function getSpecificHeatCapacity() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetSpecificHeatCapacity() const
       {
          return getSpecificHeatCapacity<Length1T, Length2T,Time1T, Time2T, Temperature1T>(*this);
@@ -162,6 +169,7 @@ namespace Dimension
       template<typename NamedSpecificHeatCapacityUnit>
       requires IsNamedSpecificHeatCapacityUnit<NamedSpecificHeatCapacityUnit>
       [[deprecated("Use the free function getSpecificHeatCapacity() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetSpecificHeatCapacity() const
       {
          return getSpecificHeatCapacity<NamedSpecificHeatCapacityUnit>(*this);

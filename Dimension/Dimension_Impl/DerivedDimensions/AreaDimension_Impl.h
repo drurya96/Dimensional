@@ -76,13 +76,15 @@ namespace Dimension
 
       /// @brief Constructs a Area object with a value.
       /// @param val The value of the Area.
-      constexpr Area(PrecisionType val) : Base(val) {}
+      explicit constexpr Area(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Area object from a named unit.
       /// @tparam NamedArea The named unit type.
       /// @param base The base unit object.
       template<typename NamedArea>
       requires IsNamedAreaUnit<NamedArea>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Area(const NamedArea& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of Area.
@@ -91,6 +93,7 @@ namespace Dimension
       template<typename Length1T, typename Length2T>
       requires IsAreaUnits<Length1T, Length2T>
       [[deprecated("Use the free function getArea() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetArea() const
       {
          return getArea<Length1T, Length2T>(*this);
@@ -102,6 +105,7 @@ namespace Dimension
       template<typename NamedArea>
       requires IsNamedAreaUnit<NamedArea>
       [[deprecated("Use the free function getArea() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetArea() const
       {
          return getArea<NamedArea>(*this);
@@ -121,13 +125,15 @@ namespace Dimension
 
       /// @brief Constructs a Area object with a value.
       /// @param val The value of the Area.
-      constexpr Area(PrecisionType val) : Base(val) {}
+      explicit constexpr Area(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Area object from another Area object.
       /// @tparam OtherArea The other Area type.
       /// @param base The base Area object.
       template<typename OtherArea>
       requires IsAreaType<OtherArea>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Area(const OtherArea& base)
          : Base(base.template GetVal<typename NamedArea::NumTuple, typename NamedArea::DenTuple>()) {}
 
@@ -137,6 +143,7 @@ namespace Dimension
       template<typename Length1T, typename Length2T>
       requires IsAreaUnits<Length1T, Length2T>
       [[deprecated("Use the free function getArea() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetArea() const
       {
          return getArea<Length1T, Length2T>(*this);
@@ -148,6 +155,7 @@ namespace Dimension
       template<typename NamedAreaUnit>
       requires IsNamedAreaUnit<NamedAreaUnit>
       [[deprecated("Use the free function getArea() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetArea() const
       {
          return getArea<NamedAreaUnit>(*this);

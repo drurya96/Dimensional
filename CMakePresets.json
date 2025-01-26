@@ -10,44 +10,85 @@
             "name": "base_configure",
             "hidden": false,
             "binaryDir": "${sourceDir}/build",
-            "generator": "Visual Studio 17 2022",
+            "generator": "Unix Makefiles",
             "cacheVariables": {
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "CMAKE_BUILD_TYPE": "Release"
+                "CMAKE_BUILD_TYPE": "Release",
+                "Enable_Dimensional_Tests": "ON"
             }
+        },
+        {
+            "name": "Unix_Makefiles_config",
+            "inherits": "base_configure",
+            "generator": "Unix Makefiles"
+        },
+        {
+            "name": "Visual_Studio_config",
+            "inherits": "base_configure",
+            "generator": "Visual Studio 17 2022"
         }
     ],
     "buildPresets": [
         {
-            "name": "build_project",
-            "displayName": "Build the project",
-            "configurePreset": "base_configure",
+            "name": "build_linux",
+            "displayName": "Build the project in linux",
+            "configurePreset": "Unix_Makefiles_config",
+            "hidden": false
+        },
+        {
+            "name": "build_windows",
+            "displayName": "Build the project in windows",
+            "configurePreset": "Visual_Studio_config",
             "hidden": false
         }
     ],
     "testPresets": [
         {
-            "name": "run_tests",
+            "name": "run_tests_linux",
             "displayName": "Run Unit Tests",
-            "configurePreset": "base_configure",
+            "configurePreset": "Unix_Makefiles_config",
+            "hidden": false
+        },
+        {
+            "name": "run_tests_windows",
+            "displayName": "Run Unit Tests",
+            "configurePreset": "Visual_Studio_config",
             "hidden": false
         }
     ],
     "workflowPresets": [
         {
-            "name": "build_and_test",
+            "name": "build_and_test_linux",
             "description": "Build and run tests",
             "steps": [
                 {
-                    "name": "base_configure",
+                    "name": "Unix_Makefiles_config",
                     "type": "configure"
                 },
                 {
-                    "name": "build_project",
+                    "name": "build_linux",
                     "type": "build"
                 },
                 {
-                    "name": "run_tests",
+                    "name": "run_tests_linux",
+                    "type": "test"
+                }
+            ]
+        },
+        {
+            "name": "build_and_test_windows",
+            "description": "Build and run tests",
+            "steps": [
+                {
+                    "name": "Visual_Studio_config",
+                    "type": "configure"
+                },
+                {
+                    "name": "build_windows",
+                    "type": "build"
+                },
+                {
+                    "name": "run_tests_windows",
                     "type": "test"
                 }
             ]

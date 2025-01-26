@@ -15,7 +15,4 @@ if(NOT DEFINED DIMENSIONAL_PrecisionType)
     set(DIMENSIONAL_PrecisionType USE_DOUBLE CACHE STRING "Precision type")
 endif()
 
-include(../Dimension/UnitTest/UnitTests.cmake)
-
-target_link_libraries(Dimension_UnitTests PUBLIC)
-target_compile_definitions(Dimension_UnitTests PRIVATE ${DIMENSIONAL_PrecisionType})
+add_executable(Dimension_Example ../example_project/example.cpp)

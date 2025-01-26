@@ -44,6 +44,7 @@ namespace Dimension
       using NumTuple = std::tuple<NonBaseUnit>;
       using DenTuple = std::tuple<>;
 
+      // cppcheck-suppress unusedStructMember
       constexpr static int ID = 0;
    };
 

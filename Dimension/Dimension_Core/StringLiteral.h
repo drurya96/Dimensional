@@ -21,11 +21,15 @@ namespace Dimension
       static constexpr size_t size = N;
       std::array<char, N> value;
 
+      // StringLiteral is meant to be used as a wrapper for strings so they may be used in template parameters, implicit conversion is acceptable.
+      // cppcheck-suppress noExplicitConstructor
       constexpr StringLiteral(const char (&str)[N]) {
          std::copy_n(str, N, value.begin());
       }
 
       constexpr StringLiteral() : value{} {}
+      // StringLiteral is meant to be used as a wrapper for strings so they may be used in template parameters, implicit conversion is acceptable.
+      // cppcheck-suppress noExplicitConstructor
       constexpr StringLiteral(const std::array<char, N>& arr) : value(arr) {}
    };
 

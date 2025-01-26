@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_ACCELERATION_IMPL_H
 #define STATIC_DIMENSION_ACCELERATION_IMPL_H
 
-#include "../../LengthDimension.h"
 #include "../../TimeDimension.h"
+#include "../../LengthDimension.h"
 
 namespace Dimension
 {
@@ -81,13 +81,15 @@ namespace Dimension
 
       /// @brief Constructs a Acceleration object with a value.
       /// @param val The value of the Acceleration.
-      constexpr Acceleration(PrecisionType val) : Base(val) {}
+      explicit constexpr Acceleration(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Acceleration object from a named unit.
       /// @tparam NamedAcceleration The named unit type.
       /// @param base The base unit object.
       template<typename NamedAcceleration>
       requires IsNamedAccelerationUnit<NamedAcceleration>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Acceleration(const NamedAcceleration& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of Acceleration.
@@ -96,6 +98,7 @@ namespace Dimension
       template<typename Length1T,typename Time1T, typename Time2T>
       requires IsAccelerationUnits<Length1T,Time1T, Time2T>
       [[deprecated("Use the free function getAcceleration() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetAcceleration() const
       {
          return getAcceleration<Length1T,Time1T, Time2T>(*this);
@@ -107,6 +110,7 @@ namespace Dimension
       template<typename NamedAcceleration>
       requires IsNamedAccelerationUnit<NamedAcceleration>
       [[deprecated("Use the free function getAcceleration() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetAcceleration() const
       {
          return getAcceleration<NamedAcceleration>(*this);
@@ -126,13 +130,15 @@ namespace Dimension
 
       /// @brief Constructs a Acceleration object with a value.
       /// @param val The value of the Acceleration.
-      constexpr Acceleration(PrecisionType val) : Base(val) {}
+      explicit constexpr Acceleration(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Acceleration object from another Acceleration object.
       /// @tparam OtherAcceleration The other Acceleration type.
       /// @param base The base Acceleration object.
       template<typename OtherAcceleration>
       requires IsAccelerationType<OtherAcceleration>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Acceleration(const OtherAcceleration& base)
          : Base(base.template GetVal<typename NamedAcceleration::NumTuple, typename NamedAcceleration::DenTuple>()) {}
 
@@ -142,6 +148,7 @@ namespace Dimension
       template<typename Length1T,typename Time1T, typename Time2T>
       requires IsAccelerationUnits<Length1T,Time1T, Time2T>
       [[deprecated("Use the free function getAcceleration() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetAcceleration() const
       {
          return getAcceleration<Length1T,Time1T, Time2T>(*this);
@@ -153,6 +160,7 @@ namespace Dimension
       template<typename NamedAccelerationUnit>
       requires IsNamedAccelerationUnit<NamedAccelerationUnit>
       [[deprecated("Use the free function getAcceleration() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetAcceleration() const
       {
          return getAcceleration<NamedAccelerationUnit>(*this);

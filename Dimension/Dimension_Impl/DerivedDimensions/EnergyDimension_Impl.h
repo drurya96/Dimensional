@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_ENERGY_IMPL_H
 #define STATIC_DIMENSION_ENERGY_IMPL_H
 
-#include "../../LengthDimension.h"
-#include "../../MassDimension.h"
 #include "../../TimeDimension.h"
+#include "../../MassDimension.h"
+#include "../../LengthDimension.h"
 
 namespace Dimension
 {
@@ -90,13 +90,15 @@ namespace Dimension
 
       /// @brief Constructs a Energy object with a value.
       /// @param val The value of the Energy.
-      constexpr Energy(PrecisionType val) : Base(val) {}
+      explicit constexpr Energy(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Energy object from a named unit.
       /// @tparam NamedEnergy The named unit type.
       /// @param base The base unit object.
       template<typename NamedEnergy>
       requires IsNamedEnergyUnit<NamedEnergy>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Energy(const NamedEnergy& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of Energy.
@@ -105,6 +107,7 @@ namespace Dimension
       template<typename Mass1T, typename Length1T, typename Length2T,typename Time1T, typename Time2T>
       requires IsEnergyUnits<Mass1T, Length1T, Length2T,Time1T, Time2T>
       [[deprecated("Use the free function getEnergy() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetEnergy() const
       {
          return getEnergy<Mass1T, Length1T, Length2T,Time1T, Time2T>(*this);
@@ -116,6 +119,7 @@ namespace Dimension
       template<typename NamedEnergy>
       requires IsNamedEnergyUnit<NamedEnergy>
       [[deprecated("Use the free function getEnergy() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetEnergy() const
       {
          return getEnergy<NamedEnergy>(*this);
@@ -135,13 +139,15 @@ namespace Dimension
 
       /// @brief Constructs a Energy object with a value.
       /// @param val The value of the Energy.
-      constexpr Energy(PrecisionType val) : Base(val) {}
+      explicit constexpr Energy(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Energy object from another Energy object.
       /// @tparam OtherEnergy The other Energy type.
       /// @param base The base Energy object.
       template<typename OtherEnergy>
       requires IsEnergyType<OtherEnergy>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Energy(const OtherEnergy& base)
          : Base(base.template GetVal<typename NamedEnergy::NumTuple, typename NamedEnergy::DenTuple>()) {}
 
@@ -151,6 +157,7 @@ namespace Dimension
       template<typename Mass1T, typename Length1T, typename Length2T,typename Time1T, typename Time2T>
       requires IsEnergyUnits<Mass1T, Length1T, Length2T,Time1T, Time2T>
       [[deprecated("Use the free function getEnergy() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetEnergy() const
       {
          return getEnergy<Mass1T, Length1T, Length2T,Time1T, Time2T>(*this);
@@ -162,6 +169,7 @@ namespace Dimension
       template<typename NamedEnergyUnit>
       requires IsNamedEnergyUnit<NamedEnergyUnit>
       [[deprecated("Use the free function getEnergy() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetEnergy() const
       {
          return getEnergy<NamedEnergyUnit>(*this);

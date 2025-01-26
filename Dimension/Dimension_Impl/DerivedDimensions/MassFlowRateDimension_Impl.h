@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_MASSFLOWRATE_IMPL_H
 #define STATIC_DIMENSION_MASSFLOWRATE_IMPL_H
 
-#include "../../MassDimension.h"
 #include "../../TimeDimension.h"
+#include "../../MassDimension.h"
 
 namespace Dimension
 {
@@ -77,13 +77,15 @@ namespace Dimension
 
       /// @brief Constructs a MassFlowRate object with a value.
       /// @param val The value of the MassFlowRate.
-      constexpr MassFlowRate(PrecisionType val) : Base(val) {}
+      explicit constexpr MassFlowRate(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a MassFlowRate object from a named unit.
       /// @tparam NamedMassFlowRate The named unit type.
       /// @param base The base unit object.
       template<typename NamedMassFlowRate>
       requires IsNamedMassFlowRateUnit<NamedMassFlowRate>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr MassFlowRate(const NamedMassFlowRate& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of MassFlowRate.
@@ -92,6 +94,7 @@ namespace Dimension
       template<typename Mass1T,typename Time1T>
       requires IsMassFlowRateUnits<Mass1T,Time1T>
       [[deprecated("Use the free function getMassFlowRate() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMassFlowRate() const
       {
          return getMassFlowRate<Mass1T,Time1T>(*this);
@@ -103,6 +106,7 @@ namespace Dimension
       template<typename NamedMassFlowRate>
       requires IsNamedMassFlowRateUnit<NamedMassFlowRate>
       [[deprecated("Use the free function getMassFlowRate() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMassFlowRate() const
       {
          return getMassFlowRate<NamedMassFlowRate>(*this);
@@ -122,13 +126,15 @@ namespace Dimension
 
       /// @brief Constructs a MassFlowRate object with a value.
       /// @param val The value of the MassFlowRate.
-      constexpr MassFlowRate(PrecisionType val) : Base(val) {}
+      explicit constexpr MassFlowRate(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a MassFlowRate object from another MassFlowRate object.
       /// @tparam OtherMassFlowRate The other MassFlowRate type.
       /// @param base The base MassFlowRate object.
       template<typename OtherMassFlowRate>
       requires IsMassFlowRateType<OtherMassFlowRate>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr MassFlowRate(const OtherMassFlowRate& base)
          : Base(base.template GetVal<typename NamedMassFlowRate::NumTuple, typename NamedMassFlowRate::DenTuple>()) {}
 
@@ -138,6 +144,7 @@ namespace Dimension
       template<typename Mass1T,typename Time1T>
       requires IsMassFlowRateUnits<Mass1T,Time1T>
       [[deprecated("Use the free function getMassFlowRate() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMassFlowRate() const
       {
          return getMassFlowRate<Mass1T,Time1T>(*this);
@@ -149,6 +156,7 @@ namespace Dimension
       template<typename NamedMassFlowRateUnit>
       requires IsNamedMassFlowRateUnit<NamedMassFlowRateUnit>
       [[deprecated("Use the free function getMassFlowRate() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMassFlowRate() const
       {
          return getMassFlowRate<NamedMassFlowRateUnit>(*this);

@@ -24,7 +24,7 @@ namespace Dimension
    /// @brief A base class representing a unit
    /// @details This abstract class represents a Unit,
    ///    such as Meters, Seconds, Grams, etc.
-   template<typename Unit, StringLiteral Name, StringLiteral Abbreviation, StringLiteral DimName>
+   template<typename Unit, StringLiteral Name, StringLiteral Abbreviation, StringLiteral DimName, int UnitID = 0>
    struct BaseUnit
    {
    public:
@@ -38,7 +38,7 @@ namespace Dimension
       /// @details Units only cancel if this value is the same.
       ///    This means, creating units with different IDs and combining them
       ///    into one dimension will prevent them from canelling out.
-      constexpr static int ID = 0;
+      constexpr static int ID = UnitID;
 
       static constexpr StringLiteral<Name.size> name = Name;
       static constexpr StringLiteral<Abbreviation.size> abbr = Abbreviation;
@@ -97,13 +97,15 @@ namespace Dimension
       }
 
       /// @brief Constructor given value
-      constexpr BaseDimension(PrecisionType val) :
+      explicit constexpr BaseDimension(PrecisionType val) :
          scalar(val)
       {
       }
 
       template<typename T, typename U>
       requires MatchingDimensionsNew<BaseDimension<NumTuple, DenTuple>, BaseDimension<T, U>>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr BaseDimension(BaseDimension<T, U> obj) :
          BaseDimension(obj.template GetVal<NumTuple, DenTuple>())
       {
@@ -111,7 +113,7 @@ namespace Dimension
 
       /// @brief Return an equivalent dimension with all units simplified
       /// @return Simplified dimension
-      constexpr auto Simplify()
+      constexpr auto Simplify() const
       {
          using simplified = UnitSimplifier<NumTuple, std::tuple<>, std::tuple<>, DenTuple>;
 

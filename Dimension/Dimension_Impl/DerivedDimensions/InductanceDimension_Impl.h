@@ -90,13 +90,15 @@ namespace Dimension
 
       /// @brief Constructs a Inductance object with a value.
       /// @param val The value of the Inductance.
-      constexpr Inductance(PrecisionType val) : Base(val) {}
+      explicit constexpr Inductance(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Inductance object from a named unit.
       /// @tparam NamedInductance The named unit type.
       /// @param base The base unit object.
       template<typename NamedInductance>
       requires IsNamedInductanceUnit<NamedInductance>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Inductance(const NamedInductance& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of Inductance.
@@ -105,6 +107,7 @@ namespace Dimension
       template<typename Mass1T, typename Length1T, typename Length2T,typename Charge1T, typename Charge2T>
       requires IsInductanceUnits<Mass1T, Length1T, Length2T,Charge1T, Charge2T>
       [[deprecated("Use the free function getInductance() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetInductance() const
       {
          return getInductance<Mass1T, Length1T, Length2T,Charge1T, Charge2T>(*this);
@@ -116,6 +119,7 @@ namespace Dimension
       template<typename NamedInductance>
       requires IsNamedInductanceUnit<NamedInductance>
       [[deprecated("Use the free function getInductance() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetInductance() const
       {
          return getInductance<NamedInductance>(*this);
@@ -135,13 +139,15 @@ namespace Dimension
 
       /// @brief Constructs a Inductance object with a value.
       /// @param val The value of the Inductance.
-      constexpr Inductance(PrecisionType val) : Base(val) {}
+      explicit constexpr Inductance(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Inductance object from another Inductance object.
       /// @tparam OtherInductance The other Inductance type.
       /// @param base The base Inductance object.
       template<typename OtherInductance>
       requires IsInductanceType<OtherInductance>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Inductance(const OtherInductance& base)
          : Base(base.template GetVal<typename NamedInductance::NumTuple, typename NamedInductance::DenTuple>()) {}
 
@@ -151,6 +157,7 @@ namespace Dimension
       template<typename Mass1T, typename Length1T, typename Length2T,typename Charge1T, typename Charge2T>
       requires IsInductanceUnits<Mass1T, Length1T, Length2T,Charge1T, Charge2T>
       [[deprecated("Use the free function getInductance() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetInductance() const
       {
          return getInductance<Mass1T, Length1T, Length2T,Charge1T, Charge2T>(*this);
@@ -162,6 +169,7 @@ namespace Dimension
       template<typename NamedInductanceUnit>
       requires IsNamedInductanceUnit<NamedInductanceUnit>
       [[deprecated("Use the free function getInductance() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetInductance() const
       {
          return getInductance<NamedInductanceUnit>(*this);

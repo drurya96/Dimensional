@@ -8,7 +8,7 @@ protected:
 
    virtual void SetUp() override;
 
-   virtual void TearDown() override {}
+   virtual void TearDown() override;
 };
 
 const double TOLERANCE = 0.01;

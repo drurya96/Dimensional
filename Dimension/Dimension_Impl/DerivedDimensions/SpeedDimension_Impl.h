@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_SPEED_IMPL_H
 #define STATIC_DIMENSION_SPEED_IMPL_H
 
-#include "../../LengthDimension.h"
 #include "../../TimeDimension.h"
+#include "../../LengthDimension.h"
 
 namespace Dimension
 {
@@ -77,13 +77,15 @@ namespace Dimension
 
       /// @brief Constructs a Speed object with a value.
       /// @param val The value of the Speed.
-      constexpr Speed(PrecisionType val) : Base(val) {}
+      explicit constexpr Speed(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Speed object from a named unit.
       /// @tparam NamedSpeed The named unit type.
       /// @param base The base unit object.
       template<typename NamedSpeed>
       requires IsNamedSpeedUnit<NamedSpeed>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Speed(const NamedSpeed& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of Speed.
@@ -92,6 +94,7 @@ namespace Dimension
       template<typename Length1T,typename Time1T>
       requires IsSpeedUnits<Length1T,Time1T>
       [[deprecated("Use the free function getSpeed() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetSpeed() const
       {
          return getSpeed<Length1T,Time1T>(*this);
@@ -103,6 +106,7 @@ namespace Dimension
       template<typename NamedSpeed>
       requires IsNamedSpeedUnit<NamedSpeed>
       [[deprecated("Use the free function getSpeed() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetSpeed() const
       {
          return getSpeed<NamedSpeed>(*this);
@@ -122,13 +126,15 @@ namespace Dimension
 
       /// @brief Constructs a Speed object with a value.
       /// @param val The value of the Speed.
-      constexpr Speed(PrecisionType val) : Base(val) {}
+      explicit constexpr Speed(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Speed object from another Speed object.
       /// @tparam OtherSpeed The other Speed type.
       /// @param base The base Speed object.
       template<typename OtherSpeed>
       requires IsSpeedType<OtherSpeed>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Speed(const OtherSpeed& base)
          : Base(base.template GetVal<typename NamedSpeed::NumTuple, typename NamedSpeed::DenTuple>()) {}
 
@@ -138,6 +144,7 @@ namespace Dimension
       template<typename Length1T,typename Time1T>
       requires IsSpeedUnits<Length1T,Time1T>
       [[deprecated("Use the free function getSpeed() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetSpeed() const
       {
          return getSpeed<Length1T,Time1T>(*this);
@@ -149,6 +156,7 @@ namespace Dimension
       template<typename NamedSpeedUnit>
       requires IsNamedSpeedUnit<NamedSpeedUnit>
       [[deprecated("Use the free function getSpeed() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetSpeed() const
       {
          return getSpeed<NamedSpeedUnit>(*this);

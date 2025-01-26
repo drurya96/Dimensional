@@ -1,10 +1,10 @@
 #ifndef STATIC_DIMENSION_RESISTANCE_IMPL_H
 #define STATIC_DIMENSION_RESISTANCE_IMPL_H
 
-#include "../../MassDimension.h"
-#include "../../ChargeDimension.h"
 #include "../../TimeDimension.h"
 #include "../../LengthDimension.h"
+#include "../../ChargeDimension.h"
+#include "../../MassDimension.h"
 
 namespace Dimension
 {
@@ -95,13 +95,15 @@ namespace Dimension
 
       /// @brief Constructs a Resistance object with a value.
       /// @param val The value of the Resistance.
-      constexpr Resistance(PrecisionType val) : Base(val) {}
+      explicit constexpr Resistance(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Resistance object from a named unit.
       /// @tparam NamedResistance The named unit type.
       /// @param base The base unit object.
       template<typename NamedResistance>
       requires IsNamedResistanceUnit<NamedResistance>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Resistance(const NamedResistance& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of Resistance.
@@ -110,6 +112,7 @@ namespace Dimension
       template<typename Mass1T, typename Length1T, typename Length2T,typename Time1T, typename Charge1T, typename Charge2T>
       requires IsResistanceUnits<Mass1T, Length1T, Length2T,Time1T, Charge1T, Charge2T>
       [[deprecated("Use the free function getResistance() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetResistance() const
       {
          return getResistance<Mass1T, Length1T, Length2T,Time1T, Charge1T, Charge2T>(*this);
@@ -121,6 +124,7 @@ namespace Dimension
       template<typename NamedResistance>
       requires IsNamedResistanceUnit<NamedResistance>
       [[deprecated("Use the free function getResistance() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetResistance() const
       {
          return getResistance<NamedResistance>(*this);
@@ -140,13 +144,15 @@ namespace Dimension
 
       /// @brief Constructs a Resistance object with a value.
       /// @param val The value of the Resistance.
-      constexpr Resistance(PrecisionType val) : Base(val) {}
+      explicit constexpr Resistance(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Resistance object from another Resistance object.
       /// @tparam OtherResistance The other Resistance type.
       /// @param base The base Resistance object.
       template<typename OtherResistance>
       requires IsResistanceType<OtherResistance>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Resistance(const OtherResistance& base)
          : Base(base.template GetVal<typename NamedResistance::NumTuple, typename NamedResistance::DenTuple>()) {}
 
@@ -156,6 +162,7 @@ namespace Dimension
       template<typename Mass1T, typename Length1T, typename Length2T,typename Time1T, typename Charge1T, typename Charge2T>
       requires IsResistanceUnits<Mass1T, Length1T, Length2T,Time1T, Charge1T, Charge2T>
       [[deprecated("Use the free function getResistance() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetResistance() const
       {
          return getResistance<Mass1T, Length1T, Length2T,Time1T, Charge1T, Charge2T>(*this);
@@ -167,6 +174,7 @@ namespace Dimension
       template<typename NamedResistanceUnit>
       requires IsNamedResistanceUnit<NamedResistanceUnit>
       [[deprecated("Use the free function getResistance() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetResistance() const
       {
          return getResistance<NamedResistanceUnit>(*this);

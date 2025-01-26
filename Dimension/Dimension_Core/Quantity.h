@@ -51,12 +51,8 @@ namespace Dimension
       {
          return is_quantity_v<T1>;
       }
-      else
-      {
-         return is_quantity_v<T1>;
-      }
 
-   return true;
+   return is_quantity_v<T1>;
    }
 
    template<typename T>

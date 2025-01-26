@@ -25,11 +25,11 @@ class TestPackageConan(ConanFile):
         if not tools.cross_building(self):
             # Look for the executable in the current directory, or the bin folder
             extension = ".exe" if self.settings.os == "Windows" else ""
-            bin_path = os.path.join("bin", f"Dimension_UnitTests{extension}")
+            bin_path = os.path.join("bin", f"Dimension_Example{extension}")
 
             # If the binary isn't in 'bin', check the root of the build folder
             if not os.path.isfile(bin_path):
-                bin_path = os.path.join(".", f"Dimension_UnitTests{extension}")
+                bin_path = os.path.join(".", f"Dimension_Example{extension}")
 
             # Check if we found the file
             if os.path.isfile(bin_path):

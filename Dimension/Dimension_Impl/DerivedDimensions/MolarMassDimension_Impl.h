@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_MOLARMASS_IMPL_H
 #define STATIC_DIMENSION_MOLARMASS_IMPL_H
 
-#include "../../MassDimension.h"
 #include "../../AmountDimension.h"
+#include "../../MassDimension.h"
 
 namespace Dimension
 {
@@ -77,13 +77,15 @@ namespace Dimension
 
       /// @brief Constructs a MolarMass object with a value.
       /// @param val The value of the MolarMass.
-      constexpr MolarMass(PrecisionType val) : Base(val) {}
+      explicit constexpr MolarMass(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a MolarMass object from a named unit.
       /// @tparam NamedMolarMass The named unit type.
       /// @param base The base unit object.
       template<typename NamedMolarMass>
       requires IsNamedMolarMassUnit<NamedMolarMass>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr MolarMass(const NamedMolarMass& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of MolarMass.
@@ -92,6 +94,7 @@ namespace Dimension
       template<typename Mass1T,typename Amount1T>
       requires IsMolarMassUnits<Mass1T,Amount1T>
       [[deprecated("Use the free function getMolarMass() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMolarMass() const
       {
          return getMolarMass<Mass1T,Amount1T>(*this);
@@ -103,6 +106,7 @@ namespace Dimension
       template<typename NamedMolarMass>
       requires IsNamedMolarMassUnit<NamedMolarMass>
       [[deprecated("Use the free function getMolarMass() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMolarMass() const
       {
          return getMolarMass<NamedMolarMass>(*this);
@@ -122,13 +126,15 @@ namespace Dimension
 
       /// @brief Constructs a MolarMass object with a value.
       /// @param val The value of the MolarMass.
-      constexpr MolarMass(PrecisionType val) : Base(val) {}
+      explicit constexpr MolarMass(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a MolarMass object from another MolarMass object.
       /// @tparam OtherMolarMass The other MolarMass type.
       /// @param base The base MolarMass object.
       template<typename OtherMolarMass>
       requires IsMolarMassType<OtherMolarMass>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr MolarMass(const OtherMolarMass& base)
          : Base(base.template GetVal<typename NamedMolarMass::NumTuple, typename NamedMolarMass::DenTuple>()) {}
 
@@ -138,6 +144,7 @@ namespace Dimension
       template<typename Mass1T,typename Amount1T>
       requires IsMolarMassUnits<Mass1T,Amount1T>
       [[deprecated("Use the free function getMolarMass() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMolarMass() const
       {
          return getMolarMass<Mass1T,Amount1T>(*this);
@@ -149,6 +156,7 @@ namespace Dimension
       template<typename NamedMolarMassUnit>
       requires IsNamedMolarMassUnit<NamedMolarMassUnit>
       [[deprecated("Use the free function getMolarMass() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMolarMass() const
       {
          return getMolarMass<NamedMolarMassUnit>(*this);

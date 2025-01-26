@@ -1,0 +1,9 @@
+Checks: >
+  clang-analyzer-*,
+  #readability-identifier-naming,
+  #cppcoreguidelines-*,
+  modernize-*
+WarningsAsErrors: ''
+HeaderFilterRegex: '/workspace/Dimension/.*\.h$'
+#HeaderFilterRegex: '*\.h$'
+FormatStyle: none

@@ -17,7 +17,7 @@ namespace Dimension
       using type = T;
       T value;
       static constexpr size_t size = sizeof(T);
-      constexpr TagWrapper(const T& v) : value(v) {}
+      explicit constexpr TagWrapper(const T& v) : value(v) {}
       constexpr T get() const { return value; }
    };
 
@@ -28,6 +28,8 @@ namespace Dimension
    {
       using type = void;
       static constexpr size_t size = 0;
+      // TagWrapper::get cannot be static in the template, so it should not be made static in this specialization
+      // cppcheck-suppress functionStatic
       constexpr void get() const noexcept {} // No-op
    };
 

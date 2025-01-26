@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_FORCE_IMPL_H
 #define STATIC_DIMENSION_FORCE_IMPL_H
 
+#include "../../LengthDimension.h"
 #include "../../MassDimension.h"
 #include "../../TimeDimension.h"
-#include "../../LengthDimension.h"
 
 namespace Dimension
 {
@@ -86,13 +86,15 @@ namespace Dimension
 
       /// @brief Constructs a Force object with a value.
       /// @param val The value of the Force.
-      constexpr Force(PrecisionType val) : Base(val) {}
+      explicit constexpr Force(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Force object from a named unit.
       /// @tparam NamedForce The named unit type.
       /// @param base The base unit object.
       template<typename NamedForce>
       requires IsNamedForceUnit<NamedForce>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Force(const NamedForce& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of Force.
@@ -101,6 +103,7 @@ namespace Dimension
       template<typename Mass1T, typename Length1T,typename Time1T, typename Time2T>
       requires IsForceUnits<Mass1T, Length1T,Time1T, Time2T>
       [[deprecated("Use the free function getForce() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetForce() const
       {
          return getForce<Mass1T, Length1T,Time1T, Time2T>(*this);
@@ -112,6 +115,7 @@ namespace Dimension
       template<typename NamedForce>
       requires IsNamedForceUnit<NamedForce>
       [[deprecated("Use the free function getForce() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetForce() const
       {
          return getForce<NamedForce>(*this);
@@ -131,13 +135,15 @@ namespace Dimension
 
       /// @brief Constructs a Force object with a value.
       /// @param val The value of the Force.
-      constexpr Force(PrecisionType val) : Base(val) {}
+      explicit constexpr Force(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Force object from another Force object.
       /// @tparam OtherForce The other Force type.
       /// @param base The base Force object.
       template<typename OtherForce>
       requires IsForceType<OtherForce>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Force(const OtherForce& base)
          : Base(base.template GetVal<typename NamedForce::NumTuple, typename NamedForce::DenTuple>()) {}
 
@@ -147,6 +153,7 @@ namespace Dimension
       template<typename Mass1T, typename Length1T,typename Time1T, typename Time2T>
       requires IsForceUnits<Mass1T, Length1T,Time1T, Time2T>
       [[deprecated("Use the free function getForce() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetForce() const
       {
          return getForce<Mass1T, Length1T,Time1T, Time2T>(*this);
@@ -158,6 +165,7 @@ namespace Dimension
       template<typename NamedForceUnit>
       requires IsNamedForceUnit<NamedForceUnit>
       [[deprecated("Use the free function getForce() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetForce() const
       {
          return getForce<NamedForceUnit>(*this);

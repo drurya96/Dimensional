@@ -1,10 +1,10 @@
 #ifndef STATIC_DIMENSION_ENTROPY_IMPL_H
 #define STATIC_DIMENSION_ENTROPY_IMPL_H
 
-#include "../../LengthDimension.h"
 #include "../../TemperatureDimension.h"
-#include "../../MassDimension.h"
 #include "../../TimeDimension.h"
+#include "../../MassDimension.h"
+#include "../../LengthDimension.h"
 
 namespace Dimension
 {
@@ -95,13 +95,15 @@ namespace Dimension
 
       /// @brief Constructs a Entropy object with a value.
       /// @param val The value of the Entropy.
-      constexpr Entropy(PrecisionType val) : Base(val) {}
+      explicit constexpr Entropy(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Entropy object from a named unit.
       /// @tparam NamedEntropy The named unit type.
       /// @param base The base unit object.
       template<typename NamedEntropy>
       requires IsNamedEntropyUnit<NamedEntropy>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Entropy(const NamedEntropy& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of Entropy.
@@ -110,6 +112,7 @@ namespace Dimension
       template<typename Mass1T, typename Length1T, typename Length2T,typename Time1T, typename Time2T, typename Temperature1T>
       requires IsEntropyUnits<Mass1T, Length1T, Length2T,Time1T, Time2T, Temperature1T>
       [[deprecated("Use the free function getEntropy() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetEntropy() const
       {
          return getEntropy<Mass1T, Length1T, Length2T,Time1T, Time2T, Temperature1T>(*this);
@@ -121,6 +124,7 @@ namespace Dimension
       template<typename NamedEntropy>
       requires IsNamedEntropyUnit<NamedEntropy>
       [[deprecated("Use the free function getEntropy() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetEntropy() const
       {
          return getEntropy<NamedEntropy>(*this);
@@ -140,13 +144,15 @@ namespace Dimension
 
       /// @brief Constructs a Entropy object with a value.
       /// @param val The value of the Entropy.
-      constexpr Entropy(PrecisionType val) : Base(val) {}
+      explicit constexpr Entropy(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Entropy object from another Entropy object.
       /// @tparam OtherEntropy The other Entropy type.
       /// @param base The base Entropy object.
       template<typename OtherEntropy>
       requires IsEntropyType<OtherEntropy>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Entropy(const OtherEntropy& base)
          : Base(base.template GetVal<typename NamedEntropy::NumTuple, typename NamedEntropy::DenTuple>()) {}
 
@@ -156,6 +162,7 @@ namespace Dimension
       template<typename Mass1T, typename Length1T, typename Length2T,typename Time1T, typename Time2T, typename Temperature1T>
       requires IsEntropyUnits<Mass1T, Length1T, Length2T,Time1T, Time2T, Temperature1T>
       [[deprecated("Use the free function getEntropy() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetEntropy() const
       {
          return getEntropy<Mass1T, Length1T, Length2T,Time1T, Time2T, Temperature1T>(*this);
@@ -167,6 +174,7 @@ namespace Dimension
       template<typename NamedEntropyUnit>
       requires IsNamedEntropyUnit<NamedEntropyUnit>
       [[deprecated("Use the free function getEntropy() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetEntropy() const
       {
          return getEntropy<NamedEntropyUnit>(*this);

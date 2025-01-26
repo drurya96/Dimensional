@@ -27,7 +27,7 @@ def main():
     output = template.render(**template_params)
 
     # Write the output file
-    output_filename = f"{dimension_name}Dimension_Impl.h"
+    output_filename = f"Dimension/Dimension_Impl/FundamentalDimensions/{dimension_name}Dimension_Impl.h"
     with open(output_filename, "w") as f:
         f.write(output)
 

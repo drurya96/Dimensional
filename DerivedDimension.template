@@ -87,13 +87,15 @@ namespace Dimension
 
       /// @brief Constructs a {{ dimension_name }} object with a value.
       /// @param val The value of the {{ dimension_name }}.
-      constexpr {{ dimension_name }}(PrecisionType val) : Base(val) {}
+      explicit constexpr {{ dimension_name }}(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a {{ dimension_name }} object from a named unit.
       /// @tparam Named{{ dimension_name }} The named unit type.
       /// @param base The base unit object.
       template<typename Named{{ dimension_name }}>
       requires IsNamed{{ dimension_name }}Unit<Named{{ dimension_name }}>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr {{ dimension_name }}(const Named{{ dimension_name }}& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of {{ dimension_name }}.
@@ -102,6 +104,7 @@ namespace Dimension
       template<{{ numerator_template_typesT }} {%- if numerator_template_typesT and denominator_template_typesT -%},{%- endif -%} {{ denominator_template_typesT }}>
       requires Is{{ dimension_name }}Units<{{ numerator_typesT }} {%- if numerator_typesT and denominator_typesT -%},{%- endif -%} {{ denominator_typesT }}>
       [[deprecated("Use the free function get{{ dimension_name }}() instead.")]]
+      // cppcheck-suppress unusedFunction
       double Get{{ dimension_name }}() const
       {
          return get{{ dimension_name }}<{{ numerator_typesT }} {%- if numerator_typesT and denominator_typesT -%},{%- endif -%} {{ denominator_typesT }}>(*this);
@@ -113,6 +116,7 @@ namespace Dimension
       template<typename Named{{ dimension_name }}>
       requires IsNamed{{ dimension_name }}Unit<Named{{ dimension_name }}>
       [[deprecated("Use the free function get{{ dimension_name }}() instead.")]]
+      // cppcheck-suppress unusedFunction
       double Get{{ dimension_name }}() const
       {
          return get{{ dimension_name }}<Named{{ dimension_name }}>(*this);
@@ -132,13 +136,15 @@ namespace Dimension
 
       /// @brief Constructs a {{ dimension_name }} object with a value.
       /// @param val The value of the {{ dimension_name }}.
-      constexpr {{ dimension_name }}(PrecisionType val) : Base(val) {}
+      explicit constexpr {{ dimension_name }}(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a {{ dimension_name }} object from another {{ dimension_name }} object.
       /// @tparam Other{{ dimension_name }} The other {{ dimension_name }} type.
       /// @param base The base {{ dimension_name }} object.
       template<typename Other{{ dimension_name }}>
       requires Is{{ dimension_name }}Type<Other{{ dimension_name }}>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr {{ dimension_name }}(const Other{{ dimension_name }}& base)
          : Base(base.template GetVal<typename Named{{ dimension_name }}::NumTuple, typename Named{{ dimension_name }}::DenTuple>()) {}
 
@@ -148,6 +154,7 @@ namespace Dimension
       template<{{ numerator_template_typesT }} {%- if numerator_template_typesT and denominator_template_typesT -%},{%- endif -%} {{ denominator_template_typesT }}>
       requires Is{{ dimension_name }}Units<{{ numerator_typesT }} {%- if numerator_typesT and denominator_typesT -%},{%- endif -%} {{ denominator_typesT }}>
       [[deprecated("Use the free function get{{ dimension_name }}() instead.")]]
+      // cppcheck-suppress unusedFunction
       double Get{{ dimension_name }}() const
       {
          return get{{ dimension_name }}<{{ numerator_typesT }} {%- if numerator_typesT and denominator_typesT -%},{%- endif -%} {{ denominator_typesT }}>(*this);
@@ -159,6 +166,7 @@ namespace Dimension
       template<typename Named{{ dimension_name }}Unit>
       requires IsNamed{{ dimension_name }}Unit<Named{{ dimension_name }}Unit>
       [[deprecated("Use the free function get{{ dimension_name }}() instead.")]]
+      // cppcheck-suppress unusedFunction
       double Get{{ dimension_name }}() const
       {
          return get{{ dimension_name }}<Named{{ dimension_name }}Unit>(*this);

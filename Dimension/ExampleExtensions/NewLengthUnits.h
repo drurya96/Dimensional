@@ -36,11 +36,10 @@ namespace Dimension
    };
 
    template<int I = 0>
-   class BarSub : public LengthUnit<BarSub<I>, "BarSub", "zzz">
+   class BarSub : public LengthUnit<BarSub<I>, "BarSub", "zzz", I>
    {
    public:
-      using LengthUnit<BarSub<I>, "BarSub", "zzz">::LengthUnit;
-      static constexpr int ID = I;
+      using LengthUnit<BarSub<I>, "BarSub", "zzz", I>::LengthUnit;
    };
 
    template<int I> struct Conversion<Meters, BarSub<I>> { static constexpr PrecisionType slope = Conversion<Meters, Bar>::slope; };

@@ -81,13 +81,15 @@ namespace Dimension
 
       /// @brief Constructs a MomentOfInertia object with a value.
       /// @param val The value of the MomentOfInertia.
-      constexpr MomentOfInertia(PrecisionType val) : Base(val) {}
+      explicit constexpr MomentOfInertia(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a MomentOfInertia object from a named unit.
       /// @tparam NamedMomentOfInertia The named unit type.
       /// @param base The base unit object.
       template<typename NamedMomentOfInertia>
       requires IsNamedMomentOfInertiaUnit<NamedMomentOfInertia>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr MomentOfInertia(const NamedMomentOfInertia& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of MomentOfInertia.
@@ -96,6 +98,7 @@ namespace Dimension
       template<typename Mass1T, typename Length1T, typename Length2T>
       requires IsMomentOfInertiaUnits<Mass1T, Length1T, Length2T>
       [[deprecated("Use the free function getMomentOfInertia() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMomentOfInertia() const
       {
          return getMomentOfInertia<Mass1T, Length1T, Length2T>(*this);
@@ -107,6 +110,7 @@ namespace Dimension
       template<typename NamedMomentOfInertia>
       requires IsNamedMomentOfInertiaUnit<NamedMomentOfInertia>
       [[deprecated("Use the free function getMomentOfInertia() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMomentOfInertia() const
       {
          return getMomentOfInertia<NamedMomentOfInertia>(*this);
@@ -126,13 +130,15 @@ namespace Dimension
 
       /// @brief Constructs a MomentOfInertia object with a value.
       /// @param val The value of the MomentOfInertia.
-      constexpr MomentOfInertia(PrecisionType val) : Base(val) {}
+      explicit constexpr MomentOfInertia(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a MomentOfInertia object from another MomentOfInertia object.
       /// @tparam OtherMomentOfInertia The other MomentOfInertia type.
       /// @param base The base MomentOfInertia object.
       template<typename OtherMomentOfInertia>
       requires IsMomentOfInertiaType<OtherMomentOfInertia>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr MomentOfInertia(const OtherMomentOfInertia& base)
          : Base(base.template GetVal<typename NamedMomentOfInertia::NumTuple, typename NamedMomentOfInertia::DenTuple>()) {}
 
@@ -142,6 +148,7 @@ namespace Dimension
       template<typename Mass1T, typename Length1T, typename Length2T>
       requires IsMomentOfInertiaUnits<Mass1T, Length1T, Length2T>
       [[deprecated("Use the free function getMomentOfInertia() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMomentOfInertia() const
       {
          return getMomentOfInertia<Mass1T, Length1T, Length2T>(*this);
@@ -153,6 +160,7 @@ namespace Dimension
       template<typename NamedMomentOfInertiaUnit>
       requires IsNamedMomentOfInertiaUnit<NamedMomentOfInertiaUnit>
       [[deprecated("Use the free function getMomentOfInertia() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMomentOfInertia() const
       {
          return getMomentOfInertia<NamedMomentOfInertiaUnit>(*this);
