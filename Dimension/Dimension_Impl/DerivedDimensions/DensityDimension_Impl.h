@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_DENSITY_IMPL_H
 #define STATIC_DIMENSION_DENSITY_IMPL_H
 
-#include "../../LengthDimension.h"
 #include "../../MassDimension.h"
+#include "../../LengthDimension.h"
 
 namespace Dimension
 {
@@ -85,13 +85,15 @@ namespace Dimension
 
       /// @brief Constructs a Density object with a value.
       /// @param val The value of the Density.
-      constexpr Density(PrecisionType val) : Base(val) {}
+      explicit constexpr Density(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Density object from a named unit.
       /// @tparam NamedDensity The named unit type.
       /// @param base The base unit object.
       template<typename NamedDensity>
       requires IsNamedDensityUnit<NamedDensity>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Density(const NamedDensity& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of Density.
@@ -100,6 +102,7 @@ namespace Dimension
       template<typename Mass1T,typename Length1T, typename Length2T, typename Length3T>
       requires IsDensityUnits<Mass1T,Length1T, Length2T, Length3T>
       [[deprecated("Use the free function getDensity() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetDensity() const
       {
          return getDensity<Mass1T,Length1T, Length2T, Length3T>(*this);
@@ -111,6 +114,7 @@ namespace Dimension
       template<typename NamedDensity>
       requires IsNamedDensityUnit<NamedDensity>
       [[deprecated("Use the free function getDensity() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetDensity() const
       {
          return getDensity<NamedDensity>(*this);
@@ -130,13 +134,15 @@ namespace Dimension
 
       /// @brief Constructs a Density object with a value.
       /// @param val The value of the Density.
-      constexpr Density(PrecisionType val) : Base(val) {}
+      explicit constexpr Density(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Density object from another Density object.
       /// @tparam OtherDensity The other Density type.
       /// @param base The base Density object.
       template<typename OtherDensity>
       requires IsDensityType<OtherDensity>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Density(const OtherDensity& base)
          : Base(base.template GetVal<typename NamedDensity::NumTuple, typename NamedDensity::DenTuple>()) {}
 
@@ -146,6 +152,7 @@ namespace Dimension
       template<typename Mass1T,typename Length1T, typename Length2T, typename Length3T>
       requires IsDensityUnits<Mass1T,Length1T, Length2T, Length3T>
       [[deprecated("Use the free function getDensity() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetDensity() const
       {
          return getDensity<Mass1T,Length1T, Length2T, Length3T>(*this);
@@ -157,6 +164,7 @@ namespace Dimension
       template<typename NamedDensityUnit>
       requires IsNamedDensityUnit<NamedDensityUnit>
       [[deprecated("Use the free function getDensity() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetDensity() const
       {
          return getDensity<NamedDensityUnit>(*this);

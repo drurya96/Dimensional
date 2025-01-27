@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_ELECTRICPOTENTIAL_IMPL_H
 #define STATIC_DIMENSION_ELECTRICPOTENTIAL_IMPL_H
 
-#include "../../LengthDimension.h"
 #include "../../TimeDimension.h"
+#include "../../LengthDimension.h"
 #include "../../ChargeDimension.h"
 #include "../../MassDimension.h"
 
@@ -95,13 +95,15 @@ namespace Dimension
 
       /// @brief Constructs a ElectricPotential object with a value.
       /// @param val The value of the ElectricPotential.
-      constexpr ElectricPotential(PrecisionType val) : Base(val) {}
+      explicit constexpr ElectricPotential(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a ElectricPotential object from a named unit.
       /// @tparam NamedElectricPotential The named unit type.
       /// @param base The base unit object.
       template<typename NamedElectricPotential>
       requires IsNamedElectricPotentialUnit<NamedElectricPotential>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr ElectricPotential(const NamedElectricPotential& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of ElectricPotential.
@@ -110,6 +112,7 @@ namespace Dimension
       template<typename Mass1T, typename Length1T, typename Length2T,typename Time1T, typename Time2T, typename Charge1T>
       requires IsElectricPotentialUnits<Mass1T, Length1T, Length2T,Time1T, Time2T, Charge1T>
       [[deprecated("Use the free function getElectricPotential() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetElectricPotential() const
       {
          return getElectricPotential<Mass1T, Length1T, Length2T,Time1T, Time2T, Charge1T>(*this);
@@ -121,6 +124,7 @@ namespace Dimension
       template<typename NamedElectricPotential>
       requires IsNamedElectricPotentialUnit<NamedElectricPotential>
       [[deprecated("Use the free function getElectricPotential() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetElectricPotential() const
       {
          return getElectricPotential<NamedElectricPotential>(*this);
@@ -140,13 +144,15 @@ namespace Dimension
 
       /// @brief Constructs a ElectricPotential object with a value.
       /// @param val The value of the ElectricPotential.
-      constexpr ElectricPotential(PrecisionType val) : Base(val) {}
+      explicit constexpr ElectricPotential(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a ElectricPotential object from another ElectricPotential object.
       /// @tparam OtherElectricPotential The other ElectricPotential type.
       /// @param base The base ElectricPotential object.
       template<typename OtherElectricPotential>
       requires IsElectricPotentialType<OtherElectricPotential>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr ElectricPotential(const OtherElectricPotential& base)
          : Base(base.template GetVal<typename NamedElectricPotential::NumTuple, typename NamedElectricPotential::DenTuple>()) {}
 
@@ -156,6 +162,7 @@ namespace Dimension
       template<typename Mass1T, typename Length1T, typename Length2T,typename Time1T, typename Time2T, typename Charge1T>
       requires IsElectricPotentialUnits<Mass1T, Length1T, Length2T,Time1T, Time2T, Charge1T>
       [[deprecated("Use the free function getElectricPotential() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetElectricPotential() const
       {
          return getElectricPotential<Mass1T, Length1T, Length2T,Time1T, Time2T, Charge1T>(*this);
@@ -167,6 +174,7 @@ namespace Dimension
       template<typename NamedElectricPotentialUnit>
       requires IsNamedElectricPotentialUnit<NamedElectricPotentialUnit>
       [[deprecated("Use the free function getElectricPotential() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetElectricPotential() const
       {
          return getElectricPotential<NamedElectricPotentialUnit>(*this);

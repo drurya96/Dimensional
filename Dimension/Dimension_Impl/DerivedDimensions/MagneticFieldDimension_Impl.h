@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_MAGNETICFIELD_IMPL_H
 #define STATIC_DIMENSION_MAGNETICFIELD_IMPL_H
 
-#include "../../ChargeDimension.h"
 #include "../../TimeDimension.h"
 #include "../../MassDimension.h"
+#include "../../ChargeDimension.h"
 
 namespace Dimension
 {
@@ -82,13 +82,15 @@ namespace Dimension
 
       /// @brief Constructs a MagneticField object with a value.
       /// @param val The value of the MagneticField.
-      constexpr MagneticField(PrecisionType val) : Base(val) {}
+      explicit constexpr MagneticField(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a MagneticField object from a named unit.
       /// @tparam NamedMagneticField The named unit type.
       /// @param base The base unit object.
       template<typename NamedMagneticField>
       requires IsNamedMagneticFieldUnit<NamedMagneticField>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr MagneticField(const NamedMagneticField& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of MagneticField.
@@ -97,6 +99,7 @@ namespace Dimension
       template<typename Mass1T,typename Time1T, typename Charge1T>
       requires IsMagneticFieldUnits<Mass1T,Time1T, Charge1T>
       [[deprecated("Use the free function getMagneticField() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMagneticField() const
       {
          return getMagneticField<Mass1T,Time1T, Charge1T>(*this);
@@ -108,6 +111,7 @@ namespace Dimension
       template<typename NamedMagneticField>
       requires IsNamedMagneticFieldUnit<NamedMagneticField>
       [[deprecated("Use the free function getMagneticField() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMagneticField() const
       {
          return getMagneticField<NamedMagneticField>(*this);
@@ -127,13 +131,15 @@ namespace Dimension
 
       /// @brief Constructs a MagneticField object with a value.
       /// @param val The value of the MagneticField.
-      constexpr MagneticField(PrecisionType val) : Base(val) {}
+      explicit constexpr MagneticField(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a MagneticField object from another MagneticField object.
       /// @tparam OtherMagneticField The other MagneticField type.
       /// @param base The base MagneticField object.
       template<typename OtherMagneticField>
       requires IsMagneticFieldType<OtherMagneticField>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr MagneticField(const OtherMagneticField& base)
          : Base(base.template GetVal<typename NamedMagneticField::NumTuple, typename NamedMagneticField::DenTuple>()) {}
 
@@ -143,6 +149,7 @@ namespace Dimension
       template<typename Mass1T,typename Time1T, typename Charge1T>
       requires IsMagneticFieldUnits<Mass1T,Time1T, Charge1T>
       [[deprecated("Use the free function getMagneticField() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMagneticField() const
       {
          return getMagneticField<Mass1T,Time1T, Charge1T>(*this);
@@ -154,6 +161,7 @@ namespace Dimension
       template<typename NamedMagneticFieldUnit>
       requires IsNamedMagneticFieldUnit<NamedMagneticFieldUnit>
       [[deprecated("Use the free function getMagneticField() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMagneticField() const
       {
          return getMagneticField<NamedMagneticFieldUnit>(*this);

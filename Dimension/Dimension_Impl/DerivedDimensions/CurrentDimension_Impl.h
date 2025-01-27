@@ -77,13 +77,15 @@ namespace Dimension
 
       /// @brief Constructs a Current object with a value.
       /// @param val The value of the Current.
-      constexpr Current(PrecisionType val) : Base(val) {}
+      explicit constexpr Current(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Current object from a named unit.
       /// @tparam NamedCurrent The named unit type.
       /// @param base The base unit object.
       template<typename NamedCurrent>
       requires IsNamedCurrentUnit<NamedCurrent>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Current(const NamedCurrent& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of Current.
@@ -92,6 +94,7 @@ namespace Dimension
       template<typename Charge1T,typename Time1T>
       requires IsCurrentUnits<Charge1T,Time1T>
       [[deprecated("Use the free function getCurrent() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetCurrent() const
       {
          return getCurrent<Charge1T,Time1T>(*this);
@@ -103,6 +106,7 @@ namespace Dimension
       template<typename NamedCurrent>
       requires IsNamedCurrentUnit<NamedCurrent>
       [[deprecated("Use the free function getCurrent() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetCurrent() const
       {
          return getCurrent<NamedCurrent>(*this);
@@ -122,13 +126,15 @@ namespace Dimension
 
       /// @brief Constructs a Current object with a value.
       /// @param val The value of the Current.
-      constexpr Current(PrecisionType val) : Base(val) {}
+      explicit constexpr Current(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Current object from another Current object.
       /// @tparam OtherCurrent The other Current type.
       /// @param base The base Current object.
       template<typename OtherCurrent>
       requires IsCurrentType<OtherCurrent>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Current(const OtherCurrent& base)
          : Base(base.template GetVal<typename NamedCurrent::NumTuple, typename NamedCurrent::DenTuple>()) {}
 
@@ -138,6 +144,7 @@ namespace Dimension
       template<typename Charge1T,typename Time1T>
       requires IsCurrentUnits<Charge1T,Time1T>
       [[deprecated("Use the free function getCurrent() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetCurrent() const
       {
          return getCurrent<Charge1T,Time1T>(*this);
@@ -149,6 +156,7 @@ namespace Dimension
       template<typename NamedCurrentUnit>
       requires IsNamedCurrentUnit<NamedCurrentUnit>
       [[deprecated("Use the free function getCurrent() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetCurrent() const
       {
          return getCurrent<NamedCurrentUnit>(*this);

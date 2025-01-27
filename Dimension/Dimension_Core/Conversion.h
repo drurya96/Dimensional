@@ -148,6 +148,7 @@ namespace Dimension
 
    // Metafunction to transform the entire rhs tuple based on lhs tuple
    template <typename LhsTuple, typename RhsTuple, size_t... Is>
+   // cppcheck-suppress unusedFunction // Only used for type deduction
    auto transform_rhs_impl(std::index_sequence<Is...>) 
       -> std::tuple< typename transform_rhs_element<
                      std::tuple_element_t<Is, LhsTuple>, 
@@ -467,6 +468,7 @@ namespace Dimension
    requires (I < std::tuple_size_v<fromTup>)
    constexpr PrecisionType ConvertDimension(PrecisionType value)
    {
+      // cppcheck-suppress templateRecursion // cppcheck isn't aware of the requires clause preventing infinite recursion
       using fromType = std::tuple_element_t<I, fromTup>;
       using toType = typename get_first_match<is_same_dim, fromType, toTuple>::type;
 

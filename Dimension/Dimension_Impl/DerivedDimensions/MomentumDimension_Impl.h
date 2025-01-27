@@ -82,13 +82,15 @@ namespace Dimension
 
       /// @brief Constructs a Momentum object with a value.
       /// @param val The value of the Momentum.
-      constexpr Momentum(PrecisionType val) : Base(val) {}
+      explicit constexpr Momentum(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Momentum object from a named unit.
       /// @tparam NamedMomentum The named unit type.
       /// @param base The base unit object.
       template<typename NamedMomentum>
       requires IsNamedMomentumUnit<NamedMomentum>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Momentum(const NamedMomentum& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of Momentum.
@@ -97,6 +99,7 @@ namespace Dimension
       template<typename Mass1T, typename Length1T,typename Time1T>
       requires IsMomentumUnits<Mass1T, Length1T,Time1T>
       [[deprecated("Use the free function getMomentum() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMomentum() const
       {
          return getMomentum<Mass1T, Length1T,Time1T>(*this);
@@ -108,6 +111,7 @@ namespace Dimension
       template<typename NamedMomentum>
       requires IsNamedMomentumUnit<NamedMomentum>
       [[deprecated("Use the free function getMomentum() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMomentum() const
       {
          return getMomentum<NamedMomentum>(*this);
@@ -127,13 +131,15 @@ namespace Dimension
 
       /// @brief Constructs a Momentum object with a value.
       /// @param val The value of the Momentum.
-      constexpr Momentum(PrecisionType val) : Base(val) {}
+      explicit constexpr Momentum(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Momentum object from another Momentum object.
       /// @tparam OtherMomentum The other Momentum type.
       /// @param base The base Momentum object.
       template<typename OtherMomentum>
       requires IsMomentumType<OtherMomentum>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Momentum(const OtherMomentum& base)
          : Base(base.template GetVal<typename NamedMomentum::NumTuple, typename NamedMomentum::DenTuple>()) {}
 
@@ -143,6 +149,7 @@ namespace Dimension
       template<typename Mass1T, typename Length1T,typename Time1T>
       requires IsMomentumUnits<Mass1T, Length1T,Time1T>
       [[deprecated("Use the free function getMomentum() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMomentum() const
       {
          return getMomentum<Mass1T, Length1T,Time1T>(*this);
@@ -154,6 +161,7 @@ namespace Dimension
       template<typename NamedMomentumUnit>
       requires IsNamedMomentumUnit<NamedMomentumUnit>
       [[deprecated("Use the free function getMomentum() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetMomentum() const
       {
          return getMomentum<NamedMomentumUnit>(*this);

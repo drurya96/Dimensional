@@ -14,5 +14,5 @@ class DimensionalConan(ConanFile):
 
     def package_info(self):
         self.info.header_only()  # Indicate this is a header-only library
-        self.cpp_info.cxxflags = ["-DUSE_DOUBLE"]
+        self.cpp_info.cxxflags = ["-DUSE_DOUBLE", "-DUSE_CONAN=ON"]
     

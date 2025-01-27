@@ -85,13 +85,15 @@ namespace Dimension
 
       /// @brief Constructs a HeatFlux object with a value.
       /// @param val The value of the HeatFlux.
-      constexpr HeatFlux(PrecisionType val) : Base(val) {}
+      explicit constexpr HeatFlux(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a HeatFlux object from a named unit.
       /// @tparam NamedHeatFlux The named unit type.
       /// @param base The base unit object.
       template<typename NamedHeatFlux>
       requires IsNamedHeatFluxUnit<NamedHeatFlux>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr HeatFlux(const NamedHeatFlux& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of HeatFlux.
@@ -100,6 +102,7 @@ namespace Dimension
       template<typename Mass1T,typename Time1T, typename Time2T, typename Time3T>
       requires IsHeatFluxUnits<Mass1T,Time1T, Time2T, Time3T>
       [[deprecated("Use the free function getHeatFlux() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetHeatFlux() const
       {
          return getHeatFlux<Mass1T,Time1T, Time2T, Time3T>(*this);
@@ -111,6 +114,7 @@ namespace Dimension
       template<typename NamedHeatFlux>
       requires IsNamedHeatFluxUnit<NamedHeatFlux>
       [[deprecated("Use the free function getHeatFlux() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetHeatFlux() const
       {
          return getHeatFlux<NamedHeatFlux>(*this);
@@ -130,13 +134,15 @@ namespace Dimension
 
       /// @brief Constructs a HeatFlux object with a value.
       /// @param val The value of the HeatFlux.
-      constexpr HeatFlux(PrecisionType val) : Base(val) {}
+      explicit constexpr HeatFlux(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a HeatFlux object from another HeatFlux object.
       /// @tparam OtherHeatFlux The other HeatFlux type.
       /// @param base The base HeatFlux object.
       template<typename OtherHeatFlux>
       requires IsHeatFluxType<OtherHeatFlux>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr HeatFlux(const OtherHeatFlux& base)
          : Base(base.template GetVal<typename NamedHeatFlux::NumTuple, typename NamedHeatFlux::DenTuple>()) {}
 
@@ -146,6 +152,7 @@ namespace Dimension
       template<typename Mass1T,typename Time1T, typename Time2T, typename Time3T>
       requires IsHeatFluxUnits<Mass1T,Time1T, Time2T, Time3T>
       [[deprecated("Use the free function getHeatFlux() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetHeatFlux() const
       {
          return getHeatFlux<Mass1T,Time1T, Time2T, Time3T>(*this);
@@ -157,6 +164,7 @@ namespace Dimension
       template<typename NamedHeatFluxUnit>
       requires IsNamedHeatFluxUnit<NamedHeatFluxUnit>
       [[deprecated("Use the free function getHeatFlux() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetHeatFlux() const
       {
          return getHeatFlux<NamedHeatFluxUnit>(*this);

@@ -1,10 +1,10 @@
 #ifndef STATIC_DIMENSION_CAPACITANCE_IMPL_H
 #define STATIC_DIMENSION_CAPACITANCE_IMPL_H
 
-#include "../../MassDimension.h"
 #include "../../LengthDimension.h"
-#include "../../TimeDimension.h"
 #include "../../ChargeDimension.h"
+#include "../../MassDimension.h"
+#include "../../TimeDimension.h"
 
 namespace Dimension
 {
@@ -99,13 +99,15 @@ namespace Dimension
 
       /// @brief Constructs a Capacitance object with a value.
       /// @param val The value of the Capacitance.
-      constexpr Capacitance(PrecisionType val) : Base(val) {}
+      explicit constexpr Capacitance(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Capacitance object from a named unit.
       /// @tparam NamedCapacitance The named unit type.
       /// @param base The base unit object.
       template<typename NamedCapacitance>
       requires IsNamedCapacitanceUnit<NamedCapacitance>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Capacitance(const NamedCapacitance& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of Capacitance.
@@ -114,6 +116,7 @@ namespace Dimension
       template<typename Charge1T, typename Charge2T, typename Time1T, typename Time2T,typename Mass1T, typename Length1T, typename Length2T>
       requires IsCapacitanceUnits<Charge1T, Charge2T, Time1T, Time2T,Mass1T, Length1T, Length2T>
       [[deprecated("Use the free function getCapacitance() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetCapacitance() const
       {
          return getCapacitance<Charge1T, Charge2T, Time1T, Time2T,Mass1T, Length1T, Length2T>(*this);
@@ -125,6 +128,7 @@ namespace Dimension
       template<typename NamedCapacitance>
       requires IsNamedCapacitanceUnit<NamedCapacitance>
       [[deprecated("Use the free function getCapacitance() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetCapacitance() const
       {
          return getCapacitance<NamedCapacitance>(*this);
@@ -144,13 +148,15 @@ namespace Dimension
 
       /// @brief Constructs a Capacitance object with a value.
       /// @param val The value of the Capacitance.
-      constexpr Capacitance(PrecisionType val) : Base(val) {}
+      explicit constexpr Capacitance(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Capacitance object from another Capacitance object.
       /// @tparam OtherCapacitance The other Capacitance type.
       /// @param base The base Capacitance object.
       template<typename OtherCapacitance>
       requires IsCapacitanceType<OtherCapacitance>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Capacitance(const OtherCapacitance& base)
          : Base(base.template GetVal<typename NamedCapacitance::NumTuple, typename NamedCapacitance::DenTuple>()) {}
 
@@ -160,6 +166,7 @@ namespace Dimension
       template<typename Charge1T, typename Charge2T, typename Time1T, typename Time2T,typename Mass1T, typename Length1T, typename Length2T>
       requires IsCapacitanceUnits<Charge1T, Charge2T, Time1T, Time2T,Mass1T, Length1T, Length2T>
       [[deprecated("Use the free function getCapacitance() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetCapacitance() const
       {
          return getCapacitance<Charge1T, Charge2T, Time1T, Time2T,Mass1T, Length1T, Length2T>(*this);
@@ -171,6 +178,7 @@ namespace Dimension
       template<typename NamedCapacitanceUnit>
       requires IsNamedCapacitanceUnit<NamedCapacitanceUnit>
       [[deprecated("Use the free function getCapacitance() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetCapacitance() const
       {
          return getCapacitance<NamedCapacitanceUnit>(*this);

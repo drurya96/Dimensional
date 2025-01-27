@@ -85,13 +85,15 @@ namespace Dimension
 
       /// @brief Constructs a VolumetricFlowRate object with a value.
       /// @param val The value of the VolumetricFlowRate.
-      constexpr VolumetricFlowRate(PrecisionType val) : Base(val) {}
+      explicit constexpr VolumetricFlowRate(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a VolumetricFlowRate object from a named unit.
       /// @tparam NamedVolumetricFlowRate The named unit type.
       /// @param base The base unit object.
       template<typename NamedVolumetricFlowRate>
       requires IsNamedVolumetricFlowRateUnit<NamedVolumetricFlowRate>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr VolumetricFlowRate(const NamedVolumetricFlowRate& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of VolumetricFlowRate.
@@ -100,6 +102,7 @@ namespace Dimension
       template<typename Length1T, typename Length2T, typename Length3T,typename Time1T>
       requires IsVolumetricFlowRateUnits<Length1T, Length2T, Length3T,Time1T>
       [[deprecated("Use the free function getVolumetricFlowRate() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetVolumetricFlowRate() const
       {
          return getVolumetricFlowRate<Length1T, Length2T, Length3T,Time1T>(*this);
@@ -111,6 +114,7 @@ namespace Dimension
       template<typename NamedVolumetricFlowRate>
       requires IsNamedVolumetricFlowRateUnit<NamedVolumetricFlowRate>
       [[deprecated("Use the free function getVolumetricFlowRate() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetVolumetricFlowRate() const
       {
          return getVolumetricFlowRate<NamedVolumetricFlowRate>(*this);
@@ -130,13 +134,15 @@ namespace Dimension
 
       /// @brief Constructs a VolumetricFlowRate object with a value.
       /// @param val The value of the VolumetricFlowRate.
-      constexpr VolumetricFlowRate(PrecisionType val) : Base(val) {}
+      explicit constexpr VolumetricFlowRate(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a VolumetricFlowRate object from another VolumetricFlowRate object.
       /// @tparam OtherVolumetricFlowRate The other VolumetricFlowRate type.
       /// @param base The base VolumetricFlowRate object.
       template<typename OtherVolumetricFlowRate>
       requires IsVolumetricFlowRateType<OtherVolumetricFlowRate>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr VolumetricFlowRate(const OtherVolumetricFlowRate& base)
          : Base(base.template GetVal<typename NamedVolumetricFlowRate::NumTuple, typename NamedVolumetricFlowRate::DenTuple>()) {}
 
@@ -146,6 +152,7 @@ namespace Dimension
       template<typename Length1T, typename Length2T, typename Length3T,typename Time1T>
       requires IsVolumetricFlowRateUnits<Length1T, Length2T, Length3T,Time1T>
       [[deprecated("Use the free function getVolumetricFlowRate() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetVolumetricFlowRate() const
       {
          return getVolumetricFlowRate<Length1T, Length2T, Length3T,Time1T>(*this);
@@ -157,6 +164,7 @@ namespace Dimension
       template<typename NamedVolumetricFlowRateUnit>
       requires IsNamedVolumetricFlowRateUnit<NamedVolumetricFlowRateUnit>
       [[deprecated("Use the free function getVolumetricFlowRate() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetVolumetricFlowRate() const
       {
          return getVolumetricFlowRate<NamedVolumetricFlowRateUnit>(*this);

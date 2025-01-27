@@ -72,13 +72,15 @@ namespace Dimension
 
       /// @brief Constructs a Frequency object with a value.
       /// @param val The value of the Frequency.
-      constexpr Frequency(PrecisionType val) : Base(val) {}
+      explicit constexpr Frequency(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Frequency object from a named unit.
       /// @tparam NamedFrequency The named unit type.
       /// @param base The base unit object.
       template<typename NamedFrequency>
       requires IsNamedFrequencyUnit<NamedFrequency>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Frequency(const NamedFrequency& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of Frequency.
@@ -87,6 +89,7 @@ namespace Dimension
       template<typename Time1T>
       requires IsFrequencyUnits<Time1T>
       [[deprecated("Use the free function getFrequency() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetFrequency() const
       {
          return getFrequency<Time1T>(*this);
@@ -98,6 +101,7 @@ namespace Dimension
       template<typename NamedFrequency>
       requires IsNamedFrequencyUnit<NamedFrequency>
       [[deprecated("Use the free function getFrequency() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetFrequency() const
       {
          return getFrequency<NamedFrequency>(*this);
@@ -117,13 +121,15 @@ namespace Dimension
 
       /// @brief Constructs a Frequency object with a value.
       /// @param val The value of the Frequency.
-      constexpr Frequency(PrecisionType val) : Base(val) {}
+      explicit constexpr Frequency(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Frequency object from another Frequency object.
       /// @tparam OtherFrequency The other Frequency type.
       /// @param base The base Frequency object.
       template<typename OtherFrequency>
       requires IsFrequencyType<OtherFrequency>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Frequency(const OtherFrequency& base)
          : Base(base.template GetVal<typename NamedFrequency::NumTuple, typename NamedFrequency::DenTuple>()) {}
 
@@ -133,6 +139,7 @@ namespace Dimension
       template<typename Time1T>
       requires IsFrequencyUnits<Time1T>
       [[deprecated("Use the free function getFrequency() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetFrequency() const
       {
          return getFrequency<Time1T>(*this);
@@ -144,6 +151,7 @@ namespace Dimension
       template<typename NamedFrequencyUnit>
       requires IsNamedFrequencyUnit<NamedFrequencyUnit>
       [[deprecated("Use the free function getFrequency() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetFrequency() const
       {
          return getFrequency<NamedFrequencyUnit>(*this);

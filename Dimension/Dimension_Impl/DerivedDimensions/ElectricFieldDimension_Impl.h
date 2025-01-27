@@ -1,10 +1,10 @@
 #ifndef STATIC_DIMENSION_ELECTRICFIELD_IMPL_H
 #define STATIC_DIMENSION_ELECTRICFIELD_IMPL_H
 
-#include "../../ChargeDimension.h"
-#include "../../TimeDimension.h"
 #include "../../MassDimension.h"
+#include "../../TimeDimension.h"
 #include "../../LengthDimension.h"
+#include "../../ChargeDimension.h"
 
 namespace Dimension
 {
@@ -91,13 +91,15 @@ namespace Dimension
 
       /// @brief Constructs a ElectricField object with a value.
       /// @param val The value of the ElectricField.
-      constexpr ElectricField(PrecisionType val) : Base(val) {}
+      explicit constexpr ElectricField(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a ElectricField object from a named unit.
       /// @tparam NamedElectricField The named unit type.
       /// @param base The base unit object.
       template<typename NamedElectricField>
       requires IsNamedElectricFieldUnit<NamedElectricField>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr ElectricField(const NamedElectricField& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of ElectricField.
@@ -106,6 +108,7 @@ namespace Dimension
       template<typename Mass1T, typename Length1T,typename Time1T, typename Time2T, typename Charge1T>
       requires IsElectricFieldUnits<Mass1T, Length1T,Time1T, Time2T, Charge1T>
       [[deprecated("Use the free function getElectricField() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetElectricField() const
       {
          return getElectricField<Mass1T, Length1T,Time1T, Time2T, Charge1T>(*this);
@@ -117,6 +120,7 @@ namespace Dimension
       template<typename NamedElectricField>
       requires IsNamedElectricFieldUnit<NamedElectricField>
       [[deprecated("Use the free function getElectricField() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetElectricField() const
       {
          return getElectricField<NamedElectricField>(*this);
@@ -136,13 +140,15 @@ namespace Dimension
 
       /// @brief Constructs a ElectricField object with a value.
       /// @param val The value of the ElectricField.
-      constexpr ElectricField(PrecisionType val) : Base(val) {}
+      explicit constexpr ElectricField(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a ElectricField object from another ElectricField object.
       /// @tparam OtherElectricField The other ElectricField type.
       /// @param base The base ElectricField object.
       template<typename OtherElectricField>
       requires IsElectricFieldType<OtherElectricField>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr ElectricField(const OtherElectricField& base)
          : Base(base.template GetVal<typename NamedElectricField::NumTuple, typename NamedElectricField::DenTuple>()) {}
 
@@ -152,6 +158,7 @@ namespace Dimension
       template<typename Mass1T, typename Length1T,typename Time1T, typename Time2T, typename Charge1T>
       requires IsElectricFieldUnits<Mass1T, Length1T,Time1T, Time2T, Charge1T>
       [[deprecated("Use the free function getElectricField() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetElectricField() const
       {
          return getElectricField<Mass1T, Length1T,Time1T, Time2T, Charge1T>(*this);
@@ -163,6 +170,7 @@ namespace Dimension
       template<typename NamedElectricFieldUnit>
       requires IsNamedElectricFieldUnit<NamedElectricFieldUnit>
       [[deprecated("Use the free function getElectricField() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetElectricField() const
       {
          return getElectricField<NamedElectricFieldUnit>(*this);

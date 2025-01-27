@@ -94,13 +94,15 @@ namespace Dimension
 
       /// @brief Constructs a Power object with a value.
       /// @param val The value of the Power.
-      constexpr Power(PrecisionType val) : Base(val) {}
+      explicit constexpr Power(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Power object from a named unit.
       /// @tparam NamedPower The named unit type.
       /// @param base The base unit object.
       template<typename NamedPower>
       requires IsNamedPowerUnit<NamedPower>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Power(const NamedPower& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of Power.
@@ -109,6 +111,7 @@ namespace Dimension
       template<typename Mass1T, typename Length1T, typename Length2T,typename Time1T, typename Time2T, typename Time3T>
       requires IsPowerUnits<Mass1T, Length1T, Length2T,Time1T, Time2T, Time3T>
       [[deprecated("Use the free function getPower() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetPower() const
       {
          return getPower<Mass1T, Length1T, Length2T,Time1T, Time2T, Time3T>(*this);
@@ -120,6 +123,7 @@ namespace Dimension
       template<typename NamedPower>
       requires IsNamedPowerUnit<NamedPower>
       [[deprecated("Use the free function getPower() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetPower() const
       {
          return getPower<NamedPower>(*this);
@@ -139,13 +143,15 @@ namespace Dimension
 
       /// @brief Constructs a Power object with a value.
       /// @param val The value of the Power.
-      constexpr Power(PrecisionType val) : Base(val) {}
+      explicit constexpr Power(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Power object from another Power object.
       /// @tparam OtherPower The other Power type.
       /// @param base The base Power object.
       template<typename OtherPower>
       requires IsPowerType<OtherPower>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Power(const OtherPower& base)
          : Base(base.template GetVal<typename NamedPower::NumTuple, typename NamedPower::DenTuple>()) {}
 
@@ -155,6 +161,7 @@ namespace Dimension
       template<typename Mass1T, typename Length1T, typename Length2T,typename Time1T, typename Time2T, typename Time3T>
       requires IsPowerUnits<Mass1T, Length1T, Length2T,Time1T, Time2T, Time3T>
       [[deprecated("Use the free function getPower() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetPower() const
       {
          return getPower<Mass1T, Length1T, Length2T,Time1T, Time2T, Time3T>(*this);
@@ -166,6 +173,7 @@ namespace Dimension
       template<typename NamedPowerUnit>
       requires IsNamedPowerUnit<NamedPowerUnit>
       [[deprecated("Use the free function getPower() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetPower() const
       {
          return getPower<NamedPowerUnit>(*this);

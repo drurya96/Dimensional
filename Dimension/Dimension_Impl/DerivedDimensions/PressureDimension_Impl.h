@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_PRESSURE_IMPL_H
 #define STATIC_DIMENSION_PRESSURE_IMPL_H
 
+#include "../../MassDimension.h"
 #include "../../LengthDimension.h"
 #include "../../TimeDimension.h"
-#include "../../MassDimension.h"
 
 namespace Dimension
 {
@@ -86,13 +86,15 @@ namespace Dimension
 
       /// @brief Constructs a Pressure object with a value.
       /// @param val The value of the Pressure.
-      constexpr Pressure(PrecisionType val) : Base(val) {}
+      explicit constexpr Pressure(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Pressure object from a named unit.
       /// @tparam NamedPressure The named unit type.
       /// @param base The base unit object.
       template<typename NamedPressure>
       requires IsNamedPressureUnit<NamedPressure>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Pressure(const NamedPressure& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of Pressure.
@@ -101,6 +103,7 @@ namespace Dimension
       template<typename Mass1T,typename Length1T, typename Time1T, typename Time2T>
       requires IsPressureUnits<Mass1T,Length1T, Time1T, Time2T>
       [[deprecated("Use the free function getPressure() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetPressure() const
       {
          return getPressure<Mass1T,Length1T, Time1T, Time2T>(*this);
@@ -112,6 +115,7 @@ namespace Dimension
       template<typename NamedPressure>
       requires IsNamedPressureUnit<NamedPressure>
       [[deprecated("Use the free function getPressure() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetPressure() const
       {
          return getPressure<NamedPressure>(*this);
@@ -131,13 +135,15 @@ namespace Dimension
 
       /// @brief Constructs a Pressure object with a value.
       /// @param val The value of the Pressure.
-      constexpr Pressure(PrecisionType val) : Base(val) {}
+      explicit constexpr Pressure(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Pressure object from another Pressure object.
       /// @tparam OtherPressure The other Pressure type.
       /// @param base The base Pressure object.
       template<typename OtherPressure>
       requires IsPressureType<OtherPressure>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Pressure(const OtherPressure& base)
          : Base(base.template GetVal<typename NamedPressure::NumTuple, typename NamedPressure::DenTuple>()) {}
 
@@ -147,6 +153,7 @@ namespace Dimension
       template<typename Mass1T,typename Length1T, typename Time1T, typename Time2T>
       requires IsPressureUnits<Mass1T,Length1T, Time1T, Time2T>
       [[deprecated("Use the free function getPressure() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetPressure() const
       {
          return getPressure<Mass1T,Length1T, Time1T, Time2T>(*this);
@@ -158,6 +165,7 @@ namespace Dimension
       template<typename NamedPressureUnit>
       requires IsNamedPressureUnit<NamedPressureUnit>
       [[deprecated("Use the free function getPressure() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetPressure() const
       {
          return getPressure<NamedPressureUnit>(*this);

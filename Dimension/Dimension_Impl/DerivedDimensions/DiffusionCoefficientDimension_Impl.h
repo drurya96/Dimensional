@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_DIFFUSIONCOEFFICIENT_IMPL_H
 #define STATIC_DIMENSION_DIFFUSIONCOEFFICIENT_IMPL_H
 
-#include "../../LengthDimension.h"
 #include "../../TimeDimension.h"
+#include "../../LengthDimension.h"
 
 namespace Dimension
 {
@@ -81,13 +81,15 @@ namespace Dimension
 
       /// @brief Constructs a DiffusionCoefficient object with a value.
       /// @param val The value of the DiffusionCoefficient.
-      constexpr DiffusionCoefficient(PrecisionType val) : Base(val) {}
+      explicit constexpr DiffusionCoefficient(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a DiffusionCoefficient object from a named unit.
       /// @tparam NamedDiffusionCoefficient The named unit type.
       /// @param base The base unit object.
       template<typename NamedDiffusionCoefficient>
       requires IsNamedDiffusionCoefficientUnit<NamedDiffusionCoefficient>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr DiffusionCoefficient(const NamedDiffusionCoefficient& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of DiffusionCoefficient.
@@ -96,6 +98,7 @@ namespace Dimension
       template<typename Length1T, typename Length2T,typename Time1T>
       requires IsDiffusionCoefficientUnits<Length1T, Length2T,Time1T>
       [[deprecated("Use the free function getDiffusionCoefficient() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetDiffusionCoefficient() const
       {
          return getDiffusionCoefficient<Length1T, Length2T,Time1T>(*this);
@@ -107,6 +110,7 @@ namespace Dimension
       template<typename NamedDiffusionCoefficient>
       requires IsNamedDiffusionCoefficientUnit<NamedDiffusionCoefficient>
       [[deprecated("Use the free function getDiffusionCoefficient() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetDiffusionCoefficient() const
       {
          return getDiffusionCoefficient<NamedDiffusionCoefficient>(*this);
@@ -126,13 +130,15 @@ namespace Dimension
 
       /// @brief Constructs a DiffusionCoefficient object with a value.
       /// @param val The value of the DiffusionCoefficient.
-      constexpr DiffusionCoefficient(PrecisionType val) : Base(val) {}
+      explicit constexpr DiffusionCoefficient(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a DiffusionCoefficient object from another DiffusionCoefficient object.
       /// @tparam OtherDiffusionCoefficient The other DiffusionCoefficient type.
       /// @param base The base DiffusionCoefficient object.
       template<typename OtherDiffusionCoefficient>
       requires IsDiffusionCoefficientType<OtherDiffusionCoefficient>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr DiffusionCoefficient(const OtherDiffusionCoefficient& base)
          : Base(base.template GetVal<typename NamedDiffusionCoefficient::NumTuple, typename NamedDiffusionCoefficient::DenTuple>()) {}
 
@@ -142,6 +148,7 @@ namespace Dimension
       template<typename Length1T, typename Length2T,typename Time1T>
       requires IsDiffusionCoefficientUnits<Length1T, Length2T,Time1T>
       [[deprecated("Use the free function getDiffusionCoefficient() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetDiffusionCoefficient() const
       {
          return getDiffusionCoefficient<Length1T, Length2T,Time1T>(*this);
@@ -153,6 +160,7 @@ namespace Dimension
       template<typename NamedDiffusionCoefficientUnit>
       requires IsNamedDiffusionCoefficientUnit<NamedDiffusionCoefficientUnit>
       [[deprecated("Use the free function getDiffusionCoefficient() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetDiffusionCoefficient() const
       {
          return getDiffusionCoefficient<NamedDiffusionCoefficientUnit>(*this);

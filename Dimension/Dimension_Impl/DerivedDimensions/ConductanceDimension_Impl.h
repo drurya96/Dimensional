@@ -1,10 +1,10 @@
 #ifndef STATIC_DIMENSION_CONDUCTANCE_IMPL_H
 #define STATIC_DIMENSION_CONDUCTANCE_IMPL_H
 
-#include "../../ChargeDimension.h"
-#include "../../TimeDimension.h"
 #include "../../LengthDimension.h"
+#include "../../ChargeDimension.h"
 #include "../../MassDimension.h"
+#include "../../TimeDimension.h"
 
 namespace Dimension
 {
@@ -95,13 +95,15 @@ namespace Dimension
 
       /// @brief Constructs a Conductance object with a value.
       /// @param val The value of the Conductance.
-      constexpr Conductance(PrecisionType val) : Base(val) {}
+      explicit constexpr Conductance(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Conductance object from a named unit.
       /// @tparam NamedConductance The named unit type.
       /// @param base The base unit object.
       template<typename NamedConductance>
       requires IsNamedConductanceUnit<NamedConductance>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Conductance(const NamedConductance& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of Conductance.
@@ -110,6 +112,7 @@ namespace Dimension
       template<typename Time1T, typename Charge1T, typename Charge2T,typename Mass1T, typename Length1T, typename Length2T>
       requires IsConductanceUnits<Time1T, Charge1T, Charge2T,Mass1T, Length1T, Length2T>
       [[deprecated("Use the free function getConductance() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetConductance() const
       {
          return getConductance<Time1T, Charge1T, Charge2T,Mass1T, Length1T, Length2T>(*this);
@@ -121,6 +124,7 @@ namespace Dimension
       template<typename NamedConductance>
       requires IsNamedConductanceUnit<NamedConductance>
       [[deprecated("Use the free function getConductance() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetConductance() const
       {
          return getConductance<NamedConductance>(*this);
@@ -140,13 +144,15 @@ namespace Dimension
 
       /// @brief Constructs a Conductance object with a value.
       /// @param val The value of the Conductance.
-      constexpr Conductance(PrecisionType val) : Base(val) {}
+      explicit constexpr Conductance(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a Conductance object from another Conductance object.
       /// @tparam OtherConductance The other Conductance type.
       /// @param base The base Conductance object.
       template<typename OtherConductance>
       requires IsConductanceType<OtherConductance>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr Conductance(const OtherConductance& base)
          : Base(base.template GetVal<typename NamedConductance::NumTuple, typename NamedConductance::DenTuple>()) {}
 
@@ -156,6 +162,7 @@ namespace Dimension
       template<typename Time1T, typename Charge1T, typename Charge2T,typename Mass1T, typename Length1T, typename Length2T>
       requires IsConductanceUnits<Time1T, Charge1T, Charge2T,Mass1T, Length1T, Length2T>
       [[deprecated("Use the free function getConductance() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetConductance() const
       {
          return getConductance<Time1T, Charge1T, Charge2T,Mass1T, Length1T, Length2T>(*this);
@@ -167,6 +174,7 @@ namespace Dimension
       template<typename NamedConductanceUnit>
       requires IsNamedConductanceUnit<NamedConductanceUnit>
       [[deprecated("Use the free function getConductance() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetConductance() const
       {
          return getConductance<NamedConductanceUnit>(*this);

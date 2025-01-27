@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_ANGULARSPEED_IMPL_H
 #define STATIC_DIMENSION_ANGULARSPEED_IMPL_H
 
-#include "../../TimeDimension.h"
 #include "../../AngleDimension.h"
+#include "../../TimeDimension.h"
 
 namespace Dimension
 {
@@ -77,13 +77,15 @@ namespace Dimension
 
       /// @brief Constructs a AngularSpeed object with a value.
       /// @param val The value of the AngularSpeed.
-      constexpr AngularSpeed(PrecisionType val) : Base(val) {}
+      explicit constexpr AngularSpeed(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a AngularSpeed object from a named unit.
       /// @tparam NamedAngularSpeed The named unit type.
       /// @param base The base unit object.
       template<typename NamedAngularSpeed>
       requires IsNamedAngularSpeedUnit<NamedAngularSpeed>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr AngularSpeed(const NamedAngularSpeed& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of AngularSpeed.
@@ -92,6 +94,7 @@ namespace Dimension
       template<typename Angle1T,typename Time1T>
       requires IsAngularSpeedUnits<Angle1T,Time1T>
       [[deprecated("Use the free function getAngularSpeed() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetAngularSpeed() const
       {
          return getAngularSpeed<Angle1T,Time1T>(*this);
@@ -103,6 +106,7 @@ namespace Dimension
       template<typename NamedAngularSpeed>
       requires IsNamedAngularSpeedUnit<NamedAngularSpeed>
       [[deprecated("Use the free function getAngularSpeed() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetAngularSpeed() const
       {
          return getAngularSpeed<NamedAngularSpeed>(*this);
@@ -122,13 +126,15 @@ namespace Dimension
 
       /// @brief Constructs a AngularSpeed object with a value.
       /// @param val The value of the AngularSpeed.
-      constexpr AngularSpeed(PrecisionType val) : Base(val) {}
+      explicit constexpr AngularSpeed(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a AngularSpeed object from another AngularSpeed object.
       /// @tparam OtherAngularSpeed The other AngularSpeed type.
       /// @param base The base AngularSpeed object.
       template<typename OtherAngularSpeed>
       requires IsAngularSpeedType<OtherAngularSpeed>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr AngularSpeed(const OtherAngularSpeed& base)
          : Base(base.template GetVal<typename NamedAngularSpeed::NumTuple, typename NamedAngularSpeed::DenTuple>()) {}
 
@@ -138,6 +144,7 @@ namespace Dimension
       template<typename Angle1T,typename Time1T>
       requires IsAngularSpeedUnits<Angle1T,Time1T>
       [[deprecated("Use the free function getAngularSpeed() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetAngularSpeed() const
       {
          return getAngularSpeed<Angle1T,Time1T>(*this);
@@ -149,6 +156,7 @@ namespace Dimension
       template<typename NamedAngularSpeedUnit>
       requires IsNamedAngularSpeedUnit<NamedAngularSpeedUnit>
       [[deprecated("Use the free function getAngularSpeed() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetAngularSpeed() const
       {
          return getAngularSpeed<NamedAngularSpeedUnit>(*this);

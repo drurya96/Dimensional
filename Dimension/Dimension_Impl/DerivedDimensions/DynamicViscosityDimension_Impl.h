@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_DYNAMICVISCOSITY_IMPL_H
 #define STATIC_DIMENSION_DYNAMICVISCOSITY_IMPL_H
 
-#include "../../LengthDimension.h"
 #include "../../TimeDimension.h"
+#include "../../LengthDimension.h"
 #include "../../MassDimension.h"
 
 namespace Dimension
@@ -82,13 +82,15 @@ namespace Dimension
 
       /// @brief Constructs a DynamicViscosity object with a value.
       /// @param val The value of the DynamicViscosity.
-      constexpr DynamicViscosity(PrecisionType val) : Base(val) {}
+      explicit constexpr DynamicViscosity(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a DynamicViscosity object from a named unit.
       /// @tparam NamedDynamicViscosity The named unit type.
       /// @param base The base unit object.
       template<typename NamedDynamicViscosity>
       requires IsNamedDynamicViscosityUnit<NamedDynamicViscosity>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr DynamicViscosity(const NamedDynamicViscosity& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of DynamicViscosity.
@@ -97,6 +99,7 @@ namespace Dimension
       template<typename Mass1T,typename Time1T, typename Length1T>
       requires IsDynamicViscosityUnits<Mass1T,Time1T, Length1T>
       [[deprecated("Use the free function getDynamicViscosity() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetDynamicViscosity() const
       {
          return getDynamicViscosity<Mass1T,Time1T, Length1T>(*this);
@@ -108,6 +111,7 @@ namespace Dimension
       template<typename NamedDynamicViscosity>
       requires IsNamedDynamicViscosityUnit<NamedDynamicViscosity>
       [[deprecated("Use the free function getDynamicViscosity() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetDynamicViscosity() const
       {
          return getDynamicViscosity<NamedDynamicViscosity>(*this);
@@ -127,13 +131,15 @@ namespace Dimension
 
       /// @brief Constructs a DynamicViscosity object with a value.
       /// @param val The value of the DynamicViscosity.
-      constexpr DynamicViscosity(PrecisionType val) : Base(val) {}
+      explicit constexpr DynamicViscosity(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a DynamicViscosity object from another DynamicViscosity object.
       /// @tparam OtherDynamicViscosity The other DynamicViscosity type.
       /// @param base The base DynamicViscosity object.
       template<typename OtherDynamicViscosity>
       requires IsDynamicViscosityType<OtherDynamicViscosity>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr DynamicViscosity(const OtherDynamicViscosity& base)
          : Base(base.template GetVal<typename NamedDynamicViscosity::NumTuple, typename NamedDynamicViscosity::DenTuple>()) {}
 
@@ -143,6 +149,7 @@ namespace Dimension
       template<typename Mass1T,typename Time1T, typename Length1T>
       requires IsDynamicViscosityUnits<Mass1T,Time1T, Length1T>
       [[deprecated("Use the free function getDynamicViscosity() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetDynamicViscosity() const
       {
          return getDynamicViscosity<Mass1T,Time1T, Length1T>(*this);
@@ -154,6 +161,7 @@ namespace Dimension
       template<typename NamedDynamicViscosityUnit>
       requires IsNamedDynamicViscosityUnit<NamedDynamicViscosityUnit>
       [[deprecated("Use the free function getDynamicViscosity() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetDynamicViscosity() const
       {
          return getDynamicViscosity<NamedDynamicViscosityUnit>(*this);

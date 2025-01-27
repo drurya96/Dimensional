@@ -11,7 +11,7 @@ namespace Dimension
 {
 
    // Forward declare dimension and unit
-   template<typename Unit, StringLiteral Name, StringLiteral Abbreviation, StringLiteral DimName>
+   template<typename Unit, StringLiteral Name, StringLiteral Abbreviation, StringLiteral DimName, int UnitID>
    struct BaseUnit;
 
    template<typename NumTupleT, typename DenTupleT>

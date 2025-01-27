@@ -85,13 +85,15 @@ namespace Dimension
 
       /// @brief Constructs a SpecificVolume object with a value.
       /// @param val The value of the SpecificVolume.
-      constexpr SpecificVolume(PrecisionType val) : Base(val) {}
+      explicit constexpr SpecificVolume(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a SpecificVolume object from a named unit.
       /// @tparam NamedSpecificVolume The named unit type.
       /// @param base The base unit object.
       template<typename NamedSpecificVolume>
       requires IsNamedSpecificVolumeUnit<NamedSpecificVolume>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr SpecificVolume(const NamedSpecificVolume& base) : Base(base) {}
 
       /// @brief Deprecated function to get the value of SpecificVolume.
@@ -100,6 +102,7 @@ namespace Dimension
       template<typename Length1T, typename Length2T, typename Length3T,typename Mass1T>
       requires IsSpecificVolumeUnits<Length1T, Length2T, Length3T,Mass1T>
       [[deprecated("Use the free function getSpecificVolume() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetSpecificVolume() const
       {
          return getSpecificVolume<Length1T, Length2T, Length3T,Mass1T>(*this);
@@ -111,6 +114,7 @@ namespace Dimension
       template<typename NamedSpecificVolume>
       requires IsNamedSpecificVolumeUnit<NamedSpecificVolume>
       [[deprecated("Use the free function getSpecificVolume() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetSpecificVolume() const
       {
          return getSpecificVolume<NamedSpecificVolume>(*this);
@@ -130,13 +134,15 @@ namespace Dimension
 
       /// @brief Constructs a SpecificVolume object with a value.
       /// @param val The value of the SpecificVolume.
-      constexpr SpecificVolume(PrecisionType val) : Base(val) {}
+      explicit constexpr SpecificVolume(PrecisionType val) : Base(val) {}
 
       /// @brief Constructs a SpecificVolume object from another SpecificVolume object.
       /// @tparam OtherSpecificVolume The other SpecificVolume type.
       /// @param base The base SpecificVolume object.
       template<typename OtherSpecificVolume>
       requires IsSpecificVolumeType<OtherSpecificVolume>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
       constexpr SpecificVolume(const OtherSpecificVolume& base)
          : Base(base.template GetVal<typename NamedSpecificVolume::NumTuple, typename NamedSpecificVolume::DenTuple>()) {}
 
@@ -146,6 +152,7 @@ namespace Dimension
       template<typename Length1T, typename Length2T, typename Length3T,typename Mass1T>
       requires IsSpecificVolumeUnits<Length1T, Length2T, Length3T,Mass1T>
       [[deprecated("Use the free function getSpecificVolume() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetSpecificVolume() const
       {
          return getSpecificVolume<Length1T, Length2T, Length3T,Mass1T>(*this);
@@ -157,6 +164,7 @@ namespace Dimension
       template<typename NamedSpecificVolumeUnit>
       requires IsNamedSpecificVolumeUnit<NamedSpecificVolumeUnit>
       [[deprecated("Use the free function getSpecificVolume() instead.")]]
+      // cppcheck-suppress unusedFunction
       double GetSpecificVolume() const
       {
          return getSpecificVolume<NamedSpecificVolumeUnit>(*this);
