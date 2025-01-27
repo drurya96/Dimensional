@@ -8,7 +8,7 @@
 using namespace Dimension;
 using namespace std;
 
-TEST_F(DimensionTest, SimplificationWithMath) {
+TEST(Simplification, SimplificationWithMath) {
 
    Length<Meters> length1(10.0);
    Length<Feet> length2(20.0);
@@ -27,7 +27,7 @@ TEST_F(DimensionTest, SimplificationWithMath) {
    ASSERT_NEAR((getTime<Seconds>(test)), 0.056959027777777775, TOLERANCE); // TODO: Double check precision
 }
 
-TEST_F(DimensionTest, Simplification) {
+TEST(Simplification, Simplification) {
 
    // This is 10.0 (Meters-Mintues / Feet-Seconds-Minutes-Minutes)
    auto test_before = BaseDimension<std::tuple<Meters, Minutes>, std::tuple<Seconds, Feet, Minutes>>(10.0);
@@ -44,7 +44,7 @@ TEST_F(DimensionTest, Simplification) {
    ASSERT_NEAR((test_after.GetVal<std::tuple<>, std::tuple<Minutes>>()), 1968.504, TOLERANCE);
 }
 
-TEST_F(DimensionTest, SimplificationSpeedTypes)
+TEST(Simplification, SimplificationSpeedTypes)
 {
    Speed<Meters, Seconds> speed(1);
    Time<Minutes> time(1);
@@ -57,7 +57,7 @@ TEST_F(DimensionTest, SimplificationSpeedTypes)
 // TODO: Validate simplification resulting in unitless
 // TODO: How to handle unitless?
 
-TEST_F(DimensionTest, Validate_constexpr_behavior) {
+TEST(Simplification, Validate_constexpr_behavior) {
 
     using namespace Dimension;
     using std::tuple;

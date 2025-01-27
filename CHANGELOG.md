@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. Semantic versioning is followed.
 
+## [UNRELEASED]
+
+### Changed
+- Internal changes to address static analysis warnings
+
+
+### Added
+- CppCheck static analysis on pipelines
+
+### Deprecated
+- 
+
+### Removed
+- Removed Doxygen folder
+  - And artifact will be available instead at a later date.
+
+### Fixed
+- Constructors from doubles now correctly marked `explicit`
+
 ## [2.5.0] - 2025-1-5
 
 ### Changed

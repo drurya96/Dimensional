@@ -1,4 +1,4 @@
-#include "Example1.h"
+#include "PhysicsProblemsBase.h"
 
 #include "AmountDimension.h"
 #include "AngleDimension.h"
@@ -21,7 +21,7 @@
 
 #include <iostream>
 
-TEST_F(PhysicsProblemsExample1, HeatTransfer)
+TEST(PhysicsProblemsExample1, HeatTransfer)
 {
     using namespace Dimension;
 
@@ -40,7 +40,7 @@ TEST_F(PhysicsProblemsExample1, HeatTransfer)
     ASSERT_NEAR(getEnergy<Joules>(heat), expected_heat, TOLERANCE);
 }
 
-TEST_F(PhysicsProblemsExample1, KinematicsDisplacement)
+TEST(PhysicsProblemsExample1, KinematicsDisplacement)
 {
     using namespace Dimension;
 
@@ -59,7 +59,7 @@ TEST_F(PhysicsProblemsExample1, KinematicsDisplacement)
     ASSERT_NEAR(getLength<Meters>(totalDisplacement), 75.0, TOLERANCE);
 }
 
-TEST_F(PhysicsProblemsExample1, WorkDoneByForce)
+TEST(PhysicsProblemsExample1, WorkDoneByForce)
 {
     using namespace Dimension;
 
@@ -75,7 +75,7 @@ TEST_F(PhysicsProblemsExample1, WorkDoneByForce)
     ASSERT_NEAR((getEnergy<Joules>(workDone)), 250.0, TOLERANCE);
 }
 
-TEST_F(PhysicsProblemsExample1, ProjectileMotion)
+TEST(PhysicsProblemsExample1, ProjectileMotion)
 {
     using namespace Dimension;
 
@@ -99,7 +99,7 @@ TEST_F(PhysicsProblemsExample1, ProjectileMotion)
     ASSERT_NEAR(getLength<Meters>(horizontalRange), expectedRange, TOLERANCE);
 }
 
-TEST_F(PhysicsProblemsExample1, PowerFromWorkAndTime)
+TEST(PhysicsProblemsExample1, PowerFromWorkAndTime)
 {
     using namespace Dimension;
 
@@ -119,7 +119,7 @@ TEST_F(PhysicsProblemsExample1, PowerFromWorkAndTime)
 
 }
 
-TEST_F(PhysicsProblemsExample1, DensityCalculation)
+TEST(PhysicsProblemsExample1, DensityCalculation)
 {
     using namespace Dimension;
 
@@ -144,7 +144,7 @@ TEST_F(PhysicsProblemsExample1, DensityCalculation)
     ASSERT_NEAR((density.GetVal<std::tuple<KiloGrams>, std::tuple<Meters, Meters, Meters>>()), expectedDensity, TOLERANCE);
 }
 
-TEST_F(PhysicsProblemsExample1, PressureFromForceAndVolume)
+TEST(PhysicsProblemsExample1, PressureFromForceAndVolume)
 {
     using namespace Dimension;
 
@@ -176,7 +176,7 @@ TEST_F(PhysicsProblemsExample1, PressureFromForceAndVolume)
 
 }
 
-TEST_F(PhysicsProblemsExample1, WaterBoilingTemperatureChange)
+TEST(PhysicsProblemsExample1, WaterBoilingTemperatureChange)
 {
     using namespace Dimension;
 
@@ -197,7 +197,7 @@ TEST_F(PhysicsProblemsExample1, WaterBoilingTemperatureChange)
     ASSERT_NEAR(getTemperature<Fahrenheit>(deltaTempF), expectedDeltaTempF, TOLERANCE);
 }
 
-TEST_F(PhysicsProblemsExample1, EnergyRequiredToHeatWater)
+TEST(PhysicsProblemsExample1, EnergyRequiredToHeatWater)
 {
     using namespace Dimension;
 
@@ -223,7 +223,7 @@ TEST_F(PhysicsProblemsExample1, EnergyRequiredToHeatWater)
     ASSERT_NEAR(getEnergy<Calories>(energy), expectedEnergyCal, TOLERANCE);
 }
 
-TEST_F(PhysicsProblemsExample1, PVEqualsnRT) {
+TEST(PhysicsProblemsExample1, PVEqualsnRT) {
     using namespace Dimension;
 
     // Define the quantities
@@ -242,7 +242,7 @@ TEST_F(PhysicsProblemsExample1, PVEqualsnRT) {
 
 
 
-TEST_F(PhysicsProblemsExample1, PVEqualsnRT_TemperatureInCelsius) {
+TEST(PhysicsProblemsExample1, PVEqualsnRT_TemperatureInCelsius) {
     using namespace Dimension;
     // Define the quantities
     BaseDimension<std::tuple<KiloGrams>, std::tuple<Meters, Seconds, Seconds>> P{202650}; // 2 atm in Pascals
@@ -260,7 +260,7 @@ TEST_F(PhysicsProblemsExample1, PVEqualsnRT_TemperatureInCelsius) {
     ASSERT_NEAR(getEnergy<Joules>(PV), getEnergy<Joules>(nRT), 1e-1);
 }
 
-TEST_F(PhysicsProblemsExample1, VerifyFaraday) {
+TEST(PhysicsProblemsExample1, VerifyFaraday) {
     using namespace Dimension;
 
     auto chargePerMole = Charge<ElementaryCharges>(1.0) * Constants::avogadro_number;
@@ -272,7 +272,7 @@ TEST_F(PhysicsProblemsExample1, VerifyFaraday) {
 
 }
 
-TEST_F(PhysicsProblemsExample1, AreaCalculation)
+TEST(PhysicsProblemsExample1, AreaCalculation)
 {
     using namespace Dimension;
 
@@ -284,7 +284,7 @@ TEST_F(PhysicsProblemsExample1, AreaCalculation)
     ASSERT_NEAR((getArea<Meters, Meters>(area)), 15.0, TOLERANCE);
 }
 
-TEST_F(PhysicsProblemsExample1, FrequencyFromPeriod)
+TEST(PhysicsProblemsExample1, FrequencyFromPeriod)
 {
     using namespace Dimension;
 
@@ -294,7 +294,7 @@ TEST_F(PhysicsProblemsExample1, FrequencyFromPeriod)
     ASSERT_NEAR((getFrequency<Hertz>(frequency)), 0.5, TOLERANCE); // 0.5 Hz
 }
 
-TEST_F(PhysicsProblemsExample1, MomentumCalculation)
+TEST(PhysicsProblemsExample1, MomentumCalculation)
 {
     using namespace Dimension;
 
@@ -306,7 +306,7 @@ TEST_F(PhysicsProblemsExample1, MomentumCalculation)
     ASSERT_NEAR((getMomentum<KiloGrams, Meters, Seconds>(momentum)), 6.0, TOLERANCE);
 }
 
-TEST_F(PhysicsProblemsExample1, PowerFromWorkAndTime2)
+TEST(PhysicsProblemsExample1, PowerFromWorkAndTime2)
 {
     using namespace Dimension;
 
@@ -318,7 +318,7 @@ TEST_F(PhysicsProblemsExample1, PowerFromWorkAndTime2)
     ASSERT_NEAR((getPower<Watts>(power)), 20.0, TOLERANCE); // 100 J / 5 s = 20 W
 }
 
-TEST_F(PhysicsProblemsExample1, CurrentCalculation)
+TEST(PhysicsProblemsExample1, CurrentCalculation)
 {
     using namespace Dimension;
 
@@ -330,7 +330,7 @@ TEST_F(PhysicsProblemsExample1, CurrentCalculation)
     ASSERT_NEAR((getCurrent<Amperes>(current)), 5.0, TOLERANCE); // 10 C / 2 s = 5 A
 }
 
-TEST_F(PhysicsProblemsExample1, ElectricPotentialFromWorkAndCharge)
+TEST(PhysicsProblemsExample1, ElectricPotentialFromWorkAndCharge)
 {
     using namespace Dimension;
 
@@ -342,7 +342,7 @@ TEST_F(PhysicsProblemsExample1, ElectricPotentialFromWorkAndCharge)
     ASSERT_NEAR((getElectricPotential<Volts>(voltage)), 25.0, TOLERANCE); // 50 J / 2 C = 25 V
 }
 
-TEST_F(PhysicsProblemsExample1, ResistanceFromVoltageAndCurrent)
+TEST(PhysicsProblemsExample1, ResistanceFromVoltageAndCurrent)
 {
     using namespace Dimension;
 
@@ -356,7 +356,7 @@ TEST_F(PhysicsProblemsExample1, ResistanceFromVoltageAndCurrent)
     ASSERT_NEAR((getResistance<Ohms>(resistance)), 12.0, TOLERANCE); // 120 V / 10 A = 12 Ohms
 }
 
-TEST_F(PhysicsProblemsExample1, CapacitanceCalculation)
+TEST(PhysicsProblemsExample1, CapacitanceCalculation)
 {
     using namespace Dimension;
 
@@ -368,7 +368,7 @@ TEST_F(PhysicsProblemsExample1, CapacitanceCalculation)
     ASSERT_NEAR((getCapacitance<Farads>(capacitance)), 0.5, TOLERANCE); // 5 C / 10 V = 0.5 F
 }
 
-TEST_F(PhysicsProblemsExample1, InductanceCalculation)
+TEST(PhysicsProblemsExample1, InductanceCalculation)
 {
     using namespace Dimension;
 
@@ -380,7 +380,7 @@ TEST_F(PhysicsProblemsExample1, InductanceCalculation)
     ASSERT_NEAR((getInductance<Henrys>(inductance)), 0.5, TOLERANCE); // 2 Wb / 4 A = 0.5 H
 }
 
-TEST_F(PhysicsProblemsExample1, MagneticFluxCalculation)
+TEST(PhysicsProblemsExample1, MagneticFluxCalculation)
 {
     using namespace Dimension;
 
@@ -392,7 +392,7 @@ TEST_F(PhysicsProblemsExample1, MagneticFluxCalculation)
     ASSERT_NEAR((getMagneticFlux<Webers>(flux)), 20.0, TOLERANCE); // 10 V * 2 s = 20 Wb
 }
 
-TEST_F(PhysicsProblemsExample1, MagneticFieldCalculation)
+TEST(PhysicsProblemsExample1, MagneticFieldCalculation)
 {
     using namespace Dimension;
 
@@ -404,7 +404,7 @@ TEST_F(PhysicsProblemsExample1, MagneticFieldCalculation)
     ASSERT_NEAR((getMagneticField<Teslas>(field)), 2.5, TOLERANCE); // 5 Wb / 2 m² = 2.5 T
 }
 
-TEST_F(PhysicsProblemsExample1, ElectricFieldCalculation)
+TEST(PhysicsProblemsExample1, ElectricFieldCalculation)
 {
     using namespace Dimension;
 
@@ -416,7 +416,7 @@ TEST_F(PhysicsProblemsExample1, ElectricFieldCalculation)
     ASSERT_NEAR((getElectricField<KiloGrams, Meters, Seconds, Seconds, Coulombs>(field)), 50.0, TOLERANCE); // 100 V / 2 m = 50 N/C
 }
 
-TEST_F(PhysicsProblemsExample1, ConductanceCalculation)
+TEST(PhysicsProblemsExample1, ConductanceCalculation)
 {
     using namespace Dimension;
 
@@ -427,7 +427,7 @@ TEST_F(PhysicsProblemsExample1, ConductanceCalculation)
     ASSERT_NEAR((getConductance<Siemens>(conductance)), 0.1, TOLERANCE); // 1 / 10 Ohms = 0.1 S
 }
 
-TEST_F(PhysicsProblemsExample1, DynamicViscosityCalculation)
+TEST(PhysicsProblemsExample1, DynamicViscosityCalculation)
 {
     using namespace Dimension;
 
@@ -441,7 +441,7 @@ TEST_F(PhysicsProblemsExample1, DynamicViscosityCalculation)
     ASSERT_NEAR(getDynamicViscosity<Poises>(viscosity), 12.5, TOLERANCE);
 }
 
-TEST_F(PhysicsProblemsExample1, DensityCalculation2)
+TEST(PhysicsProblemsExample1, DensityCalculation2)
 {
     using namespace Dimension;
 
@@ -453,7 +453,7 @@ TEST_F(PhysicsProblemsExample1, DensityCalculation2)
     ASSERT_NEAR((getDensity<KiloGrams, Meters, Meters, Meters>(density)), 5.0, TOLERANCE); // 10 kg / 2 m³ = 5 kg/m³
 }
 
-TEST_F(PhysicsProblemsExample1, VolumetricFlowRateCalculation)
+TEST(PhysicsProblemsExample1, VolumetricFlowRateCalculation)
 {
     using namespace Dimension;
 
@@ -465,7 +465,7 @@ TEST_F(PhysicsProblemsExample1, VolumetricFlowRateCalculation)
     ASSERT_NEAR((getVolumetricFlowRate<Meters, Meters, Meters, Seconds>(flowRate)), 0.5, TOLERANCE); // 1 m³ / 2 s = 0.5 m³/s
 }
 
-TEST_F(PhysicsProblemsExample1, MassFlowRateCalculation)
+TEST(PhysicsProblemsExample1, MassFlowRateCalculation)
 {
     using namespace Dimension;
 
@@ -477,7 +477,7 @@ TEST_F(PhysicsProblemsExample1, MassFlowRateCalculation)
     ASSERT_NEAR((getMassFlowRate<KiloGrams, Seconds>(flowRate)), 5.0, TOLERANCE); // 20 kg / 4 s = 5 kg/s
 }
 
-TEST_F(PhysicsProblemsExample1, SpecificVolumeCalculation)
+TEST(PhysicsProblemsExample1, SpecificVolumeCalculation)
 {
     using namespace Dimension;
 
@@ -489,7 +489,7 @@ TEST_F(PhysicsProblemsExample1, SpecificVolumeCalculation)
     ASSERT_NEAR((getSpecificVolume<Meters, Meters, Meters, KiloGrams>(specificVolume)), 0.25, TOLERANCE); // 1 m³ / 4 kg = 0.25 m³/kg
 }
 
-TEST_F(PhysicsProblemsExample1, MomentOfInertiaCalculation)
+TEST(PhysicsProblemsExample1, MomentOfInertiaCalculation)
 {
     using namespace Dimension;
 
@@ -501,7 +501,7 @@ TEST_F(PhysicsProblemsExample1, MomentOfInertiaCalculation)
     ASSERT_NEAR((getMomentOfInertia<KiloGrams, Meters, Meters>(inertia)), 40.0, TOLERANCE); // 10 kg * 2 m * 2 m = 40 kg·m²
 }
 
-TEST_F(PhysicsProblemsExample1, AngularSpeedCalculation)
+TEST(PhysicsProblemsExample1, AngularSpeedCalculation)
 {
     using namespace Dimension;
 
@@ -513,7 +513,7 @@ TEST_F(PhysicsProblemsExample1, AngularSpeedCalculation)
     ASSERT_NEAR((getAngularSpeed<Radians, Seconds>(angularSpeed)), std::numbers::pi / 2.0, TOLERANCE); // π radians / 2 s = π/2 rad/s
 }
 
-TEST_F(PhysicsProblemsExample1, AngularAccelerationCalculation)
+TEST(PhysicsProblemsExample1, AngularAccelerationCalculation)
 {
     using namespace Dimension;
 

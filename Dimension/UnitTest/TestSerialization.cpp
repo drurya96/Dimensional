@@ -82,7 +82,7 @@ void ValidateAll()
 }
 
 
-TEST_F(DimensionTest, TestSingleNum)
+TEST(Serialization, TestSingleNum)
 {
     using NumTuple = std::tuple<Feet>;
     using DenTuple = std::tuple<>;
@@ -90,7 +90,7 @@ TEST_F(DimensionTest, TestSingleNum)
     ValidateAll<NumTuple, DenTuple>();
 }
 
-TEST_F(DimensionTest, TestSingleInverse)
+TEST(Serialization, TestSingleInverse)
 {
     using NumTuple = std::tuple<>;
     using DenTuple = std::tuple<Seconds>;
@@ -98,7 +98,7 @@ TEST_F(DimensionTest, TestSingleInverse)
     ValidateAll<NumTuple, DenTuple>();
 }
 
-TEST_F(DimensionTest, TestOneEach)
+TEST(Serialization, TestOneEach)
 {
     using NumTuple = std::tuple<Grams>;
     using DenTuple = std::tuple<Radians>;
@@ -106,7 +106,7 @@ TEST_F(DimensionTest, TestOneEach)
     ValidateAll<NumTuple, DenTuple>();
 }
 
-TEST_F(DimensionTest, TestMultipleEach)
+TEST(Serialization, TestMultipleEach)
 {
     using NumTuple = std::tuple<Grams, Meters>;
     using DenTuple = std::tuple<Radians, Seconds>;
@@ -114,7 +114,7 @@ TEST_F(DimensionTest, TestMultipleEach)
     ValidateAll<NumTuple, DenTuple>();
 }
 
-TEST_F(DimensionTest, TestShouldCancel)
+TEST(Serialization, TestShouldCancel)
 {
     using NumTuple = std::tuple<Meters>;
     using DenTuple = std::tuple<Meters>;

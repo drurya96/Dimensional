@@ -3,8 +3,6 @@ cmake_minimum_required(VERSION 3.25)
 enable_testing()
 
 set(PHYSICS_SOURCES 
-    PhysicsProblemsBase.cpp
-
     Example1.cpp
 )
 

@@ -51,7 +51,7 @@ namespace Dimension
    template<> struct Conversion<NonBaseUnit,  Meters> { static constexpr PrecisionType slope = 3.14; };
 }
 
-TEST_F(DimensionTest, TestFunctionParameters) {
+TEST(Functions, TestFunctionParameters) {
 
    Length<Meters> ret1 = TestFunction1(Time<Seconds>(5.0));
    ASSERT_NEAR((getLength<Meters>(ret1)), 5.0, TOLERANCE);

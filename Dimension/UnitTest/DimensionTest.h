@@ -3,14 +3,6 @@
 
 #include <gtest/gtest.h>
 
-class DimensionTest : public ::testing::Test {
-protected:
-
-   virtual void SetUp() override;
-
-   virtual void TearDown() override;
-};
-
-const double TOLERANCE = 0.01;
+constexpr double TOLERANCE = 0.01;
 
 #endif // DIMENSION_TEST_H

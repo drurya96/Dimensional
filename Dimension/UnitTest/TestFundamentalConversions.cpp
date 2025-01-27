@@ -9,7 +9,7 @@
 
 using namespace Dimension;
 
-TEST_F(DimensionTest, TestTimeConversions)
+TEST(FundamentalConversions, TestTimeConversions)
 {
 
    //Time myBadTime = Time<Feet>(10.0); // Correctly fails to compile - Cannot create a Time object using Feet.
@@ -38,7 +38,7 @@ TEST_F(DimensionTest, TestTimeConversions)
 }
 
 
-TEST_F(DimensionTest, TestLengthConversions)
+TEST(FundamentalConversions, TestLengthConversions)
 {
 
    // Base length in Meters
@@ -235,7 +235,7 @@ TEST_F(DimensionTest, TestLengthConversions)
    
 }
 
-TEST_F(DimensionTest, TestMassConversions)
+TEST(FundamentalConversions, TestMassConversions)
 {
 
    // Test from Grams to other units
@@ -404,7 +404,7 @@ TEST_F(DimensionTest, TestMassConversions)
    ASSERT_NEAR(getMass<MilliGrams>(massInMilliGrams), 1000000.0, TOLERANCE);
 }
 
-TEST_F(DimensionTest, TestAngleConversions)
+TEST(FundamentalConversions, TestAngleConversions)
 {
 
    // Test from Degrees to other units
@@ -421,7 +421,7 @@ TEST_F(DimensionTest, TestAngleConversions)
 
 }
 
-TEST_F(DimensionTest, TestTemperatureConversions)
+TEST(FundamentalConversions, TestTemperatureConversions)
 {
 
    // IMPORTANT!
@@ -461,7 +461,7 @@ TEST_F(DimensionTest, TestTemperatureConversions)
 
 }
 
-TEST_F(DimensionTest, TestChargeConversions)
+TEST(FundamentalConversions, TestChargeConversions)
 {
 
    // Test from Coulombs to other units
