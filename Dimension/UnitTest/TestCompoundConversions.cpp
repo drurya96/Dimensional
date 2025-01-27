@@ -6,7 +6,7 @@
 
 using namespace Dimension;
 
-TEST_F(DimensionTest, TestSpeed) {
+TEST(CompoundConversions, TestSpeed) {
 
    using namespace std;
 

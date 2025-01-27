@@ -9,7 +9,7 @@ using namespace Dimension;
 using namespace std;
 
 
-TEST_F(DimensionTest, Comparisons) {
+TEST(Operators, Comparisons) {
 
    Speed<Meters, Seconds> mySpeed1(10.0); // 10.0 m/s == 1968.504 f/m
    Speed<Feet, Minutes> mySpeed2(20.0); // 20.0 f/m == 0.1016 m/s
@@ -35,7 +35,7 @@ TEST_F(DimensionTest, Comparisons) {
 }
 
 
-TEST_F(DimensionTest, DimensionMultiplication) {
+TEST(Operators, DimensionMultiplication) {
 
    Length<Meters> myLength(10.0);
    Time<Seconds> myTime(5.0);
@@ -53,7 +53,7 @@ TEST_F(DimensionTest, DimensionMultiplication) {
 }
 
 
-TEST_F(DimensionTest, DimensionDivision) {
+TEST(Operators, DimensionDivision) {
 
    Length<Meters> myLength(20.0);
    Time<Seconds> myTime(2.0);
@@ -72,7 +72,7 @@ TEST_F(DimensionTest, DimensionDivision) {
 
 
 // Test Scalar multiplation
-TEST_F(DimensionTest, ScalarMultiplication)
+TEST(Operators, ScalarMultiplication)
 {
    Speed<Meters, Seconds> mySpeed(5.0);
 
@@ -93,7 +93,7 @@ TEST_F(DimensionTest, ScalarMultiplication)
 }
 
 // Test Scalar division
-TEST_F(DimensionTest, ScalarDivision)
+TEST(Operators, ScalarDivision)
 {
    Speed<Meters, Seconds> mySpeed(20.0);
 
@@ -113,7 +113,7 @@ TEST_F(DimensionTest, ScalarDivision)
 }
 
 // Test addition
-TEST_F(DimensionTest, DimensionAddition)
+TEST(Operators, DimensionAddition)
 {
    Speed<Meters, Seconds> speed1(10.0);
    Speed<Feet, Minutes> speed2(10.0);
@@ -130,7 +130,7 @@ TEST_F(DimensionTest, DimensionAddition)
 }
 
 // Test subtraction
-TEST_F(DimensionTest, DimensionSubtraction)
+TEST(Operators, DimensionSubtraction)
 {
    Speed<Meters, Seconds> speed1(10.0);
    Speed<Feet, Minutes> speed2(10.0);
@@ -148,7 +148,7 @@ TEST_F(DimensionTest, DimensionSubtraction)
 }
 
 // Test Exponent
-TEST_F(DimensionTest, DimensionExponent)
+TEST(Operators, DimensionExponent)
 {
    Speed<Meters, Seconds> speed(10.0);
 
@@ -160,7 +160,7 @@ TEST_F(DimensionTest, DimensionExponent)
 }
 
 // Test Negative
-TEST_F(DimensionTest, DimensionNegative)
+TEST(Operators, DimensionNegative)
 {
    Speed<Meters, Seconds> speed = -Speed<Meters, Seconds>(10.0);
 
@@ -169,7 +169,7 @@ TEST_F(DimensionTest, DimensionNegative)
    ASSERT_NEAR(test, -10.0, TOLERANCE);
 }
 
-TEST_F(DimensionTest, TestSetter) 
+TEST(Operators, TestSetter) 
 {
 
    using namespace std;
@@ -184,7 +184,7 @@ TEST_F(DimensionTest, TestSetter)
 
 }
 
-TEST_F(DimensionTest, TestImplicitCastToAbsoluteQuantity)
+TEST(Operators, TestImplicitCastToAbsoluteQuantity)
 {
     using namespace Dimension;
 

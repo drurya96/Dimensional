@@ -9,7 +9,7 @@
 using namespace Dimension;
 using namespace std;
 
-TEST_F(DimensionTest, Test_tuple_cat_t)
+TEST(Utilities, Test_tuple_cat_t)
 {
    ASSERT_TRUE((is_same_v<tuple_cat_t<tuple<int>, tuple<double>>, tuple<int, double>>));
    ASSERT_TRUE((is_same_v<tuple_cat_t<tuple<int, double>, tuple<double, int>>, tuple<int, double, double, int>>));
@@ -17,7 +17,7 @@ TEST_F(DimensionTest, Test_tuple_cat_t)
 }
 
 
-TEST_F(DimensionTest, Test_same_dim)
+TEST(Utilities, Test_same_dim)
 {
    ASSERT_TRUE((is_same_dim<Meters, Meters>::value));
    ASSERT_TRUE((is_same_dim<Meters, Feet>::value));
@@ -28,7 +28,7 @@ TEST_F(DimensionTest, Test_same_dim)
    ASSERT_FALSE((has_same_dim<Meters, tuple<Seconds, Minutes>>::value));
 }
 
-TEST_F(DimensionTest, Test_remove_instance)
+TEST(Utilities, Test_remove_instance)
 {
    
    ASSERT_TRUE((is_same_v<RemoveOneInstance<is_same_dim, Meters, tuple<Meters>>::type, tuple<>>));
@@ -44,7 +44,7 @@ TEST_F(DimensionTest, Test_remove_instance)
    
 }
 
-TEST_F(DimensionTest, Test_GetConvertedValue)
+TEST(Utilities, Test_GetConvertedValue)
 {
    using fromNum = tuple<Meters, Seconds>;
    using fromDen = tuple<Feet, Grams>;
@@ -68,7 +68,7 @@ TEST_F(DimensionTest, Test_GetConvertedValue)
    
 }
 
-TEST_F(DimensionTest, Test_tuple_diff_dim)
+TEST(Utilities, Test_tuple_diff_dim)
 {
    ASSERT_TRUE((is_same_v<tuple_diff<has_same_dim, tuple<Meters>, tuple<Meters>>::type, tuple<>>));
    ASSERT_TRUE((is_same_v<tuple_diff<has_same_dim, tuple<Meters>, tuple<Meters, Seconds>>::type, tuple<>>));
@@ -81,7 +81,7 @@ TEST_F(DimensionTest, Test_tuple_diff_dim)
    ASSERT_TRUE((is_same_v<tuple_diff<has_same_dim, tuple<Feet, Meters>, tuple<Meters>>::type, tuple<Meters>>));
 }
 
-TEST_F(DimensionTest, Test_UnitSimplifier)
+TEST(Utilities, Test_UnitSimplifier)
 {
    // IMPORTANT NOTE
    // At least for now, UnitSimplifier *assumes* NumTuple1 - DenTuple1 and NumTuple2 - DenTuple2
@@ -110,7 +110,7 @@ TEST_F(DimensionTest, Test_UnitSimplifier)
    ASSERT_TRUE((is_same_v<simplified4::newDen, tuple<Seconds, Seconds>>));
 }
 
-TEST_F(DimensionTest, Test_CancelUnits)
+TEST(Utilities, Test_CancelUnits)
 {
    using NumTup1 = tuple<Meters, Seconds, Grams>;
    using DenTup1 = tuple<Feet, Ounces>;

@@ -10,7 +10,7 @@
 using namespace Dimension;
 
 
-TEST_F(DimensionTest, StdMinMaxClamp) {
+TEST(StandardFunctions, StdMinMaxClamp) {
 
    Speed<Meters, Seconds> mySpeed1(10.0); 
    Speed<Meters, Seconds> mySpeed2(20.0); 
@@ -31,13 +31,13 @@ TEST_F(DimensionTest, StdMinMaxClamp) {
 
 }
 
-TEST_F(DimensionTest, DimensionalAbs) {
+TEST(StandardFunctions, DimensionalAbs) {
    
    ASSERT_NEAR((getSpeed<Meters, Seconds>(abs(Speed<Meters, Seconds>(-10.0)))), 10.0, TOLERANCE);
    ASSERT_NEAR((getSpeed<Meters, Seconds>(abs(Speed<Meters, Seconds>(10.0)))), 10.0, TOLERANCE);
 }
 
-TEST_F(DimensionTest, DimensionalRound) {
+TEST(StandardFunctions, DimensionalRound) {
    
    ASSERT_NEAR((getSpeed<Meters, Seconds>(floor(Speed<Meters, Seconds>(1.5)))), 1.0, TOLERANCE);
    ASSERT_NEAR((getSpeed<Meters, Seconds>(ceil(Speed<Meters, Seconds>(1.5)))), 2.0, TOLERANCE);
@@ -45,7 +45,7 @@ TEST_F(DimensionTest, DimensionalRound) {
    ASSERT_NEAR((getSpeed<Meters, Seconds>(round(Speed<Meters, Seconds>(1.8)))), 2.0, TOLERANCE);
 }
 
-TEST_F(DimensionTest, DimensionalModf) {
+TEST(StandardFunctions, DimensionalModf) {
 
    Speed<Meters, Seconds> value;
    Speed<Meters, Seconds> decSpeed;
@@ -62,7 +62,7 @@ TEST_F(DimensionTest, DimensionalModf) {
 
 }
 
-TEST_F(DimensionTest, DimensionalFmod) {
+TEST(StandardFunctions, DimensionalFmod) {
 
    using std::numbers::pi;
 

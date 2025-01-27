@@ -8,7 +8,7 @@
 using namespace Dimension;
 using namespace std;
 
-TEST_F(DimensionTest, NewDimension) {
+TEST(NewDimension, NewDimension) {
    // TODO: Write tests for creating new dimensions from a user's perspective
 
    Length<Foo> length1{ 100.0 };

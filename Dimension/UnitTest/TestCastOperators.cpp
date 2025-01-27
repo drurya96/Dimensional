@@ -7,7 +7,7 @@
 using namespace Dimension;
 using namespace std;
 
-TEST_F(DimensionTest, CastSpeed) {
+TEST(CastOperatorTests, CastSpeed) {
 
    BaseDimension<tuple<Meters>, tuple<Seconds>> testSpeed(10.0);
 
@@ -24,7 +24,7 @@ TEST_F(DimensionTest, CastSpeed) {
    // Speed notSpeed = testNotSpeed;
 }
 
-TEST_F(DimensionTest, CastLength) {
+TEST(CastOperatorTests, CastLength) {
 
    BaseDimension<tuple<Meters>, tuple<>> testLength(10.0);
 
@@ -41,7 +41,7 @@ TEST_F(DimensionTest, CastLength) {
    // Length notLength = testNotLength;
 }
 
-TEST_F(DimensionTest, CastTime) {
+TEST(CastOperatorTests, CastTime) {
 
    BaseDimension<tuple<Seconds>, tuple<>> testTime(10.0);
 
@@ -58,7 +58,7 @@ TEST_F(DimensionTest, CastTime) {
    // Time notTime = testNotTime;
 }
 
-TEST_F(DimensionTest, CastScalar) {
+TEST(CastOperatorTests, CastScalar) {
 
    BaseDimension<tuple<Seconds>, tuple<>> testTime(10.0);
 
