@@ -1,10 +1,10 @@
 #ifndef STATIC_DIMENSION_CAPACITANCE_IMPL_H
 #define STATIC_DIMENSION_CAPACITANCE_IMPL_H
 
-#include "../../LengthDimension.h"
-#include "../../ChargeDimension.h"
 #include "../../MassDimension.h"
 #include "../../TimeDimension.h"
+#include "../../ChargeDimension.h"
+#include "../../LengthDimension.h"
 
 namespace Dimension
 {
@@ -79,6 +79,32 @@ namespace Dimension
 
    template<typename... Ts>
    class Capacitance;
+
+   /// @brief Represents a default Capacitance.
+   /// @details This Capacitance is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "Capacitance" type, without regard for the underlying units.
+   template<>
+   class Capacitance<> : public BaseDimension<std::tuple<PrimaryCharge, PrimaryCharge, PrimaryTime, PrimaryTime>, std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryCharge, PrimaryCharge, PrimaryTime, PrimaryTime>, std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>>;
+      using Base::Base;
+
+      /// @brief Constructs a Capacitance object with a value.
+      /// @param val The value of the Capacitance.
+      explicit constexpr Capacitance(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a Capacitance object from another Capacitance object.
+      /// @tparam OtherCapacitance The other Capacitance type.
+      /// @param base The base Capacitance object.
+      template<typename OtherCapacitance>
+      requires IsCapacitanceType<OtherCapacitance>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr Capacitance(const OtherCapacitance& base)
+         : Base(base.template GetVal<std::tuple<PrimaryCharge, PrimaryCharge, PrimaryTime, PrimaryTime>, std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>>()) {}
+   };
 
    /// @brief Represents a Capacitance.
    /// @details Defines operations and data storage for Capacitance dimensions.

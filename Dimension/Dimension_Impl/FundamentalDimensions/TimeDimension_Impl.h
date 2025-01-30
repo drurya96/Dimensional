@@ -11,6 +11,8 @@ namespace Dimension
    /// @brief Represents the primary unit for Time.
    struct Seconds;
 
+   using PrimaryTime = Seconds;
+
    /// @brief Concept to check if a type is a valid Time unit.
    /// @tparam T The type to check.
    template<typename T>
@@ -28,7 +30,7 @@ namespace Dimension
       using Dim = TimeType;
 
       /// @brief The primary unit type for this dimension.
-      using Primary = Seconds;
+      using Primary = PrimaryTime;
    };
 
    /// @brief Trait to check if a type is a Time dimension.
@@ -63,7 +65,7 @@ namespace Dimension
 
    /// @brief Represents a dimension type for Time.
    /// @tparam Unit The primary unit type.
-   template<IsTimeUnit Unit>
+   template<IsTimeUnit Unit = PrimaryTime>
    class Time : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
    public:

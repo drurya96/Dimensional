@@ -11,6 +11,8 @@ namespace Dimension
    /// @brief Represents the primary unit for Length.
    struct Meters;
 
+   using PrimaryLength = Meters;
+
    /// @brief Concept to check if a type is a valid Length unit.
    /// @tparam T The type to check.
    template<typename T>
@@ -28,7 +30,7 @@ namespace Dimension
       using Dim = LengthType;
 
       /// @brief The primary unit type for this dimension.
-      using Primary = Meters;
+      using Primary = PrimaryLength;
    };
 
    /// @brief Trait to check if a type is a Length dimension.
@@ -63,7 +65,7 @@ namespace Dimension
 
    /// @brief Represents a dimension type for Length.
    /// @tparam Unit The primary unit type.
-   template<IsLengthUnit Unit>
+   template<IsLengthUnit Unit = PrimaryLength>
    class Length : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
    public:

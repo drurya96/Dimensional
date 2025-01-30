@@ -1,10 +1,10 @@
 #ifndef STATIC_DIMENSION_ELECTRICPOTENTIAL_IMPL_H
 #define STATIC_DIMENSION_ELECTRICPOTENTIAL_IMPL_H
 
-#include "../../TimeDimension.h"
+#include "../../MassDimension.h"
 #include "../../LengthDimension.h"
 #include "../../ChargeDimension.h"
-#include "../../MassDimension.h"
+#include "../../TimeDimension.h"
 
 namespace Dimension
 {
@@ -76,6 +76,32 @@ namespace Dimension
 
    template<typename... Ts>
    class ElectricPotential;
+
+   /// @brief Represents a default ElectricPotential.
+   /// @details This ElectricPotential is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "ElectricPotential" type, without regard for the underlying units.
+   template<>
+   class ElectricPotential<> : public BaseDimension<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryCharge>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryCharge>>;
+      using Base::Base;
+
+      /// @brief Constructs a ElectricPotential object with a value.
+      /// @param val The value of the ElectricPotential.
+      explicit constexpr ElectricPotential(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a ElectricPotential object from another ElectricPotential object.
+      /// @tparam OtherElectricPotential The other ElectricPotential type.
+      /// @param base The base ElectricPotential object.
+      template<typename OtherElectricPotential>
+      requires IsElectricPotentialType<OtherElectricPotential>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr ElectricPotential(const OtherElectricPotential& base)
+         : Base(base.template GetVal<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryCharge>>()) {}
+   };
 
    /// @brief Represents a ElectricPotential.
    /// @details Defines operations and data storage for ElectricPotential dimensions.

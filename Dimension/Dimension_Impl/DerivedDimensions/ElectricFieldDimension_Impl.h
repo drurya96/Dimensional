@@ -1,10 +1,10 @@
 #ifndef STATIC_DIMENSION_ELECTRICFIELD_IMPL_H
 #define STATIC_DIMENSION_ELECTRICFIELD_IMPL_H
 
-#include "../../MassDimension.h"
 #include "../../TimeDimension.h"
 #include "../../LengthDimension.h"
 #include "../../ChargeDimension.h"
+#include "../../MassDimension.h"
 
 namespace Dimension
 {
@@ -73,6 +73,32 @@ namespace Dimension
 
    template<typename... Ts>
    class ElectricField;
+
+   /// @brief Represents a default ElectricField.
+   /// @details This ElectricField is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "ElectricField" type, without regard for the underlying units.
+   template<>
+   class ElectricField<> : public BaseDimension<std::tuple<PrimaryMass, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryCharge>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryMass, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryCharge>>;
+      using Base::Base;
+
+      /// @brief Constructs a ElectricField object with a value.
+      /// @param val The value of the ElectricField.
+      explicit constexpr ElectricField(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a ElectricField object from another ElectricField object.
+      /// @tparam OtherElectricField The other ElectricField type.
+      /// @param base The base ElectricField object.
+      template<typename OtherElectricField>
+      requires IsElectricFieldType<OtherElectricField>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr ElectricField(const OtherElectricField& base)
+         : Base(base.template GetVal<std::tuple<PrimaryMass, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryCharge>>()) {}
+   };
 
    /// @brief Represents a ElectricField.
    /// @details Defines operations and data storage for ElectricField dimensions.

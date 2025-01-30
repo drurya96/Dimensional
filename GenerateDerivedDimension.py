@@ -37,6 +37,8 @@ def main():
         "dimension_name": dimension_name,
         "numerator_template_types": ", ".join([f"typename {unit}" for unit in numerator_template_list]),
         "denominator_template_types": ", ".join([f"typename {unit}" for unit in denominator_template_list]),
+        "numerator_template_list_non_numbered": numerator_list,
+        "denominator_template_list_non_numbered": denominator_list,
         "numerator_template_typesT": ", ".join([f"typename {unit}" for unit in [f"{unit}T" for unit in numerator_template_list]]),
         "denominator_template_typesT": ", ".join([f"typename {unit}" for unit in [f"{unit}T" for unit in denominator_template_list]]),
         "numerator_types": ", ".join(numerator_template_list),

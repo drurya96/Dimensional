@@ -11,6 +11,8 @@ namespace Dimension
    /// @brief Represents the primary unit for Amount.
    struct Moles;
 
+   using PrimaryAmount = Moles;
+
    /// @brief Concept to check if a type is a valid Amount unit.
    /// @tparam T The type to check.
    template<typename T>
@@ -28,7 +30,7 @@ namespace Dimension
       using Dim = AmountType;
 
       /// @brief The primary unit type for this dimension.
-      using Primary = Moles;
+      using Primary = PrimaryAmount;
    };
 
    /// @brief Trait to check if a type is a Amount dimension.
@@ -63,7 +65,7 @@ namespace Dimension
 
    /// @brief Represents a dimension type for Amount.
    /// @tparam Unit The primary unit type.
-   template<IsAmountUnit Unit>
+   template<IsAmountUnit Unit = PrimaryAmount>
    class Amount : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
    public:

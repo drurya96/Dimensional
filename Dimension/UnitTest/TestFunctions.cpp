@@ -6,6 +6,7 @@
 #include "LengthDimension.h"
 #include "MassDimension.h"
 #include "AngleDimension.h"
+#include "ForceDimension.h"
 
 #include <iostream>
 
@@ -32,6 +33,11 @@ template<typename T>
 double TestFunction2(Length<T> time)
 {
    return getLength<Meters>(time);
+}
+
+double TestFunctionGenericLength(Dimension::Force<> force)
+{
+   return getForce<Newtons>(force);
 }
 
 namespace Dimension
@@ -69,4 +75,8 @@ TEST(Functions, TestFunctionParameters) {
 
    double ret4 = TestFunction2(test);
    ASSERT_NEAR(ret4, 60.0, TOLERANCE);
+
+   Force<Grams, Miles, Hours, Hours> f1(10000000.0);
+   ASSERT_NEAR(TestFunctionGenericLength(f1), 1.24178, TOLERANCE);
+
 }

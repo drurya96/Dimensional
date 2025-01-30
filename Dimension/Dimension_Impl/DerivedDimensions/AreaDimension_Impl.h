@@ -62,6 +62,32 @@ namespace Dimension
    template<typename... Ts>
    class Area;
 
+   /// @brief Represents a default Area.
+   /// @details This Area is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "Area" type, without regard for the underlying units.
+   template<>
+   class Area<> : public BaseDimension<std::tuple<PrimaryLength, PrimaryLength>, std::tuple<>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryLength, PrimaryLength>, std::tuple<>>;
+      using Base::Base;
+
+      /// @brief Constructs a Area object with a value.
+      /// @param val The value of the Area.
+      explicit constexpr Area(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a Area object from another Area object.
+      /// @tparam OtherArea The other Area type.
+      /// @param base The base Area object.
+      template<typename OtherArea>
+      requires IsAreaType<OtherArea>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr Area(const OtherArea& base)
+         : Base(base.template GetVal<std::tuple<PrimaryLength, PrimaryLength>, std::tuple<>>()) {}
+   };
+
    /// @brief Represents a Area.
    /// @details Defines operations and data storage for Area dimensions.
    /// @tparam Length1 Numerator Length1 type

@@ -11,6 +11,8 @@ namespace Dimension
    /// @brief Represents the primary unit for Temperature.
    struct Kelvin;
 
+   using PrimaryTemperature = Kelvin;
+
    /// @brief Concept to check if a type is a valid Temperature unit.
    /// @tparam T The type to check.
    template<typename T>
@@ -28,7 +30,7 @@ namespace Dimension
       using Dim = TemperatureType;
 
       /// @brief The primary unit type for this dimension.
-      using Primary = Kelvin;
+      using Primary = PrimaryTemperature;
    };
 
    /// @brief Trait to check if a type is a Temperature dimension.
@@ -63,7 +65,7 @@ namespace Dimension
 
    /// @brief Represents a dimension type for Temperature.
    /// @tparam Unit The primary unit type.
-   template<IsTemperatureUnit Unit>
+   template<IsTemperatureUnit Unit = PrimaryTemperature>
    class Temperature : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
    public:

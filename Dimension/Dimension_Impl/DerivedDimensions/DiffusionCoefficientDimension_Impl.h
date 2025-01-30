@@ -66,6 +66,32 @@ namespace Dimension
    template<typename... Ts>
    class DiffusionCoefficient;
 
+   /// @brief Represents a default DiffusionCoefficient.
+   /// @details This DiffusionCoefficient is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "DiffusionCoefficient" type, without regard for the underlying units.
+   template<>
+   class DiffusionCoefficient<> : public BaseDimension<std::tuple<PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime>>;
+      using Base::Base;
+
+      /// @brief Constructs a DiffusionCoefficient object with a value.
+      /// @param val The value of the DiffusionCoefficient.
+      explicit constexpr DiffusionCoefficient(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a DiffusionCoefficient object from another DiffusionCoefficient object.
+      /// @tparam OtherDiffusionCoefficient The other DiffusionCoefficient type.
+      /// @param base The base DiffusionCoefficient object.
+      template<typename OtherDiffusionCoefficient>
+      requires IsDiffusionCoefficientType<OtherDiffusionCoefficient>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr DiffusionCoefficient(const OtherDiffusionCoefficient& base)
+         : Base(base.template GetVal<std::tuple<PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime>>()) {}
+   };
+
    /// @brief Represents a DiffusionCoefficient.
    /// @details Defines operations and data storage for DiffusionCoefficient dimensions.
    /// @tparam Length1 Numerator Length1 type

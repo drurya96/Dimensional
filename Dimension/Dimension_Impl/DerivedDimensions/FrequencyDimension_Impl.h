@@ -59,6 +59,32 @@ namespace Dimension
    template<typename... Ts>
    class Frequency;
 
+   /// @brief Represents a default Frequency.
+   /// @details This Frequency is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "Frequency" type, without regard for the underlying units.
+   template<>
+   class Frequency<> : public BaseDimension<std::tuple<>, std::tuple<PrimaryTime>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<>, std::tuple<PrimaryTime>>;
+      using Base::Base;
+
+      /// @brief Constructs a Frequency object with a value.
+      /// @param val The value of the Frequency.
+      explicit constexpr Frequency(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a Frequency object from another Frequency object.
+      /// @tparam OtherFrequency The other Frequency type.
+      /// @param base The base Frequency object.
+      template<typename OtherFrequency>
+      requires IsFrequencyType<OtherFrequency>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr Frequency(const OtherFrequency& base)
+         : Base(base.template GetVal<std::tuple<>, std::tuple<PrimaryTime>>()) {}
+   };
+
    /// @brief Represents a Frequency.
    /// @details Defines operations and data storage for Frequency dimensions.
    /// @tparam Time1 Denominator Time1 type

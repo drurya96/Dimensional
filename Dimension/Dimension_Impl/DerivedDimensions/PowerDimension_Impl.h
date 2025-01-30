@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_POWER_IMPL_H
 #define STATIC_DIMENSION_POWER_IMPL_H
 
-#include "../../TimeDimension.h"
 #include "../../MassDimension.h"
 #include "../../LengthDimension.h"
+#include "../../TimeDimension.h"
 
 namespace Dimension
 {
@@ -75,6 +75,32 @@ namespace Dimension
 
    template<typename... Ts>
    class Power;
+
+   /// @brief Represents a default Power.
+   /// @details This Power is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "Power" type, without regard for the underlying units.
+   template<>
+   class Power<> : public BaseDimension<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryTime>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryTime>>;
+      using Base::Base;
+
+      /// @brief Constructs a Power object with a value.
+      /// @param val The value of the Power.
+      explicit constexpr Power(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a Power object from another Power object.
+      /// @tparam OtherPower The other Power type.
+      /// @param base The base Power object.
+      template<typename OtherPower>
+      requires IsPowerType<OtherPower>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr Power(const OtherPower& base)
+         : Base(base.template GetVal<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryTime>>()) {}
+   };
 
    /// @brief Represents a Power.
    /// @details Defines operations and data storage for Power dimensions.

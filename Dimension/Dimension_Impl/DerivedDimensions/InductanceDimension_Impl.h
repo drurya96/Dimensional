@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_INDUCTANCE_IMPL_H
 #define STATIC_DIMENSION_INDUCTANCE_IMPL_H
 
+#include "../../MassDimension.h"
 #include "../../ChargeDimension.h"
 #include "../../LengthDimension.h"
-#include "../../MassDimension.h"
 
 namespace Dimension
 {
@@ -72,6 +72,32 @@ namespace Dimension
 
    template<typename... Ts>
    class Inductance;
+
+   /// @brief Represents a default Inductance.
+   /// @details This Inductance is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "Inductance" type, without regard for the underlying units.
+   template<>
+   class Inductance<> : public BaseDimension<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryCharge, PrimaryCharge>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryCharge, PrimaryCharge>>;
+      using Base::Base;
+
+      /// @brief Constructs a Inductance object with a value.
+      /// @param val The value of the Inductance.
+      explicit constexpr Inductance(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a Inductance object from another Inductance object.
+      /// @tparam OtherInductance The other Inductance type.
+      /// @param base The base Inductance object.
+      template<typename OtherInductance>
+      requires IsInductanceType<OtherInductance>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr Inductance(const OtherInductance& base)
+         : Base(base.template GetVal<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryCharge, PrimaryCharge>>()) {}
+   };
 
    /// @brief Represents a Inductance.
    /// @details Defines operations and data storage for Inductance dimensions.

@@ -1,10 +1,10 @@
 #ifndef STATIC_DIMENSION_ENTROPY_IMPL_H
 #define STATIC_DIMENSION_ENTROPY_IMPL_H
 
-#include "../../TemperatureDimension.h"
 #include "../../TimeDimension.h"
-#include "../../MassDimension.h"
+#include "../../TemperatureDimension.h"
 #include "../../LengthDimension.h"
+#include "../../MassDimension.h"
 
 namespace Dimension
 {
@@ -76,6 +76,32 @@ namespace Dimension
 
    template<typename... Ts>
    class Entropy;
+
+   /// @brief Represents a default Entropy.
+   /// @details This Entropy is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "Entropy" type, without regard for the underlying units.
+   template<>
+   class Entropy<> : public BaseDimension<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryTemperature>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryTemperature>>;
+      using Base::Base;
+
+      /// @brief Constructs a Entropy object with a value.
+      /// @param val The value of the Entropy.
+      explicit constexpr Entropy(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a Entropy object from another Entropy object.
+      /// @tparam OtherEntropy The other Entropy type.
+      /// @param base The base Entropy object.
+      template<typename OtherEntropy>
+      requires IsEntropyType<OtherEntropy>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr Entropy(const OtherEntropy& base)
+         : Base(base.template GetVal<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryTemperature>>()) {}
+   };
 
    /// @brief Represents a Entropy.
    /// @details Defines operations and data storage for Entropy dimensions.

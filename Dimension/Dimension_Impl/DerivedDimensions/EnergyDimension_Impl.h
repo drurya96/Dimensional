@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_ENERGY_IMPL_H
 #define STATIC_DIMENSION_ENERGY_IMPL_H
 
-#include "../../TimeDimension.h"
 #include "../../MassDimension.h"
 #include "../../LengthDimension.h"
+#include "../../TimeDimension.h"
 
 namespace Dimension
 {
@@ -72,6 +72,32 @@ namespace Dimension
 
    template<typename... Ts>
    class Energy;
+
+   /// @brief Represents a default Energy.
+   /// @details This Energy is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "Energy" type, without regard for the underlying units.
+   template<>
+   class Energy<> : public BaseDimension<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime>>;
+      using Base::Base;
+
+      /// @brief Constructs a Energy object with a value.
+      /// @param val The value of the Energy.
+      explicit constexpr Energy(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a Energy object from another Energy object.
+      /// @tparam OtherEnergy The other Energy type.
+      /// @param base The base Energy object.
+      template<typename OtherEnergy>
+      requires IsEnergyType<OtherEnergy>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr Energy(const OtherEnergy& base)
+         : Base(base.template GetVal<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime>>()) {}
+   };
 
    /// @brief Represents a Energy.
    /// @details Defines operations and data storage for Energy dimensions.

@@ -7,8 +7,8 @@ All notable changes to this project will be documented in this file. Semantic ve
 ### Changed
 - Internal changes to address static analysis warnings
 
-
 ### Added
+- Default template parameters for Fundamental and Derived dimensions
 - CppCheck static analysis on pipelines
 
 ### Deprecated

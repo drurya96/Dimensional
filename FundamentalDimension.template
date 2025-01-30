@@ -11,6 +11,8 @@ namespace Dimension
    /// @brief Represents the primary unit for {{ dimension_name }}.
    struct {{ primary_name }};
 
+   using Primary{{ dimension_name }} = {{ primary_name }};
+
    /// @brief Concept to check if a type is a valid {{ dimension_name }} unit.
    /// @tparam T The type to check.
    template<typename T>
@@ -28,7 +30,7 @@ namespace Dimension
       using Dim = {{ dimension_name }}Type;
 
       /// @brief The primary unit type for this dimension.
-      using Primary = {{ primary_name }};
+      using Primary = Primary{{ dimension_name }};
    };
 
    /// @brief Trait to check if a type is a {{ dimension_name }} dimension.
@@ -63,7 +65,7 @@ namespace Dimension
 
    /// @brief Represents a dimension type for {{ dimension_name }}.
    /// @tparam Unit The primary unit type.
-   template<Is{{ dimension_name }}Unit Unit>
+   template<Is{{ dimension_name }}Unit Unit = Primary{{ dimension_name }}>
    class {{ dimension_name }} : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
    public:

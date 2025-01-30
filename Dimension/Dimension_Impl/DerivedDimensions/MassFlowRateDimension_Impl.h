@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_MASSFLOWRATE_IMPL_H
 #define STATIC_DIMENSION_MASSFLOWRATE_IMPL_H
 
-#include "../../TimeDimension.h"
 #include "../../MassDimension.h"
+#include "../../TimeDimension.h"
 
 namespace Dimension
 {
@@ -62,6 +62,32 @@ namespace Dimension
 
    template<typename... Ts>
    class MassFlowRate;
+
+   /// @brief Represents a default MassFlowRate.
+   /// @details This MassFlowRate is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "MassFlowRate" type, without regard for the underlying units.
+   template<>
+   class MassFlowRate<> : public BaseDimension<std::tuple<PrimaryMass>, std::tuple<PrimaryTime>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryMass>, std::tuple<PrimaryTime>>;
+      using Base::Base;
+
+      /// @brief Constructs a MassFlowRate object with a value.
+      /// @param val The value of the MassFlowRate.
+      explicit constexpr MassFlowRate(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a MassFlowRate object from another MassFlowRate object.
+      /// @tparam OtherMassFlowRate The other MassFlowRate type.
+      /// @param base The base MassFlowRate object.
+      template<typename OtherMassFlowRate>
+      requires IsMassFlowRateType<OtherMassFlowRate>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr MassFlowRate(const OtherMassFlowRate& base)
+         : Base(base.template GetVal<std::tuple<PrimaryMass>, std::tuple<PrimaryTime>>()) {}
+   };
 
    /// @brief Represents a MassFlowRate.
    /// @details Defines operations and data storage for MassFlowRate dimensions.

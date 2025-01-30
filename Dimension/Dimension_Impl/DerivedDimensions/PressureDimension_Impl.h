@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_PRESSURE_IMPL_H
 #define STATIC_DIMENSION_PRESSURE_IMPL_H
 
-#include "../../MassDimension.h"
-#include "../../LengthDimension.h"
 #include "../../TimeDimension.h"
+#include "../../LengthDimension.h"
+#include "../../MassDimension.h"
 
 namespace Dimension
 {
@@ -69,6 +69,32 @@ namespace Dimension
 
    template<typename... Ts>
    class Pressure;
+
+   /// @brief Represents a default Pressure.
+   /// @details This Pressure is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "Pressure" type, without regard for the underlying units.
+   template<>
+   class Pressure<> : public BaseDimension<std::tuple<PrimaryMass>, std::tuple<PrimaryLength, PrimaryTime, PrimaryTime>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryMass>, std::tuple<PrimaryLength, PrimaryTime, PrimaryTime>>;
+      using Base::Base;
+
+      /// @brief Constructs a Pressure object with a value.
+      /// @param val The value of the Pressure.
+      explicit constexpr Pressure(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a Pressure object from another Pressure object.
+      /// @tparam OtherPressure The other Pressure type.
+      /// @param base The base Pressure object.
+      template<typename OtherPressure>
+      requires IsPressureType<OtherPressure>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr Pressure(const OtherPressure& base)
+         : Base(base.template GetVal<std::tuple<PrimaryMass>, std::tuple<PrimaryLength, PrimaryTime, PrimaryTime>>()) {}
+   };
 
    /// @brief Represents a Pressure.
    /// @details Defines operations and data storage for Pressure dimensions.
