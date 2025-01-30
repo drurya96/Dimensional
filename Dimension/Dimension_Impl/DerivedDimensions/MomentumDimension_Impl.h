@@ -2,8 +2,8 @@
 #define STATIC_DIMENSION_MOMENTUM_IMPL_H
 
 #include "../../LengthDimension.h"
-#include "../../MassDimension.h"
 #include "../../TimeDimension.h"
+#include "../../MassDimension.h"
 
 namespace Dimension
 {
@@ -66,6 +66,32 @@ namespace Dimension
 
    template<typename... Ts>
    class Momentum;
+
+   /// @brief Represents a default Momentum.
+   /// @details This Momentum is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "Momentum" type, without regard for the underlying units.
+   template<>
+   class Momentum<> : public BaseDimension<std::tuple<PrimaryMass, PrimaryLength>, std::tuple<PrimaryTime>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryMass, PrimaryLength>, std::tuple<PrimaryTime>>;
+      using Base::Base;
+
+      /// @brief Constructs a Momentum object with a value.
+      /// @param val The value of the Momentum.
+      explicit constexpr Momentum(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a Momentum object from another Momentum object.
+      /// @tparam OtherMomentum The other Momentum type.
+      /// @param base The base Momentum object.
+      template<typename OtherMomentum>
+      requires IsMomentumType<OtherMomentum>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr Momentum(const OtherMomentum& base)
+         : Base(base.template GetVal<std::tuple<PrimaryMass, PrimaryLength>, std::tuple<PrimaryTime>>()) {}
+   };
 
    /// @brief Represents a Momentum.
    /// @details Defines operations and data storage for Momentum dimensions.

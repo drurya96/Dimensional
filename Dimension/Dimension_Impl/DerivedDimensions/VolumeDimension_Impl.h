@@ -65,6 +65,32 @@ namespace Dimension
    template<typename... Ts>
    class Volume;
 
+   /// @brief Represents a default Volume.
+   /// @details This Volume is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "Volume" type, without regard for the underlying units.
+   template<>
+   class Volume<> : public BaseDimension<std::tuple<PrimaryLength, PrimaryLength, PrimaryLength>, std::tuple<>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryLength, PrimaryLength, PrimaryLength>, std::tuple<>>;
+      using Base::Base;
+
+      /// @brief Constructs a Volume object with a value.
+      /// @param val The value of the Volume.
+      explicit constexpr Volume(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a Volume object from another Volume object.
+      /// @tparam OtherVolume The other Volume type.
+      /// @param base The base Volume object.
+      template<typename OtherVolume>
+      requires IsVolumeType<OtherVolume>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr Volume(const OtherVolume& base)
+         : Base(base.template GetVal<std::tuple<PrimaryLength, PrimaryLength, PrimaryLength>, std::tuple<>>()) {}
+   };
+
    /// @brief Represents a Volume.
    /// @details Defines operations and data storage for Volume dimensions.
    /// @tparam Length1 Numerator Length1 type

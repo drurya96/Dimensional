@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_MAGNETICFIELD_IMPL_H
 #define STATIC_DIMENSION_MAGNETICFIELD_IMPL_H
 
-#include "../../TimeDimension.h"
-#include "../../MassDimension.h"
 #include "../../ChargeDimension.h"
+#include "../../MassDimension.h"
+#include "../../TimeDimension.h"
 
 namespace Dimension
 {
@@ -66,6 +66,32 @@ namespace Dimension
 
    template<typename... Ts>
    class MagneticField;
+
+   /// @brief Represents a default MagneticField.
+   /// @details This MagneticField is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "MagneticField" type, without regard for the underlying units.
+   template<>
+   class MagneticField<> : public BaseDimension<std::tuple<PrimaryMass>, std::tuple<PrimaryTime, PrimaryCharge>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryMass>, std::tuple<PrimaryTime, PrimaryCharge>>;
+      using Base::Base;
+
+      /// @brief Constructs a MagneticField object with a value.
+      /// @param val The value of the MagneticField.
+      explicit constexpr MagneticField(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a MagneticField object from another MagneticField object.
+      /// @tparam OtherMagneticField The other MagneticField type.
+      /// @param base The base MagneticField object.
+      template<typename OtherMagneticField>
+      requires IsMagneticFieldType<OtherMagneticField>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr MagneticField(const OtherMagneticField& base)
+         : Base(base.template GetVal<std::tuple<PrimaryMass>, std::tuple<PrimaryTime, PrimaryCharge>>()) {}
+   };
 
    /// @brief Represents a MagneticField.
    /// @details Defines operations and data storage for MagneticField dimensions.

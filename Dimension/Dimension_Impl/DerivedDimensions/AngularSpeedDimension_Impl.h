@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_ANGULARSPEED_IMPL_H
 #define STATIC_DIMENSION_ANGULARSPEED_IMPL_H
 
-#include "../../AngleDimension.h"
 #include "../../TimeDimension.h"
+#include "../../AngleDimension.h"
 
 namespace Dimension
 {
@@ -62,6 +62,32 @@ namespace Dimension
 
    template<typename... Ts>
    class AngularSpeed;
+
+   /// @brief Represents a default AngularSpeed.
+   /// @details This AngularSpeed is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "AngularSpeed" type, without regard for the underlying units.
+   template<>
+   class AngularSpeed<> : public BaseDimension<std::tuple<PrimaryAngle>, std::tuple<PrimaryTime>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryAngle>, std::tuple<PrimaryTime>>;
+      using Base::Base;
+
+      /// @brief Constructs a AngularSpeed object with a value.
+      /// @param val The value of the AngularSpeed.
+      explicit constexpr AngularSpeed(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a AngularSpeed object from another AngularSpeed object.
+      /// @tparam OtherAngularSpeed The other AngularSpeed type.
+      /// @param base The base AngularSpeed object.
+      template<typename OtherAngularSpeed>
+      requires IsAngularSpeedType<OtherAngularSpeed>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr AngularSpeed(const OtherAngularSpeed& base)
+         : Base(base.template GetVal<std::tuple<PrimaryAngle>, std::tuple<PrimaryTime>>()) {}
+   };
 
    /// @brief Represents a AngularSpeed.
    /// @details Defines operations and data storage for AngularSpeed dimensions.

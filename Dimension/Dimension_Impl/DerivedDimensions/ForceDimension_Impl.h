@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_FORCE_IMPL_H
 #define STATIC_DIMENSION_FORCE_IMPL_H
 
-#include "../../LengthDimension.h"
 #include "../../MassDimension.h"
 #include "../../TimeDimension.h"
+#include "../../LengthDimension.h"
 
 namespace Dimension
 {
@@ -69,6 +69,32 @@ namespace Dimension
 
    template<typename... Ts>
    class Force;
+
+   /// @brief Represents a default Force.
+   /// @details This Force is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "Force" type, without regard for the underlying units.
+   template<>
+   class Force<> : public BaseDimension<std::tuple<PrimaryMass, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryMass, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime>>;
+      using Base::Base;
+
+      /// @brief Constructs a Force object with a value.
+      /// @param val The value of the Force.
+      explicit constexpr Force(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a Force object from another Force object.
+      /// @tparam OtherForce The other Force type.
+      /// @param base The base Force object.
+      template<typename OtherForce>
+      requires IsForceType<OtherForce>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr Force(const OtherForce& base)
+         : Base(base.template GetVal<std::tuple<PrimaryMass, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime>>()) {}
+   };
 
    /// @brief Represents a Force.
    /// @details Defines operations and data storage for Force dimensions.

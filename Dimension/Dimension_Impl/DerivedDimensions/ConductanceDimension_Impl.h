@@ -1,10 +1,10 @@
 #ifndef STATIC_DIMENSION_CONDUCTANCE_IMPL_H
 #define STATIC_DIMENSION_CONDUCTANCE_IMPL_H
 
-#include "../../LengthDimension.h"
-#include "../../ChargeDimension.h"
-#include "../../MassDimension.h"
 #include "../../TimeDimension.h"
+#include "../../LengthDimension.h"
+#include "../../MassDimension.h"
+#include "../../ChargeDimension.h"
 
 namespace Dimension
 {
@@ -76,6 +76,32 @@ namespace Dimension
 
    template<typename... Ts>
    class Conductance;
+
+   /// @brief Represents a default Conductance.
+   /// @details This Conductance is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "Conductance" type, without regard for the underlying units.
+   template<>
+   class Conductance<> : public BaseDimension<std::tuple<PrimaryTime, PrimaryCharge, PrimaryCharge>, std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryTime, PrimaryCharge, PrimaryCharge>, std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>>;
+      using Base::Base;
+
+      /// @brief Constructs a Conductance object with a value.
+      /// @param val The value of the Conductance.
+      explicit constexpr Conductance(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a Conductance object from another Conductance object.
+      /// @tparam OtherConductance The other Conductance type.
+      /// @param base The base Conductance object.
+      template<typename OtherConductance>
+      requires IsConductanceType<OtherConductance>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr Conductance(const OtherConductance& base)
+         : Base(base.template GetVal<std::tuple<PrimaryTime, PrimaryCharge, PrimaryCharge>, std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>>()) {}
+   };
 
    /// @brief Represents a Conductance.
    /// @details Defines operations and data storage for Conductance dimensions.

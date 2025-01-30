@@ -1,10 +1,10 @@
 #ifndef STATIC_DIMENSION_RESISTANCE_IMPL_H
 #define STATIC_DIMENSION_RESISTANCE_IMPL_H
 
-#include "../../TimeDimension.h"
 #include "../../LengthDimension.h"
-#include "../../ChargeDimension.h"
+#include "../../TimeDimension.h"
 #include "../../MassDimension.h"
+#include "../../ChargeDimension.h"
 
 namespace Dimension
 {
@@ -76,6 +76,32 @@ namespace Dimension
 
    template<typename... Ts>
    class Resistance;
+
+   /// @brief Represents a default Resistance.
+   /// @details This Resistance is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "Resistance" type, without regard for the underlying units.
+   template<>
+   class Resistance<> : public BaseDimension<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryCharge, PrimaryCharge>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryCharge, PrimaryCharge>>;
+      using Base::Base;
+
+      /// @brief Constructs a Resistance object with a value.
+      /// @param val The value of the Resistance.
+      explicit constexpr Resistance(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a Resistance object from another Resistance object.
+      /// @tparam OtherResistance The other Resistance type.
+      /// @param base The base Resistance object.
+      template<typename OtherResistance>
+      requires IsResistanceType<OtherResistance>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr Resistance(const OtherResistance& base)
+         : Base(base.template GetVal<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryCharge, PrimaryCharge>>()) {}
+   };
 
    /// @brief Represents a Resistance.
    /// @details Defines operations and data storage for Resistance dimensions.

@@ -127,6 +127,88 @@ class MyClass
 };
 ```
 
+## Dimensions as Parameters
+
+When writing a function that takes a Dimension object as a parameter, consider the following approaches.
+
+In all examples, signatures will be presented as if they are within a header, where `using name Dimension` would generally be discouraged.
+
+### Dimension of Pre-Defined Unit
+
+A function may accept a dimension of a pre-defined unit.
+This allows the declaration to exist in the header, while the definition may be pre-compiled, reducing compile times for large projects.
+However, calling this function with a different unit will invoke an implicit cast. This is expected, but does incur a runtime performance and precision cost.
+The cost is small per-call, but in highly performance- or precision-critical contexts, this may not be ideal.
+
+#### Fully Qualified Dimension
+
+Fully defining the dimension in terms of units is highly verbose, but it creates a very clear API for the function.
+This is especially useful when the function uses the object in terms of the defined unit.
+For example, if within the function body, `getLength<Meters>(obj)` is called, especially if its called multiple times, defining the unit can improve performance.
+
+Unfortunately, for dimensions with longer names (i.e. `Dimension::Force<Dimension::KiloGrams, Dimension::Meters, Dimension::Seconds, Dimension::Seconds>`), this approach is very verbose.
+
+```cpp
+void MyFunction(Dimension::Length<Dimension::Meters> obj);
+```
+
+#### Dimension with default unit
+
+Dimensions have default template parameters for their units. This can be leveraged in function signatures to "ignore" the unit.
+To the compiler, this is still a fully-qualified type. There are no compile-time or runtime costs or savings for this approach compared to the previous.
+Use a Dimension with default unit(s) when the function does not need any particular unit, **and** the function won't be called in highly performance or precision sensitive contexts.
+
+Typically, this form is ideal for *thinking* about the object in terms of its dimension, rather than its unit. "My function expects a Length, but it doesn't matter what kind".
+While the compiler treats this as a fully defined type, using the default template parameters abstracts the unit knowledge away from the author and caller of the function.
+Whether this is seen as "good" or "bad" is at the discretion of the user.
+
+```cpp
+void MyFunction(Dimension::Length<> obj);
+```
+
+### Template dimensions
+
+A function may accept a template-based Dimension.
+In this case, typically the function definition must also exist in the header (i.e. inline), though it is possible to specialize the function in a source file that is pre-compiled.
+A function template may use a dimension of any unit, resulting in maximum runtime performance and precision since no casting is needed.
+However, invoking the function template with many different units and/or in many compilation units will incur some compile-time costs.
+Changes to the implementation of these functions may also trigger re-compilation of dependent compilation units.
+For functions that are not performance or precision critical, this may not be ideal for large projects.
+
+#### Dimension templated on unit
+
+The unit can be provided as a template parameter.
+While the template will accept any unit, only those that satisfy the built-in constraints of the dimension will be allowed.
+
+```cpp
+template<typename T>
+void MyFunction(Dimension::Length<T> obj){/*implementation*/}
+```
+
+#### Constrained templated dimension
+
+The dimension itself can be a template parameter.
+Using the `is_Length` or similar concepts, the function template can be constrained to only accept length types.
+This is functionally very similar to templating on the unit, however there is a small compile-time cost to checking the constraint.
+
+The choice between these template approaches is predominately stylistic (with very slightly faster compile times when templating on the unit(s)).
+
+```cpp
+void MyFunction(Dimension::is_Length auto obj){/*implementation*/}
+```
+
+**Note**: This is the same as:
+```cpp
+template<Dimension::is_Length T>
+void MyFunction(T obj){/*implementation*/}
+```
+and
+```cpp
+template<typename T>
+requires Dimension::is_Length<T>
+void MyFunction(T obj){/*implementation*/}
+```
+
 ## Arithmetic
 
 As a dimensional analysis library, arithmetic operations are at the core of `Dimensional`.

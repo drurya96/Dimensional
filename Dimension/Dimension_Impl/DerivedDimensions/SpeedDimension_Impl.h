@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_SPEED_IMPL_H
 #define STATIC_DIMENSION_SPEED_IMPL_H
 
-#include "../../TimeDimension.h"
 #include "../../LengthDimension.h"
+#include "../../TimeDimension.h"
 
 namespace Dimension
 {
@@ -62,6 +62,32 @@ namespace Dimension
 
    template<typename... Ts>
    class Speed;
+
+   /// @brief Represents a default Speed.
+   /// @details This Speed is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "Speed" type, without regard for the underlying units.
+   template<>
+   class Speed<> : public BaseDimension<std::tuple<PrimaryLength>, std::tuple<PrimaryTime>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryLength>, std::tuple<PrimaryTime>>;
+      using Base::Base;
+
+      /// @brief Constructs a Speed object with a value.
+      /// @param val The value of the Speed.
+      explicit constexpr Speed(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a Speed object from another Speed object.
+      /// @tparam OtherSpeed The other Speed type.
+      /// @param base The base Speed object.
+      template<typename OtherSpeed>
+      requires IsSpeedType<OtherSpeed>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr Speed(const OtherSpeed& base)
+         : Base(base.template GetVal<std::tuple<PrimaryLength>, std::tuple<PrimaryTime>>()) {}
+   };
 
    /// @brief Represents a Speed.
    /// @details Defines operations and data storage for Speed dimensions.

@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_DYNAMICVISCOSITY_IMPL_H
 #define STATIC_DIMENSION_DYNAMICVISCOSITY_IMPL_H
 
-#include "../../TimeDimension.h"
-#include "../../LengthDimension.h"
 #include "../../MassDimension.h"
+#include "../../LengthDimension.h"
+#include "../../TimeDimension.h"
 
 namespace Dimension
 {
@@ -66,6 +66,32 @@ namespace Dimension
 
    template<typename... Ts>
    class DynamicViscosity;
+
+   /// @brief Represents a default DynamicViscosity.
+   /// @details This DynamicViscosity is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "DynamicViscosity" type, without regard for the underlying units.
+   template<>
+   class DynamicViscosity<> : public BaseDimension<std::tuple<PrimaryMass>, std::tuple<PrimaryTime, PrimaryLength>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryMass>, std::tuple<PrimaryTime, PrimaryLength>>;
+      using Base::Base;
+
+      /// @brief Constructs a DynamicViscosity object with a value.
+      /// @param val The value of the DynamicViscosity.
+      explicit constexpr DynamicViscosity(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a DynamicViscosity object from another DynamicViscosity object.
+      /// @tparam OtherDynamicViscosity The other DynamicViscosity type.
+      /// @param base The base DynamicViscosity object.
+      template<typename OtherDynamicViscosity>
+      requires IsDynamicViscosityType<OtherDynamicViscosity>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr DynamicViscosity(const OtherDynamicViscosity& base)
+         : Base(base.template GetVal<std::tuple<PrimaryMass>, std::tuple<PrimaryTime, PrimaryLength>>()) {}
+   };
 
    /// @brief Represents a DynamicViscosity.
    /// @details Defines operations and data storage for DynamicViscosity dimensions.

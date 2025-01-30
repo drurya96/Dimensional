@@ -69,6 +69,32 @@ namespace Dimension
    template<typename... Ts>
    class SpecificVolume;
 
+   /// @brief Represents a default SpecificVolume.
+   /// @details This SpecificVolume is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "SpecificVolume" type, without regard for the underlying units.
+   template<>
+   class SpecificVolume<> : public BaseDimension<std::tuple<PrimaryLength, PrimaryLength, PrimaryLength>, std::tuple<PrimaryMass>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryLength, PrimaryLength, PrimaryLength>, std::tuple<PrimaryMass>>;
+      using Base::Base;
+
+      /// @brief Constructs a SpecificVolume object with a value.
+      /// @param val The value of the SpecificVolume.
+      explicit constexpr SpecificVolume(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a SpecificVolume object from another SpecificVolume object.
+      /// @tparam OtherSpecificVolume The other SpecificVolume type.
+      /// @param base The base SpecificVolume object.
+      template<typename OtherSpecificVolume>
+      requires IsSpecificVolumeType<OtherSpecificVolume>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr SpecificVolume(const OtherSpecificVolume& base)
+         : Base(base.template GetVal<std::tuple<PrimaryLength, PrimaryLength, PrimaryLength>, std::tuple<PrimaryMass>>()) {}
+   };
+
    /// @brief Represents a SpecificVolume.
    /// @details Defines operations and data storage for SpecificVolume dimensions.
    /// @tparam Length1 Numerator Length1 type

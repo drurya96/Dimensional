@@ -11,6 +11,8 @@ namespace Dimension
    /// @brief Represents the primary unit for Charge.
    struct Coulombs;
 
+   using PrimaryCharge = Coulombs;
+
    /// @brief Concept to check if a type is a valid Charge unit.
    /// @tparam T The type to check.
    template<typename T>
@@ -28,7 +30,7 @@ namespace Dimension
       using Dim = ChargeType;
 
       /// @brief The primary unit type for this dimension.
-      using Primary = Coulombs;
+      using Primary = PrimaryCharge;
    };
 
    /// @brief Trait to check if a type is a Charge dimension.
@@ -63,7 +65,7 @@ namespace Dimension
 
    /// @brief Represents a dimension type for Charge.
    /// @tparam Unit The primary unit type.
-   template<IsChargeUnit Unit>
+   template<IsChargeUnit Unit = PrimaryCharge>
    class Charge : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
    public:

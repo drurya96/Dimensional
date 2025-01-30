@@ -69,6 +69,32 @@ namespace Dimension
    template<typename... Ts>
    class HeatFlux;
 
+   /// @brief Represents a default HeatFlux.
+   /// @details This HeatFlux is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "HeatFlux" type, without regard for the underlying units.
+   template<>
+   class HeatFlux<> : public BaseDimension<std::tuple<PrimaryMass>, std::tuple<PrimaryTime, PrimaryTime, PrimaryTime>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryMass>, std::tuple<PrimaryTime, PrimaryTime, PrimaryTime>>;
+      using Base::Base;
+
+      /// @brief Constructs a HeatFlux object with a value.
+      /// @param val The value of the HeatFlux.
+      explicit constexpr HeatFlux(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a HeatFlux object from another HeatFlux object.
+      /// @tparam OtherHeatFlux The other HeatFlux type.
+      /// @param base The base HeatFlux object.
+      template<typename OtherHeatFlux>
+      requires IsHeatFluxType<OtherHeatFlux>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr HeatFlux(const OtherHeatFlux& base)
+         : Base(base.template GetVal<std::tuple<PrimaryMass>, std::tuple<PrimaryTime, PrimaryTime, PrimaryTime>>()) {}
+   };
+
    /// @brief Represents a HeatFlux.
    /// @details Defines operations and data storage for HeatFlux dimensions.
    /// @tparam Mass1 Numerator Mass1 type

@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_ACCELERATION_IMPL_H
 #define STATIC_DIMENSION_ACCELERATION_IMPL_H
 
-#include "../../TimeDimension.h"
 #include "../../LengthDimension.h"
+#include "../../TimeDimension.h"
 
 namespace Dimension
 {
@@ -65,6 +65,32 @@ namespace Dimension
 
    template<typename... Ts>
    class Acceleration;
+
+   /// @brief Represents a default Acceleration.
+   /// @details This Acceleration is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "Acceleration" type, without regard for the underlying units.
+   template<>
+   class Acceleration<> : public BaseDimension<std::tuple<PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime>>;
+      using Base::Base;
+
+      /// @brief Constructs a Acceleration object with a value.
+      /// @param val The value of the Acceleration.
+      explicit constexpr Acceleration(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a Acceleration object from another Acceleration object.
+      /// @tparam OtherAcceleration The other Acceleration type.
+      /// @param base The base Acceleration object.
+      template<typename OtherAcceleration>
+      requires IsAccelerationType<OtherAcceleration>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr Acceleration(const OtherAcceleration& base)
+         : Base(base.template GetVal<std::tuple<PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime>>()) {}
+   };
 
    /// @brief Represents a Acceleration.
    /// @details Defines operations and data storage for Acceleration dimensions.

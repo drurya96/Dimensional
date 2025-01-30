@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_MOLARMASS_IMPL_H
 #define STATIC_DIMENSION_MOLARMASS_IMPL_H
 
-#include "../../AmountDimension.h"
 #include "../../MassDimension.h"
+#include "../../AmountDimension.h"
 
 namespace Dimension
 {
@@ -62,6 +62,32 @@ namespace Dimension
 
    template<typename... Ts>
    class MolarMass;
+
+   /// @brief Represents a default MolarMass.
+   /// @details This MolarMass is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "MolarMass" type, without regard for the underlying units.
+   template<>
+   class MolarMass<> : public BaseDimension<std::tuple<PrimaryMass>, std::tuple<PrimaryAmount>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryMass>, std::tuple<PrimaryAmount>>;
+      using Base::Base;
+
+      /// @brief Constructs a MolarMass object with a value.
+      /// @param val The value of the MolarMass.
+      explicit constexpr MolarMass(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a MolarMass object from another MolarMass object.
+      /// @tparam OtherMolarMass The other MolarMass type.
+      /// @param base The base MolarMass object.
+      template<typename OtherMolarMass>
+      requires IsMolarMassType<OtherMolarMass>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr MolarMass(const OtherMolarMass& base)
+         : Base(base.template GetVal<std::tuple<PrimaryMass>, std::tuple<PrimaryAmount>>()) {}
+   };
 
    /// @brief Represents a MolarMass.
    /// @details Defines operations and data storage for MolarMass dimensions.

@@ -73,6 +73,32 @@ namespace Dimension
    template<typename... Ts>
    class SpecificHeatCapacity;
 
+   /// @brief Represents a default SpecificHeatCapacity.
+   /// @details This SpecificHeatCapacity is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "SpecificHeatCapacity" type, without regard for the underlying units.
+   template<>
+   class SpecificHeatCapacity<> : public BaseDimension<std::tuple<PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryTemperature>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryTemperature>>;
+      using Base::Base;
+
+      /// @brief Constructs a SpecificHeatCapacity object with a value.
+      /// @param val The value of the SpecificHeatCapacity.
+      explicit constexpr SpecificHeatCapacity(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a SpecificHeatCapacity object from another SpecificHeatCapacity object.
+      /// @tparam OtherSpecificHeatCapacity The other SpecificHeatCapacity type.
+      /// @param base The base SpecificHeatCapacity object.
+      template<typename OtherSpecificHeatCapacity>
+      requires IsSpecificHeatCapacityType<OtherSpecificHeatCapacity>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr SpecificHeatCapacity(const OtherSpecificHeatCapacity& base)
+         : Base(base.template GetVal<std::tuple<PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryTemperature>>()) {}
+   };
+
    /// @brief Represents a SpecificHeatCapacity.
    /// @details Defines operations and data storage for SpecificHeatCapacity dimensions.
    /// @tparam Length1 Numerator Length1 type

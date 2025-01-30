@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_DENSITY_IMPL_H
 #define STATIC_DIMENSION_DENSITY_IMPL_H
 
-#include "../../MassDimension.h"
 #include "../../LengthDimension.h"
+#include "../../MassDimension.h"
 
 namespace Dimension
 {
@@ -68,6 +68,32 @@ namespace Dimension
 
    template<typename... Ts>
    class Density;
+
+   /// @brief Represents a default Density.
+   /// @details This Density is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "Density" type, without regard for the underlying units.
+   template<>
+   class Density<> : public BaseDimension<std::tuple<PrimaryMass>, std::tuple<PrimaryLength, PrimaryLength, PrimaryLength>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryMass>, std::tuple<PrimaryLength, PrimaryLength, PrimaryLength>>;
+      using Base::Base;
+
+      /// @brief Constructs a Density object with a value.
+      /// @param val The value of the Density.
+      explicit constexpr Density(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a Density object from another Density object.
+      /// @tparam OtherDensity The other Density type.
+      /// @param base The base Density object.
+      template<typename OtherDensity>
+      requires IsDensityType<OtherDensity>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr Density(const OtherDensity& base)
+         : Base(base.template GetVal<std::tuple<PrimaryMass>, std::tuple<PrimaryLength, PrimaryLength, PrimaryLength>>()) {}
+   };
 
    /// @brief Represents a Density.
    /// @details Defines operations and data storage for Density dimensions.

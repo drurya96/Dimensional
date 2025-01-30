@@ -66,6 +66,32 @@ namespace Dimension
    template<typename... Ts>
    class AngularAcceleration;
 
+   /// @brief Represents a default AngularAcceleration.
+   /// @details This AngularAcceleration is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "AngularAcceleration" type, without regard for the underlying units.
+   template<>
+   class AngularAcceleration<> : public BaseDimension<std::tuple<PrimaryAngle>, std::tuple<PrimaryTime, PrimaryTime>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryAngle>, std::tuple<PrimaryTime, PrimaryTime>>;
+      using Base::Base;
+
+      /// @brief Constructs a AngularAcceleration object with a value.
+      /// @param val The value of the AngularAcceleration.
+      explicit constexpr AngularAcceleration(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a AngularAcceleration object from another AngularAcceleration object.
+      /// @tparam OtherAngularAcceleration The other AngularAcceleration type.
+      /// @param base The base AngularAcceleration object.
+      template<typename OtherAngularAcceleration>
+      requires IsAngularAccelerationType<OtherAngularAcceleration>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr AngularAcceleration(const OtherAngularAcceleration& base)
+         : Base(base.template GetVal<std::tuple<PrimaryAngle>, std::tuple<PrimaryTime, PrimaryTime>>()) {}
+   };
+
    /// @brief Represents a AngularAcceleration.
    /// @details Defines operations and data storage for AngularAcceleration dimensions.
    /// @tparam Angle1 Numerator Angle1 type

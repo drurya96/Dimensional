@@ -11,6 +11,8 @@ namespace Dimension
    /// @brief Represents the primary unit for Mass.
    struct Grams;
 
+   using PrimaryMass = Grams;
+
    /// @brief Concept to check if a type is a valid Mass unit.
    /// @tparam T The type to check.
    template<typename T>
@@ -28,7 +30,7 @@ namespace Dimension
       using Dim = MassType;
 
       /// @brief The primary unit type for this dimension.
-      using Primary = Grams;
+      using Primary = PrimaryMass;
    };
 
    /// @brief Trait to check if a type is a Mass dimension.
@@ -63,7 +65,7 @@ namespace Dimension
 
    /// @brief Represents a dimension type for Mass.
    /// @tparam Unit The primary unit type.
-   template<IsMassUnit Unit>
+   template<IsMassUnit Unit = PrimaryMass>
    class Mass : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
    public:

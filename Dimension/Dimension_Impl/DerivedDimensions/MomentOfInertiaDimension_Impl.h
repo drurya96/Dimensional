@@ -66,6 +66,32 @@ namespace Dimension
    template<typename... Ts>
    class MomentOfInertia;
 
+   /// @brief Represents a default MomentOfInertia.
+   /// @details This MomentOfInertia is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "MomentOfInertia" type, without regard for the underlying units.
+   template<>
+   class MomentOfInertia<> : public BaseDimension<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<>>;
+      using Base::Base;
+
+      /// @brief Constructs a MomentOfInertia object with a value.
+      /// @param val The value of the MomentOfInertia.
+      explicit constexpr MomentOfInertia(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a MomentOfInertia object from another MomentOfInertia object.
+      /// @tparam OtherMomentOfInertia The other MomentOfInertia type.
+      /// @param base The base MomentOfInertia object.
+      template<typename OtherMomentOfInertia>
+      requires IsMomentOfInertiaType<OtherMomentOfInertia>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr MomentOfInertia(const OtherMomentOfInertia& base)
+         : Base(base.template GetVal<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<>>()) {}
+   };
+
    /// @brief Represents a MomentOfInertia.
    /// @details Defines operations and data storage for MomentOfInertia dimensions.
    /// @tparam Mass1 Numerator Mass1 type

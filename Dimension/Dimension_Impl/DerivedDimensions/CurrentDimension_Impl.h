@@ -63,6 +63,32 @@ namespace Dimension
    template<typename... Ts>
    class Current;
 
+   /// @brief Represents a default Current.
+   /// @details This Current is templated on the primary units of the relevant dimensions.
+   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
+   ///   "Current" type, without regard for the underlying units.
+   template<>
+   class Current<> : public BaseDimension<std::tuple<PrimaryCharge>, std::tuple<PrimaryTime>>
+   {
+   public:
+      using Base = BaseDimension<std::tuple<PrimaryCharge>, std::tuple<PrimaryTime>>;
+      using Base::Base;
+
+      /// @brief Constructs a Current object with a value.
+      /// @param val The value of the Current.
+      explicit constexpr Current(PrecisionType val) : Base(val) {}
+
+      /// @brief Constructs a Current object from another Current object.
+      /// @tparam OtherCurrent The other Current type.
+      /// @param base The base Current object.
+      template<typename OtherCurrent>
+      requires IsCurrentType<OtherCurrent>
+      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      // cppcheck-suppress noExplicitConstructor
+      constexpr Current(const OtherCurrent& base)
+         : Base(base.template GetVal<std::tuple<PrimaryCharge>, std::tuple<PrimaryTime>>()) {}
+   };
+
    /// @brief Represents a Current.
    /// @details Defines operations and data storage for Current dimensions.
    /// @tparam Charge1 Numerator Charge1 type

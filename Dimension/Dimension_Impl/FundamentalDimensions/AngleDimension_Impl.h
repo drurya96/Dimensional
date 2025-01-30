@@ -11,6 +11,8 @@ namespace Dimension
    /// @brief Represents the primary unit for Angle.
    struct Radians;
 
+   using PrimaryAngle = Radians;
+
    /// @brief Concept to check if a type is a valid Angle unit.
    /// @tparam T The type to check.
    template<typename T>
@@ -28,7 +30,7 @@ namespace Dimension
       using Dim = AngleType;
 
       /// @brief The primary unit type for this dimension.
-      using Primary = Radians;
+      using Primary = PrimaryAngle;
    };
 
    /// @brief Trait to check if a type is a Angle dimension.
@@ -63,7 +65,7 @@ namespace Dimension
 
    /// @brief Represents a dimension type for Angle.
    /// @tparam Unit The primary unit type.
-   template<IsAngleUnit Unit>
+   template<IsAngleUnit Unit = PrimaryAngle>
    class Angle : public BaseDimension<std::tuple<Unit>, std::tuple<>>
    {
    public:
