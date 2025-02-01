@@ -8,8 +8,6 @@ python GenerateDerivedDimension.py MolarMass Mass Amount
 python GenerateDerivedDimension.py Pressure Mass Length,Time,Time
 python GenerateDerivedDimension.py Speed Length Time
 python GenerateDerivedDimension.py Volume Length,Length,Length []
-
-# New - already evaluated
 python GenerateDerivedDimension.py Area Length,Length []
 python GenerateDerivedDimension.py Frequency [] Time
 python GenerateDerivedDimension.py Momentum Mass,Length Time # Same as Impulse, see documentation
@@ -23,8 +21,6 @@ python GenerateDerivedDimension.py MagneticFlux Mass,Length,Length Time,Charge
 python GenerateDerivedDimension.py MagneticField Mass Time,Charge
 python GenerateDerivedDimension.py ElectricField Mass,Length Time,Time,Charge
 python GenerateDerivedDimension.py Conductance Time,Charge,Charge Mass,Length,Length
-
-# New
 python GenerateDerivedDimension.py Entropy Mass,Length,Length Time,Time,Temperature
 python GenerateDerivedDimension.py HeatFlux Mass Time,Time,Time
 python GenerateDerivedDimension.py SpecificHeatCapacity Length,Length Time,Time,Temperature
@@ -37,3 +33,4 @@ python GenerateDerivedDimension.py SpecificVolume Length,Length,Length Mass
 python GenerateDerivedDimension.py MomentOfInertia Mass,Length,Length []
 python GenerateDerivedDimension.py AngularSpeed Angle Time
 python GenerateDerivedDimension.py AngularAcceleration Angle Time,Time
+python GenerateDerivedDimension.py Torque Mass,Length,Length Time,Time,Angle
