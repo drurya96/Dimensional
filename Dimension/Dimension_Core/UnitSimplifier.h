@@ -39,7 +39,10 @@ namespace Dimension
                              !has_matching_quantity<NumTuple, DenTuple>::value;
 
    // Forward declarations
-   template<typename NumTuple, typename DenTuple>
+   template<typename... T>
+   struct SymbolicList;
+
+   template<typename NumTuple, typename DenTuple, typename Symbolics>
    requires IsUnitTuplePair<NumTuple, DenTuple>
    class BaseDimension;
 
@@ -81,7 +84,10 @@ namespace Dimension
       using numSimple = tuple_cat_t<typename num1AfterSimpleCancel::type, typename num2AfterSimpleCancel::type>;
       using denSimple = tuple_cat_t<typename den1AfterSimpleCancel::type, typename den2AfterSimpleCancel::type>;
 
-      using dimType = BaseDimension<newNum, newDen>;
+      // TODO: This one needs more work...
+      //using dimType = BaseDimension<newNum, newDen>;
+      using dimType = BaseDimension<newNum, newDen, SymbolicList<>>;
+
 
       constexpr static bool isDelta = !((std::tuple_size_v<newNum> == 1) && (std::tuple_size_v<newDen> == 0));
       constexpr static bool isScalar = (std::tuple_size_v<newNum> == 0) && (std::tuple_size_v<newDen> == 0);

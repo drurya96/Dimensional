@@ -555,3 +555,30 @@ TEST(PhysicsProblemsExample1, VolumeCaclulation)
     ASSERT_NEAR((getVolume<Teaspoons>(obj)), 768.0, 1e-3);
     ASSERT_NEAR((getVolume<Tablespoons>(obj)), 256.0, 1e-3);
 }
+
+
+TEST(PhysicsProblemsExample1, TestSymbolic)
+{
+
+    using namespace Dimension;
+
+    auto a = Pi<2>();
+
+    double test = a.value();
+
+    std::cout << test << std::endl;
+
+
+    
+
+
+
+    BaseDimension<std::tuple<Radians>, std::tuple<>, SymbolicList<Pi<2>>> obj(10.0);
+
+    double res = obj.GetVal<std::tuple<Radians>, std::tuple<>>();
+
+    std::cout << res << std::endl;
+
+    //std::cout << obj << std::endl;
+
+}

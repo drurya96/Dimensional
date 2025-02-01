@@ -21,6 +21,64 @@
 namespace Dimension
 {
 
+
+
+
+
+
+
+
+
+   // Base class for symbolic constants
+   template<typename Derived, int Exp>
+   struct SymbolicFactor {
+      static constexpr int exponent = Exp;
+
+      constexpr static double value()
+      {
+         return Derived::value() * exponent;
+      }
+   };
+
+   // Example Built-In Symbols
+   struct PiTag {
+      static constexpr double value() { return std::numbers::pi; }
+   };
+
+   // Example Usage
+   template<int Exp>
+   using Pi = SymbolicFactor<PiTag, Exp>;
+
+
+
+
+
+   template<typename... Factors>
+   struct SymbolicList {
+      constexpr static double as_double() {
+         return (Factors::value() * ... * 1.0); // Expand each factor into a multiplication
+      }
+   };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
    /// @brief A base class representing a unit
    /// @details This abstract class represents a Unit,
    ///    such as Meters, Seconds, Grams, etc.
@@ -70,7 +128,7 @@ namespace Dimension
    ///    Note all types in NumTuple must derive from BaseUnit
    /// @tparam DenTuple A tuple of BaseUnits describing the dimension's denominator.
    ///    Note all types in DenTuple must derive from BaseUnit
-   template<typename NumTupleT, typename DenTupleT>
+   template<typename NumTupleT, typename DenTupleT, typename Symbolics = SymbolicList<>>
    requires IsUnitTuplePair<NumTupleT, DenTupleT>
    class BaseDimension
    {
@@ -97,10 +155,27 @@ namespace Dimension
       }
 
       /// @brief Constructor given value
-      explicit constexpr BaseDimension(PrecisionType val) :
-         scalar(val)
+      explicit constexpr BaseDimension(PrecisionType val)// :
+         //scalar(val)
       {
+         // TODO: This is only a temporary implementation to get the signatures working
+         //   The intent is to only extract as double when needed*
+         scalar = val * Symbolics::as_double();
       }
+/*
+      template<typename... Factors>
+      constexpr BaseDimension(SymbolicList<Factors...>)
+      {
+         scalar = 0;
+      }
+*/
+/*
+      template<typename Symbolic>
+      constexpr BaseDimension()
+      {
+         scalar = 0;
+      }
+*/
 
       template<typename T, typename U>
       requires MatchingDimensionsNew<BaseDimension<NumTuple, DenTuple>, BaseDimension<T, U>>
@@ -298,7 +373,7 @@ namespace Dimension
 
       // Making all BaseDimensions friends of one-another for access to scalars and
       //    unit list information during construction of new objects
-      template<typename NumTupleOther, typename DenTupleOther>
+      template<typename NumTupleOther, typename DenTupleOther, typename Symbolics>
       requires IsUnitTuplePair<NumTupleOther, DenTupleOther>
       friend class BaseDimension;
    };

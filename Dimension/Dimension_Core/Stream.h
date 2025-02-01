@@ -14,7 +14,10 @@ namespace Dimension
    template<typename Unit, StringLiteral Name, StringLiteral Abbreviation, StringLiteral DimName, int UnitID>
    struct BaseUnit;
 
-   template<typename NumTupleT, typename DenTupleT>
+   //template<typename... T>
+   //class SymbolicList;
+
+   template<typename NumTupleT, typename DenTupleT, typename Symbolics>
    requires IsUnitTuplePair<NumTupleT, DenTupleT>
    class BaseDimension;
 
@@ -48,11 +51,11 @@ namespace Dimension
    /// @param os stream to write to
    /// @param obj object to write
    /// @return reference to stream written
-   template<typename NumTupleT, typename DenTupleT>
-   std::ostream& to_stream(std::ostream& os, const BaseDimension<NumTupleT, DenTupleT>& obj)
+   template<typename Dim>
+   std::ostream& to_stream(std::ostream& os, const Dim& obj)
    {
-      using NumTuple = BaseDimension<NumTupleT, DenTupleT>::NumTuple;
-      using DenTuple = BaseDimension<NumTupleT, DenTupleT>::DenTuple;
+      using NumTuple = typename Dim::NumTuple;
+      using DenTuple = typename Dim::DenTuple;
 
       os << obj.template GetVal<NumTuple, DenTuple>() << " [";
 
@@ -88,8 +91,8 @@ namespace Dimension
    /// @tparam DenTuple Denominator unit tuple
    /// @param obj Dimension object to write
    /// @return string representation of object
-   template<typename NumTuple, typename DenTuple>
-   std::string to_string(const BaseDimension<NumTuple, DenTuple>& obj)
+   template<typename Dim>
+   std::string to_string(const Dim& obj)
    {
       std::ostringstream os;
       to_stream(os, obj);
@@ -102,8 +105,8 @@ namespace Dimension
    /// @param os stream object
    /// @param obj dimension object
    /// @return reference to stream object
-   template<typename NumTuple, typename DenTuple>
-   std::ostream& operator<<(std::ostream& os, const BaseDimension<NumTuple, DenTuple>& obj)
+   template<typename Dim>
+   std::ostream& operator<<(std::ostream& os, const Dim& obj)
    {
       return to_stream(os, obj);
    }

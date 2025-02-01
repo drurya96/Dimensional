@@ -11,7 +11,10 @@ namespace Dimension
 {
 
    // Forward declaration
-   template<typename NumTupleT, typename DenTupleT>
+   //template<typename... T>
+   //class SymbolicList;
+
+   template<typename NumTupleT, typename DenTupleT, typename Symbolics>
    requires IsUnitTuplePair<NumTupleT, DenTupleT>
    class BaseDimension;
 
@@ -45,18 +48,19 @@ namespace Dimension
    struct DefaultSerializationPolicy
    {
    private:
-      template <typename NumTuple, typename DenTuple, typename OutputIt, typename BufferSizeType>
-      static void serialize_impl(OutputIt out, const BaseDimension<NumTuple, DenTuple>& obj)
+      //template <typename NumTuple, typename DenTuple, typename OutputIt, typename BufferSizeType>
+      template <typename Dim, typename OutputIt, typename BufferSizeType>
+      static void serialize_impl(OutputIt out, const Dim& obj)
       {
          if constexpr(!std::is_void_v<typename HashPolicy::tag_type::type>)
          {
-            constexpr auto tagData = TypeTagHelper<NumTuple, DenTuple, HashPolicy>::value().get();
+            constexpr auto tagData = TypeTagHelper<typename Dim::NumTuple, typename Dim::DenTuple, HashPolicy>::value().get();
             std::memcpy(&*out, &tagData, HashPolicy::tag_size);
             out += (HashPolicy::tag_size / sizeof(BufferSizeType));
          }
 
          // Write the double scalar
-         PrecisionType temp = obj.template GetVal<NumTuple, DenTuple>();
+         PrecisionType temp = obj.template GetVal<typename Dim::NumTuple, typename Dim::DenTuple>();
          std::memcpy(&*out, &temp, sizeof(PrecisionType));
       }
 
@@ -83,8 +87,9 @@ namespace Dimension
       /// @tparam OutputBuf The buffer type
       /// @param out The buffer to serialize into
       /// @param obj The object to serialize
-      template <typename NumTuple, typename DenTuple, typename OutputBuf>
-      static void serialize(OutputBuf& out, const BaseDimension<NumTuple, DenTuple>& obj)
+      //ytemplate <typename NumTuple, typename DenTuple, typename OutputBuf>
+      template <typename Dim, typename OutputBuf>
+      static void serialize(OutputBuf& out, const Dim& obj)
       {
          constexpr size_t required_size = HashPolicy::tag_size + sizeof(PrecisionType);
 
@@ -92,7 +97,7 @@ namespace Dimension
          {
             throw std::invalid_argument("Buffer size is too small. Must be at least " + std::to_string(required_size) + " bytes with these parameters.");
          }
-         serialize_impl<NumTuple, DenTuple, decltype(out.begin()), typename OutputBuf::value_type>(out.begin(), obj);
+         serialize_impl<Dim, decltype(out.begin()), typename OutputBuf::value_type>(out.begin(), obj);
       }
 
       /// @brief serialize a BaseDimension object and return the buffer
@@ -101,14 +106,14 @@ namespace Dimension
       /// @tparam OutputBuf The buffer type
       /// @param obj The object to serialize
       /// @return A new buffer populated with data from serializing obj
-      template <typename NumTuple, typename DenTuple, typename OutputBuf = std::vector<uint8_t>>
-      static OutputBuf serialize(const BaseDimension<NumTuple, DenTuple>& obj)
+      template <typename Dim, typename OutputBuf = std::vector<uint8_t>>
+      static OutputBuf serialize(const Dim& obj)
       {
          // Generate the unique type tag based on `NumTuple` and `DenTuple`
          OutputBuf out;
          out.resize(HashPolicy::tag_size + sizeof(PrecisionType));
 
-         serialize_impl<NumTuple, DenTuple, decltype(out.begin()), typename OutputBuf::value_type>(out.begin(), obj);
+         serialize_impl<Dim, decltype(out.begin()), typename OutputBuf::value_type>(out.begin(), obj);
 
          return out;
       }
@@ -119,11 +124,12 @@ namespace Dimension
       /// @tparam InputBuf The buffer type
       /// @param in The buffer to deserialize
       /// @return A new BaseDimension object populated with data from deserializing input buffer
-      template <typename NumTuple, typename DenTuple, typename InputBuf>
-      static BaseDimension<NumTuple, DenTuple> deserialize(const InputBuf& in)
+      template <typename Dim, typename InputBuf>
+      //static BaseDimension<NumTuple, DenTuple> deserialize(const InputBuf& in)
+      static Dim deserialize(const InputBuf& in)
       {
-         PrecisionType val = deserialize_impl<NumTuple, DenTuple, decltype(in.begin()), typename InputBuf::value_type>(in.begin());
-         return BaseDimension<NumTuple, DenTuple>(val);
+         PrecisionType val = deserialize_impl<typename Dim::NumTuple, typename Dim::DenTuple, decltype(in.begin()), typename InputBuf::value_type>(in.begin());
+         return Dim(val);
       }
 
       /// @brief deserialize a buffer and update the input object
@@ -132,11 +138,11 @@ namespace Dimension
       /// @tparam InputBuf The buffer type
       /// @param in The buffer to deserialize
       /// @param obj The object to deserialize into
-      template <typename NumTuple, typename DenTuple, typename InputBuf>
-      static void deserialize(const InputBuf& in, BaseDimension<NumTuple, DenTuple>& obj)
+      template <typename Dim, typename InputBuf>
+      static void deserialize(const InputBuf& in, Dim& obj)
       {
-         PrecisionType val = deserialize_impl<NumTuple, DenTuple, decltype(in.begin()), typename InputBuf::value_type>(in.begin());
-         obj.template SetVal<NumTuple, DenTuple>(val);
+         PrecisionType val = deserialize_impl<typename Dim::NumTuple, typename Dim::DenTuple, decltype(in.begin()), typename InputBuf::value_type>(in.begin());
+         obj.template SetVal<typename Dim::NumTuple, typename Dim::DenTuple>(val);
       }
 
    };
