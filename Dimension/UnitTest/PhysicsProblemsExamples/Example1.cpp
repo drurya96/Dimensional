@@ -525,3 +525,33 @@ TEST(PhysicsProblemsExample1, AngularAccelerationCalculation)
 
     ASSERT_NEAR((getAngularAcceleration<Radians, Seconds, Seconds>(angularAcceleration)), 2.0, TOLERANCE); // (6 rad/s - 2 rad/s) / 2 s = 2 rad/s²
 }
+
+
+TEST(PhysicsProblemsExample1, AtmosphereCalculation)
+{
+    using namespace Dimension;
+
+    Pressure<Pascals> obj(1.0);
+
+    ASSERT_NEAR((getPressure<Atmospheres>(obj)), 9.86923e-6, 1e-7);
+    ASSERT_NEAR((getPressure<Bar>(obj)), 1e-5, 1e-7);
+    ASSERT_NEAR((getPressure<Torr>(obj)), 0.00750062, 1e-7);
+    ASSERT_NEAR((getPressure<mmHg>(obj)), 0.00750062, 1e-7);
+    ASSERT_NEAR((getPressure<inHg>(obj)), 0.0002953, 1e-7);
+    ASSERT_NEAR((getPressure<Pascals>(obj)), 1.0, 1e-7);
+}
+
+TEST(PhysicsProblemsExample1, VolumeCaclulation)
+{
+    using namespace Dimension;
+
+    Volume<Gallons> obj(1.0);
+
+    ASSERT_NEAR((getVolume<FluidOunces>(obj)), 128.0, 1e-3);
+    ASSERT_NEAR((getVolume<Cups>(obj)), 16.0, 1e-3);
+    ASSERT_NEAR((getVolume<Pints>(obj)), 8.0, 1e-3);
+    ASSERT_NEAR((getVolume<Quarts>(obj)), 4.0, 1e-3);
+    ASSERT_NEAR((getVolume<Gallons>(obj)), 1.0, 1e-3);
+    ASSERT_NEAR((getVolume<Teaspoons>(obj)), 768.0, 1e-3);
+    ASSERT_NEAR((getVolume<Tablespoons>(obj)), 256.0, 1e-3);
+}

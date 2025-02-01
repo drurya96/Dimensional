@@ -10,6 +10,11 @@ All notable changes to this project will be documented in this file. Semantic ve
 ### Added
 - Default template parameters for Fundamental and Derived dimensions
 - CppCheck static analysis on pipelines
+- Torque
+- More Volume named units
+  - FluidOunces, Cups, Pints, Quarts, Teaspoons, Tablespoons
+- More Pressure named units
+  - Atmospheres, Bar, Torr, mmHg, inHg
 
 ### Deprecated
 - 
