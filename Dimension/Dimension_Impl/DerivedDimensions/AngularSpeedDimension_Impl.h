@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_ANGULARSPEED_IMPL_H
 #define STATIC_DIMENSION_ANGULARSPEED_IMPL_H
 
-#include "../../TimeDimension.h"
 #include "../../AngleDimension.h"
+#include "../../TimeDimension.h"
 
 namespace Dimension
 {
@@ -18,10 +18,10 @@ namespace Dimension
    /// @details Checks if the provided types satisfy the AngularSpeed dimension requirements.
    /// @tparam Angle1 Numerator Angle1 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Angle1,typename Time1>
+   template<typename Angle1, typename Time1>
    concept IsAngularSpeedUnits = 
       std::is_same_v<typename Angle1::Dim, AngleType> &&
-        std::is_same_v<typename Time1::Dim, TimeType>;
+      std::is_same_v<typename Time1::Dim, TimeType>;
 
    /// @brief Concept for a AngularSpeed type.
    /// @details Ensures that the type meets AngularSpeed type requirements, based on numerator and denominator types.
@@ -31,7 +31,7 @@ namespace Dimension
       typename T::NumTuple;
       typename T::DenTuple;
    } && std::tuple_size_v<typename T::NumTuple> == 1 && std::tuple_size_v<typename T::DenTuple> == 1 &&
-   IsAngularSpeedUnits<typename std::tuple_element_t<0, typename T::NumTuple>,typename std::tuple_element_t<0, typename T::DenTuple>>;
+   IsAngularSpeedUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>>;
 
    /// @brief Retrieves the value of a AngularSpeed object.
    /// @details Provides access to the underlying value represented by a AngularSpeed object.
@@ -40,8 +40,8 @@ namespace Dimension
    /// @tparam AngularSpeedType The type of the object being accessed.
    /// @param obj The AngularSpeed object.
    /// @return The underlying value as `PrecisionType`
-   template<typename Angle1,typename Time1, typename AngularSpeedType>
-   requires IsAngularSpeedUnits<Angle1,Time1> && IsAngularSpeedType<AngularSpeedType>
+   template<typename Angle1, typename Time1, typename AngularSpeedType>
+   requires IsAngularSpeedUnits<Angle1, Time1> && IsAngularSpeedType<AngularSpeedType>
    constexpr PrecisionType getAngularSpeed(const AngularSpeedType& obj)
    {
       return obj.template GetVal<std::tuple<Angle1>, std::tuple<Time1>>();
@@ -93,9 +93,9 @@ namespace Dimension
    /// @details Defines operations and data storage for AngularSpeed dimensions.
    /// @tparam Angle1 Numerator Angle1 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Angle1,typename Time1>
-   requires IsAngularSpeedUnits<Angle1,Time1>
-   class AngularSpeed<Angle1,Time1> : public BaseDimension<std::tuple<Angle1>, std::tuple<Time1>>
+   template<typename Angle1, typename Time1>
+   requires IsAngularSpeedUnits<Angle1, Time1>
+   class AngularSpeed<Angle1, Time1> : public BaseDimension<std::tuple<Angle1>, std::tuple<Time1>>
    {
    public:
       using Base = BaseDimension<std::tuple<Angle1>, std::tuple<Time1>>;
@@ -117,13 +117,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of AngularSpeed.
       /// @details Prefer using the free function `getAngularSpeed()` instead.
       /// @return The value of the AngularSpeed.
-      template<typename Angle1T,typename Time1T>
-      requires IsAngularSpeedUnits<Angle1T,Time1T>
+      template<typename Angle1T, typename Time1T>
+      requires IsAngularSpeedUnits<Angle1T, Time1T>
       [[deprecated("Use the free function getAngularSpeed() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetAngularSpeed() const
       {
-         return getAngularSpeed<Angle1T,Time1T>(*this);
+         return getAngularSpeed<Angle1T, Time1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of AngularSpeed.
@@ -167,13 +167,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of AngularSpeed.
       /// @details Prefer using the free function `getAngularSpeed()` instead.
       /// @return The value of the AngularSpeed.
-      template<typename Angle1T,typename Time1T>
-      requires IsAngularSpeedUnits<Angle1T,Time1T>
+      template<typename Angle1T, typename Time1T>
+      requires IsAngularSpeedUnits<Angle1T, Time1T>
       [[deprecated("Use the free function getAngularSpeed() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetAngularSpeed() const
       {
-         return getAngularSpeed<Angle1T,Time1T>(*this);
+         return getAngularSpeed<Angle1T, Time1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of AngularSpeed.
@@ -192,9 +192,9 @@ namespace Dimension
    /// @brief Template deduction guide for AngularSpeed.
    /// @tparam Angle1 Numerator Angle1 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Angle1,typename Time1>
-   requires IsAngularSpeedUnits<Angle1,Time1>
-   AngularSpeed(Angle1,Time1) -> AngularSpeed<Angle1,Time1>;
+   template<typename Angle1, typename Time1>
+   requires IsAngularSpeedUnits<Angle1, Time1>
+   AngularSpeed(Angle1, Time1) -> AngularSpeed<Angle1, Time1>;
 
    /// @brief Template deduction guide for AngularSpeed.
    /// @tparam Angle1 Numerator Angle1 type
@@ -206,9 +206,9 @@ namespace Dimension
    /// @brief Template deduction guide for AngularSpeed.
    /// @tparam Angle1 Numerator Angle1 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Angle1,typename Time1>
-   requires IsAngularSpeedUnits<Angle1,Time1>
-   AngularSpeed(BaseDimension<std::tuple<Angle1>, std::tuple<Time1>>) -> AngularSpeed<Angle1,Time1>;
+   template<typename Angle1, typename Time1>
+   requires IsAngularSpeedUnits<Angle1, Time1>
+   AngularSpeed(BaseDimension<std::tuple<Angle1>, std::tuple<Time1>>) -> AngularSpeed<Angle1, Time1>;
 
 }
 

@@ -1,10 +1,10 @@
 #ifndef STATIC_DIMENSION_ELECTRICFIELD_IMPL_H
 #define STATIC_DIMENSION_ELECTRICFIELD_IMPL_H
 
-#include "../../TimeDimension.h"
-#include "../../LengthDimension.h"
-#include "../../ChargeDimension.h"
 #include "../../MassDimension.h"
+#include "../../LengthDimension.h"
+#include "../../TimeDimension.h"
+#include "../../ChargeDimension.h"
 
 namespace Dimension
 {
@@ -23,13 +23,13 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1, typename Length1,typename Time1, typename Time2, typename Charge1>
+   template<typename Mass1, typename Length1, typename Time1, typename Time2, typename Charge1>
    concept IsElectricFieldUnits = 
       std::is_same_v<typename Mass1::Dim, MassType> &&
-        std::is_same_v<typename Length1::Dim, LengthType> &&
-        std::is_same_v<typename Time1::Dim, TimeType> &&
-        std::is_same_v<typename Time2::Dim, TimeType> &&
-        std::is_same_v<typename Charge1::Dim, ChargeType>;
+      std::is_same_v<typename Length1::Dim, LengthType> &&
+      std::is_same_v<typename Time1::Dim, TimeType> &&
+      std::is_same_v<typename Time2::Dim, TimeType> &&
+      std::is_same_v<typename Charge1::Dim, ChargeType>;
 
    /// @brief Concept for a ElectricField type.
    /// @details Ensures that the type meets ElectricField type requirements, based on numerator and denominator types.
@@ -39,7 +39,7 @@ namespace Dimension
       typename T::NumTuple;
       typename T::DenTuple;
    } && std::tuple_size_v<typename T::NumTuple> == 2 && std::tuple_size_v<typename T::DenTuple> == 3 &&
-   IsElectricFieldUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>,typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>, typename std::tuple_element_t<2, typename T::DenTuple>>;
+   IsElectricFieldUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>, typename std::tuple_element_t<2, typename T::DenTuple>>;
 
    /// @brief Retrieves the value of a ElectricField object.
    /// @details Provides access to the underlying value represented by a ElectricField object.
@@ -51,8 +51,8 @@ namespace Dimension
    /// @tparam ElectricFieldType The type of the object being accessed.
    /// @param obj The ElectricField object.
    /// @return The underlying value as `PrecisionType`
-   template<typename Mass1, typename Length1,typename Time1, typename Time2, typename Charge1, typename ElectricFieldType>
-   requires IsElectricFieldUnits<Mass1, Length1,Time1, Time2, Charge1> && IsElectricFieldType<ElectricFieldType>
+   template<typename Mass1, typename Length1, typename Time1, typename Time2, typename Charge1, typename ElectricFieldType>
+   requires IsElectricFieldUnits<Mass1, Length1, Time1, Time2, Charge1> && IsElectricFieldType<ElectricFieldType>
    constexpr PrecisionType getElectricField(const ElectricFieldType& obj)
    {
       return obj.template GetVal<std::tuple<Mass1, Length1>, std::tuple<Time1, Time2, Charge1>>();
@@ -107,9 +107,9 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1, typename Length1,typename Time1, typename Time2, typename Charge1>
-   requires IsElectricFieldUnits<Mass1, Length1,Time1, Time2, Charge1>
-   class ElectricField<Mass1, Length1,Time1, Time2, Charge1> : public BaseDimension<std::tuple<Mass1, Length1>, std::tuple<Time1, Time2, Charge1>>
+   template<typename Mass1, typename Length1, typename Time1, typename Time2, typename Charge1>
+   requires IsElectricFieldUnits<Mass1, Length1, Time1, Time2, Charge1>
+   class ElectricField<Mass1, Length1, Time1, Time2, Charge1> : public BaseDimension<std::tuple<Mass1, Length1>, std::tuple<Time1, Time2, Charge1>>
    {
    public:
       using Base = BaseDimension<std::tuple<Mass1, Length1>, std::tuple<Time1, Time2, Charge1>>;
@@ -131,13 +131,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of ElectricField.
       /// @details Prefer using the free function `getElectricField()` instead.
       /// @return The value of the ElectricField.
-      template<typename Mass1T, typename Length1T,typename Time1T, typename Time2T, typename Charge1T>
-      requires IsElectricFieldUnits<Mass1T, Length1T,Time1T, Time2T, Charge1T>
+      template<typename Mass1T, typename Length1T, typename Time1T, typename Time2T, typename Charge1T>
+      requires IsElectricFieldUnits<Mass1T, Length1T, Time1T, Time2T, Charge1T>
       [[deprecated("Use the free function getElectricField() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetElectricField() const
       {
-         return getElectricField<Mass1T, Length1T,Time1T, Time2T, Charge1T>(*this);
+         return getElectricField<Mass1T, Length1T, Time1T, Time2T, Charge1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of ElectricField.
@@ -181,13 +181,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of ElectricField.
       /// @details Prefer using the free function `getElectricField()` instead.
       /// @return The value of the ElectricField.
-      template<typename Mass1T, typename Length1T,typename Time1T, typename Time2T, typename Charge1T>
-      requires IsElectricFieldUnits<Mass1T, Length1T,Time1T, Time2T, Charge1T>
+      template<typename Mass1T, typename Length1T, typename Time1T, typename Time2T, typename Charge1T>
+      requires IsElectricFieldUnits<Mass1T, Length1T, Time1T, Time2T, Charge1T>
       [[deprecated("Use the free function getElectricField() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetElectricField() const
       {
-         return getElectricField<Mass1T, Length1T,Time1T, Time2T, Charge1T>(*this);
+         return getElectricField<Mass1T, Length1T, Time1T, Time2T, Charge1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of ElectricField.
@@ -209,9 +209,9 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1, typename Length1,typename Time1, typename Time2, typename Charge1>
-   requires IsElectricFieldUnits<Mass1, Length1,Time1, Time2, Charge1>
-   ElectricField(Mass1, Length1,Time1, Time2, Charge1) -> ElectricField<Mass1, Length1,Time1, Time2, Charge1>;
+   template<typename Mass1, typename Length1, typename Time1, typename Time2, typename Charge1>
+   requires IsElectricFieldUnits<Mass1, Length1, Time1, Time2, Charge1>
+   ElectricField(Mass1, Length1, Time1, Time2, Charge1) -> ElectricField<Mass1, Length1, Time1, Time2, Charge1>;
 
    /// @brief Template deduction guide for ElectricField.
    /// @tparam Mass1 Numerator Mass1 type
@@ -229,9 +229,9 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1, typename Length1,typename Time1, typename Time2, typename Charge1>
-   requires IsElectricFieldUnits<Mass1, Length1,Time1, Time2, Charge1>
-   ElectricField(BaseDimension<std::tuple<Mass1, Length1>, std::tuple<Time1, Time2, Charge1>>) -> ElectricField<Mass1, Length1,Time1, Time2, Charge1>;
+   template<typename Mass1, typename Length1, typename Time1, typename Time2, typename Charge1>
+   requires IsElectricFieldUnits<Mass1, Length1, Time1, Time2, Charge1>
+   ElectricField(BaseDimension<std::tuple<Mass1, Length1>, std::tuple<Time1, Time2, Charge1>>) -> ElectricField<Mass1, Length1, Time1, Time2, Charge1>;
 
 }
 

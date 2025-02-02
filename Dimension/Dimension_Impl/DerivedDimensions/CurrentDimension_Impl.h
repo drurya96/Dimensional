@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_CURRENT_IMPL_H
 #define STATIC_DIMENSION_CURRENT_IMPL_H
 
-#include "../../TimeDimension.h"
 #include "../../ChargeDimension.h"
+#include "../../TimeDimension.h"
 
 namespace Dimension
 {
@@ -18,10 +18,10 @@ namespace Dimension
    /// @details Checks if the provided types satisfy the Current dimension requirements.
    /// @tparam Charge1 Numerator Charge1 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Charge1,typename Time1>
+   template<typename Charge1, typename Time1>
    concept IsCurrentUnits = 
       std::is_same_v<typename Charge1::Dim, ChargeType> &&
-        std::is_same_v<typename Time1::Dim, TimeType>;
+      std::is_same_v<typename Time1::Dim, TimeType>;
 
    /// @brief Concept for a Current type.
    /// @details Ensures that the type meets Current type requirements, based on numerator and denominator types.
@@ -31,7 +31,7 @@ namespace Dimension
       typename T::NumTuple;
       typename T::DenTuple;
    } && std::tuple_size_v<typename T::NumTuple> == 1 && std::tuple_size_v<typename T::DenTuple> == 1 &&
-   IsCurrentUnits<typename std::tuple_element_t<0, typename T::NumTuple>,typename std::tuple_element_t<0, typename T::DenTuple>>;
+   IsCurrentUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>>;
 
    /// @brief Retrieves the value of a Current object.
    /// @details Provides access to the underlying value represented by a Current object.
@@ -40,8 +40,8 @@ namespace Dimension
    /// @tparam CurrentType The type of the object being accessed.
    /// @param obj The Current object.
    /// @return The underlying value as `PrecisionType`
-   template<typename Charge1,typename Time1, typename CurrentType>
-   requires IsCurrentUnits<Charge1,Time1> && IsCurrentType<CurrentType>
+   template<typename Charge1, typename Time1, typename CurrentType>
+   requires IsCurrentUnits<Charge1, Time1> && IsCurrentType<CurrentType>
    constexpr PrecisionType getCurrent(const CurrentType& obj)
    {
       return obj.template GetVal<std::tuple<Charge1>, std::tuple<Time1>>();
@@ -93,9 +93,9 @@ namespace Dimension
    /// @details Defines operations and data storage for Current dimensions.
    /// @tparam Charge1 Numerator Charge1 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Charge1,typename Time1>
-   requires IsCurrentUnits<Charge1,Time1>
-   class Current<Charge1,Time1> : public BaseDimension<std::tuple<Charge1>, std::tuple<Time1>>
+   template<typename Charge1, typename Time1>
+   requires IsCurrentUnits<Charge1, Time1>
+   class Current<Charge1, Time1> : public BaseDimension<std::tuple<Charge1>, std::tuple<Time1>>
    {
    public:
       using Base = BaseDimension<std::tuple<Charge1>, std::tuple<Time1>>;
@@ -117,13 +117,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of Current.
       /// @details Prefer using the free function `getCurrent()` instead.
       /// @return The value of the Current.
-      template<typename Charge1T,typename Time1T>
-      requires IsCurrentUnits<Charge1T,Time1T>
+      template<typename Charge1T, typename Time1T>
+      requires IsCurrentUnits<Charge1T, Time1T>
       [[deprecated("Use the free function getCurrent() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetCurrent() const
       {
-         return getCurrent<Charge1T,Time1T>(*this);
+         return getCurrent<Charge1T, Time1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of Current.
@@ -167,13 +167,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of Current.
       /// @details Prefer using the free function `getCurrent()` instead.
       /// @return The value of the Current.
-      template<typename Charge1T,typename Time1T>
-      requires IsCurrentUnits<Charge1T,Time1T>
+      template<typename Charge1T, typename Time1T>
+      requires IsCurrentUnits<Charge1T, Time1T>
       [[deprecated("Use the free function getCurrent() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetCurrent() const
       {
-         return getCurrent<Charge1T,Time1T>(*this);
+         return getCurrent<Charge1T, Time1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of Current.
@@ -192,9 +192,9 @@ namespace Dimension
    /// @brief Template deduction guide for Current.
    /// @tparam Charge1 Numerator Charge1 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Charge1,typename Time1>
-   requires IsCurrentUnits<Charge1,Time1>
-   Current(Charge1,Time1) -> Current<Charge1,Time1>;
+   template<typename Charge1, typename Time1>
+   requires IsCurrentUnits<Charge1, Time1>
+   Current(Charge1, Time1) -> Current<Charge1, Time1>;
 
    /// @brief Template deduction guide for Current.
    /// @tparam Charge1 Numerator Charge1 type
@@ -206,9 +206,9 @@ namespace Dimension
    /// @brief Template deduction guide for Current.
    /// @tparam Charge1 Numerator Charge1 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Charge1,typename Time1>
-   requires IsCurrentUnits<Charge1,Time1>
-   Current(BaseDimension<std::tuple<Charge1>, std::tuple<Time1>>) -> Current<Charge1,Time1>;
+   template<typename Charge1, typename Time1>
+   requires IsCurrentUnits<Charge1, Time1>
+   Current(BaseDimension<std::tuple<Charge1>, std::tuple<Time1>>) -> Current<Charge1, Time1>;
 
 }
 

@@ -19,11 +19,11 @@ namespace Dimension
    /// @tparam Length1 Numerator Length1 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
-   template<typename Length1,typename Time1, typename Time2>
+   template<typename Length1, typename Time1, typename Time2>
    concept IsAccelerationUnits = 
       std::is_same_v<typename Length1::Dim, LengthType> &&
-        std::is_same_v<typename Time1::Dim, TimeType> &&
-        std::is_same_v<typename Time2::Dim, TimeType>;
+      std::is_same_v<typename Time1::Dim, TimeType> &&
+      std::is_same_v<typename Time2::Dim, TimeType>;
 
    /// @brief Concept for a Acceleration type.
    /// @details Ensures that the type meets Acceleration type requirements, based on numerator and denominator types.
@@ -33,7 +33,7 @@ namespace Dimension
       typename T::NumTuple;
       typename T::DenTuple;
    } && std::tuple_size_v<typename T::NumTuple> == 1 && std::tuple_size_v<typename T::DenTuple> == 2 &&
-   IsAccelerationUnits<typename std::tuple_element_t<0, typename T::NumTuple>,typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>>;
+   IsAccelerationUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>>;
 
    /// @brief Retrieves the value of a Acceleration object.
    /// @details Provides access to the underlying value represented by a Acceleration object.
@@ -43,8 +43,8 @@ namespace Dimension
    /// @tparam AccelerationType The type of the object being accessed.
    /// @param obj The Acceleration object.
    /// @return The underlying value as `PrecisionType`
-   template<typename Length1,typename Time1, typename Time2, typename AccelerationType>
-   requires IsAccelerationUnits<Length1,Time1, Time2> && IsAccelerationType<AccelerationType>
+   template<typename Length1, typename Time1, typename Time2, typename AccelerationType>
+   requires IsAccelerationUnits<Length1, Time1, Time2> && IsAccelerationType<AccelerationType>
    constexpr PrecisionType getAcceleration(const AccelerationType& obj)
    {
       return obj.template GetVal<std::tuple<Length1>, std::tuple<Time1, Time2>>();
@@ -97,9 +97,9 @@ namespace Dimension
    /// @tparam Length1 Numerator Length1 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
-   template<typename Length1,typename Time1, typename Time2>
-   requires IsAccelerationUnits<Length1,Time1, Time2>
-   class Acceleration<Length1,Time1, Time2> : public BaseDimension<std::tuple<Length1>, std::tuple<Time1, Time2>>
+   template<typename Length1, typename Time1, typename Time2>
+   requires IsAccelerationUnits<Length1, Time1, Time2>
+   class Acceleration<Length1, Time1, Time2> : public BaseDimension<std::tuple<Length1>, std::tuple<Time1, Time2>>
    {
    public:
       using Base = BaseDimension<std::tuple<Length1>, std::tuple<Time1, Time2>>;
@@ -121,13 +121,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of Acceleration.
       /// @details Prefer using the free function `getAcceleration()` instead.
       /// @return The value of the Acceleration.
-      template<typename Length1T,typename Time1T, typename Time2T>
-      requires IsAccelerationUnits<Length1T,Time1T, Time2T>
+      template<typename Length1T, typename Time1T, typename Time2T>
+      requires IsAccelerationUnits<Length1T, Time1T, Time2T>
       [[deprecated("Use the free function getAcceleration() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetAcceleration() const
       {
-         return getAcceleration<Length1T,Time1T, Time2T>(*this);
+         return getAcceleration<Length1T, Time1T, Time2T>(*this);
       }
 
       /// @brief Deprecated function to get the value of Acceleration.
@@ -171,13 +171,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of Acceleration.
       /// @details Prefer using the free function `getAcceleration()` instead.
       /// @return The value of the Acceleration.
-      template<typename Length1T,typename Time1T, typename Time2T>
-      requires IsAccelerationUnits<Length1T,Time1T, Time2T>
+      template<typename Length1T, typename Time1T, typename Time2T>
+      requires IsAccelerationUnits<Length1T, Time1T, Time2T>
       [[deprecated("Use the free function getAcceleration() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetAcceleration() const
       {
-         return getAcceleration<Length1T,Time1T, Time2T>(*this);
+         return getAcceleration<Length1T, Time1T, Time2T>(*this);
       }
 
       /// @brief Deprecated function to get the value of Acceleration.
@@ -197,9 +197,9 @@ namespace Dimension
    /// @tparam Length1 Numerator Length1 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
-   template<typename Length1,typename Time1, typename Time2>
-   requires IsAccelerationUnits<Length1,Time1, Time2>
-   Acceleration(Length1,Time1, Time2) -> Acceleration<Length1,Time1, Time2>;
+   template<typename Length1, typename Time1, typename Time2>
+   requires IsAccelerationUnits<Length1, Time1, Time2>
+   Acceleration(Length1, Time1, Time2) -> Acceleration<Length1, Time1, Time2>;
 
    /// @brief Template deduction guide for Acceleration.
    /// @tparam Length1 Numerator Length1 type
@@ -213,9 +213,9 @@ namespace Dimension
    /// @tparam Length1 Numerator Length1 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
-   template<typename Length1,typename Time1, typename Time2>
-   requires IsAccelerationUnits<Length1,Time1, Time2>
-   Acceleration(BaseDimension<std::tuple<Length1>, std::tuple<Time1, Time2>>) -> Acceleration<Length1,Time1, Time2>;
+   template<typename Length1, typename Time1, typename Time2>
+   requires IsAccelerationUnits<Length1, Time1, Time2>
+   Acceleration(BaseDimension<std::tuple<Length1>, std::tuple<Time1, Time2>>) -> Acceleration<Length1, Time1, Time2>;
 
 }
 

@@ -1,0 +1,93 @@
+[
+   {
+      "Dimension": "Length",
+      "Fundamental": true,
+      "BaseUnit": "Meters",
+      "SI_Prefixes": true,
+      "Units": {
+         "Meters": { "Name": "Meters", "Abbreviation": "m", "SI_Prefixes": true },
+         "Feet": { "Name": "Feet", "Abbreviation": "ft", "SI_Prefixes": false },
+         "Inches": { "Name": "Inches", "Abbreviation": "in", "SI_Prefixes": false },
+         "AstronomicalUnits": { "Name": "Astronomical Units", "Abbreviation": "au", "SI_Prefixes": false },
+         "DataMiles": { "Name": "Data Miles", "Abbreviation": "DataMiles", "SI_Prefixes": false },
+         "NauticalMiles": { "Name": "Nautical Miles", "Abbreviation": "nmi", "SI_Prefixes": false },
+         "Miles": { "Name": "Miles", "Abbreviation": "mi", "SI_Prefixes": false },
+         "Leagues": { "Name": "Leagues", "Abbreviation": "lea", "SI_Prefixes": false },
+         "Fathoms": { "Name": "Fathoms", "Abbreviation": "ftm", "SI_Prefixes": false },
+         "Furlong": { "Name": "Furlong", "Abbreviation": "fur", "SI_Prefixes": false },
+         "Yards": { "Name": "Yards", "Abbreviation": "yd", "SI_Prefixes": false },
+         "US_Survey_Feet": { "Name": "US Survey Feet", "Abbreviation": "ftUS", "SI_Prefixes": false }
+      }
+   },
+   {
+      "Dimension": "Mass",
+      "Fundamental": true,
+      "BaseUnit": "Grams",
+      "SI_Prefixes": true,
+      "Units": {
+         "Grams": { "Name": "Grams", "Abbreviation": "g", "SI_Prefixes": true },
+         "PoundMass": { "Name": "Pound Mass", "Abbreviation": "lb", "SI_Prefixes": false },
+         "Ounces": { "Name": "Ounces", "Abbreviation": "oz", "SI_Prefixes": false },
+         "Slugs": { "Name": "Slugs", "Abbreviation": "slug", "SI_Prefixes": false },
+         "Grains": { "Name": "Grains", "Abbreviation": "gr", "SI_Prefixes": false },
+         "Stone": { "Name": "Stone", "Abbreviation": "st", "SI_Prefixes": false },
+         "ShortTon": { "Name": "Short Ton", "Abbreviation": "ton", "SI_Prefixes": false },
+         "LongTon": { "Name": "Long Ton", "Abbreviation": "LT", "SI_Prefixes": false },
+         "Tonne": { "Name": "Tonne", "Abbreviation": "t", "SI_Prefixes": false }
+      }
+   },
+   {
+      "Dimension": "Amount",
+      "Fundamental": true,
+      "BaseUnit": "Moles",
+      "SI_Prefixes": true,
+      "Units": {
+         "Moles": { "Name": "Moles", "Abbreviation": "mol", "SI_Prefixes": true },
+         "PoundMoles": { "Name": "Pound Moles", "Abbreviation": "lbmol", "SI_Prefixes": false }
+      }
+   },
+   {
+      "Dimension": "Angle",
+      "Fundamental": true,
+      "BaseUnit": "Radians",
+      "SI_Prefixes": false,
+      "Units": {
+         "Radians": { "Name": "Radians", "Abbreviation": "rad", "SI_Prefixes": false },
+         "Degrees": { "Name": "Degrees", "Abbreviation": "deg", "SI_Prefixes": false }
+      }
+   },
+   {
+      "Dimension": "Charge",
+      "Fundamental": true,
+      "BaseUnit": "Coulombs",
+      "SI_Prefixes": true,
+      "Units": {
+         "Coulombs": { "Name": "Coulombs", "Abbreviation": "C", "SI_Prefixes": true },
+         "StatCoulombs": { "Name": "Stat Coulombs", "Abbreviation": "esu", "SI_Prefixes": false },
+         "ElementaryCharges": { "Name": "Elementary Charges", "Abbreviation": "e", "SI_Prefixes": false }
+      }
+   },
+   {
+      "Dimension": "Time",
+      "Fundamental": true,
+      "BaseUnit": "Seconds",
+      "SI_Prefixes": true,
+      "Units": {
+         "Seconds": { "Name": "Seconds", "Abbreviation": "s", "SI_Prefixes": true },
+         "Minutes": { "Name": "Minutes", "Abbreviation": "min", "SI_Prefixes": false },
+         "Hours": { "Name": "Hours", "Abbreviation": "h", "SI_Prefixes": false }
+      }
+   },
+   {
+      "Dimension": "Temperature",
+      "Fundamental": true,
+      "BaseUnit": "Kelvin",
+      "SI_Prefixes": false,
+      "Units": {
+         "Kelvin": { "Name": "Kelvin", "Abbreviation": "K", "SI_Prefixes": false },
+         "Celsius": { "Name": "Celsius", "Abbreviation": "°C", "SI_Prefixes": false },
+         "Fahrenheit": { "Name": "Fahrenheit", "Abbreviation": "°F", "SI_Prefixes": false },
+         "Rankine": { "Name": "Rankine", "Abbreviation": "°R", "SI_Prefixes": false }
+      }
+   }
+]

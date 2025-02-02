@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_MAGNETICFIELD_IMPL_H
 #define STATIC_DIMENSION_MAGNETICFIELD_IMPL_H
 
-#include "../../ChargeDimension.h"
 #include "../../MassDimension.h"
 #include "../../TimeDimension.h"
+#include "../../ChargeDimension.h"
 
 namespace Dimension
 {
@@ -20,11 +20,11 @@ namespace Dimension
    /// @tparam Mass1 Numerator Mass1 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1,typename Time1, typename Charge1>
+   template<typename Mass1, typename Time1, typename Charge1>
    concept IsMagneticFieldUnits = 
       std::is_same_v<typename Mass1::Dim, MassType> &&
-        std::is_same_v<typename Time1::Dim, TimeType> &&
-        std::is_same_v<typename Charge1::Dim, ChargeType>;
+      std::is_same_v<typename Time1::Dim, TimeType> &&
+      std::is_same_v<typename Charge1::Dim, ChargeType>;
 
    /// @brief Concept for a MagneticField type.
    /// @details Ensures that the type meets MagneticField type requirements, based on numerator and denominator types.
@@ -34,7 +34,7 @@ namespace Dimension
       typename T::NumTuple;
       typename T::DenTuple;
    } && std::tuple_size_v<typename T::NumTuple> == 1 && std::tuple_size_v<typename T::DenTuple> == 2 &&
-   IsMagneticFieldUnits<typename std::tuple_element_t<0, typename T::NumTuple>,typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>>;
+   IsMagneticFieldUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>>;
 
    /// @brief Retrieves the value of a MagneticField object.
    /// @details Provides access to the underlying value represented by a MagneticField object.
@@ -44,8 +44,8 @@ namespace Dimension
    /// @tparam MagneticFieldType The type of the object being accessed.
    /// @param obj The MagneticField object.
    /// @return The underlying value as `PrecisionType`
-   template<typename Mass1,typename Time1, typename Charge1, typename MagneticFieldType>
-   requires IsMagneticFieldUnits<Mass1,Time1, Charge1> && IsMagneticFieldType<MagneticFieldType>
+   template<typename Mass1, typename Time1, typename Charge1, typename MagneticFieldType>
+   requires IsMagneticFieldUnits<Mass1, Time1, Charge1> && IsMagneticFieldType<MagneticFieldType>
    constexpr PrecisionType getMagneticField(const MagneticFieldType& obj)
    {
       return obj.template GetVal<std::tuple<Mass1>, std::tuple<Time1, Charge1>>();
@@ -98,9 +98,9 @@ namespace Dimension
    /// @tparam Mass1 Numerator Mass1 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1,typename Time1, typename Charge1>
-   requires IsMagneticFieldUnits<Mass1,Time1, Charge1>
-   class MagneticField<Mass1,Time1, Charge1> : public BaseDimension<std::tuple<Mass1>, std::tuple<Time1, Charge1>>
+   template<typename Mass1, typename Time1, typename Charge1>
+   requires IsMagneticFieldUnits<Mass1, Time1, Charge1>
+   class MagneticField<Mass1, Time1, Charge1> : public BaseDimension<std::tuple<Mass1>, std::tuple<Time1, Charge1>>
    {
    public:
       using Base = BaseDimension<std::tuple<Mass1>, std::tuple<Time1, Charge1>>;
@@ -122,13 +122,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of MagneticField.
       /// @details Prefer using the free function `getMagneticField()` instead.
       /// @return The value of the MagneticField.
-      template<typename Mass1T,typename Time1T, typename Charge1T>
-      requires IsMagneticFieldUnits<Mass1T,Time1T, Charge1T>
+      template<typename Mass1T, typename Time1T, typename Charge1T>
+      requires IsMagneticFieldUnits<Mass1T, Time1T, Charge1T>
       [[deprecated("Use the free function getMagneticField() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetMagneticField() const
       {
-         return getMagneticField<Mass1T,Time1T, Charge1T>(*this);
+         return getMagneticField<Mass1T, Time1T, Charge1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of MagneticField.
@@ -172,13 +172,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of MagneticField.
       /// @details Prefer using the free function `getMagneticField()` instead.
       /// @return The value of the MagneticField.
-      template<typename Mass1T,typename Time1T, typename Charge1T>
-      requires IsMagneticFieldUnits<Mass1T,Time1T, Charge1T>
+      template<typename Mass1T, typename Time1T, typename Charge1T>
+      requires IsMagneticFieldUnits<Mass1T, Time1T, Charge1T>
       [[deprecated("Use the free function getMagneticField() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetMagneticField() const
       {
-         return getMagneticField<Mass1T,Time1T, Charge1T>(*this);
+         return getMagneticField<Mass1T, Time1T, Charge1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of MagneticField.
@@ -198,9 +198,9 @@ namespace Dimension
    /// @tparam Mass1 Numerator Mass1 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1,typename Time1, typename Charge1>
-   requires IsMagneticFieldUnits<Mass1,Time1, Charge1>
-   MagneticField(Mass1,Time1, Charge1) -> MagneticField<Mass1,Time1, Charge1>;
+   template<typename Mass1, typename Time1, typename Charge1>
+   requires IsMagneticFieldUnits<Mass1, Time1, Charge1>
+   MagneticField(Mass1, Time1, Charge1) -> MagneticField<Mass1, Time1, Charge1>;
 
    /// @brief Template deduction guide for MagneticField.
    /// @tparam Mass1 Numerator Mass1 type
@@ -214,9 +214,9 @@ namespace Dimension
    /// @tparam Mass1 Numerator Mass1 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1,typename Time1, typename Charge1>
-   requires IsMagneticFieldUnits<Mass1,Time1, Charge1>
-   MagneticField(BaseDimension<std::tuple<Mass1>, std::tuple<Time1, Charge1>>) -> MagneticField<Mass1,Time1, Charge1>;
+   template<typename Mass1, typename Time1, typename Charge1>
+   requires IsMagneticFieldUnits<Mass1, Time1, Charge1>
+   MagneticField(BaseDimension<std::tuple<Mass1>, std::tuple<Time1, Charge1>>) -> MagneticField<Mass1, Time1, Charge1>;
 
 }
 

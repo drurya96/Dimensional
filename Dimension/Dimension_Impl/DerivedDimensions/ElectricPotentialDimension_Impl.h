@@ -3,8 +3,8 @@
 
 #include "../../MassDimension.h"
 #include "../../LengthDimension.h"
-#include "../../ChargeDimension.h"
 #include "../../TimeDimension.h"
+#include "../../ChargeDimension.h"
 
 namespace Dimension
 {
@@ -24,14 +24,14 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1, typename Length1, typename Length2,typename Time1, typename Time2, typename Charge1>
+   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Charge1>
    concept IsElectricPotentialUnits = 
       std::is_same_v<typename Mass1::Dim, MassType> &&
-        std::is_same_v<typename Length1::Dim, LengthType> &&
-        std::is_same_v<typename Length2::Dim, LengthType> &&
-        std::is_same_v<typename Time1::Dim, TimeType> &&
-        std::is_same_v<typename Time2::Dim, TimeType> &&
-        std::is_same_v<typename Charge1::Dim, ChargeType>;
+      std::is_same_v<typename Length1::Dim, LengthType> &&
+      std::is_same_v<typename Length2::Dim, LengthType> &&
+      std::is_same_v<typename Time1::Dim, TimeType> &&
+      std::is_same_v<typename Time2::Dim, TimeType> &&
+      std::is_same_v<typename Charge1::Dim, ChargeType>;
 
    /// @brief Concept for a ElectricPotential type.
    /// @details Ensures that the type meets ElectricPotential type requirements, based on numerator and denominator types.
@@ -41,7 +41,7 @@ namespace Dimension
       typename T::NumTuple;
       typename T::DenTuple;
    } && std::tuple_size_v<typename T::NumTuple> == 3 && std::tuple_size_v<typename T::DenTuple> == 3 &&
-   IsElectricPotentialUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<2, typename T::NumTuple>,typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>, typename std::tuple_element_t<2, typename T::DenTuple>>;
+   IsElectricPotentialUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<2, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>, typename std::tuple_element_t<2, typename T::DenTuple>>;
 
    /// @brief Retrieves the value of a ElectricPotential object.
    /// @details Provides access to the underlying value represented by a ElectricPotential object.
@@ -54,8 +54,8 @@ namespace Dimension
    /// @tparam ElectricPotentialType The type of the object being accessed.
    /// @param obj The ElectricPotential object.
    /// @return The underlying value as `PrecisionType`
-   template<typename Mass1, typename Length1, typename Length2,typename Time1, typename Time2, typename Charge1, typename ElectricPotentialType>
-   requires IsElectricPotentialUnits<Mass1, Length1, Length2,Time1, Time2, Charge1> && IsElectricPotentialType<ElectricPotentialType>
+   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Charge1, typename ElectricPotentialType>
+   requires IsElectricPotentialUnits<Mass1, Length1, Length2, Time1, Time2, Charge1> && IsElectricPotentialType<ElectricPotentialType>
    constexpr PrecisionType getElectricPotential(const ElectricPotentialType& obj)
    {
       return obj.template GetVal<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Charge1>>();
@@ -111,9 +111,9 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1, typename Length1, typename Length2,typename Time1, typename Time2, typename Charge1>
-   requires IsElectricPotentialUnits<Mass1, Length1, Length2,Time1, Time2, Charge1>
-   class ElectricPotential<Mass1, Length1, Length2,Time1, Time2, Charge1> : public BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Charge1>>
+   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Charge1>
+   requires IsElectricPotentialUnits<Mass1, Length1, Length2, Time1, Time2, Charge1>
+   class ElectricPotential<Mass1, Length1, Length2, Time1, Time2, Charge1> : public BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Charge1>>
    {
    public:
       using Base = BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Charge1>>;
@@ -135,13 +135,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of ElectricPotential.
       /// @details Prefer using the free function `getElectricPotential()` instead.
       /// @return The value of the ElectricPotential.
-      template<typename Mass1T, typename Length1T, typename Length2T,typename Time1T, typename Time2T, typename Charge1T>
-      requires IsElectricPotentialUnits<Mass1T, Length1T, Length2T,Time1T, Time2T, Charge1T>
+      template<typename Mass1T, typename Length1T, typename Length2T, typename Time1T, typename Time2T, typename Charge1T>
+      requires IsElectricPotentialUnits<Mass1T, Length1T, Length2T, Time1T, Time2T, Charge1T>
       [[deprecated("Use the free function getElectricPotential() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetElectricPotential() const
       {
-         return getElectricPotential<Mass1T, Length1T, Length2T,Time1T, Time2T, Charge1T>(*this);
+         return getElectricPotential<Mass1T, Length1T, Length2T, Time1T, Time2T, Charge1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of ElectricPotential.
@@ -185,13 +185,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of ElectricPotential.
       /// @details Prefer using the free function `getElectricPotential()` instead.
       /// @return The value of the ElectricPotential.
-      template<typename Mass1T, typename Length1T, typename Length2T,typename Time1T, typename Time2T, typename Charge1T>
-      requires IsElectricPotentialUnits<Mass1T, Length1T, Length2T,Time1T, Time2T, Charge1T>
+      template<typename Mass1T, typename Length1T, typename Length2T, typename Time1T, typename Time2T, typename Charge1T>
+      requires IsElectricPotentialUnits<Mass1T, Length1T, Length2T, Time1T, Time2T, Charge1T>
       [[deprecated("Use the free function getElectricPotential() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetElectricPotential() const
       {
-         return getElectricPotential<Mass1T, Length1T, Length2T,Time1T, Time2T, Charge1T>(*this);
+         return getElectricPotential<Mass1T, Length1T, Length2T, Time1T, Time2T, Charge1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of ElectricPotential.
@@ -214,9 +214,9 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1, typename Length1, typename Length2,typename Time1, typename Time2, typename Charge1>
-   requires IsElectricPotentialUnits<Mass1, Length1, Length2,Time1, Time2, Charge1>
-   ElectricPotential(Mass1, Length1, Length2,Time1, Time2, Charge1) -> ElectricPotential<Mass1, Length1, Length2,Time1, Time2, Charge1>;
+   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Charge1>
+   requires IsElectricPotentialUnits<Mass1, Length1, Length2, Time1, Time2, Charge1>
+   ElectricPotential(Mass1, Length1, Length2, Time1, Time2, Charge1) -> ElectricPotential<Mass1, Length1, Length2, Time1, Time2, Charge1>;
 
    /// @brief Template deduction guide for ElectricPotential.
    /// @tparam Mass1 Numerator Mass1 type
@@ -236,9 +236,9 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1, typename Length1, typename Length2,typename Time1, typename Time2, typename Charge1>
-   requires IsElectricPotentialUnits<Mass1, Length1, Length2,Time1, Time2, Charge1>
-   ElectricPotential(BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Charge1>>) -> ElectricPotential<Mass1, Length1, Length2,Time1, Time2, Charge1>;
+   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Charge1>
+   requires IsElectricPotentialUnits<Mass1, Length1, Length2, Time1, Time2, Charge1>
+   ElectricPotential(BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Charge1>>) -> ElectricPotential<Mass1, Length1, Length2, Time1, Time2, Charge1>;
 
 }
 

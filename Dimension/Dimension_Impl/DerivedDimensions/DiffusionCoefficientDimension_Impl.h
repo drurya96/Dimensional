@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_DIFFUSIONCOEFFICIENT_IMPL_H
 #define STATIC_DIMENSION_DIFFUSIONCOEFFICIENT_IMPL_H
 
-#include "../../TimeDimension.h"
 #include "../../LengthDimension.h"
+#include "../../TimeDimension.h"
 
 namespace Dimension
 {
@@ -19,11 +19,11 @@ namespace Dimension
    /// @tparam Length1 Numerator Length1 type
    /// @tparam Length2 Numerator Length2 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Length1, typename Length2,typename Time1>
+   template<typename Length1, typename Length2, typename Time1>
    concept IsDiffusionCoefficientUnits = 
       std::is_same_v<typename Length1::Dim, LengthType> &&
-        std::is_same_v<typename Length2::Dim, LengthType> &&
-        std::is_same_v<typename Time1::Dim, TimeType>;
+      std::is_same_v<typename Length2::Dim, LengthType> &&
+      std::is_same_v<typename Time1::Dim, TimeType>;
 
    /// @brief Concept for a DiffusionCoefficient type.
    /// @details Ensures that the type meets DiffusionCoefficient type requirements, based on numerator and denominator types.
@@ -33,7 +33,7 @@ namespace Dimension
       typename T::NumTuple;
       typename T::DenTuple;
    } && std::tuple_size_v<typename T::NumTuple> == 2 && std::tuple_size_v<typename T::DenTuple> == 1 &&
-   IsDiffusionCoefficientUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>,typename std::tuple_element_t<0, typename T::DenTuple>>;
+   IsDiffusionCoefficientUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>>;
 
    /// @brief Retrieves the value of a DiffusionCoefficient object.
    /// @details Provides access to the underlying value represented by a DiffusionCoefficient object.
@@ -43,8 +43,8 @@ namespace Dimension
    /// @tparam DiffusionCoefficientType The type of the object being accessed.
    /// @param obj The DiffusionCoefficient object.
    /// @return The underlying value as `PrecisionType`
-   template<typename Length1, typename Length2,typename Time1, typename DiffusionCoefficientType>
-   requires IsDiffusionCoefficientUnits<Length1, Length2,Time1> && IsDiffusionCoefficientType<DiffusionCoefficientType>
+   template<typename Length1, typename Length2, typename Time1, typename DiffusionCoefficientType>
+   requires IsDiffusionCoefficientUnits<Length1, Length2, Time1> && IsDiffusionCoefficientType<DiffusionCoefficientType>
    constexpr PrecisionType getDiffusionCoefficient(const DiffusionCoefficientType& obj)
    {
       return obj.template GetVal<std::tuple<Length1, Length2>, std::tuple<Time1>>();
@@ -97,9 +97,9 @@ namespace Dimension
    /// @tparam Length1 Numerator Length1 type
    /// @tparam Length2 Numerator Length2 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Length1, typename Length2,typename Time1>
-   requires IsDiffusionCoefficientUnits<Length1, Length2,Time1>
-   class DiffusionCoefficient<Length1, Length2,Time1> : public BaseDimension<std::tuple<Length1, Length2>, std::tuple<Time1>>
+   template<typename Length1, typename Length2, typename Time1>
+   requires IsDiffusionCoefficientUnits<Length1, Length2, Time1>
+   class DiffusionCoefficient<Length1, Length2, Time1> : public BaseDimension<std::tuple<Length1, Length2>, std::tuple<Time1>>
    {
    public:
       using Base = BaseDimension<std::tuple<Length1, Length2>, std::tuple<Time1>>;
@@ -121,13 +121,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of DiffusionCoefficient.
       /// @details Prefer using the free function `getDiffusionCoefficient()` instead.
       /// @return The value of the DiffusionCoefficient.
-      template<typename Length1T, typename Length2T,typename Time1T>
-      requires IsDiffusionCoefficientUnits<Length1T, Length2T,Time1T>
+      template<typename Length1T, typename Length2T, typename Time1T>
+      requires IsDiffusionCoefficientUnits<Length1T, Length2T, Time1T>
       [[deprecated("Use the free function getDiffusionCoefficient() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetDiffusionCoefficient() const
       {
-         return getDiffusionCoefficient<Length1T, Length2T,Time1T>(*this);
+         return getDiffusionCoefficient<Length1T, Length2T, Time1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of DiffusionCoefficient.
@@ -171,13 +171,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of DiffusionCoefficient.
       /// @details Prefer using the free function `getDiffusionCoefficient()` instead.
       /// @return The value of the DiffusionCoefficient.
-      template<typename Length1T, typename Length2T,typename Time1T>
-      requires IsDiffusionCoefficientUnits<Length1T, Length2T,Time1T>
+      template<typename Length1T, typename Length2T, typename Time1T>
+      requires IsDiffusionCoefficientUnits<Length1T, Length2T, Time1T>
       [[deprecated("Use the free function getDiffusionCoefficient() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetDiffusionCoefficient() const
       {
-         return getDiffusionCoefficient<Length1T, Length2T,Time1T>(*this);
+         return getDiffusionCoefficient<Length1T, Length2T, Time1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of DiffusionCoefficient.
@@ -197,9 +197,9 @@ namespace Dimension
    /// @tparam Length1 Numerator Length1 type
    /// @tparam Length2 Numerator Length2 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Length1, typename Length2,typename Time1>
-   requires IsDiffusionCoefficientUnits<Length1, Length2,Time1>
-   DiffusionCoefficient(Length1, Length2,Time1) -> DiffusionCoefficient<Length1, Length2,Time1>;
+   template<typename Length1, typename Length2, typename Time1>
+   requires IsDiffusionCoefficientUnits<Length1, Length2, Time1>
+   DiffusionCoefficient(Length1, Length2, Time1) -> DiffusionCoefficient<Length1, Length2, Time1>;
 
    /// @brief Template deduction guide for DiffusionCoefficient.
    /// @tparam Length1 Numerator Length1 type
@@ -213,9 +213,9 @@ namespace Dimension
    /// @tparam Length1 Numerator Length1 type
    /// @tparam Length2 Numerator Length2 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Length1, typename Length2,typename Time1>
-   requires IsDiffusionCoefficientUnits<Length1, Length2,Time1>
-   DiffusionCoefficient(BaseDimension<std::tuple<Length1, Length2>, std::tuple<Time1>>) -> DiffusionCoefficient<Length1, Length2,Time1>;
+   template<typename Length1, typename Length2, typename Time1>
+   requires IsDiffusionCoefficientUnits<Length1, Length2, Time1>
+   DiffusionCoefficient(BaseDimension<std::tuple<Length1, Length2>, std::tuple<Time1>>) -> DiffusionCoefficient<Length1, Length2, Time1>;
 
 }
 

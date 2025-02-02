@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_SPECIFICVOLUME_IMPL_H
 #define STATIC_DIMENSION_SPECIFICVOLUME_IMPL_H
 
-#include "../../MassDimension.h"
 #include "../../LengthDimension.h"
+#include "../../MassDimension.h"
 
 namespace Dimension
 {
@@ -20,12 +20,12 @@ namespace Dimension
    /// @tparam Length2 Numerator Length2 type
    /// @tparam Length3 Numerator Length3 type
    /// @tparam Mass1 Denominator Mass1 type
-   template<typename Length1, typename Length2, typename Length3,typename Mass1>
+   template<typename Length1, typename Length2, typename Length3, typename Mass1>
    concept IsSpecificVolumeUnits = 
       std::is_same_v<typename Length1::Dim, LengthType> &&
-        std::is_same_v<typename Length2::Dim, LengthType> &&
-        std::is_same_v<typename Length3::Dim, LengthType> &&
-        std::is_same_v<typename Mass1::Dim, MassType>;
+      std::is_same_v<typename Length2::Dim, LengthType> &&
+      std::is_same_v<typename Length3::Dim, LengthType> &&
+      std::is_same_v<typename Mass1::Dim, MassType>;
 
    /// @brief Concept for a SpecificVolume type.
    /// @details Ensures that the type meets SpecificVolume type requirements, based on numerator and denominator types.
@@ -35,7 +35,7 @@ namespace Dimension
       typename T::NumTuple;
       typename T::DenTuple;
    } && std::tuple_size_v<typename T::NumTuple> == 3 && std::tuple_size_v<typename T::DenTuple> == 1 &&
-   IsSpecificVolumeUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<2, typename T::NumTuple>,typename std::tuple_element_t<0, typename T::DenTuple>>;
+   IsSpecificVolumeUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<2, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>>;
 
    /// @brief Retrieves the value of a SpecificVolume object.
    /// @details Provides access to the underlying value represented by a SpecificVolume object.
@@ -46,8 +46,8 @@ namespace Dimension
    /// @tparam SpecificVolumeType The type of the object being accessed.
    /// @param obj The SpecificVolume object.
    /// @return The underlying value as `PrecisionType`
-   template<typename Length1, typename Length2, typename Length3,typename Mass1, typename SpecificVolumeType>
-   requires IsSpecificVolumeUnits<Length1, Length2, Length3,Mass1> && IsSpecificVolumeType<SpecificVolumeType>
+   template<typename Length1, typename Length2, typename Length3, typename Mass1, typename SpecificVolumeType>
+   requires IsSpecificVolumeUnits<Length1, Length2, Length3, Mass1> && IsSpecificVolumeType<SpecificVolumeType>
    constexpr PrecisionType getSpecificVolume(const SpecificVolumeType& obj)
    {
       return obj.template GetVal<std::tuple<Length1, Length2, Length3>, std::tuple<Mass1>>();
@@ -101,9 +101,9 @@ namespace Dimension
    /// @tparam Length2 Numerator Length2 type
    /// @tparam Length3 Numerator Length3 type
    /// @tparam Mass1 Denominator Mass1 type
-   template<typename Length1, typename Length2, typename Length3,typename Mass1>
-   requires IsSpecificVolumeUnits<Length1, Length2, Length3,Mass1>
-   class SpecificVolume<Length1, Length2, Length3,Mass1> : public BaseDimension<std::tuple<Length1, Length2, Length3>, std::tuple<Mass1>>
+   template<typename Length1, typename Length2, typename Length3, typename Mass1>
+   requires IsSpecificVolumeUnits<Length1, Length2, Length3, Mass1>
+   class SpecificVolume<Length1, Length2, Length3, Mass1> : public BaseDimension<std::tuple<Length1, Length2, Length3>, std::tuple<Mass1>>
    {
    public:
       using Base = BaseDimension<std::tuple<Length1, Length2, Length3>, std::tuple<Mass1>>;
@@ -125,13 +125,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of SpecificVolume.
       /// @details Prefer using the free function `getSpecificVolume()` instead.
       /// @return The value of the SpecificVolume.
-      template<typename Length1T, typename Length2T, typename Length3T,typename Mass1T>
-      requires IsSpecificVolumeUnits<Length1T, Length2T, Length3T,Mass1T>
+      template<typename Length1T, typename Length2T, typename Length3T, typename Mass1T>
+      requires IsSpecificVolumeUnits<Length1T, Length2T, Length3T, Mass1T>
       [[deprecated("Use the free function getSpecificVolume() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetSpecificVolume() const
       {
-         return getSpecificVolume<Length1T, Length2T, Length3T,Mass1T>(*this);
+         return getSpecificVolume<Length1T, Length2T, Length3T, Mass1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of SpecificVolume.
@@ -175,13 +175,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of SpecificVolume.
       /// @details Prefer using the free function `getSpecificVolume()` instead.
       /// @return The value of the SpecificVolume.
-      template<typename Length1T, typename Length2T, typename Length3T,typename Mass1T>
-      requires IsSpecificVolumeUnits<Length1T, Length2T, Length3T,Mass1T>
+      template<typename Length1T, typename Length2T, typename Length3T, typename Mass1T>
+      requires IsSpecificVolumeUnits<Length1T, Length2T, Length3T, Mass1T>
       [[deprecated("Use the free function getSpecificVolume() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetSpecificVolume() const
       {
-         return getSpecificVolume<Length1T, Length2T, Length3T,Mass1T>(*this);
+         return getSpecificVolume<Length1T, Length2T, Length3T, Mass1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of SpecificVolume.
@@ -202,9 +202,9 @@ namespace Dimension
    /// @tparam Length2 Numerator Length2 type
    /// @tparam Length3 Numerator Length3 type
    /// @tparam Mass1 Denominator Mass1 type
-   template<typename Length1, typename Length2, typename Length3,typename Mass1>
-   requires IsSpecificVolumeUnits<Length1, Length2, Length3,Mass1>
-   SpecificVolume(Length1, Length2, Length3,Mass1) -> SpecificVolume<Length1, Length2, Length3,Mass1>;
+   template<typename Length1, typename Length2, typename Length3, typename Mass1>
+   requires IsSpecificVolumeUnits<Length1, Length2, Length3, Mass1>
+   SpecificVolume(Length1, Length2, Length3, Mass1) -> SpecificVolume<Length1, Length2, Length3, Mass1>;
 
    /// @brief Template deduction guide for SpecificVolume.
    /// @tparam Length1 Numerator Length1 type
@@ -220,9 +220,9 @@ namespace Dimension
    /// @tparam Length2 Numerator Length2 type
    /// @tparam Length3 Numerator Length3 type
    /// @tparam Mass1 Denominator Mass1 type
-   template<typename Length1, typename Length2, typename Length3,typename Mass1>
-   requires IsSpecificVolumeUnits<Length1, Length2, Length3,Mass1>
-   SpecificVolume(BaseDimension<std::tuple<Length1, Length2, Length3>, std::tuple<Mass1>>) -> SpecificVolume<Length1, Length2, Length3,Mass1>;
+   template<typename Length1, typename Length2, typename Length3, typename Mass1>
+   requires IsSpecificVolumeUnits<Length1, Length2, Length3, Mass1>
+   SpecificVolume(BaseDimension<std::tuple<Length1, Length2, Length3>, std::tuple<Mass1>>) -> SpecificVolume<Length1, Length2, Length3, Mass1>;
 
 }
 

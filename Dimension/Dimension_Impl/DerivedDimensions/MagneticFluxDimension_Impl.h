@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_MAGNETICFLUX_IMPL_H
 #define STATIC_DIMENSION_MAGNETICFLUX_IMPL_H
 
-#include "../../TimeDimension.h"
 #include "../../MassDimension.h"
 #include "../../LengthDimension.h"
+#include "../../TimeDimension.h"
 #include "../../ChargeDimension.h"
 
 namespace Dimension
@@ -23,13 +23,13 @@ namespace Dimension
    /// @tparam Length2 Numerator Length2 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1, typename Length1, typename Length2,typename Time1, typename Charge1>
+   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Charge1>
    concept IsMagneticFluxUnits = 
       std::is_same_v<typename Mass1::Dim, MassType> &&
-        std::is_same_v<typename Length1::Dim, LengthType> &&
-        std::is_same_v<typename Length2::Dim, LengthType> &&
-        std::is_same_v<typename Time1::Dim, TimeType> &&
-        std::is_same_v<typename Charge1::Dim, ChargeType>;
+      std::is_same_v<typename Length1::Dim, LengthType> &&
+      std::is_same_v<typename Length2::Dim, LengthType> &&
+      std::is_same_v<typename Time1::Dim, TimeType> &&
+      std::is_same_v<typename Charge1::Dim, ChargeType>;
 
    /// @brief Concept for a MagneticFlux type.
    /// @details Ensures that the type meets MagneticFlux type requirements, based on numerator and denominator types.
@@ -39,7 +39,7 @@ namespace Dimension
       typename T::NumTuple;
       typename T::DenTuple;
    } && std::tuple_size_v<typename T::NumTuple> == 3 && std::tuple_size_v<typename T::DenTuple> == 2 &&
-   IsMagneticFluxUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<2, typename T::NumTuple>,typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>>;
+   IsMagneticFluxUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<2, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>>;
 
    /// @brief Retrieves the value of a MagneticFlux object.
    /// @details Provides access to the underlying value represented by a MagneticFlux object.
@@ -51,8 +51,8 @@ namespace Dimension
    /// @tparam MagneticFluxType The type of the object being accessed.
    /// @param obj The MagneticFlux object.
    /// @return The underlying value as `PrecisionType`
-   template<typename Mass1, typename Length1, typename Length2,typename Time1, typename Charge1, typename MagneticFluxType>
-   requires IsMagneticFluxUnits<Mass1, Length1, Length2,Time1, Charge1> && IsMagneticFluxType<MagneticFluxType>
+   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Charge1, typename MagneticFluxType>
+   requires IsMagneticFluxUnits<Mass1, Length1, Length2, Time1, Charge1> && IsMagneticFluxType<MagneticFluxType>
    constexpr PrecisionType getMagneticFlux(const MagneticFluxType& obj)
    {
       return obj.template GetVal<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Charge1>>();
@@ -107,9 +107,9 @@ namespace Dimension
    /// @tparam Length2 Numerator Length2 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1, typename Length1, typename Length2,typename Time1, typename Charge1>
-   requires IsMagneticFluxUnits<Mass1, Length1, Length2,Time1, Charge1>
-   class MagneticFlux<Mass1, Length1, Length2,Time1, Charge1> : public BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Charge1>>
+   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Charge1>
+   requires IsMagneticFluxUnits<Mass1, Length1, Length2, Time1, Charge1>
+   class MagneticFlux<Mass1, Length1, Length2, Time1, Charge1> : public BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Charge1>>
    {
    public:
       using Base = BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Charge1>>;
@@ -131,13 +131,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of MagneticFlux.
       /// @details Prefer using the free function `getMagneticFlux()` instead.
       /// @return The value of the MagneticFlux.
-      template<typename Mass1T, typename Length1T, typename Length2T,typename Time1T, typename Charge1T>
-      requires IsMagneticFluxUnits<Mass1T, Length1T, Length2T,Time1T, Charge1T>
+      template<typename Mass1T, typename Length1T, typename Length2T, typename Time1T, typename Charge1T>
+      requires IsMagneticFluxUnits<Mass1T, Length1T, Length2T, Time1T, Charge1T>
       [[deprecated("Use the free function getMagneticFlux() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetMagneticFlux() const
       {
-         return getMagneticFlux<Mass1T, Length1T, Length2T,Time1T, Charge1T>(*this);
+         return getMagneticFlux<Mass1T, Length1T, Length2T, Time1T, Charge1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of MagneticFlux.
@@ -181,13 +181,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of MagneticFlux.
       /// @details Prefer using the free function `getMagneticFlux()` instead.
       /// @return The value of the MagneticFlux.
-      template<typename Mass1T, typename Length1T, typename Length2T,typename Time1T, typename Charge1T>
-      requires IsMagneticFluxUnits<Mass1T, Length1T, Length2T,Time1T, Charge1T>
+      template<typename Mass1T, typename Length1T, typename Length2T, typename Time1T, typename Charge1T>
+      requires IsMagneticFluxUnits<Mass1T, Length1T, Length2T, Time1T, Charge1T>
       [[deprecated("Use the free function getMagneticFlux() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetMagneticFlux() const
       {
-         return getMagneticFlux<Mass1T, Length1T, Length2T,Time1T, Charge1T>(*this);
+         return getMagneticFlux<Mass1T, Length1T, Length2T, Time1T, Charge1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of MagneticFlux.
@@ -209,9 +209,9 @@ namespace Dimension
    /// @tparam Length2 Numerator Length2 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1, typename Length1, typename Length2,typename Time1, typename Charge1>
-   requires IsMagneticFluxUnits<Mass1, Length1, Length2,Time1, Charge1>
-   MagneticFlux(Mass1, Length1, Length2,Time1, Charge1) -> MagneticFlux<Mass1, Length1, Length2,Time1, Charge1>;
+   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Charge1>
+   requires IsMagneticFluxUnits<Mass1, Length1, Length2, Time1, Charge1>
+   MagneticFlux(Mass1, Length1, Length2, Time1, Charge1) -> MagneticFlux<Mass1, Length1, Length2, Time1, Charge1>;
 
    /// @brief Template deduction guide for MagneticFlux.
    /// @tparam Mass1 Numerator Mass1 type
@@ -229,9 +229,9 @@ namespace Dimension
    /// @tparam Length2 Numerator Length2 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1, typename Length1, typename Length2,typename Time1, typename Charge1>
-   requires IsMagneticFluxUnits<Mass1, Length1, Length2,Time1, Charge1>
-   MagneticFlux(BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Charge1>>) -> MagneticFlux<Mass1, Length1, Length2,Time1, Charge1>;
+   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Charge1>
+   requires IsMagneticFluxUnits<Mass1, Length1, Length2, Time1, Charge1>
+   MagneticFlux(BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Charge1>>) -> MagneticFlux<Mass1, Length1, Length2, Time1, Charge1>;
 
 }
 

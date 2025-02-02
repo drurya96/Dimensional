@@ -53,8 +53,6 @@ namespace Dimension
       using NumTuple = std::tuple<inHgMass>;
       using DenTuple = std::tuple<Meters, Seconds, Seconds>;
    };
-
-
    
 }
 

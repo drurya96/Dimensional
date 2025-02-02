@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_SPECIFICHEATCAPACITY_IMPL_H
 #define STATIC_DIMENSION_SPECIFICHEATCAPACITY_IMPL_H
 
-#include "../../TimeDimension.h"
 #include "../../LengthDimension.h"
+#include "../../TimeDimension.h"
 #include "../../TemperatureDimension.h"
 
 namespace Dimension
@@ -22,13 +22,13 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Temperature1 Denominator Temperature1 type
-   template<typename Length1, typename Length2,typename Time1, typename Time2, typename Temperature1>
+   template<typename Length1, typename Length2, typename Time1, typename Time2, typename Temperature1>
    concept IsSpecificHeatCapacityUnits = 
       std::is_same_v<typename Length1::Dim, LengthType> &&
-        std::is_same_v<typename Length2::Dim, LengthType> &&
-        std::is_same_v<typename Time1::Dim, TimeType> &&
-        std::is_same_v<typename Time2::Dim, TimeType> &&
-        std::is_same_v<typename Temperature1::Dim, TemperatureType>;
+      std::is_same_v<typename Length2::Dim, LengthType> &&
+      std::is_same_v<typename Time1::Dim, TimeType> &&
+      std::is_same_v<typename Time2::Dim, TimeType> &&
+      std::is_same_v<typename Temperature1::Dim, TemperatureType>;
 
    /// @brief Concept for a SpecificHeatCapacity type.
    /// @details Ensures that the type meets SpecificHeatCapacity type requirements, based on numerator and denominator types.
@@ -38,7 +38,7 @@ namespace Dimension
       typename T::NumTuple;
       typename T::DenTuple;
    } && std::tuple_size_v<typename T::NumTuple> == 2 && std::tuple_size_v<typename T::DenTuple> == 3 &&
-   IsSpecificHeatCapacityUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>,typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>, typename std::tuple_element_t<2, typename T::DenTuple>>;
+   IsSpecificHeatCapacityUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>, typename std::tuple_element_t<2, typename T::DenTuple>>;
 
    /// @brief Retrieves the value of a SpecificHeatCapacity object.
    /// @details Provides access to the underlying value represented by a SpecificHeatCapacity object.
@@ -50,8 +50,8 @@ namespace Dimension
    /// @tparam SpecificHeatCapacityType The type of the object being accessed.
    /// @param obj The SpecificHeatCapacity object.
    /// @return The underlying value as `PrecisionType`
-   template<typename Length1, typename Length2,typename Time1, typename Time2, typename Temperature1, typename SpecificHeatCapacityType>
-   requires IsSpecificHeatCapacityUnits<Length1, Length2,Time1, Time2, Temperature1> && IsSpecificHeatCapacityType<SpecificHeatCapacityType>
+   template<typename Length1, typename Length2, typename Time1, typename Time2, typename Temperature1, typename SpecificHeatCapacityType>
+   requires IsSpecificHeatCapacityUnits<Length1, Length2, Time1, Time2, Temperature1> && IsSpecificHeatCapacityType<SpecificHeatCapacityType>
    constexpr PrecisionType getSpecificHeatCapacity(const SpecificHeatCapacityType& obj)
    {
       return obj.template GetVal<std::tuple<Length1, Length2>, std::tuple<Time1, Time2, Temperature1>>();
@@ -106,9 +106,9 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Temperature1 Denominator Temperature1 type
-   template<typename Length1, typename Length2,typename Time1, typename Time2, typename Temperature1>
-   requires IsSpecificHeatCapacityUnits<Length1, Length2,Time1, Time2, Temperature1>
-   class SpecificHeatCapacity<Length1, Length2,Time1, Time2, Temperature1> : public BaseDimension<std::tuple<Length1, Length2>, std::tuple<Time1, Time2, Temperature1>>
+   template<typename Length1, typename Length2, typename Time1, typename Time2, typename Temperature1>
+   requires IsSpecificHeatCapacityUnits<Length1, Length2, Time1, Time2, Temperature1>
+   class SpecificHeatCapacity<Length1, Length2, Time1, Time2, Temperature1> : public BaseDimension<std::tuple<Length1, Length2>, std::tuple<Time1, Time2, Temperature1>>
    {
    public:
       using Base = BaseDimension<std::tuple<Length1, Length2>, std::tuple<Time1, Time2, Temperature1>>;
@@ -130,13 +130,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of SpecificHeatCapacity.
       /// @details Prefer using the free function `getSpecificHeatCapacity()` instead.
       /// @return The value of the SpecificHeatCapacity.
-      template<typename Length1T, typename Length2T,typename Time1T, typename Time2T, typename Temperature1T>
-      requires IsSpecificHeatCapacityUnits<Length1T, Length2T,Time1T, Time2T, Temperature1T>
+      template<typename Length1T, typename Length2T, typename Time1T, typename Time2T, typename Temperature1T>
+      requires IsSpecificHeatCapacityUnits<Length1T, Length2T, Time1T, Time2T, Temperature1T>
       [[deprecated("Use the free function getSpecificHeatCapacity() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetSpecificHeatCapacity() const
       {
-         return getSpecificHeatCapacity<Length1T, Length2T,Time1T, Time2T, Temperature1T>(*this);
+         return getSpecificHeatCapacity<Length1T, Length2T, Time1T, Time2T, Temperature1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of SpecificHeatCapacity.
@@ -180,13 +180,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of SpecificHeatCapacity.
       /// @details Prefer using the free function `getSpecificHeatCapacity()` instead.
       /// @return The value of the SpecificHeatCapacity.
-      template<typename Length1T, typename Length2T,typename Time1T, typename Time2T, typename Temperature1T>
-      requires IsSpecificHeatCapacityUnits<Length1T, Length2T,Time1T, Time2T, Temperature1T>
+      template<typename Length1T, typename Length2T, typename Time1T, typename Time2T, typename Temperature1T>
+      requires IsSpecificHeatCapacityUnits<Length1T, Length2T, Time1T, Time2T, Temperature1T>
       [[deprecated("Use the free function getSpecificHeatCapacity() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetSpecificHeatCapacity() const
       {
-         return getSpecificHeatCapacity<Length1T, Length2T,Time1T, Time2T, Temperature1T>(*this);
+         return getSpecificHeatCapacity<Length1T, Length2T, Time1T, Time2T, Temperature1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of SpecificHeatCapacity.
@@ -208,9 +208,9 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Temperature1 Denominator Temperature1 type
-   template<typename Length1, typename Length2,typename Time1, typename Time2, typename Temperature1>
-   requires IsSpecificHeatCapacityUnits<Length1, Length2,Time1, Time2, Temperature1>
-   SpecificHeatCapacity(Length1, Length2,Time1, Time2, Temperature1) -> SpecificHeatCapacity<Length1, Length2,Time1, Time2, Temperature1>;
+   template<typename Length1, typename Length2, typename Time1, typename Time2, typename Temperature1>
+   requires IsSpecificHeatCapacityUnits<Length1, Length2, Time1, Time2, Temperature1>
+   SpecificHeatCapacity(Length1, Length2, Time1, Time2, Temperature1) -> SpecificHeatCapacity<Length1, Length2, Time1, Time2, Temperature1>;
 
    /// @brief Template deduction guide for SpecificHeatCapacity.
    /// @tparam Length1 Numerator Length1 type
@@ -228,9 +228,9 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Temperature1 Denominator Temperature1 type
-   template<typename Length1, typename Length2,typename Time1, typename Time2, typename Temperature1>
-   requires IsSpecificHeatCapacityUnits<Length1, Length2,Time1, Time2, Temperature1>
-   SpecificHeatCapacity(BaseDimension<std::tuple<Length1, Length2>, std::tuple<Time1, Time2, Temperature1>>) -> SpecificHeatCapacity<Length1, Length2,Time1, Time2, Temperature1>;
+   template<typename Length1, typename Length2, typename Time1, typename Time2, typename Temperature1>
+   requires IsSpecificHeatCapacityUnits<Length1, Length2, Time1, Time2, Temperature1>
+   SpecificHeatCapacity(BaseDimension<std::tuple<Length1, Length2>, std::tuple<Time1, Time2, Temperature1>>) -> SpecificHeatCapacity<Length1, Length2, Time1, Time2, Temperature1>;
 
 }
 
