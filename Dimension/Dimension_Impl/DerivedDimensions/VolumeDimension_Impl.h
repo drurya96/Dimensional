@@ -3,6 +3,7 @@
 
 #include "../../LengthDimension.h"
 
+
 namespace Dimension
 {
    /// @brief Concept for a named Volume unit.
@@ -21,8 +22,8 @@ namespace Dimension
    template<typename Length1, typename Length2, typename Length3>
    concept IsVolumeUnits = 
       std::is_same_v<typename Length1::Dim, LengthType> &&
-        std::is_same_v<typename Length2::Dim, LengthType> &&
-        std::is_same_v<typename Length3::Dim, LengthType>;
+      std::is_same_v<typename Length2::Dim, LengthType> &&
+      std::is_same_v<typename Length3::Dim, LengthType>;
 
    /// @brief Concept for a Volume type.
    /// @details Ensures that the type meets Volume type requirements, based on numerator and denominator types.

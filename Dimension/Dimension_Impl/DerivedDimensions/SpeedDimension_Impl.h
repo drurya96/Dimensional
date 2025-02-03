@@ -18,10 +18,10 @@ namespace Dimension
    /// @details Checks if the provided types satisfy the Speed dimension requirements.
    /// @tparam Length1 Numerator Length1 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Length1,typename Time1>
+   template<typename Length1, typename Time1>
    concept IsSpeedUnits = 
       std::is_same_v<typename Length1::Dim, LengthType> &&
-        std::is_same_v<typename Time1::Dim, TimeType>;
+      std::is_same_v<typename Time1::Dim, TimeType>;
 
    /// @brief Concept for a Speed type.
    /// @details Ensures that the type meets Speed type requirements, based on numerator and denominator types.
@@ -31,7 +31,7 @@ namespace Dimension
       typename T::NumTuple;
       typename T::DenTuple;
    } && std::tuple_size_v<typename T::NumTuple> == 1 && std::tuple_size_v<typename T::DenTuple> == 1 &&
-   IsSpeedUnits<typename std::tuple_element_t<0, typename T::NumTuple>,typename std::tuple_element_t<0, typename T::DenTuple>>;
+   IsSpeedUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>>;
 
    /// @brief Retrieves the value of a Speed object.
    /// @details Provides access to the underlying value represented by a Speed object.
@@ -40,8 +40,8 @@ namespace Dimension
    /// @tparam SpeedType The type of the object being accessed.
    /// @param obj The Speed object.
    /// @return The underlying value as `PrecisionType`
-   template<typename Length1,typename Time1, typename SpeedType>
-   requires IsSpeedUnits<Length1,Time1> && IsSpeedType<SpeedType>
+   template<typename Length1, typename Time1, typename SpeedType>
+   requires IsSpeedUnits<Length1, Time1> && IsSpeedType<SpeedType>
    constexpr PrecisionType getSpeed(const SpeedType& obj)
    {
       return obj.template GetVal<std::tuple<Length1>, std::tuple<Time1>>();
@@ -93,9 +93,9 @@ namespace Dimension
    /// @details Defines operations and data storage for Speed dimensions.
    /// @tparam Length1 Numerator Length1 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Length1,typename Time1>
-   requires IsSpeedUnits<Length1,Time1>
-   class Speed<Length1,Time1> : public BaseDimension<std::tuple<Length1>, std::tuple<Time1>>
+   template<typename Length1, typename Time1>
+   requires IsSpeedUnits<Length1, Time1>
+   class Speed<Length1, Time1> : public BaseDimension<std::tuple<Length1>, std::tuple<Time1>>
    {
    public:
       using Base = BaseDimension<std::tuple<Length1>, std::tuple<Time1>>;
@@ -117,13 +117,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of Speed.
       /// @details Prefer using the free function `getSpeed()` instead.
       /// @return The value of the Speed.
-      template<typename Length1T,typename Time1T>
-      requires IsSpeedUnits<Length1T,Time1T>
+      template<typename Length1T, typename Time1T>
+      requires IsSpeedUnits<Length1T, Time1T>
       [[deprecated("Use the free function getSpeed() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetSpeed() const
       {
-         return getSpeed<Length1T,Time1T>(*this);
+         return getSpeed<Length1T, Time1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of Speed.
@@ -167,13 +167,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of Speed.
       /// @details Prefer using the free function `getSpeed()` instead.
       /// @return The value of the Speed.
-      template<typename Length1T,typename Time1T>
-      requires IsSpeedUnits<Length1T,Time1T>
+      template<typename Length1T, typename Time1T>
+      requires IsSpeedUnits<Length1T, Time1T>
       [[deprecated("Use the free function getSpeed() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetSpeed() const
       {
-         return getSpeed<Length1T,Time1T>(*this);
+         return getSpeed<Length1T, Time1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of Speed.
@@ -192,9 +192,9 @@ namespace Dimension
    /// @brief Template deduction guide for Speed.
    /// @tparam Length1 Numerator Length1 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Length1,typename Time1>
-   requires IsSpeedUnits<Length1,Time1>
-   Speed(Length1,Time1) -> Speed<Length1,Time1>;
+   template<typename Length1, typename Time1>
+   requires IsSpeedUnits<Length1, Time1>
+   Speed(Length1, Time1) -> Speed<Length1, Time1>;
 
    /// @brief Template deduction guide for Speed.
    /// @tparam Length1 Numerator Length1 type
@@ -206,9 +206,9 @@ namespace Dimension
    /// @brief Template deduction guide for Speed.
    /// @tparam Length1 Numerator Length1 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Length1,typename Time1>
-   requires IsSpeedUnits<Length1,Time1>
-   Speed(BaseDimension<std::tuple<Length1>, std::tuple<Time1>>) -> Speed<Length1,Time1>;
+   template<typename Length1, typename Time1>
+   requires IsSpeedUnits<Length1, Time1>
+   Speed(BaseDimension<std::tuple<Length1>, std::tuple<Time1>>) -> Speed<Length1, Time1>;
 
 }
 

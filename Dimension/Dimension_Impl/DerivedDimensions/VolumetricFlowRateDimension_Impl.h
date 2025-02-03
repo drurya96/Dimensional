@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_VOLUMETRICFLOWRATE_IMPL_H
 #define STATIC_DIMENSION_VOLUMETRICFLOWRATE_IMPL_H
 
-#include "../../TimeDimension.h"
 #include "../../LengthDimension.h"
+#include "../../TimeDimension.h"
 
 namespace Dimension
 {
@@ -20,12 +20,12 @@ namespace Dimension
    /// @tparam Length2 Numerator Length2 type
    /// @tparam Length3 Numerator Length3 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Length1, typename Length2, typename Length3,typename Time1>
+   template<typename Length1, typename Length2, typename Length3, typename Time1>
    concept IsVolumetricFlowRateUnits = 
       std::is_same_v<typename Length1::Dim, LengthType> &&
-        std::is_same_v<typename Length2::Dim, LengthType> &&
-        std::is_same_v<typename Length3::Dim, LengthType> &&
-        std::is_same_v<typename Time1::Dim, TimeType>;
+      std::is_same_v<typename Length2::Dim, LengthType> &&
+      std::is_same_v<typename Length3::Dim, LengthType> &&
+      std::is_same_v<typename Time1::Dim, TimeType>;
 
    /// @brief Concept for a VolumetricFlowRate type.
    /// @details Ensures that the type meets VolumetricFlowRate type requirements, based on numerator and denominator types.
@@ -35,7 +35,7 @@ namespace Dimension
       typename T::NumTuple;
       typename T::DenTuple;
    } && std::tuple_size_v<typename T::NumTuple> == 3 && std::tuple_size_v<typename T::DenTuple> == 1 &&
-   IsVolumetricFlowRateUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<2, typename T::NumTuple>,typename std::tuple_element_t<0, typename T::DenTuple>>;
+   IsVolumetricFlowRateUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<2, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>>;
 
    /// @brief Retrieves the value of a VolumetricFlowRate object.
    /// @details Provides access to the underlying value represented by a VolumetricFlowRate object.
@@ -46,8 +46,8 @@ namespace Dimension
    /// @tparam VolumetricFlowRateType The type of the object being accessed.
    /// @param obj The VolumetricFlowRate object.
    /// @return The underlying value as `PrecisionType`
-   template<typename Length1, typename Length2, typename Length3,typename Time1, typename VolumetricFlowRateType>
-   requires IsVolumetricFlowRateUnits<Length1, Length2, Length3,Time1> && IsVolumetricFlowRateType<VolumetricFlowRateType>
+   template<typename Length1, typename Length2, typename Length3, typename Time1, typename VolumetricFlowRateType>
+   requires IsVolumetricFlowRateUnits<Length1, Length2, Length3, Time1> && IsVolumetricFlowRateType<VolumetricFlowRateType>
    constexpr PrecisionType getVolumetricFlowRate(const VolumetricFlowRateType& obj)
    {
       return obj.template GetVal<std::tuple<Length1, Length2, Length3>, std::tuple<Time1>>();
@@ -101,9 +101,9 @@ namespace Dimension
    /// @tparam Length2 Numerator Length2 type
    /// @tparam Length3 Numerator Length3 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Length1, typename Length2, typename Length3,typename Time1>
-   requires IsVolumetricFlowRateUnits<Length1, Length2, Length3,Time1>
-   class VolumetricFlowRate<Length1, Length2, Length3,Time1> : public BaseDimension<std::tuple<Length1, Length2, Length3>, std::tuple<Time1>>
+   template<typename Length1, typename Length2, typename Length3, typename Time1>
+   requires IsVolumetricFlowRateUnits<Length1, Length2, Length3, Time1>
+   class VolumetricFlowRate<Length1, Length2, Length3, Time1> : public BaseDimension<std::tuple<Length1, Length2, Length3>, std::tuple<Time1>>
    {
    public:
       using Base = BaseDimension<std::tuple<Length1, Length2, Length3>, std::tuple<Time1>>;
@@ -125,13 +125,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of VolumetricFlowRate.
       /// @details Prefer using the free function `getVolumetricFlowRate()` instead.
       /// @return The value of the VolumetricFlowRate.
-      template<typename Length1T, typename Length2T, typename Length3T,typename Time1T>
-      requires IsVolumetricFlowRateUnits<Length1T, Length2T, Length3T,Time1T>
+      template<typename Length1T, typename Length2T, typename Length3T, typename Time1T>
+      requires IsVolumetricFlowRateUnits<Length1T, Length2T, Length3T, Time1T>
       [[deprecated("Use the free function getVolumetricFlowRate() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetVolumetricFlowRate() const
       {
-         return getVolumetricFlowRate<Length1T, Length2T, Length3T,Time1T>(*this);
+         return getVolumetricFlowRate<Length1T, Length2T, Length3T, Time1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of VolumetricFlowRate.
@@ -175,13 +175,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of VolumetricFlowRate.
       /// @details Prefer using the free function `getVolumetricFlowRate()` instead.
       /// @return The value of the VolumetricFlowRate.
-      template<typename Length1T, typename Length2T, typename Length3T,typename Time1T>
-      requires IsVolumetricFlowRateUnits<Length1T, Length2T, Length3T,Time1T>
+      template<typename Length1T, typename Length2T, typename Length3T, typename Time1T>
+      requires IsVolumetricFlowRateUnits<Length1T, Length2T, Length3T, Time1T>
       [[deprecated("Use the free function getVolumetricFlowRate() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetVolumetricFlowRate() const
       {
-         return getVolumetricFlowRate<Length1T, Length2T, Length3T,Time1T>(*this);
+         return getVolumetricFlowRate<Length1T, Length2T, Length3T, Time1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of VolumetricFlowRate.
@@ -202,9 +202,9 @@ namespace Dimension
    /// @tparam Length2 Numerator Length2 type
    /// @tparam Length3 Numerator Length3 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Length1, typename Length2, typename Length3,typename Time1>
-   requires IsVolumetricFlowRateUnits<Length1, Length2, Length3,Time1>
-   VolumetricFlowRate(Length1, Length2, Length3,Time1) -> VolumetricFlowRate<Length1, Length2, Length3,Time1>;
+   template<typename Length1, typename Length2, typename Length3, typename Time1>
+   requires IsVolumetricFlowRateUnits<Length1, Length2, Length3, Time1>
+   VolumetricFlowRate(Length1, Length2, Length3, Time1) -> VolumetricFlowRate<Length1, Length2, Length3, Time1>;
 
    /// @brief Template deduction guide for VolumetricFlowRate.
    /// @tparam Length1 Numerator Length1 type
@@ -220,9 +220,9 @@ namespace Dimension
    /// @tparam Length2 Numerator Length2 type
    /// @tparam Length3 Numerator Length3 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Length1, typename Length2, typename Length3,typename Time1>
-   requires IsVolumetricFlowRateUnits<Length1, Length2, Length3,Time1>
-   VolumetricFlowRate(BaseDimension<std::tuple<Length1, Length2, Length3>, std::tuple<Time1>>) -> VolumetricFlowRate<Length1, Length2, Length3,Time1>;
+   template<typename Length1, typename Length2, typename Length3, typename Time1>
+   requires IsVolumetricFlowRateUnits<Length1, Length2, Length3, Time1>
+   VolumetricFlowRate(BaseDimension<std::tuple<Length1, Length2, Length3>, std::tuple<Time1>>) -> VolumetricFlowRate<Length1, Length2, Length3, Time1>;
 
 }
 

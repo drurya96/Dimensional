@@ -1,0 +1,233 @@
+[
+   {
+      "Dimension": "Acceleration",
+      "Fundamental": false,
+      "Numerator": ["Length"],
+      "Denominator": ["Time", "Time"],
+      "Units": {}
+   },
+   {
+      "Dimension": "Energy",
+      "Fundamental": false,
+      "Numerator": ["Mass", "Length", "Length"],
+      "Denominator": ["Time", "Time"],
+      "Units": {}
+   },
+   {
+      "Dimension": "Force",
+      "Fundamental": false,
+      "Numerator": ["Mass", "Length"],
+      "Denominator": ["Time", "Time"],
+      "Units": {}
+   },
+   {
+      "Dimension": "MolarMass",
+      "Fundamental": false,
+      "Numerator": ["Mass"],
+      "Denominator": ["Amount"],
+      "Units": {}
+   },
+   {
+      "Dimension": "Pressure",
+      "Fundamental": false,
+      "Numerator": ["Mass"],
+      "Denominator": ["Length", "Time", "Time"],
+      "Units": {}
+   },
+   {
+      "Dimension": "Speed",
+      "Fundamental": false,
+      "Numerator": ["Length"],
+      "Denominator": ["Time"],
+      "Units": {}
+   },
+   {
+      "Dimension": "Volume",
+      "Fundamental": false,
+      "Numerator": ["Length", "Length", "Length"],
+      "Denominator": [],
+      "Units": {}
+   },
+   {
+      "Dimension": "Area",
+      "Fundamental": false,
+      "Numerator": ["Length", "Length"],
+      "Denominator": [],
+      "Units": {}
+   },
+   {
+      "Dimension": "Frequency",
+      "Fundamental": false,
+      "Numerator": [],
+      "Denominator": ["Time"],
+      "Units": {}
+   },
+   {
+      "Dimension": "Momentum",
+      "Fundamental": false,
+      "Numerator": ["Mass", "Length"],
+      "Denominator": ["Time"],
+      "Units": {}
+   },
+   {
+      "Dimension": "Power",
+      "Fundamental": false,
+      "Numerator": ["Mass", "Length", "Length"],
+      "Denominator": ["Time", "Time", "Time"],
+      "Units": {}
+   },
+   {
+      "Dimension": "Current",
+      "Fundamental": false,
+      "Numerator": ["Charge"],
+      "Denominator": ["Time"],
+      "Units": {}
+   },
+   {
+      "Dimension": "ElectricPotential",
+      "Fundamental": false,
+      "Numerator": ["Mass", "Length", "Length"],
+      "Denominator": ["Time", "Time", "Charge"],
+      "Units": {}
+   },
+   {
+      "Dimension": "Resistance",
+      "Fundamental": false,
+      "Numerator": ["Mass", "Length", "Length"],
+      "Denominator": ["Time", "Charge", "Charge"],
+      "Units": {}
+   },
+   {
+      "Dimension": "Capacitance",
+      "Fundamental": false,
+      "Numerator": ["Charge", "Charge", "Time", "Time"],
+      "Denominator": ["Mass", "Length", "Length"],
+      "Units": {}
+   },
+   {
+      "Dimension": "Inductance",
+      "Fundamental": false,
+      "Numerator": ["Mass", "Length", "Length"],
+      "Denominator": ["Charge", "Charge"],
+      "Units": {}
+   },
+   {
+      "Dimension": "MagneticFlux",
+      "Fundamental": false,
+      "Numerator": ["Mass", "Length", "Length"],
+      "Denominator": ["Time", "Charge"],
+      "Units": {}
+   },
+   {
+      "Dimension": "MagneticField",
+      "Fundamental": false,
+      "Numerator": ["Mass"],
+      "Denominator": ["Time", "Charge"],
+      "Units": {}
+   },
+   {
+      "Dimension": "ElectricField",
+      "Fundamental": false,
+      "Numerator": ["Mass", "Length"],
+      "Denominator": ["Time", "Time", "Charge"],
+      "Units": {}
+   },
+   {
+      "Dimension": "Conductance",
+      "Fundamental": false,
+      "Numerator": ["Time", "Charge", "Charge"],
+      "Denominator": ["Mass", "Length", "Length"],
+      "Units": {}
+   },
+   {
+      "Dimension": "Entropy",
+      "Fundamental": false,
+      "Numerator": ["Mass", "Length", "Length"],
+      "Denominator": ["Time", "Time", "Temperature"],
+      "Units": {}
+   },
+   {
+      "Dimension": "HeatFlux",
+      "Fundamental": false,
+      "Numerator": ["Mass"],
+      "Denominator": ["Time", "Time", "Time"],
+      "Units": {}
+   },
+   {
+      "Dimension": "SpecificHeatCapacity",
+      "Fundamental": false,
+      "Numerator": ["Length", "Length"],
+      "Denominator": ["Time", "Time", "Temperature"],
+      "Units": {}
+   },
+   {
+      "Dimension": "DiffusionCoefficient",
+      "Fundamental": false,
+      "Numerator": ["Length", "Length"],
+      "Denominator": ["Time"],
+      "Units": {}
+   },
+   {
+      "Dimension": "DynamicViscosity",
+      "Fundamental": false,
+      "Numerator": ["Mass"],
+      "Denominator": ["Time", "Length"],
+      "Units": {}
+   },
+   {
+      "Dimension": "Density",
+      "Fundamental": false,
+      "Numerator": ["Mass"],
+      "Denominator": ["Length", "Length", "Length"],
+      "Units": {}
+   },
+   {
+      "Dimension": "VolumetricFlowRate",
+      "Fundamental": false,
+      "Numerator": ["Length", "Length", "Length"],
+      "Denominator": ["Time"],
+      "Units": {}
+   },
+   {
+      "Dimension": "MassFlowRate",
+      "Fundamental": false,
+      "Numerator": ["Mass"],
+      "Denominator": ["Time"],
+      "Units": {}
+   },
+   {
+      "Dimension": "SpecificVolume",
+      "Fundamental": false,
+      "Numerator": ["Length", "Length", "Length"],
+      "Denominator": ["Mass"],
+      "Units": {}
+   },
+   {
+      "Dimension": "MomentOfInertia",
+      "Fundamental": false,
+      "Numerator": ["Mass", "Length", "Length"],
+      "Denominator": [],
+      "Units": {}
+   },
+   {
+      "Dimension": "AngularSpeed",
+      "Fundamental": false,
+      "Numerator": ["Angle"],
+      "Denominator": ["Time"],
+      "Units": {}
+   },
+   {
+      "Dimension": "AngularAcceleration",
+      "Fundamental": false,
+      "Numerator": ["Angle"],
+      "Denominator": ["Time", "Time"],
+      "Units": {}
+   },
+   {
+      "Dimension": "Torque",
+      "Fundamental": false,
+      "Numerator": ["Mass", "Length", "Length"],
+      "Denominator": ["Time", "Time", "Angle"],
+      "Units": {}
+   }
+]

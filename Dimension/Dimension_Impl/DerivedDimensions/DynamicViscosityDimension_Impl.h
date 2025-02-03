@@ -2,8 +2,8 @@
 #define STATIC_DIMENSION_DYNAMICVISCOSITY_IMPL_H
 
 #include "../../MassDimension.h"
-#include "../../LengthDimension.h"
 #include "../../TimeDimension.h"
+#include "../../LengthDimension.h"
 
 namespace Dimension
 {
@@ -20,11 +20,11 @@ namespace Dimension
    /// @tparam Mass1 Numerator Mass1 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Length1 Denominator Length1 type
-   template<typename Mass1,typename Time1, typename Length1>
+   template<typename Mass1, typename Time1, typename Length1>
    concept IsDynamicViscosityUnits = 
       std::is_same_v<typename Mass1::Dim, MassType> &&
-        std::is_same_v<typename Time1::Dim, TimeType> &&
-        std::is_same_v<typename Length1::Dim, LengthType>;
+      std::is_same_v<typename Time1::Dim, TimeType> &&
+      std::is_same_v<typename Length1::Dim, LengthType>;
 
    /// @brief Concept for a DynamicViscosity type.
    /// @details Ensures that the type meets DynamicViscosity type requirements, based on numerator and denominator types.
@@ -34,7 +34,7 @@ namespace Dimension
       typename T::NumTuple;
       typename T::DenTuple;
    } && std::tuple_size_v<typename T::NumTuple> == 1 && std::tuple_size_v<typename T::DenTuple> == 2 &&
-   IsDynamicViscosityUnits<typename std::tuple_element_t<0, typename T::NumTuple>,typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>>;
+   IsDynamicViscosityUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>>;
 
    /// @brief Retrieves the value of a DynamicViscosity object.
    /// @details Provides access to the underlying value represented by a DynamicViscosity object.
@@ -44,8 +44,8 @@ namespace Dimension
    /// @tparam DynamicViscosityType The type of the object being accessed.
    /// @param obj The DynamicViscosity object.
    /// @return The underlying value as `PrecisionType`
-   template<typename Mass1,typename Time1, typename Length1, typename DynamicViscosityType>
-   requires IsDynamicViscosityUnits<Mass1,Time1, Length1> && IsDynamicViscosityType<DynamicViscosityType>
+   template<typename Mass1, typename Time1, typename Length1, typename DynamicViscosityType>
+   requires IsDynamicViscosityUnits<Mass1, Time1, Length1> && IsDynamicViscosityType<DynamicViscosityType>
    constexpr PrecisionType getDynamicViscosity(const DynamicViscosityType& obj)
    {
       return obj.template GetVal<std::tuple<Mass1>, std::tuple<Time1, Length1>>();
@@ -98,9 +98,9 @@ namespace Dimension
    /// @tparam Mass1 Numerator Mass1 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Length1 Denominator Length1 type
-   template<typename Mass1,typename Time1, typename Length1>
-   requires IsDynamicViscosityUnits<Mass1,Time1, Length1>
-   class DynamicViscosity<Mass1,Time1, Length1> : public BaseDimension<std::tuple<Mass1>, std::tuple<Time1, Length1>>
+   template<typename Mass1, typename Time1, typename Length1>
+   requires IsDynamicViscosityUnits<Mass1, Time1, Length1>
+   class DynamicViscosity<Mass1, Time1, Length1> : public BaseDimension<std::tuple<Mass1>, std::tuple<Time1, Length1>>
    {
    public:
       using Base = BaseDimension<std::tuple<Mass1>, std::tuple<Time1, Length1>>;
@@ -122,13 +122,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of DynamicViscosity.
       /// @details Prefer using the free function `getDynamicViscosity()` instead.
       /// @return The value of the DynamicViscosity.
-      template<typename Mass1T,typename Time1T, typename Length1T>
-      requires IsDynamicViscosityUnits<Mass1T,Time1T, Length1T>
+      template<typename Mass1T, typename Time1T, typename Length1T>
+      requires IsDynamicViscosityUnits<Mass1T, Time1T, Length1T>
       [[deprecated("Use the free function getDynamicViscosity() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetDynamicViscosity() const
       {
-         return getDynamicViscosity<Mass1T,Time1T, Length1T>(*this);
+         return getDynamicViscosity<Mass1T, Time1T, Length1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of DynamicViscosity.
@@ -172,13 +172,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of DynamicViscosity.
       /// @details Prefer using the free function `getDynamicViscosity()` instead.
       /// @return The value of the DynamicViscosity.
-      template<typename Mass1T,typename Time1T, typename Length1T>
-      requires IsDynamicViscosityUnits<Mass1T,Time1T, Length1T>
+      template<typename Mass1T, typename Time1T, typename Length1T>
+      requires IsDynamicViscosityUnits<Mass1T, Time1T, Length1T>
       [[deprecated("Use the free function getDynamicViscosity() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetDynamicViscosity() const
       {
-         return getDynamicViscosity<Mass1T,Time1T, Length1T>(*this);
+         return getDynamicViscosity<Mass1T, Time1T, Length1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of DynamicViscosity.
@@ -198,9 +198,9 @@ namespace Dimension
    /// @tparam Mass1 Numerator Mass1 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Length1 Denominator Length1 type
-   template<typename Mass1,typename Time1, typename Length1>
-   requires IsDynamicViscosityUnits<Mass1,Time1, Length1>
-   DynamicViscosity(Mass1,Time1, Length1) -> DynamicViscosity<Mass1,Time1, Length1>;
+   template<typename Mass1, typename Time1, typename Length1>
+   requires IsDynamicViscosityUnits<Mass1, Time1, Length1>
+   DynamicViscosity(Mass1, Time1, Length1) -> DynamicViscosity<Mass1, Time1, Length1>;
 
    /// @brief Template deduction guide for DynamicViscosity.
    /// @tparam Mass1 Numerator Mass1 type
@@ -214,9 +214,9 @@ namespace Dimension
    /// @tparam Mass1 Numerator Mass1 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Length1 Denominator Length1 type
-   template<typename Mass1,typename Time1, typename Length1>
-   requires IsDynamicViscosityUnits<Mass1,Time1, Length1>
-   DynamicViscosity(BaseDimension<std::tuple<Mass1>, std::tuple<Time1, Length1>>) -> DynamicViscosity<Mass1,Time1, Length1>;
+   template<typename Mass1, typename Time1, typename Length1>
+   requires IsDynamicViscosityUnits<Mass1, Time1, Length1>
+   DynamicViscosity(BaseDimension<std::tuple<Mass1>, std::tuple<Time1, Length1>>) -> DynamicViscosity<Mass1, Time1, Length1>;
 
 }
 

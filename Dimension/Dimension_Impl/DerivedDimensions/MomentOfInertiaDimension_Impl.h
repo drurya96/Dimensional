@@ -4,6 +4,7 @@
 #include "../../MassDimension.h"
 #include "../../LengthDimension.h"
 
+
 namespace Dimension
 {
    /// @brief Concept for a named MomentOfInertia unit.
@@ -22,8 +23,8 @@ namespace Dimension
    template<typename Mass1, typename Length1, typename Length2>
    concept IsMomentOfInertiaUnits = 
       std::is_same_v<typename Mass1::Dim, MassType> &&
-        std::is_same_v<typename Length1::Dim, LengthType> &&
-        std::is_same_v<typename Length2::Dim, LengthType>;
+      std::is_same_v<typename Length1::Dim, LengthType> &&
+      std::is_same_v<typename Length2::Dim, LengthType>;
 
    /// @brief Concept for a MomentOfInertia type.
    /// @details Ensures that the type meets MomentOfInertia type requirements, based on numerator and denominator types.

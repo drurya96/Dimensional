@@ -3,6 +3,7 @@
 
 #include "../../LengthDimension.h"
 
+
 namespace Dimension
 {
    /// @brief Concept for a named Area unit.
@@ -20,7 +21,7 @@ namespace Dimension
    template<typename Length1, typename Length2>
    concept IsAreaUnits = 
       std::is_same_v<typename Length1::Dim, LengthType> &&
-        std::is_same_v<typename Length2::Dim, LengthType>;
+      std::is_same_v<typename Length2::Dim, LengthType>;
 
    /// @brief Concept for a Area type.
    /// @details Ensures that the type meets Area type requirements, based on numerator and denominator types.

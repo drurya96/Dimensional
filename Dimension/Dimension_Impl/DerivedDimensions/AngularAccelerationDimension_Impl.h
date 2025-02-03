@@ -1,8 +1,8 @@
 #ifndef STATIC_DIMENSION_ANGULARACCELERATION_IMPL_H
 #define STATIC_DIMENSION_ANGULARACCELERATION_IMPL_H
 
-#include "../../TimeDimension.h"
 #include "../../AngleDimension.h"
+#include "../../TimeDimension.h"
 
 namespace Dimension
 {
@@ -19,11 +19,11 @@ namespace Dimension
    /// @tparam Angle1 Numerator Angle1 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
-   template<typename Angle1,typename Time1, typename Time2>
+   template<typename Angle1, typename Time1, typename Time2>
    concept IsAngularAccelerationUnits = 
       std::is_same_v<typename Angle1::Dim, AngleType> &&
-        std::is_same_v<typename Time1::Dim, TimeType> &&
-        std::is_same_v<typename Time2::Dim, TimeType>;
+      std::is_same_v<typename Time1::Dim, TimeType> &&
+      std::is_same_v<typename Time2::Dim, TimeType>;
 
    /// @brief Concept for a AngularAcceleration type.
    /// @details Ensures that the type meets AngularAcceleration type requirements, based on numerator and denominator types.
@@ -33,7 +33,7 @@ namespace Dimension
       typename T::NumTuple;
       typename T::DenTuple;
    } && std::tuple_size_v<typename T::NumTuple> == 1 && std::tuple_size_v<typename T::DenTuple> == 2 &&
-   IsAngularAccelerationUnits<typename std::tuple_element_t<0, typename T::NumTuple>,typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>>;
+   IsAngularAccelerationUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>>;
 
    /// @brief Retrieves the value of a AngularAcceleration object.
    /// @details Provides access to the underlying value represented by a AngularAcceleration object.
@@ -43,8 +43,8 @@ namespace Dimension
    /// @tparam AngularAccelerationType The type of the object being accessed.
    /// @param obj The AngularAcceleration object.
    /// @return The underlying value as `PrecisionType`
-   template<typename Angle1,typename Time1, typename Time2, typename AngularAccelerationType>
-   requires IsAngularAccelerationUnits<Angle1,Time1, Time2> && IsAngularAccelerationType<AngularAccelerationType>
+   template<typename Angle1, typename Time1, typename Time2, typename AngularAccelerationType>
+   requires IsAngularAccelerationUnits<Angle1, Time1, Time2> && IsAngularAccelerationType<AngularAccelerationType>
    constexpr PrecisionType getAngularAcceleration(const AngularAccelerationType& obj)
    {
       return obj.template GetVal<std::tuple<Angle1>, std::tuple<Time1, Time2>>();
@@ -97,9 +97,9 @@ namespace Dimension
    /// @tparam Angle1 Numerator Angle1 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
-   template<typename Angle1,typename Time1, typename Time2>
-   requires IsAngularAccelerationUnits<Angle1,Time1, Time2>
-   class AngularAcceleration<Angle1,Time1, Time2> : public BaseDimension<std::tuple<Angle1>, std::tuple<Time1, Time2>>
+   template<typename Angle1, typename Time1, typename Time2>
+   requires IsAngularAccelerationUnits<Angle1, Time1, Time2>
+   class AngularAcceleration<Angle1, Time1, Time2> : public BaseDimension<std::tuple<Angle1>, std::tuple<Time1, Time2>>
    {
    public:
       using Base = BaseDimension<std::tuple<Angle1>, std::tuple<Time1, Time2>>;
@@ -121,13 +121,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of AngularAcceleration.
       /// @details Prefer using the free function `getAngularAcceleration()` instead.
       /// @return The value of the AngularAcceleration.
-      template<typename Angle1T,typename Time1T, typename Time2T>
-      requires IsAngularAccelerationUnits<Angle1T,Time1T, Time2T>
+      template<typename Angle1T, typename Time1T, typename Time2T>
+      requires IsAngularAccelerationUnits<Angle1T, Time1T, Time2T>
       [[deprecated("Use the free function getAngularAcceleration() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetAngularAcceleration() const
       {
-         return getAngularAcceleration<Angle1T,Time1T, Time2T>(*this);
+         return getAngularAcceleration<Angle1T, Time1T, Time2T>(*this);
       }
 
       /// @brief Deprecated function to get the value of AngularAcceleration.
@@ -171,13 +171,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of AngularAcceleration.
       /// @details Prefer using the free function `getAngularAcceleration()` instead.
       /// @return The value of the AngularAcceleration.
-      template<typename Angle1T,typename Time1T, typename Time2T>
-      requires IsAngularAccelerationUnits<Angle1T,Time1T, Time2T>
+      template<typename Angle1T, typename Time1T, typename Time2T>
+      requires IsAngularAccelerationUnits<Angle1T, Time1T, Time2T>
       [[deprecated("Use the free function getAngularAcceleration() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetAngularAcceleration() const
       {
-         return getAngularAcceleration<Angle1T,Time1T, Time2T>(*this);
+         return getAngularAcceleration<Angle1T, Time1T, Time2T>(*this);
       }
 
       /// @brief Deprecated function to get the value of AngularAcceleration.
@@ -197,9 +197,9 @@ namespace Dimension
    /// @tparam Angle1 Numerator Angle1 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
-   template<typename Angle1,typename Time1, typename Time2>
-   requires IsAngularAccelerationUnits<Angle1,Time1, Time2>
-   AngularAcceleration(Angle1,Time1, Time2) -> AngularAcceleration<Angle1,Time1, Time2>;
+   template<typename Angle1, typename Time1, typename Time2>
+   requires IsAngularAccelerationUnits<Angle1, Time1, Time2>
+   AngularAcceleration(Angle1, Time1, Time2) -> AngularAcceleration<Angle1, Time1, Time2>;
 
    /// @brief Template deduction guide for AngularAcceleration.
    /// @tparam Angle1 Numerator Angle1 type
@@ -213,9 +213,9 @@ namespace Dimension
    /// @tparam Angle1 Numerator Angle1 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
-   template<typename Angle1,typename Time1, typename Time2>
-   requires IsAngularAccelerationUnits<Angle1,Time1, Time2>
-   AngularAcceleration(BaseDimension<std::tuple<Angle1>, std::tuple<Time1, Time2>>) -> AngularAcceleration<Angle1,Time1, Time2>;
+   template<typename Angle1, typename Time1, typename Time2>
+   requires IsAngularAccelerationUnits<Angle1, Time1, Time2>
+   AngularAcceleration(BaseDimension<std::tuple<Angle1>, std::tuple<Time1, Time2>>) -> AngularAcceleration<Angle1, Time1, Time2>;
 
 }
 

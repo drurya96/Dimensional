@@ -2,8 +2,8 @@
 #define STATIC_DIMENSION_INDUCTANCE_IMPL_H
 
 #include "../../MassDimension.h"
-#include "../../ChargeDimension.h"
 #include "../../LengthDimension.h"
+#include "../../ChargeDimension.h"
 
 namespace Dimension
 {
@@ -22,13 +22,13 @@ namespace Dimension
    /// @tparam Length2 Numerator Length2 type
    /// @tparam Charge1 Denominator Charge1 type
    /// @tparam Charge2 Denominator Charge2 type
-   template<typename Mass1, typename Length1, typename Length2,typename Charge1, typename Charge2>
+   template<typename Mass1, typename Length1, typename Length2, typename Charge1, typename Charge2>
    concept IsInductanceUnits = 
       std::is_same_v<typename Mass1::Dim, MassType> &&
-        std::is_same_v<typename Length1::Dim, LengthType> &&
-        std::is_same_v<typename Length2::Dim, LengthType> &&
-        std::is_same_v<typename Charge1::Dim, ChargeType> &&
-        std::is_same_v<typename Charge2::Dim, ChargeType>;
+      std::is_same_v<typename Length1::Dim, LengthType> &&
+      std::is_same_v<typename Length2::Dim, LengthType> &&
+      std::is_same_v<typename Charge1::Dim, ChargeType> &&
+      std::is_same_v<typename Charge2::Dim, ChargeType>;
 
    /// @brief Concept for a Inductance type.
    /// @details Ensures that the type meets Inductance type requirements, based on numerator and denominator types.
@@ -38,7 +38,7 @@ namespace Dimension
       typename T::NumTuple;
       typename T::DenTuple;
    } && std::tuple_size_v<typename T::NumTuple> == 3 && std::tuple_size_v<typename T::DenTuple> == 2 &&
-   IsInductanceUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<2, typename T::NumTuple>,typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>>;
+   IsInductanceUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<2, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>>;
 
    /// @brief Retrieves the value of a Inductance object.
    /// @details Provides access to the underlying value represented by a Inductance object.
@@ -50,8 +50,8 @@ namespace Dimension
    /// @tparam InductanceType The type of the object being accessed.
    /// @param obj The Inductance object.
    /// @return The underlying value as `PrecisionType`
-   template<typename Mass1, typename Length1, typename Length2,typename Charge1, typename Charge2, typename InductanceType>
-   requires IsInductanceUnits<Mass1, Length1, Length2,Charge1, Charge2> && IsInductanceType<InductanceType>
+   template<typename Mass1, typename Length1, typename Length2, typename Charge1, typename Charge2, typename InductanceType>
+   requires IsInductanceUnits<Mass1, Length1, Length2, Charge1, Charge2> && IsInductanceType<InductanceType>
    constexpr PrecisionType getInductance(const InductanceType& obj)
    {
       return obj.template GetVal<std::tuple<Mass1, Length1, Length2>, std::tuple<Charge1, Charge2>>();
@@ -106,9 +106,9 @@ namespace Dimension
    /// @tparam Length2 Numerator Length2 type
    /// @tparam Charge1 Denominator Charge1 type
    /// @tparam Charge2 Denominator Charge2 type
-   template<typename Mass1, typename Length1, typename Length2,typename Charge1, typename Charge2>
-   requires IsInductanceUnits<Mass1, Length1, Length2,Charge1, Charge2>
-   class Inductance<Mass1, Length1, Length2,Charge1, Charge2> : public BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Charge1, Charge2>>
+   template<typename Mass1, typename Length1, typename Length2, typename Charge1, typename Charge2>
+   requires IsInductanceUnits<Mass1, Length1, Length2, Charge1, Charge2>
+   class Inductance<Mass1, Length1, Length2, Charge1, Charge2> : public BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Charge1, Charge2>>
    {
    public:
       using Base = BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Charge1, Charge2>>;
@@ -130,13 +130,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of Inductance.
       /// @details Prefer using the free function `getInductance()` instead.
       /// @return The value of the Inductance.
-      template<typename Mass1T, typename Length1T, typename Length2T,typename Charge1T, typename Charge2T>
-      requires IsInductanceUnits<Mass1T, Length1T, Length2T,Charge1T, Charge2T>
+      template<typename Mass1T, typename Length1T, typename Length2T, typename Charge1T, typename Charge2T>
+      requires IsInductanceUnits<Mass1T, Length1T, Length2T, Charge1T, Charge2T>
       [[deprecated("Use the free function getInductance() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetInductance() const
       {
-         return getInductance<Mass1T, Length1T, Length2T,Charge1T, Charge2T>(*this);
+         return getInductance<Mass1T, Length1T, Length2T, Charge1T, Charge2T>(*this);
       }
 
       /// @brief Deprecated function to get the value of Inductance.
@@ -180,13 +180,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of Inductance.
       /// @details Prefer using the free function `getInductance()` instead.
       /// @return The value of the Inductance.
-      template<typename Mass1T, typename Length1T, typename Length2T,typename Charge1T, typename Charge2T>
-      requires IsInductanceUnits<Mass1T, Length1T, Length2T,Charge1T, Charge2T>
+      template<typename Mass1T, typename Length1T, typename Length2T, typename Charge1T, typename Charge2T>
+      requires IsInductanceUnits<Mass1T, Length1T, Length2T, Charge1T, Charge2T>
       [[deprecated("Use the free function getInductance() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetInductance() const
       {
-         return getInductance<Mass1T, Length1T, Length2T,Charge1T, Charge2T>(*this);
+         return getInductance<Mass1T, Length1T, Length2T, Charge1T, Charge2T>(*this);
       }
 
       /// @brief Deprecated function to get the value of Inductance.
@@ -208,9 +208,9 @@ namespace Dimension
    /// @tparam Length2 Numerator Length2 type
    /// @tparam Charge1 Denominator Charge1 type
    /// @tparam Charge2 Denominator Charge2 type
-   template<typename Mass1, typename Length1, typename Length2,typename Charge1, typename Charge2>
-   requires IsInductanceUnits<Mass1, Length1, Length2,Charge1, Charge2>
-   Inductance(Mass1, Length1, Length2,Charge1, Charge2) -> Inductance<Mass1, Length1, Length2,Charge1, Charge2>;
+   template<typename Mass1, typename Length1, typename Length2, typename Charge1, typename Charge2>
+   requires IsInductanceUnits<Mass1, Length1, Length2, Charge1, Charge2>
+   Inductance(Mass1, Length1, Length2, Charge1, Charge2) -> Inductance<Mass1, Length1, Length2, Charge1, Charge2>;
 
    /// @brief Template deduction guide for Inductance.
    /// @tparam Mass1 Numerator Mass1 type
@@ -228,9 +228,9 @@ namespace Dimension
    /// @tparam Length2 Numerator Length2 type
    /// @tparam Charge1 Denominator Charge1 type
    /// @tparam Charge2 Denominator Charge2 type
-   template<typename Mass1, typename Length1, typename Length2,typename Charge1, typename Charge2>
-   requires IsInductanceUnits<Mass1, Length1, Length2,Charge1, Charge2>
-   Inductance(BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Charge1, Charge2>>) -> Inductance<Mass1, Length1, Length2,Charge1, Charge2>;
+   template<typename Mass1, typename Length1, typename Length2, typename Charge1, typename Charge2>
+   requires IsInductanceUnits<Mass1, Length1, Length2, Charge1, Charge2>
+   Inductance(BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Charge1, Charge2>>) -> Inductance<Mass1, Length1, Length2, Charge1, Charge2>;
 
 }
 

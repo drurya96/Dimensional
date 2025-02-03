@@ -1,6 +1,7 @@
 #ifndef STATIC_DIMENSION_FREQUENCY_IMPL_H
 #define STATIC_DIMENSION_FREQUENCY_IMPL_H
 
+
 #include "../../TimeDimension.h"
 
 namespace Dimension

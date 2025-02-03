@@ -2,10 +2,11 @@
 
 All notable changes to this project will be documented in this file. Semantic versioning is followed.
 
-## [UNRELEASED]
+## [2.6.0] - 2025-2-3
 
 ### Changed
 - Internal changes to address static analysis warnings
+- Internal code generation mechanism updated
 
 ### Added
 - Default template parameters for Fundamental and Derived dimensions
@@ -15,6 +16,8 @@ All notable changes to this project will be documented in this file. Semantic ve
   - FluidOunces, Cups, Pints, Quarts, Teaspoons, Tablespoons
 - More Pressure named units
   - Atmospheres, Bar, Torr, mmHg, inHg
+- JSON metadata encoding existing units
+  - This is used internally for autogeneration, but may be useful to users
 
 ### Deprecated
 - 

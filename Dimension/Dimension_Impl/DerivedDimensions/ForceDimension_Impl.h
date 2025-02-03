@@ -2,8 +2,8 @@
 #define STATIC_DIMENSION_FORCE_IMPL_H
 
 #include "../../MassDimension.h"
-#include "../../TimeDimension.h"
 #include "../../LengthDimension.h"
+#include "../../TimeDimension.h"
 
 namespace Dimension
 {
@@ -21,12 +21,12 @@ namespace Dimension
    /// @tparam Length1 Numerator Length1 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
-   template<typename Mass1, typename Length1,typename Time1, typename Time2>
+   template<typename Mass1, typename Length1, typename Time1, typename Time2>
    concept IsForceUnits = 
       std::is_same_v<typename Mass1::Dim, MassType> &&
-        std::is_same_v<typename Length1::Dim, LengthType> &&
-        std::is_same_v<typename Time1::Dim, TimeType> &&
-        std::is_same_v<typename Time2::Dim, TimeType>;
+      std::is_same_v<typename Length1::Dim, LengthType> &&
+      std::is_same_v<typename Time1::Dim, TimeType> &&
+      std::is_same_v<typename Time2::Dim, TimeType>;
 
    /// @brief Concept for a Force type.
    /// @details Ensures that the type meets Force type requirements, based on numerator and denominator types.
@@ -36,7 +36,7 @@ namespace Dimension
       typename T::NumTuple;
       typename T::DenTuple;
    } && std::tuple_size_v<typename T::NumTuple> == 2 && std::tuple_size_v<typename T::DenTuple> == 2 &&
-   IsForceUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>,typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>>;
+   IsForceUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>>;
 
    /// @brief Retrieves the value of a Force object.
    /// @details Provides access to the underlying value represented by a Force object.
@@ -47,8 +47,8 @@ namespace Dimension
    /// @tparam ForceType The type of the object being accessed.
    /// @param obj The Force object.
    /// @return The underlying value as `PrecisionType`
-   template<typename Mass1, typename Length1,typename Time1, typename Time2, typename ForceType>
-   requires IsForceUnits<Mass1, Length1,Time1, Time2> && IsForceType<ForceType>
+   template<typename Mass1, typename Length1, typename Time1, typename Time2, typename ForceType>
+   requires IsForceUnits<Mass1, Length1, Time1, Time2> && IsForceType<ForceType>
    constexpr PrecisionType getForce(const ForceType& obj)
    {
       return obj.template GetVal<std::tuple<Mass1, Length1>, std::tuple<Time1, Time2>>();
@@ -102,9 +102,9 @@ namespace Dimension
    /// @tparam Length1 Numerator Length1 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
-   template<typename Mass1, typename Length1,typename Time1, typename Time2>
-   requires IsForceUnits<Mass1, Length1,Time1, Time2>
-   class Force<Mass1, Length1,Time1, Time2> : public BaseDimension<std::tuple<Mass1, Length1>, std::tuple<Time1, Time2>>
+   template<typename Mass1, typename Length1, typename Time1, typename Time2>
+   requires IsForceUnits<Mass1, Length1, Time1, Time2>
+   class Force<Mass1, Length1, Time1, Time2> : public BaseDimension<std::tuple<Mass1, Length1>, std::tuple<Time1, Time2>>
    {
    public:
       using Base = BaseDimension<std::tuple<Mass1, Length1>, std::tuple<Time1, Time2>>;
@@ -126,13 +126,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of Force.
       /// @details Prefer using the free function `getForce()` instead.
       /// @return The value of the Force.
-      template<typename Mass1T, typename Length1T,typename Time1T, typename Time2T>
-      requires IsForceUnits<Mass1T, Length1T,Time1T, Time2T>
+      template<typename Mass1T, typename Length1T, typename Time1T, typename Time2T>
+      requires IsForceUnits<Mass1T, Length1T, Time1T, Time2T>
       [[deprecated("Use the free function getForce() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetForce() const
       {
-         return getForce<Mass1T, Length1T,Time1T, Time2T>(*this);
+         return getForce<Mass1T, Length1T, Time1T, Time2T>(*this);
       }
 
       /// @brief Deprecated function to get the value of Force.
@@ -176,13 +176,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of Force.
       /// @details Prefer using the free function `getForce()` instead.
       /// @return The value of the Force.
-      template<typename Mass1T, typename Length1T,typename Time1T, typename Time2T>
-      requires IsForceUnits<Mass1T, Length1T,Time1T, Time2T>
+      template<typename Mass1T, typename Length1T, typename Time1T, typename Time2T>
+      requires IsForceUnits<Mass1T, Length1T, Time1T, Time2T>
       [[deprecated("Use the free function getForce() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetForce() const
       {
-         return getForce<Mass1T, Length1T,Time1T, Time2T>(*this);
+         return getForce<Mass1T, Length1T, Time1T, Time2T>(*this);
       }
 
       /// @brief Deprecated function to get the value of Force.
@@ -203,9 +203,9 @@ namespace Dimension
    /// @tparam Length1 Numerator Length1 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
-   template<typename Mass1, typename Length1,typename Time1, typename Time2>
-   requires IsForceUnits<Mass1, Length1,Time1, Time2>
-   Force(Mass1, Length1,Time1, Time2) -> Force<Mass1, Length1,Time1, Time2>;
+   template<typename Mass1, typename Length1, typename Time1, typename Time2>
+   requires IsForceUnits<Mass1, Length1, Time1, Time2>
+   Force(Mass1, Length1, Time1, Time2) -> Force<Mass1, Length1, Time1, Time2>;
 
    /// @brief Template deduction guide for Force.
    /// @tparam Mass1 Numerator Mass1 type
@@ -221,9 +221,9 @@ namespace Dimension
    /// @tparam Length1 Numerator Length1 type
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
-   template<typename Mass1, typename Length1,typename Time1, typename Time2>
-   requires IsForceUnits<Mass1, Length1,Time1, Time2>
-   Force(BaseDimension<std::tuple<Mass1, Length1>, std::tuple<Time1, Time2>>) -> Force<Mass1, Length1,Time1, Time2>;
+   template<typename Mass1, typename Length1, typename Time1, typename Time2>
+   requires IsForceUnits<Mass1, Length1, Time1, Time2>
+   Force(BaseDimension<std::tuple<Mass1, Length1>, std::tuple<Time1, Time2>>) -> Force<Mass1, Length1, Time1, Time2>;
 
 }
 

@@ -1,10 +1,10 @@
 #ifndef STATIC_DIMENSION_ENTROPY_IMPL_H
 #define STATIC_DIMENSION_ENTROPY_IMPL_H
 
+#include "../../MassDimension.h"
+#include "../../LengthDimension.h"
 #include "../../TimeDimension.h"
 #include "../../TemperatureDimension.h"
-#include "../../LengthDimension.h"
-#include "../../MassDimension.h"
 
 namespace Dimension
 {
@@ -24,14 +24,14 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Temperature1 Denominator Temperature1 type
-   template<typename Mass1, typename Length1, typename Length2,typename Time1, typename Time2, typename Temperature1>
+   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Temperature1>
    concept IsEntropyUnits = 
       std::is_same_v<typename Mass1::Dim, MassType> &&
-        std::is_same_v<typename Length1::Dim, LengthType> &&
-        std::is_same_v<typename Length2::Dim, LengthType> &&
-        std::is_same_v<typename Time1::Dim, TimeType> &&
-        std::is_same_v<typename Time2::Dim, TimeType> &&
-        std::is_same_v<typename Temperature1::Dim, TemperatureType>;
+      std::is_same_v<typename Length1::Dim, LengthType> &&
+      std::is_same_v<typename Length2::Dim, LengthType> &&
+      std::is_same_v<typename Time1::Dim, TimeType> &&
+      std::is_same_v<typename Time2::Dim, TimeType> &&
+      std::is_same_v<typename Temperature1::Dim, TemperatureType>;
 
    /// @brief Concept for a Entropy type.
    /// @details Ensures that the type meets Entropy type requirements, based on numerator and denominator types.
@@ -41,7 +41,7 @@ namespace Dimension
       typename T::NumTuple;
       typename T::DenTuple;
    } && std::tuple_size_v<typename T::NumTuple> == 3 && std::tuple_size_v<typename T::DenTuple> == 3 &&
-   IsEntropyUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<2, typename T::NumTuple>,typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>, typename std::tuple_element_t<2, typename T::DenTuple>>;
+   IsEntropyUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<2, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>, typename std::tuple_element_t<2, typename T::DenTuple>>;
 
    /// @brief Retrieves the value of a Entropy object.
    /// @details Provides access to the underlying value represented by a Entropy object.
@@ -54,8 +54,8 @@ namespace Dimension
    /// @tparam EntropyType The type of the object being accessed.
    /// @param obj The Entropy object.
    /// @return The underlying value as `PrecisionType`
-   template<typename Mass1, typename Length1, typename Length2,typename Time1, typename Time2, typename Temperature1, typename EntropyType>
-   requires IsEntropyUnits<Mass1, Length1, Length2,Time1, Time2, Temperature1> && IsEntropyType<EntropyType>
+   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Temperature1, typename EntropyType>
+   requires IsEntropyUnits<Mass1, Length1, Length2, Time1, Time2, Temperature1> && IsEntropyType<EntropyType>
    constexpr PrecisionType getEntropy(const EntropyType& obj)
    {
       return obj.template GetVal<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Temperature1>>();
@@ -111,9 +111,9 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Temperature1 Denominator Temperature1 type
-   template<typename Mass1, typename Length1, typename Length2,typename Time1, typename Time2, typename Temperature1>
-   requires IsEntropyUnits<Mass1, Length1, Length2,Time1, Time2, Temperature1>
-   class Entropy<Mass1, Length1, Length2,Time1, Time2, Temperature1> : public BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Temperature1>>
+   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Temperature1>
+   requires IsEntropyUnits<Mass1, Length1, Length2, Time1, Time2, Temperature1>
+   class Entropy<Mass1, Length1, Length2, Time1, Time2, Temperature1> : public BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Temperature1>>
    {
    public:
       using Base = BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Temperature1>>;
@@ -135,13 +135,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of Entropy.
       /// @details Prefer using the free function `getEntropy()` instead.
       /// @return The value of the Entropy.
-      template<typename Mass1T, typename Length1T, typename Length2T,typename Time1T, typename Time2T, typename Temperature1T>
-      requires IsEntropyUnits<Mass1T, Length1T, Length2T,Time1T, Time2T, Temperature1T>
+      template<typename Mass1T, typename Length1T, typename Length2T, typename Time1T, typename Time2T, typename Temperature1T>
+      requires IsEntropyUnits<Mass1T, Length1T, Length2T, Time1T, Time2T, Temperature1T>
       [[deprecated("Use the free function getEntropy() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetEntropy() const
       {
-         return getEntropy<Mass1T, Length1T, Length2T,Time1T, Time2T, Temperature1T>(*this);
+         return getEntropy<Mass1T, Length1T, Length2T, Time1T, Time2T, Temperature1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of Entropy.
@@ -185,13 +185,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of Entropy.
       /// @details Prefer using the free function `getEntropy()` instead.
       /// @return The value of the Entropy.
-      template<typename Mass1T, typename Length1T, typename Length2T,typename Time1T, typename Time2T, typename Temperature1T>
-      requires IsEntropyUnits<Mass1T, Length1T, Length2T,Time1T, Time2T, Temperature1T>
+      template<typename Mass1T, typename Length1T, typename Length2T, typename Time1T, typename Time2T, typename Temperature1T>
+      requires IsEntropyUnits<Mass1T, Length1T, Length2T, Time1T, Time2T, Temperature1T>
       [[deprecated("Use the free function getEntropy() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetEntropy() const
       {
-         return getEntropy<Mass1T, Length1T, Length2T,Time1T, Time2T, Temperature1T>(*this);
+         return getEntropy<Mass1T, Length1T, Length2T, Time1T, Time2T, Temperature1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of Entropy.
@@ -214,9 +214,9 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Temperature1 Denominator Temperature1 type
-   template<typename Mass1, typename Length1, typename Length2,typename Time1, typename Time2, typename Temperature1>
-   requires IsEntropyUnits<Mass1, Length1, Length2,Time1, Time2, Temperature1>
-   Entropy(Mass1, Length1, Length2,Time1, Time2, Temperature1) -> Entropy<Mass1, Length1, Length2,Time1, Time2, Temperature1>;
+   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Temperature1>
+   requires IsEntropyUnits<Mass1, Length1, Length2, Time1, Time2, Temperature1>
+   Entropy(Mass1, Length1, Length2, Time1, Time2, Temperature1) -> Entropy<Mass1, Length1, Length2, Time1, Time2, Temperature1>;
 
    /// @brief Template deduction guide for Entropy.
    /// @tparam Mass1 Numerator Mass1 type
@@ -236,9 +236,9 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Temperature1 Denominator Temperature1 type
-   template<typename Mass1, typename Length1, typename Length2,typename Time1, typename Time2, typename Temperature1>
-   requires IsEntropyUnits<Mass1, Length1, Length2,Time1, Time2, Temperature1>
-   Entropy(BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Temperature1>>) -> Entropy<Mass1, Length1, Length2,Time1, Time2, Temperature1>;
+   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Temperature1>
+   requires IsEntropyUnits<Mass1, Length1, Length2, Time1, Time2, Temperature1>
+   Entropy(BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Temperature1>>) -> Entropy<Mass1, Length1, Length2, Time1, Time2, Temperature1>;
 
 }
 

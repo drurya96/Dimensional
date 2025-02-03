@@ -18,10 +18,10 @@ namespace Dimension
    /// @details Checks if the provided types satisfy the MassFlowRate dimension requirements.
    /// @tparam Mass1 Numerator Mass1 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Mass1,typename Time1>
+   template<typename Mass1, typename Time1>
    concept IsMassFlowRateUnits = 
       std::is_same_v<typename Mass1::Dim, MassType> &&
-        std::is_same_v<typename Time1::Dim, TimeType>;
+      std::is_same_v<typename Time1::Dim, TimeType>;
 
    /// @brief Concept for a MassFlowRate type.
    /// @details Ensures that the type meets MassFlowRate type requirements, based on numerator and denominator types.
@@ -31,7 +31,7 @@ namespace Dimension
       typename T::NumTuple;
       typename T::DenTuple;
    } && std::tuple_size_v<typename T::NumTuple> == 1 && std::tuple_size_v<typename T::DenTuple> == 1 &&
-   IsMassFlowRateUnits<typename std::tuple_element_t<0, typename T::NumTuple>,typename std::tuple_element_t<0, typename T::DenTuple>>;
+   IsMassFlowRateUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>>;
 
    /// @brief Retrieves the value of a MassFlowRate object.
    /// @details Provides access to the underlying value represented by a MassFlowRate object.
@@ -40,8 +40,8 @@ namespace Dimension
    /// @tparam MassFlowRateType The type of the object being accessed.
    /// @param obj The MassFlowRate object.
    /// @return The underlying value as `PrecisionType`
-   template<typename Mass1,typename Time1, typename MassFlowRateType>
-   requires IsMassFlowRateUnits<Mass1,Time1> && IsMassFlowRateType<MassFlowRateType>
+   template<typename Mass1, typename Time1, typename MassFlowRateType>
+   requires IsMassFlowRateUnits<Mass1, Time1> && IsMassFlowRateType<MassFlowRateType>
    constexpr PrecisionType getMassFlowRate(const MassFlowRateType& obj)
    {
       return obj.template GetVal<std::tuple<Mass1>, std::tuple<Time1>>();
@@ -93,9 +93,9 @@ namespace Dimension
    /// @details Defines operations and data storage for MassFlowRate dimensions.
    /// @tparam Mass1 Numerator Mass1 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Mass1,typename Time1>
-   requires IsMassFlowRateUnits<Mass1,Time1>
-   class MassFlowRate<Mass1,Time1> : public BaseDimension<std::tuple<Mass1>, std::tuple<Time1>>
+   template<typename Mass1, typename Time1>
+   requires IsMassFlowRateUnits<Mass1, Time1>
+   class MassFlowRate<Mass1, Time1> : public BaseDimension<std::tuple<Mass1>, std::tuple<Time1>>
    {
    public:
       using Base = BaseDimension<std::tuple<Mass1>, std::tuple<Time1>>;
@@ -117,13 +117,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of MassFlowRate.
       /// @details Prefer using the free function `getMassFlowRate()` instead.
       /// @return The value of the MassFlowRate.
-      template<typename Mass1T,typename Time1T>
-      requires IsMassFlowRateUnits<Mass1T,Time1T>
+      template<typename Mass1T, typename Time1T>
+      requires IsMassFlowRateUnits<Mass1T, Time1T>
       [[deprecated("Use the free function getMassFlowRate() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetMassFlowRate() const
       {
-         return getMassFlowRate<Mass1T,Time1T>(*this);
+         return getMassFlowRate<Mass1T, Time1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of MassFlowRate.
@@ -167,13 +167,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of MassFlowRate.
       /// @details Prefer using the free function `getMassFlowRate()` instead.
       /// @return The value of the MassFlowRate.
-      template<typename Mass1T,typename Time1T>
-      requires IsMassFlowRateUnits<Mass1T,Time1T>
+      template<typename Mass1T, typename Time1T>
+      requires IsMassFlowRateUnits<Mass1T, Time1T>
       [[deprecated("Use the free function getMassFlowRate() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetMassFlowRate() const
       {
-         return getMassFlowRate<Mass1T,Time1T>(*this);
+         return getMassFlowRate<Mass1T, Time1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of MassFlowRate.
@@ -192,9 +192,9 @@ namespace Dimension
    /// @brief Template deduction guide for MassFlowRate.
    /// @tparam Mass1 Numerator Mass1 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Mass1,typename Time1>
-   requires IsMassFlowRateUnits<Mass1,Time1>
-   MassFlowRate(Mass1,Time1) -> MassFlowRate<Mass1,Time1>;
+   template<typename Mass1, typename Time1>
+   requires IsMassFlowRateUnits<Mass1, Time1>
+   MassFlowRate(Mass1, Time1) -> MassFlowRate<Mass1, Time1>;
 
    /// @brief Template deduction guide for MassFlowRate.
    /// @tparam Mass1 Numerator Mass1 type
@@ -206,9 +206,9 @@ namespace Dimension
    /// @brief Template deduction guide for MassFlowRate.
    /// @tparam Mass1 Numerator Mass1 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Mass1,typename Time1>
-   requires IsMassFlowRateUnits<Mass1,Time1>
-   MassFlowRate(BaseDimension<std::tuple<Mass1>, std::tuple<Time1>>) -> MassFlowRate<Mass1,Time1>;
+   template<typename Mass1, typename Time1>
+   requires IsMassFlowRateUnits<Mass1, Time1>
+   MassFlowRate(BaseDimension<std::tuple<Mass1>, std::tuple<Time1>>) -> MassFlowRate<Mass1, Time1>;
 
 }
 

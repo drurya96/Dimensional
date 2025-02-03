@@ -20,12 +20,12 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Time3 Denominator Time3 type
-   template<typename Mass1,typename Time1, typename Time2, typename Time3>
+   template<typename Mass1, typename Time1, typename Time2, typename Time3>
    concept IsHeatFluxUnits = 
       std::is_same_v<typename Mass1::Dim, MassType> &&
-        std::is_same_v<typename Time1::Dim, TimeType> &&
-        std::is_same_v<typename Time2::Dim, TimeType> &&
-        std::is_same_v<typename Time3::Dim, TimeType>;
+      std::is_same_v<typename Time1::Dim, TimeType> &&
+      std::is_same_v<typename Time2::Dim, TimeType> &&
+      std::is_same_v<typename Time3::Dim, TimeType>;
 
    /// @brief Concept for a HeatFlux type.
    /// @details Ensures that the type meets HeatFlux type requirements, based on numerator and denominator types.
@@ -35,7 +35,7 @@ namespace Dimension
       typename T::NumTuple;
       typename T::DenTuple;
    } && std::tuple_size_v<typename T::NumTuple> == 1 && std::tuple_size_v<typename T::DenTuple> == 3 &&
-   IsHeatFluxUnits<typename std::tuple_element_t<0, typename T::NumTuple>,typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>, typename std::tuple_element_t<2, typename T::DenTuple>>;
+   IsHeatFluxUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>, typename std::tuple_element_t<2, typename T::DenTuple>>;
 
    /// @brief Retrieves the value of a HeatFlux object.
    /// @details Provides access to the underlying value represented by a HeatFlux object.
@@ -46,8 +46,8 @@ namespace Dimension
    /// @tparam HeatFluxType The type of the object being accessed.
    /// @param obj The HeatFlux object.
    /// @return The underlying value as `PrecisionType`
-   template<typename Mass1,typename Time1, typename Time2, typename Time3, typename HeatFluxType>
-   requires IsHeatFluxUnits<Mass1,Time1, Time2, Time3> && IsHeatFluxType<HeatFluxType>
+   template<typename Mass1, typename Time1, typename Time2, typename Time3, typename HeatFluxType>
+   requires IsHeatFluxUnits<Mass1, Time1, Time2, Time3> && IsHeatFluxType<HeatFluxType>
    constexpr PrecisionType getHeatFlux(const HeatFluxType& obj)
    {
       return obj.template GetVal<std::tuple<Mass1>, std::tuple<Time1, Time2, Time3>>();
@@ -101,9 +101,9 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Time3 Denominator Time3 type
-   template<typename Mass1,typename Time1, typename Time2, typename Time3>
-   requires IsHeatFluxUnits<Mass1,Time1, Time2, Time3>
-   class HeatFlux<Mass1,Time1, Time2, Time3> : public BaseDimension<std::tuple<Mass1>, std::tuple<Time1, Time2, Time3>>
+   template<typename Mass1, typename Time1, typename Time2, typename Time3>
+   requires IsHeatFluxUnits<Mass1, Time1, Time2, Time3>
+   class HeatFlux<Mass1, Time1, Time2, Time3> : public BaseDimension<std::tuple<Mass1>, std::tuple<Time1, Time2, Time3>>
    {
    public:
       using Base = BaseDimension<std::tuple<Mass1>, std::tuple<Time1, Time2, Time3>>;
@@ -125,13 +125,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of HeatFlux.
       /// @details Prefer using the free function `getHeatFlux()` instead.
       /// @return The value of the HeatFlux.
-      template<typename Mass1T,typename Time1T, typename Time2T, typename Time3T>
-      requires IsHeatFluxUnits<Mass1T,Time1T, Time2T, Time3T>
+      template<typename Mass1T, typename Time1T, typename Time2T, typename Time3T>
+      requires IsHeatFluxUnits<Mass1T, Time1T, Time2T, Time3T>
       [[deprecated("Use the free function getHeatFlux() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetHeatFlux() const
       {
-         return getHeatFlux<Mass1T,Time1T, Time2T, Time3T>(*this);
+         return getHeatFlux<Mass1T, Time1T, Time2T, Time3T>(*this);
       }
 
       /// @brief Deprecated function to get the value of HeatFlux.
@@ -175,13 +175,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of HeatFlux.
       /// @details Prefer using the free function `getHeatFlux()` instead.
       /// @return The value of the HeatFlux.
-      template<typename Mass1T,typename Time1T, typename Time2T, typename Time3T>
-      requires IsHeatFluxUnits<Mass1T,Time1T, Time2T, Time3T>
+      template<typename Mass1T, typename Time1T, typename Time2T, typename Time3T>
+      requires IsHeatFluxUnits<Mass1T, Time1T, Time2T, Time3T>
       [[deprecated("Use the free function getHeatFlux() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetHeatFlux() const
       {
-         return getHeatFlux<Mass1T,Time1T, Time2T, Time3T>(*this);
+         return getHeatFlux<Mass1T, Time1T, Time2T, Time3T>(*this);
       }
 
       /// @brief Deprecated function to get the value of HeatFlux.
@@ -202,9 +202,9 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Time3 Denominator Time3 type
-   template<typename Mass1,typename Time1, typename Time2, typename Time3>
-   requires IsHeatFluxUnits<Mass1,Time1, Time2, Time3>
-   HeatFlux(Mass1,Time1, Time2, Time3) -> HeatFlux<Mass1,Time1, Time2, Time3>;
+   template<typename Mass1, typename Time1, typename Time2, typename Time3>
+   requires IsHeatFluxUnits<Mass1, Time1, Time2, Time3>
+   HeatFlux(Mass1, Time1, Time2, Time3) -> HeatFlux<Mass1, Time1, Time2, Time3>;
 
    /// @brief Template deduction guide for HeatFlux.
    /// @tparam Mass1 Numerator Mass1 type
@@ -220,9 +220,9 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Time3 Denominator Time3 type
-   template<typename Mass1,typename Time1, typename Time2, typename Time3>
-   requires IsHeatFluxUnits<Mass1,Time1, Time2, Time3>
-   HeatFlux(BaseDimension<std::tuple<Mass1>, std::tuple<Time1, Time2, Time3>>) -> HeatFlux<Mass1,Time1, Time2, Time3>;
+   template<typename Mass1, typename Time1, typename Time2, typename Time3>
+   requires IsHeatFluxUnits<Mass1, Time1, Time2, Time3>
+   HeatFlux(BaseDimension<std::tuple<Mass1>, std::tuple<Time1, Time2, Time3>>) -> HeatFlux<Mass1, Time1, Time2, Time3>;
 
 }
 

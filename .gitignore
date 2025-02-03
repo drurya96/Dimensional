@@ -3,3 +3,4 @@ builds/
 test_package/build/
 cache/
 .vscode/
+*__pycache__*

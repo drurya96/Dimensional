@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_MOMENTUM_IMPL_H
 #define STATIC_DIMENSION_MOMENTUM_IMPL_H
 
+#include "../../MassDimension.h"
 #include "../../LengthDimension.h"
 #include "../../TimeDimension.h"
-#include "../../MassDimension.h"
 
 namespace Dimension
 {
@@ -20,11 +20,11 @@ namespace Dimension
    /// @tparam Mass1 Numerator Mass1 type
    /// @tparam Length1 Numerator Length1 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Mass1, typename Length1,typename Time1>
+   template<typename Mass1, typename Length1, typename Time1>
    concept IsMomentumUnits = 
       std::is_same_v<typename Mass1::Dim, MassType> &&
-        std::is_same_v<typename Length1::Dim, LengthType> &&
-        std::is_same_v<typename Time1::Dim, TimeType>;
+      std::is_same_v<typename Length1::Dim, LengthType> &&
+      std::is_same_v<typename Time1::Dim, TimeType>;
 
    /// @brief Concept for a Momentum type.
    /// @details Ensures that the type meets Momentum type requirements, based on numerator and denominator types.
@@ -34,7 +34,7 @@ namespace Dimension
       typename T::NumTuple;
       typename T::DenTuple;
    } && std::tuple_size_v<typename T::NumTuple> == 2 && std::tuple_size_v<typename T::DenTuple> == 1 &&
-   IsMomentumUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>,typename std::tuple_element_t<0, typename T::DenTuple>>;
+   IsMomentumUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>>;
 
    /// @brief Retrieves the value of a Momentum object.
    /// @details Provides access to the underlying value represented by a Momentum object.
@@ -44,8 +44,8 @@ namespace Dimension
    /// @tparam MomentumType The type of the object being accessed.
    /// @param obj The Momentum object.
    /// @return The underlying value as `PrecisionType`
-   template<typename Mass1, typename Length1,typename Time1, typename MomentumType>
-   requires IsMomentumUnits<Mass1, Length1,Time1> && IsMomentumType<MomentumType>
+   template<typename Mass1, typename Length1, typename Time1, typename MomentumType>
+   requires IsMomentumUnits<Mass1, Length1, Time1> && IsMomentumType<MomentumType>
    constexpr PrecisionType getMomentum(const MomentumType& obj)
    {
       return obj.template GetVal<std::tuple<Mass1, Length1>, std::tuple<Time1>>();
@@ -98,9 +98,9 @@ namespace Dimension
    /// @tparam Mass1 Numerator Mass1 type
    /// @tparam Length1 Numerator Length1 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Mass1, typename Length1,typename Time1>
-   requires IsMomentumUnits<Mass1, Length1,Time1>
-   class Momentum<Mass1, Length1,Time1> : public BaseDimension<std::tuple<Mass1, Length1>, std::tuple<Time1>>
+   template<typename Mass1, typename Length1, typename Time1>
+   requires IsMomentumUnits<Mass1, Length1, Time1>
+   class Momentum<Mass1, Length1, Time1> : public BaseDimension<std::tuple<Mass1, Length1>, std::tuple<Time1>>
    {
    public:
       using Base = BaseDimension<std::tuple<Mass1, Length1>, std::tuple<Time1>>;
@@ -122,13 +122,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of Momentum.
       /// @details Prefer using the free function `getMomentum()` instead.
       /// @return The value of the Momentum.
-      template<typename Mass1T, typename Length1T,typename Time1T>
-      requires IsMomentumUnits<Mass1T, Length1T,Time1T>
+      template<typename Mass1T, typename Length1T, typename Time1T>
+      requires IsMomentumUnits<Mass1T, Length1T, Time1T>
       [[deprecated("Use the free function getMomentum() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetMomentum() const
       {
-         return getMomentum<Mass1T, Length1T,Time1T>(*this);
+         return getMomentum<Mass1T, Length1T, Time1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of Momentum.
@@ -172,13 +172,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of Momentum.
       /// @details Prefer using the free function `getMomentum()` instead.
       /// @return The value of the Momentum.
-      template<typename Mass1T, typename Length1T,typename Time1T>
-      requires IsMomentumUnits<Mass1T, Length1T,Time1T>
+      template<typename Mass1T, typename Length1T, typename Time1T>
+      requires IsMomentumUnits<Mass1T, Length1T, Time1T>
       [[deprecated("Use the free function getMomentum() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetMomentum() const
       {
-         return getMomentum<Mass1T, Length1T,Time1T>(*this);
+         return getMomentum<Mass1T, Length1T, Time1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of Momentum.
@@ -198,9 +198,9 @@ namespace Dimension
    /// @tparam Mass1 Numerator Mass1 type
    /// @tparam Length1 Numerator Length1 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Mass1, typename Length1,typename Time1>
-   requires IsMomentumUnits<Mass1, Length1,Time1>
-   Momentum(Mass1, Length1,Time1) -> Momentum<Mass1, Length1,Time1>;
+   template<typename Mass1, typename Length1, typename Time1>
+   requires IsMomentumUnits<Mass1, Length1, Time1>
+   Momentum(Mass1, Length1, Time1) -> Momentum<Mass1, Length1, Time1>;
 
    /// @brief Template deduction guide for Momentum.
    /// @tparam Mass1 Numerator Mass1 type
@@ -214,9 +214,9 @@ namespace Dimension
    /// @tparam Mass1 Numerator Mass1 type
    /// @tparam Length1 Numerator Length1 type
    /// @tparam Time1 Denominator Time1 type
-   template<typename Mass1, typename Length1,typename Time1>
-   requires IsMomentumUnits<Mass1, Length1,Time1>
-   Momentum(BaseDimension<std::tuple<Mass1, Length1>, std::tuple<Time1>>) -> Momentum<Mass1, Length1,Time1>;
+   template<typename Mass1, typename Length1, typename Time1>
+   requires IsMomentumUnits<Mass1, Length1, Time1>
+   Momentum(BaseDimension<std::tuple<Mass1, Length1>, std::tuple<Time1>>) -> Momentum<Mass1, Length1, Time1>;
 
 }
 

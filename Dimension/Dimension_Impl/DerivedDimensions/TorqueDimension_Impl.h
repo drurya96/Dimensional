@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_TORQUE_IMPL_H
 #define STATIC_DIMENSION_TORQUE_IMPL_H
 
+#include "../../MassDimension.h"
 #include "../../LengthDimension.h"
 #include "../../TimeDimension.h"
-#include "../../MassDimension.h"
 #include "../../AngleDimension.h"
 
 namespace Dimension
@@ -24,14 +24,14 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Angle1 Denominator Angle1 type
-   template<typename Mass1, typename Length1, typename Length2,typename Time1, typename Time2, typename Angle1>
+   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Angle1>
    concept IsTorqueUnits = 
       std::is_same_v<typename Mass1::Dim, MassType> &&
-        std::is_same_v<typename Length1::Dim, LengthType> &&
-        std::is_same_v<typename Length2::Dim, LengthType> &&
-        std::is_same_v<typename Time1::Dim, TimeType> &&
-        std::is_same_v<typename Time2::Dim, TimeType> &&
-        std::is_same_v<typename Angle1::Dim, AngleType>;
+      std::is_same_v<typename Length1::Dim, LengthType> &&
+      std::is_same_v<typename Length2::Dim, LengthType> &&
+      std::is_same_v<typename Time1::Dim, TimeType> &&
+      std::is_same_v<typename Time2::Dim, TimeType> &&
+      std::is_same_v<typename Angle1::Dim, AngleType>;
 
    /// @brief Concept for a Torque type.
    /// @details Ensures that the type meets Torque type requirements, based on numerator and denominator types.
@@ -41,7 +41,7 @@ namespace Dimension
       typename T::NumTuple;
       typename T::DenTuple;
    } && std::tuple_size_v<typename T::NumTuple> == 3 && std::tuple_size_v<typename T::DenTuple> == 3 &&
-   IsTorqueUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<2, typename T::NumTuple>,typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>, typename std::tuple_element_t<2, typename T::DenTuple>>;
+   IsTorqueUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<2, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>, typename std::tuple_element_t<2, typename T::DenTuple>>;
 
    /// @brief Retrieves the value of a Torque object.
    /// @details Provides access to the underlying value represented by a Torque object.
@@ -54,8 +54,8 @@ namespace Dimension
    /// @tparam TorqueType The type of the object being accessed.
    /// @param obj The Torque object.
    /// @return The underlying value as `PrecisionType`
-   template<typename Mass1, typename Length1, typename Length2,typename Time1, typename Time2, typename Angle1, typename TorqueType>
-   requires IsTorqueUnits<Mass1, Length1, Length2,Time1, Time2, Angle1> && IsTorqueType<TorqueType>
+   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Angle1, typename TorqueType>
+   requires IsTorqueUnits<Mass1, Length1, Length2, Time1, Time2, Angle1> && IsTorqueType<TorqueType>
    constexpr PrecisionType getTorque(const TorqueType& obj)
    {
       return obj.template GetVal<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Angle1>>();
@@ -111,9 +111,9 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Angle1 Denominator Angle1 type
-   template<typename Mass1, typename Length1, typename Length2,typename Time1, typename Time2, typename Angle1>
-   requires IsTorqueUnits<Mass1, Length1, Length2,Time1, Time2, Angle1>
-   class Torque<Mass1, Length1, Length2,Time1, Time2, Angle1> : public BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Angle1>>
+   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Angle1>
+   requires IsTorqueUnits<Mass1, Length1, Length2, Time1, Time2, Angle1>
+   class Torque<Mass1, Length1, Length2, Time1, Time2, Angle1> : public BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Angle1>>
    {
    public:
       using Base = BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Angle1>>;
@@ -135,13 +135,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of Torque.
       /// @details Prefer using the free function `getTorque()` instead.
       /// @return The value of the Torque.
-      template<typename Mass1T, typename Length1T, typename Length2T,typename Time1T, typename Time2T, typename Angle1T>
-      requires IsTorqueUnits<Mass1T, Length1T, Length2T,Time1T, Time2T, Angle1T>
+      template<typename Mass1T, typename Length1T, typename Length2T, typename Time1T, typename Time2T, typename Angle1T>
+      requires IsTorqueUnits<Mass1T, Length1T, Length2T, Time1T, Time2T, Angle1T>
       [[deprecated("Use the free function getTorque() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetTorque() const
       {
-         return getTorque<Mass1T, Length1T, Length2T,Time1T, Time2T, Angle1T>(*this);
+         return getTorque<Mass1T, Length1T, Length2T, Time1T, Time2T, Angle1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of Torque.
@@ -185,13 +185,13 @@ namespace Dimension
       /// @brief Deprecated function to get the value of Torque.
       /// @details Prefer using the free function `getTorque()` instead.
       /// @return The value of the Torque.
-      template<typename Mass1T, typename Length1T, typename Length2T,typename Time1T, typename Time2T, typename Angle1T>
-      requires IsTorqueUnits<Mass1T, Length1T, Length2T,Time1T, Time2T, Angle1T>
+      template<typename Mass1T, typename Length1T, typename Length2T, typename Time1T, typename Time2T, typename Angle1T>
+      requires IsTorqueUnits<Mass1T, Length1T, Length2T, Time1T, Time2T, Angle1T>
       [[deprecated("Use the free function getTorque() instead.")]]
       // cppcheck-suppress unusedFunction
       double GetTorque() const
       {
-         return getTorque<Mass1T, Length1T, Length2T,Time1T, Time2T, Angle1T>(*this);
+         return getTorque<Mass1T, Length1T, Length2T, Time1T, Time2T, Angle1T>(*this);
       }
 
       /// @brief Deprecated function to get the value of Torque.
@@ -214,9 +214,9 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Angle1 Denominator Angle1 type
-   template<typename Mass1, typename Length1, typename Length2,typename Time1, typename Time2, typename Angle1>
-   requires IsTorqueUnits<Mass1, Length1, Length2,Time1, Time2, Angle1>
-   Torque(Mass1, Length1, Length2,Time1, Time2, Angle1) -> Torque<Mass1, Length1, Length2,Time1, Time2, Angle1>;
+   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Angle1>
+   requires IsTorqueUnits<Mass1, Length1, Length2, Time1, Time2, Angle1>
+   Torque(Mass1, Length1, Length2, Time1, Time2, Angle1) -> Torque<Mass1, Length1, Length2, Time1, Time2, Angle1>;
 
    /// @brief Template deduction guide for Torque.
    /// @tparam Mass1 Numerator Mass1 type
@@ -236,9 +236,9 @@ namespace Dimension
    /// @tparam Time1 Denominator Time1 type
    /// @tparam Time2 Denominator Time2 type
    /// @tparam Angle1 Denominator Angle1 type
-   template<typename Mass1, typename Length1, typename Length2,typename Time1, typename Time2, typename Angle1>
-   requires IsTorqueUnits<Mass1, Length1, Length2,Time1, Time2, Angle1>
-   Torque(BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Angle1>>) -> Torque<Mass1, Length1, Length2,Time1, Time2, Angle1>;
+   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Angle1>
+   requires IsTorqueUnits<Mass1, Length1, Length2, Time1, Time2, Angle1>
+   Torque(BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Angle1>>) -> Torque<Mass1, Length1, Length2, Time1, Time2, Angle1>;
 
 }
 
