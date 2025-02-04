@@ -288,11 +288,11 @@ namespace Dimension
       friend constexpr auto operator/(PrecisionType scalar, BaseDimension<NumTup, DenTup> obj)->BaseDimension<DenTup, NumTup>;
 
       template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
-      requires MatchingDimensionsNew<BaseDimension<NumTuple1, DenTuple1>, BaseDimension<NumTuple2, DenTuple2>>
+      requires Addable<NumTuple1, NumTuple2> && Addable<DenTuple1, DenTuple2>
       friend constexpr auto operator+(BaseDimension<NumTuple1, DenTuple1> obj1, BaseDimension<NumTuple2, DenTuple2> obj2);
 
       template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
-      requires MatchingDimensionsNew<BaseDimension<NumTuple1, DenTuple1>, BaseDimension<NumTuple2, DenTuple2>>
+      requires Subtractable<NumTuple1, NumTuple2> && Subtractable<DenTuple1, DenTuple2>
       friend constexpr auto operator-(BaseDimension<NumTuple1, DenTuple1> obj1, BaseDimension<NumTuple2, DenTuple2> obj2);
 
 
@@ -446,7 +446,7 @@ namespace Dimension
    ///    The value is the values of obj1 and obj2 added, after converting
    ///    obj2 to the same units as obj1
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
-   requires MatchingDimensionsNew<BaseDimension<NumTuple1, DenTuple1>, BaseDimension<NumTuple2, DenTuple2>>
+   requires Addable<NumTuple1, NumTuple2> && Addable<DenTuple1, DenTuple2>
    constexpr auto operator+(BaseDimension<NumTuple1, DenTuple1> obj1, BaseDimension<NumTuple2, DenTuple2> obj2)
    {
       using NumType = add_all<NumTuple1, NumTuple2>;
@@ -468,7 +468,7 @@ namespace Dimension
    ///    The value is the difference of values of obj1 and obj2, after 
    ///    converting obj2 to the same units as obj1
    template<typename NumTuple1, typename DenTuple1, typename NumTuple2, typename DenTuple2>
-   requires MatchingDimensionsNew<BaseDimension<NumTuple1, DenTuple1>, BaseDimension<NumTuple2, DenTuple2>>
+   requires Subtractable<NumTuple1, NumTuple2> && Subtractable<DenTuple1, DenTuple2>
    constexpr auto operator-(BaseDimension<NumTuple1, DenTuple1> obj1, BaseDimension<NumTuple2, DenTuple2> obj2)
    {
       using NumType = subtract_all<NumTuple1, NumTuple2>;
