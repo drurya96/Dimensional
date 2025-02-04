@@ -249,6 +249,11 @@ namespace Dimension
       using lhsTypeOrder = result::lhsTypeOrder;
    };
 
+   template<typename Lhs, typename Rhs>
+   concept Subtractable = requires {
+      typename subtract_all<Lhs, Rhs>::type;
+   };
+
    template<typename Dim, typename lhsTuple, typename rhsTuple>
    struct add_tuples
    {
@@ -325,6 +330,10 @@ namespace Dimension
       using lhsTypeOrder = result::lhsTypeOrder;
    };
 
+   template<typename Lhs, typename Rhs>
+   concept Addable = requires {
+      typename add_all<Lhs, Rhs>::type;
+   };
 
    /// @brief Concept to check if T has a numeric offset attribute.
    template<typename T>

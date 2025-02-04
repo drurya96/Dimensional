@@ -810,3 +810,19 @@ TEST(AddTuplesTest, Test1) {
     EXPECT_TRUE((std::is_same_v<TestA1Result, ExpectedResult>));
     
 }
+
+TEST(DimensionAdditionSubtraction, AddAndSubtract)
+{
+
+    using namespace Dimension;
+
+    Temperature<Celsius> t1(10.0);
+    Temperature<Quantity<Celsius>> t2(5.0);
+
+    auto t3 = t2 - t1;
+    auto t4 = t1 + t2;
+
+    std::cout << t3 << std::endl;
+    std::cout << t4 << std::endl;
+    
+}

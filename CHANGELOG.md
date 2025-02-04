@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. Semantic versioning is followed.
 
+## [2.6.1] - 2025-2-3
+
+### Changed
+- 
+
+### Added
+- 
+
+### Deprecated
+- 
+
+### Removed
+- 
+
+### Fixed
+- Addition and Subtraction between quantities works as documented now
+  - Error messages still aren't ideal, more improvements to follow
+
+
 ## [2.6.0] - 2025-2-3
 
 ### Changed
