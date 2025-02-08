@@ -52,7 +52,7 @@ namespace Dimension
    /// @return bool indicating whether lhs is less than rhs
    template <size_t N1, size_t N2>
    constexpr bool operator<(const StringLiteral<N1>& lhs, const StringLiteral<N2>& rhs) {
-      size_t min_size = std::min(N1, N2);
+      size_t min_size = std::min<size_t>(N1, N2);
       for (size_t i = 0; i < min_size; ++i) {
          if (lhs.value[i] < rhs.value[i]) {
                return true;
