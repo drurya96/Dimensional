@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. Semantic versioning is followed.
 
+## [2.6.2] - 2025-2-7
+
+### Changed
+- 
+
+### Added
+- 
+
+### Deprecated
+- 
+
+### Removed
+- 
+
+### Fixed
+- Fixed `operator<` for `StringLiteral` to specify `size_t` as the type for `std::min`
+
 ## [2.6.1] - 2025-2-3
 
 ### Changed
