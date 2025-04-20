@@ -9,7 +9,7 @@ namespace Dimension
    struct Knots
    {
       using NumTuple = std::tuple<NauticalMiles>;
-      using DenTuple = std::tuple<Seconds>;
+      using DenTuple = std::tuple<Hours>;
    };
 
 }

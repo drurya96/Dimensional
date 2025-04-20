@@ -545,7 +545,8 @@ namespace Dimension
    template<typename T>
    constexpr T abs(T obj)
    {
-      return T(std::abs(obj.template GetVal<typename T::NumTuple, typename T::DenTuple>()));
+      //return T(std::abs(obj.template GetVal<typename T::NumTuple, typename T::DenTuple>()));
+      return obj < T{0} ? -obj : obj;
    }
 
    /// @brief Round dimension down to nearest whole number
