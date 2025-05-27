@@ -1,17 +1,21 @@
-#ifndef STATIC_DIMENSION_Inductance_H
-#define STATIC_DIMENSION_Inductance_H
+#ifndef STATIC_DIMENSION_INDUCTANCE_H
+#define STATIC_DIMENSION_INDUCTANCE_H
 
-#include "Dimension_Impl/DerivedDimensions/InductanceDimension_Impl.h" 
+#include "Dimension_Impl/DerivedDimensions/InductanceDimension_Impl.h"
 
 namespace Dimension
 {
 
    struct Henrys
    {
-      using NumTuple = std::tuple<KiloGrams, Meters, Meters>;
-      using DenTuple = std::tuple<Coulombs, Coulombs>;
+      using units = std::tuple<
+         UnitExponent<KiloGrams, 1, 1>,
+         UnitExponent<Meters, 2, 1>,
+         UnitExponent<Coulombs, -2, 1>
+      >;
    };
 
 }
 
-#endif //STATIC_DIMENSION_Inductance_H
+
+#endif // STATIC_DIMENSION_INDUCTANCE_H

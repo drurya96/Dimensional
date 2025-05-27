@@ -12,7 +12,7 @@ TEST(CompoundConversions, TestSpeed) {
 
    Speed<Meters, Seconds> mySpeed(10.0);
 
-   ASSERT_NEAR((getSpeed<Feet, Seconds>(mySpeed)), 32.8084, TOLERANCE);
-   ASSERT_NEAR((getSpeed<Meters, Minutes>(mySpeed)), 600.0, TOLERANCE);
-   ASSERT_NEAR((getSpeed<Feet, Minutes>(mySpeed)), 1968.504, TOLERANCE);
+   ASSERT_NEAR((get_speed_as<Feet, Seconds>(mySpeed)), 32.8084, TOLERANCE);
+   ASSERT_NEAR((get_speed_as<Meters, Minutes>(mySpeed)), 600.0, TOLERANCE);
+   ASSERT_NEAR((get_speed_as<Feet, Minutes>(mySpeed)), 1968.504, TOLERANCE);
 }

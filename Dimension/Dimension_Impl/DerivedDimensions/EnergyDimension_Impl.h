@@ -1,237 +1,134 @@
 #ifndef STATIC_DIMENSION_ENERGY_IMPL_H
 #define STATIC_DIMENSION_ENERGY_IMPL_H
 
+#include "../../BaseDimension.h"
 #include "../../MassDimension.h"
 #include "../../LengthDimension.h"
 #include "../../TimeDimension.h"
 
 namespace Dimension
 {
-   /// @brief Concept for a named Energy unit.
-   /// @tparam NamedEnergy The type to be checked as a named Energy unit.
-   template<typename NamedEnergy>
+   /// @brief Concept to verify a type can serve as a named Energy unit
+   template<typename T>
    concept IsNamedEnergyUnit = requires {
-      typename NamedEnergy::NumTuple;
-      typename NamedEnergy::DenTuple;
+      typename T::units;
+      requires 
+         std::tuple_size_v<typename T::units> == 3 &&
+         IsMassUnit<typename std::tuple_element_t<0, typename T::units>::unit> &&
+         IsLengthUnit<typename std::tuple_element_t<1, typename T::units>::unit> &&
+         IsTimeUnit<typename std::tuple_element_t<2, typename T::units>::unit>;
+      requires !std::is_base_of_v<FundamentalUnitTag, T>;
    };
 
-   /// @brief Concept for a Energy dimension.
-   /// @details Checks if the provided types satisfy the Energy dimension requirements.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2>
-   concept IsEnergyUnits = 
-      std::is_same_v<typename Mass1::Dim, MassType> &&
-      std::is_same_v<typename Length1::Dim, LengthType> &&
-      std::is_same_v<typename Length2::Dim, LengthType> &&
-      std::is_same_v<typename Time1::Dim, TimeType> &&
-      std::is_same_v<typename Time2::Dim, TimeType>;
-
-   /// @brief Concept for a Energy type.
-   /// @details Ensures that the type meets Energy type requirements, based on numerator and denominator types.
-   /// @tparam T The type to validate.
+   /// @brief Concept to verify a dimension can be treated as a Energy type
    template<typename T>
-   concept IsEnergyType = requires {
-      typename T::NumTuple;
-      typename T::DenTuple;
-   } && std::tuple_size_v<typename T::NumTuple> == 3 && std::tuple_size_v<typename T::DenTuple> == 2 &&
-   IsEnergyUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<2, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>>;
+   concept IsEnergy = std::is_convertible_v<T, BaseDimension<
+      UnitExponent<PrimaryMass, 1>, 
+      UnitExponent<PrimaryLength, 2>, 
+      UnitExponent<PrimaryTime, -2>
+   >>;
 
-   /// @brief Retrieves the value of a Energy object.
-   /// @details Provides access to the underlying value represented by a Energy object.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   /// @tparam EnergyType The type of the object being accessed.
-   /// @param obj The Energy object.
-   /// @return The underlying value as `PrecisionType`
-   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename EnergyType>
-   requires IsEnergyUnits<Mass1, Length1, Length2, Time1, Time2> && IsEnergyType<EnergyType>
-   constexpr PrecisionType getEnergy(const EnergyType& obj)
+   /// @brief Retrieves the value of a Energy object with specific units
+   /// @tparam MassUnit The Mass unit used for all Mass components of Energy
+   /// @tparam LengthUnit The Length unit used for all Length components of Energy
+   /// @tparam TimeUnit The Time unit used for all Time components of Energy
+   /// @tparam DimType The dimension object type, deduced
+   /// @param obj The dimension to extract a raw value from
+   /// @return The raw value in terms of template units as a PrecisionType
+   template<
+      IsMassUnit MassUnit,
+      IsLengthUnit LengthUnit,
+      IsTimeUnit TimeUnit,
+      IsEnergy DimType>
+   constexpr PrecisionType get_energy_as(const DimType& obj)
    {
-      return obj.template GetVal<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2>>();
+      return get_dimension_as<
+         UnitExponent<MassUnit, 1>,
+         UnitExponent<LengthUnit, 2>,
+         UnitExponent<TimeUnit, -2>
+      >(obj);
    }
 
    /// @brief Retrieves the value of a named Energy object.
-   /// @details Provides access to the value represented by a named Energy object.
-   /// @tparam NamedEnergy The named unit type.
-   /// @tparam EnergyType The type of the object being accessed.
-   /// @param obj The Energy object.
-   /// @return The underlying value as `PrecisionType`.
-   template<typename NamedEnergy, typename EnergyType>
-   requires IsNamedEnergyUnit<NamedEnergy> && IsEnergyType<EnergyType>
-   constexpr PrecisionType getEnergy(const EnergyType& obj)
+   /// @tparam Named The named unit to extract in terms of
+   /// @tparam DimType The dimension object type, deduced
+   /// @param obj The dimension to extract a raw value from
+   /// @return The raw value in terms of template units as a PrecisionType
+   template<IsNamedEnergyUnit Named, IsEnergy DimType>
+   constexpr PrecisionType get_energy_as(const DimType& obj)
    {
-      return obj.template GetVal<typename NamedEnergy::NumTuple, typename NamedEnergy::DenTuple>();
+      return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
 
    template<typename... Ts>
    class Energy;
 
-   /// @brief Represents a default Energy.
-   /// @details This Energy is templated on the primary units of the relevant dimensions.
-   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
-   ///   "Energy" type, without regard for the underlying units.
+   /// @brief Represents the default Energy
    template<>
-   class Energy<> : public BaseDimension<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime>>
+   class Energy<> : public BaseDimension<
+      UnitExponent<PrimaryMass, 1>,
+      UnitExponent<PrimaryLength, 2>,
+      UnitExponent<PrimaryTime, -2>>
    {
    public:
-      using Base = BaseDimension<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime>>;
+      using Base = BaseDimension<
+         UnitExponent<PrimaryMass, 1>,
+         UnitExponent<PrimaryLength, 2>,
+         UnitExponent<PrimaryTime, -2>>;
       using Base::Base;
 
-      /// @brief Constructs a Energy object with a value.
-      /// @param val The value of the Energy.
       explicit constexpr Energy(PrecisionType val) : Base(val) {}
 
-      /// @brief Constructs a Energy object from another Energy object.
-      /// @tparam OtherEnergy The other Energy type.
-      /// @param base The base Energy object.
-      template<typename OtherEnergy>
-      requires IsEnergyType<OtherEnergy>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr Energy(const OtherEnergy& base)
-         : Base(base.template GetVal<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime>>()) {}
+      template<typename Other>
+      requires IsEnergy<Other>
+      constexpr Energy(const Other& base)
+         : Base(call_unpack<typename Base::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-   /// @brief Represents a Energy.
-   /// @details Defines operations and data storage for Energy dimensions.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2>
-   requires IsEnergyUnits<Mass1, Length1, Length2, Time1, Time2>
-   class Energy<Mass1, Length1, Length2, Time1, Time2> : public BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2>>
+   /// @brief Template specialization for named Energy units
+   /// @tparam Named The named unit this Energy type is in terms of
+   template<IsNamedEnergyUnit Named>
+   class Energy<Named> : public BaseDimensionFromTuple<typename Named::units>::dim
    {
    public:
-      using Base = BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2>>;
+      using Base = typename BaseDimensionFromTuple<typename Named::units>::dim;
       using Base::Base;
 
-      /// @brief Constructs a Energy object with a value.
-      /// @param val The value of the Energy.
-      explicit constexpr Energy(PrecisionType val) : Base(val) {}
-
-      /// @brief Constructs a Energy object from a named unit.
-      /// @tparam NamedEnergy The named unit type.
-      /// @param base The base unit object.
-      template<typename NamedEnergy>
-      requires IsNamedEnergyUnit<NamedEnergy>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr Energy(const NamedEnergy& base) : Base(base) {}
-
-      /// @brief Deprecated function to get the value of Energy.
-      /// @details Prefer using the free function `getEnergy()` instead.
-      /// @return The value of the Energy.
-      template<typename Mass1T, typename Length1T, typename Length2T, typename Time1T, typename Time2T>
-      requires IsEnergyUnits<Mass1T, Length1T, Length2T, Time1T, Time2T>
-      [[deprecated("Use the free function getEnergy() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetEnergy() const
-      {
-         return getEnergy<Mass1T, Length1T, Length2T, Time1T, Time2T>(*this);
-      }
-
-      /// @brief Deprecated function to get the value of Energy.
-      /// @details Prefer using the free function `getEnergy()` instead.
-      /// @return The value of the Energy.
-      template<typename NamedEnergy>
-      requires IsNamedEnergyUnit<NamedEnergy>
-      [[deprecated("Use the free function getEnergy() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetEnergy() const
-      {
-         return getEnergy<NamedEnergy>(*this);
-      }
+      template<typename Other>
+      requires IsEnergy<Other>
+      constexpr Energy(const Other& base)
+         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-   /// @brief Represents a named Energy class.
-   /// @details Provides functionality for named Energy units.
-   /// @tparam NamedEnergy The named unit type.
-   template<typename NamedEnergy>
-   requires IsNamedEnergyUnit<NamedEnergy>
-   class Energy<NamedEnergy> : public BaseDimension<typename NamedEnergy::NumTuple, typename NamedEnergy::DenTuple>
+
+   template<typename... Units>
+   class Energy<Units...> : public BaseDimension<
+      UnitExponent<typename Extractor<MassType, Units...>::type, 1>,
+      UnitExponent<typename Extractor<LengthType, Units...>::type, 2>,
+      UnitExponent<typename Extractor<TimeType, Units...>::type, -2>
+   >
    {
    public:
-      using Base = BaseDimension<typename NamedEnergy::NumTuple, typename NamedEnergy::DenTuple>;
+      using Base = BaseDimension<
+         UnitExponent<typename Extractor<MassType, Units...>::type, 1>,
+         UnitExponent<typename Extractor<LengthType, Units...>::type, 2>,
+         UnitExponent<typename Extractor<TimeType, Units...>::type, -2>
+      >;
+   
       using Base::Base;
-
-      /// @brief Constructs a Energy object with a value.
-      /// @param val The value of the Energy.
-      explicit constexpr Energy(PrecisionType val) : Base(val) {}
-
-      /// @brief Constructs a Energy object from another Energy object.
-      /// @tparam OtherEnergy The other Energy type.
-      /// @param base The base Energy object.
-      template<typename OtherEnergy>
-      requires IsEnergyType<OtherEnergy>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr Energy(const OtherEnergy& base)
-         : Base(base.template GetVal<typename NamedEnergy::NumTuple, typename NamedEnergy::DenTuple>()) {}
-
-      /// @brief Deprecated function to get the value of Energy.
-      /// @details Prefer using the free function `getEnergy()` instead.
-      /// @return The value of the Energy.
-      template<typename Mass1T, typename Length1T, typename Length2T, typename Time1T, typename Time2T>
-      requires IsEnergyUnits<Mass1T, Length1T, Length2T, Time1T, Time2T>
-      [[deprecated("Use the free function getEnergy() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetEnergy() const
-      {
-         return getEnergy<Mass1T, Length1T, Length2T, Time1T, Time2T>(*this);
-      }
-
-      /// @brief Deprecated function to get the value of Energy.
-      /// @details Prefer using the free function `getEnergy()` instead.
-      /// @return The value of the Energy.
-      template<typename NamedEnergyUnit>
-      requires IsNamedEnergyUnit<NamedEnergyUnit>
-      [[deprecated("Use the free function getEnergy() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetEnergy() const
-      {
-         return getEnergy<NamedEnergyUnit>(*this);
-      }         
+   
+      template<typename T>
+      requires IsEnergy<T>
+      constexpr Energy(const T& base) : Base(base) {}
    };
 
-   /// @brief Template deduction guide for Energy.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2>
-   requires IsEnergyUnits<Mass1, Length1, Length2, Time1, Time2>
-   Energy(Mass1, Length1, Length2, Time1, Time2) -> Energy<Mass1, Length1, Length2, Time1, Time2>;
-
-   /// @brief Template deduction guide for Energy.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   template<typename NamedEnergy>
-   requires IsNamedEnergyUnit<NamedEnergy>
-   Energy(NamedEnergy) -> Energy<NamedEnergy>;
-
-   /// @brief Template deduction guide for Energy.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2>
-   requires IsEnergyUnits<Mass1, Length1, Length2, Time1, Time2>
-   Energy(BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2>>) -> Energy<Mass1, Length1, Length2, Time1, Time2>;
-
+   template<IsEnergy Dim>
+   Energy(Dim) -> 
+   Energy<
+      DimExtractor<MassType, Dim>,
+      DimExtractor<LengthType, Dim>,
+      DimExtractor<TimeType, Dim>
+   >;
 }
 
 #endif // STATIC_DIMENSION_ENERGY_IMPL_H

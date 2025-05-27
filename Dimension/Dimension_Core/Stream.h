@@ -14,8 +14,7 @@ namespace Dimension
    template<typename Unit, StringLiteral Name, StringLiteral Abbreviation, StringLiteral DimName, int UnitID>
    struct BaseUnit;
 
-   template<typename NumTupleT, typename DenTupleT>
-   requires IsUnitTuplePair<NumTupleT, DenTupleT>
+   template<are_unit_exponents... Units>
    class BaseDimension;
 
    /// @brief Type of string to print

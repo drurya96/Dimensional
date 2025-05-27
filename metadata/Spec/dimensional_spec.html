@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dimensional Specification</title>
+  <style>
+    body { font-family: sans-serif; margin: 2em; line-height: 1.5; }
+    summary { font-size: 1.3em; font-weight: bold; margin-top: 1em; cursor: pointer; }
+    h2 { margin-top: 2em; }
+    h3 { margin-bottom: 0.2em; }
+    .context { margin-left: 1.5em; }
+    .rule { margin-left: 2.5em; margin-bottom: 1.2em; border-left: 2px solid #ccc; padding-left: 1em; }
+    .positive { color: forestgreen; font-weight: bold; }
+    .negative { color: firebrick; font-weight: bold; }
+    .neutral  { color: gray; font-weight: bold; }
+    code { background: #f0f0f0; padding: 2px 4px; border-radius: 4px; font-family: monospace; }
+    .notes { font-size: 0.9em; color: #666; margin-top: 0.5em; }
+  </style>
+</head>
+<body>
+  <h1>Dimensional Specification</h1>
+
+  
+  <details>
+    <summary>Dimension Arithmetic</summary>
+    <div class="domain">
+      <div class="context-list">
+        
+          <div class="context">
+            <h3>Identity Behavior</h3>
+            <p><em>Guarantees that a base_dimension behaves as an identity under arithmetic.</em></p>
+
+            
+              <div class="rule">
+                <strong>Exponent zero yields dimensionless</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Raising a base_dimension to the 0th power yields a dimensionless result.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Exponent one yields self</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Raising a base_dimension to the 1st power yields the original base_dimension.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Multiplication by raw one yields self</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Multiplying a base_dimension by the raw value 1 results in the original base_dimension.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Division by raw one yields self</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Dividing a base_dimension by the raw value 1 results in the original base_dimension.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+          <div class="context">
+            <h3>Multiplication of base_dimensions</h3>
+            <p><em>Defines behavior when multiplying base_dimensions or raw values.</em></p>
+
+            
+              <div class="rule">
+                <strong>Combining matching and non-matching unit exponents</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>When both operands contain the same unit, the resulting base_dimension includes that unit with an exponent equal to the sum of the input exponents.</p>
+                
+                  <p>If the resulting exponent of a unit is zero, it is omitted from the resulting base_dimension.</p>
+                
+                  <p>Units that appear in only one operand are included in the resulting base_dimension with their original exponents.</p>
+                
+                  <p>The scalar value of the resulting dimension is the product of the scalars of the multiplicands.</p>
+                
+                  <p>The order of units in the resulting base_dimension is the order of the left-hand operand units followed by the order of the right-hand operand units.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Scalar multiplied by base_dimension yields original</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Multiplying a raw value by a base_dimension yields the original base_dimension with scalar multiplied by the raw value.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Base_dimension multiplied by scalar yields original</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Multiplying a base_dimension by a raw value yields the original base_dimension with scalar multiplied by the raw value.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+          <div class="context">
+            <h3>Division of base_dimensions</h3>
+            <p><em>Defines behavior when dividing base_dimensions or by raw values.</em></p>
+
+            
+              <div class="rule">
+                <strong>Division subtracts unit exponents</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>When both operands include the same unit, the resulting base_dimension includes that unit with an exponent equal to the difference between the exponents of the numerator and denominator.</p>
+                
+                  <p>Units that appear only in the denominator are included in the result with a negated exponent.</p>
+                
+                  <p>Units that appear only in the numerator are retained in the result with their original exponents.</p>
+                
+                  <p>If the resulting exponent of a unit after subtraction is zero, the unit is omitted from the resulting base_dimension.</p>
+                
+                  <p>The order of units in the resulting base_dimension is the order of the left-hand operand units followed by the order of the right-hand operand units.</p>
+                
+                  <p>The scalar value of the resulting dimension is the quotient of the scalars of the dividend and divisor.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Base_dimension divided by raw value yields original</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Dividing a base_dimension by a raw value yields the original base_dimension with scalar divided by the raw value.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Raw divided by base_dimension yields reciprocal</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Dividing a raw value by a base_dimension results in a base_dimension where each unit exponent is negated with the quotient of the raw value and the original scalar as the new scalar.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Division by zero is invalid</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>Dividing a base_dimension or raw value by zero is a compile-time error.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+          <div class="context">
+            <h3>Dimension Exponentiation</h3>
+            <p><em>Describes behavior when base_dimensions are raised to integer or fractional powers.</em></p>
+
+            
+              <div class="rule">
+                <strong>Exponentiation of base_dimension</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>The resulting base_dimension contains the same units, but with all exponents multiplied by the power.</p>
+                
+                  <p>The scalar value of the resulting dimension is the original scalar raised to the input power.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Rational Power</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>base_dimensions can be raised to a positive rational exponent.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Rational exponents may be negative</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>A base_dimension may be raised to a negative rational exponent.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Irrational Power</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>base_dimensions cannot be raised to an irrational exponent.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+          <div class="context">
+            <h3>Addition and Subtraction</h3>
+            <p><em>Defines behavior when adding or subtracting base_dimensions, including compatibility requirements and preservation of dimensional meaning.</em></p>
+
+            
+              <div class="rule">
+                <strong>Addition requires compatible dimensions</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Adding two base_dimensions is only valid when they represent equivalent physical dimensions and are castable to each other.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Subtraction requires compatible dimensions</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Subtracting two base_dimensions is only valid when they represent equivalent physical dimensions and are castable to each other.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Addition with incompatible dimensions is disallowed</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>Adding base_dimensions with incompatible structures or dimensions results in a compile-time error.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Subtraction with incompatible dimensions is disallowed</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>Subtracting base_dimensions with incompatible structures or dimensions results in a compile-time error.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Raw scalar addition is invalid</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>Adding a raw scalar to a base_dimension is a compile-time error.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Raw scalar subtraction is invalid</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>Subtracting a raw scalar from a base_dimension is a compile-time error.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Subtracting from raw scalar is invalid</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>Subtracting a base_dimension from a raw scalar is a compile-time error.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Raw value plus or minus dimension is invalid</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>Using a raw scalar as the left-hand operand in addition or subtraction with a base_dimension is a compile-time error.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+          <div class="context">
+            <h3>Unary Negation</h3>
+            <p><em>Covers behavior of unary minus applied to a base_dimension, altering the scalar while preserving dimensional structure.</em></p>
+
+            
+              <div class="rule">
+                <strong>Negation preserves dimension</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Negating a base_dimension yields a base_dimension with the same unit structure and the scalar negated.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+      </div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>Base Dimension Comparison</summary>
+    <div class="domain">
+      <div class="context-list">
+        
+          <div class="context">
+            <h3>Comparison</h3>
+            <p><em>Covers equality and ordering behavior between base_dimension values with compatible structures.</em></p>
+
+            
+              <div class="rule">
+                <strong>Comparison requires same dimension</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>Comparison operations between base_dimensions are only permitted if their dimensional compositions are equivalent after unit conversion.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Comparison applies unit conversion</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>When comparing two base_dimension values, unit conversions are applied as needed to align scalar representations before comparison.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Comparison yields boolean result</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Comparison between two compatible base_dimensions yields a dimensionless boolean result.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+      </div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>Structure and Casting</summary>
+    <div class="domain">
+      <div class="context-list">
+        
+          <div class="context">
+            <h3>Structural Validation</h3>
+            <p><em>Rules governing the legality of unit composition in a base_dimension, including constraints on unit uniqueness.</em></p>
+
+            
+              <div class="rule">
+                <strong>No duplicate unit types in base_dimension</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>A base_dimension may not contain multiple unit_exponents with the same unit type, regardless of exponent sign.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+          <div class="context">
+            <h3>Structural Compatibility</h3>
+            <p><em>Defines when two base_dimension types are considered structurally compatible for assignment or arithmetic.</em></p>
+
+            
+              <div class="rule">
+                <strong>Structurally compatible base_dimensions are assignable</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Two base_dimensions are compatible for assignment when, after aggregating exponents by physical dimension, the resulting dimensional compositions are equal.</p>
+                
+                  <p>Units used to represent a given physical dimension may differ between base_dimensions as long as a conversion exists between each corresponding unit and a common unit within that dimension.</p>
+                
+                  <p>The ordering of unit_exponents in the base_dimension type does not affect structural compatibility.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Incompatible base_dimensions are not assignable</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>If no conversion exists between units used to represent the same physical dimension, the base_dimensions are not assignable.</p>
+                
+                  <p>If the aggregated exponent for any physical dimension differs between the two base_dimensions, assignment is disallowed.</p>
+                
+                  <p>If one base_dimension includes a physical dimension not present in the other, assignment is disallowed.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+          <div class="context">
+            <h3>Casting and Simplification</h3>
+            <p><em>Describes how explicit casting enables simplification and coercion to a structurally different but dimensionally equivalent type.</em></p>
+
+            
+              <div class="rule">
+                <strong>Cast enables cancellation of inverse units</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Explicit casting allows a base_dimension to simplify and cancel opposing units to produce a new, structurally valid type.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Cast enables conversion between compatible units</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Implicitly casting a base_dimension to a different but dimensionally equivalent structure performs necessary unit conversions to match the target structure.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Casting to same structure yields same type</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Casting a base_dimension to the same structure is a valid operation that produces a base_dimension of the same type with unchanged scalar value.</p>
+                
+                
+                  <div class="notes">Note: TODO: This behavior is expected but not yet validated in all backends. The result type is guaranteed to be the same, but scalar identity and runtime overhead are not yet guaranteed to be optimized to a true no-op.</div>
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Default construction yields zero</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Default construction of a base_dimension produces a valid object with scalar value zero and a well-formed dimensional structure.</p>
+                
+                
+                  <div class="notes">Note: This behavior is optional and may not apply to all host languages. It is assumed in C++ and other imperative languages where default-constructibility is idiomatic.</div>
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Empty base_dimension represents a scalar</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>A base_dimension containing no unit_exponents is valid and represents a dimensionless scalar quantity.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Scalar base_dimension casts to raw value</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>A base_dimension with no units may be implicitly cast to a raw scalar value for use in non-dimensional expressions.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+      </div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>Point Semantics</summary>
+    <div class="domain">
+      <div class="context-list">
+        
+          <div class="context">
+            <h3>Construction and Validity</h3>
+            <p><em>Rules for what types may be constructed as points and under what dimensional restrictions.</em></p>
+
+            
+              <div class="rule">
+                <strong>Points must be constructed from reference frames</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>A point may only be constructed from a valid reference_frame type and a fundamental dimension tag.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Points are only defined for fundamental dimensions</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>Points may not be constructed for compound dimensions or participate in base_dimension expressions.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Point scalar value may be negative</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>A point may be constructed with a scalar value less than zero relative to its reference frame's anchor unit. This is structurally valid regardless of whether such values are physically meaningful.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+          <div class="context">
+            <h3>Arithmetic Behavior</h3>
+            <p><em>Defines valid arithmetic involving points and atomic_dimensions, and how results propagate through operations.</em></p>
+
+            
+              <div class="rule">
+                <strong>Point plus atomic_dimension yields point</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Adding an atomic_dimension to a point yields a point on the same reference frame as the original point.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Point minus atomic_dimension yields point</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Subtracting an atomic_dimension from a point yields a point on the same reference frame as the original point.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Point minus point yields atomic_dimension</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Subtracting one point from another yields an atomic_dimension representing the scalar offset between them, expressed in the reference unit of the lhs point's reference frame.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Point plus point is invalid</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>Adding two points is a compile-time error, as the operation is not defined in affine space.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Atomic_dimension minus point is invalid</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>Subtracting a point from an atomic_dimension is a compile-time error.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+          <div class="context">
+            <h3>Casting and Conversion</h3>
+            <p><em>Rules for converting between points and from points to units.</em></p>
+
+            
+              <div class="rule">
+                <strong>Casting between points applies offset conversion</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Casting a point from one reference frame to another applies the appropriate offset and unit conversion.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Points convert to units in expressions</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>When a point is used in an arithmetic expression that requires a base_dimension, it automatically converts to its reference unit, applying the associated reference frame offset.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+          <div class="context">
+            <h3>Reference Frame Behavior</h3>
+            <p><em>Defines the requirements and semantics of reference_frame types, including anchor unit resolution, offset handling, and constraints for valid point usage.</em></p>
+
+            
+              <div class="rule">
+                <strong>Reference frame must define anchor unit</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>A reference_frame must declare a single anchor unit, representing the canonical unit of the physical dimension it anchors. All offset and unit conversions are performed relative to this anchor.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Point must match frame dimension</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>A point may only be constructed if the reference_frame's physical dimension matches the fundamental dimension tag used by the point.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Reference frame offset defined relative to anchor</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>The offset applied when converting between two points on different reference frames is computed using the difference between their respective positions relative to the shared anchor unit.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Reference frame without conversion is invalid</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>A reference_frame may not use a unit unless that unit has a conversion path to its declared anchor unit. Frames that do not satisfy this constraint are ill-formed.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+          <div class="context">
+            <h3>Comparison</h3>
+            <p><em>Defines valid comparison behavior for point types, including constraints on dimensional compatibility and frame handling.</em></p>
+
+            
+              <div class="rule">
+                <strong>Points must share the same dimension to compare</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>Points may only be compared using equality or ordering operators if their associated dimension tags are identical.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Point comparison allows different frames</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Points may be compared even if they are defined on different reference frames, as long as both reference frames are valid for the shared dimension. Appropriate conversion and offset adjustments are applied before comparison.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Comparison returns a dimensionless result</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Comparison operations between valid point operands yield a dimensionless boolean result.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+      </div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>Conversion Validation</summary>
+    <div class="domain">
+      <div class="context-list">
+        
+          <div class="context">
+            <h3>Conversion Legality</h3>
+            <p><em>Specifies when two dimensioned values may be converted based on unit-level Conversion definitions.</em></p>
+
+            
+              <div class="rule">
+                <strong>Convertible units enable casting between dimensioned values</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Two dimensioned values may be cast between each other if a valid conversion exists between their constituent unit types, even if the unit structures differ.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Missing conversion disables casting between dimensioned values</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>If no conversion is defined between any required pair of units, casting between the dimensioned values is disallowed at compile time.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Physical dimension mismatch disallows conversion</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>If the aggregated physical dimensions of the source and target base_dimensions differ, casting is disallowed regardless of any defined conversions.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+          <div class="context">
+            <h3>Conversion Routing</h3>
+            <p><em>Describes how the system resolves conversions through direct, inverse, or anchor-based routing.</em></p>
+
+            
+              <div class="rule">
+                <strong>Direct Conversion Path</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>When a conversion exists from source to target unit, it is used directly to enable conversion between dimensioned values.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Inverse Conversion Path</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>When a conversion exists from target to source unit, it is used in inverse to convert between dimensioned values.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Anchor Unit Conversion Path</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>When both source and target units are convertible to a common anchor unit, that anchor is used as an intermediate to convert between dimensioned values.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+          <div class="context">
+            <h3>Runtime Conversion Behavior</h3>
+            <p><em>Defines the expected runtime behavior of unit conversions, including how scalar values are transformed and guarantees on determinism and consistency across implementations.</em></p>
+
+            
+              <div class="rule">
+                <strong>Conversions apply scalar transformation</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>When a unit conversion is performed between dimensioned values, the scalar component is transformed by applying the associated conversion rule.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Conversions are deterministic</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>The scalar value resulting from a unit conversion must be uniquely determined by the definition of the conversion, regardless of whether the operation occurs at compile time or runtime.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Conversions may occur at runtime</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Conversions are permitted to occur at runtime if the host language or environment does not support compile-time evaluation. The semantics must remain consistent regardless of when the conversion is executed.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+      </div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>Unit Definition and Constraints</summary>
+    <div class="domain">
+      <div class="context-list">
+        
+          <div class="context">
+            <h3>Unit Structure</h3>
+            <p><em>Specifies structural rules for valid unit types, including dimensional tagging, naming, and conversion eligibility.</em></p>
+
+            
+              <div class="rule">
+                <strong>Units must be convertible to anchor unit</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>A unit is only valid for use in a base_dimension if it has a defined conversion path to the anchor unit of its physical dimension.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Unit must tag a single physical dimension</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>Each unit must be associated with exactly one physical dimension. Units spanning multiple dimensions are invalid.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Unit type name must be globally unique</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>Each unit type must be uniquely identifiable across the system. Duplicate unit type definitions are disallowed.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+          <div class="context">
+            <h3>Conversion Constraints</h3>
+            <p><em>Defines constraints on how conversions between unit types may be defined, including dimensional restrictions and function shape.</em></p>
+
+            
+              <div class="rule">
+                <strong>Conversions must be linear with zero intersection</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>Conversions between units must be strictly linear functions of the form y = k·x, where the origin maps to the origin. Offset conversions are not permitted for unit types.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Cross-dimensional conversions disallowed</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>Conversions may only be defined between unit types that belong to the same physical dimension. Cross-dimensional conversions are invalid.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+      </div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>Standard Helpers</summary>
+    <div class="domain">
+      <div class="context-list">
+        
+          <div class="context">
+            <h3>Dimension-Preserving Scalar Helpers</h3>
+            <p><em>Covers helper functions that operate on the scalar component of a dimensioned value while preserving its dimensional structure. Includes functions such as abs, floor, ceil, round, modf, and fmod.</em></p>
+
+            
+              <div class="rule">
+                <strong>Helpers affect only scalar</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Helper functions in this category must return a value with the same dimensional structure and unit composition as the input, modifying only the scalar component.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+          <div class="context">
+            <h3>Angle-Limited Mathematical Helpers</h3>
+            <p><em>Defines helper functions such as sin, cos, tan, and related operations that are restricted to inputs with angle dimension. These functions return dimensionless results.</em></p>
+
+            
+              <div class="rule">
+                <strong>Trigonometric functions require angle input</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>Trigonometric functions may only accept inputs whose dimension corresponds to angle. Inputs with incompatible dimensions must be rejected at compile time.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Trigonometric functions return dimensionless result</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Trigonometric functions must return dimensionless values regardless of the input angle unit.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+      </div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>Named Fundamental Dimensions</summary>
+    <div class="domain">
+      <div class="context-list">
+        
+          <div class="context">
+            <h3>Fundamental Dimension Structure</h3>
+            <p><em>Defines the structural requirements and behaviors of named fundamental dimensions and how they relate to base_dimension.</em></p>
+
+            
+              <div class="rule">
+                <strong>Named fundamental dimensions wrap base_dimension</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>A named fundamental dimension must wrap a base_dimension with exactly one unit_exponent whose exponent is +1.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Named fundamental dimensions must use fundamental units</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>The unit used in a named fundamental dimension must be a fundamental unit, not a named derived unit or composite.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+          <div class="context">
+            <h3>Dimension-Forward Usability</h3>
+            <p><em>Captures the optional implementation behavior that supports user interaction primarily through named dimensions rather than unit compositions.</em></p>
+
+            
+              <div class="rule">
+                <strong>Named fundamental dimensions may be inferred from expressions</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Implementations may allow expressions involving named dimensions to infer the resulting dimension type automatically, reducing the need for unit specification in user code. This feature is optional and does not affect correctness semantics.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+      </div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>Named Derived Dimensions</summary>
+    <div class="domain">
+      <div class="context-list">
+        
+          <div class="context">
+            <h3>Derived Dimension Structure</h3>
+            <p><em>Specifies how named derived dimensions relate to their base_dimension composition and how users may instantiate them.</em></p>
+
+            
+              <div class="rule">
+                <strong>Named derived dimensions wrap base_dimension</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>Each named derived dimension must wrap a base_dimension with a fixed unit exponent composition representing its associated physical property.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Named derived dimensions accept fundamental units</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>A named derived dimension may be parameterized with one or more fundamental units, where each position corresponds to a predefined exponent within the internal composition.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Named derived dimensions accept named derived unit</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>A named derived dimension may be instantiated using a single named derived unit whose internal composition matches the dimensional structure of the derived dimension.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+      </div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>Named Derived Units</summary>
+    <div class="domain">
+      <div class="context-list">
+        
+          <div class="context">
+            <h3>Composition and Equivalence</h3>
+            <p><em>Defines how named derived units relate to their component unit exponents and how this metadata is interpreted in dimensional expressions.</em></p>
+
+            
+              <div class="rule">
+                <strong>Derived unit composition must be explicit and fundamental</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>A named derived unit must explicitly specify a composition consisting of one or more fundamental unit types, each paired with a rational exponent.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Derived unit composition must use valid units</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>Each unit type used in the composition of a named derived unit must be a valid unit defined in the unit registry.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Derived unit exponents must be normalized</strong>
+                
+                
+                  
+                
+                <div class="negative">[negative_compile_time]</div>
+                
+                  <p>The unit exponents within a named derived unit must be reduced to their canonical rational representation and must not include duplicate unit types.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+          <div class="context">
+            <h3>Integration with Dimension System</h3>
+            <p><em>Specifies how named derived units integrate with existing dimensional constructs and participate in arithmetic, conversion, and inference.</em></p>
+
+            
+              <div class="rule">
+                <strong>Derived units are usable in dimension construction</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>A named derived unit may be used in the construction of a base_dimension, and its internal composition is treated as contributing to the dimensional structure.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Derived units do not alter arithmetic behavior</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>The use of a named derived unit in dimensional composition does not change the arithmetic semantics of the resulting base_dimension.</p>
+                
+                
+              </div>
+            
+              <div class="rule">
+                <strong>Derived units participate in conversion through composition</strong>
+                
+                
+                  
+                
+                <div class="positive">[positive_compile_time]</div>
+                
+                  <p>A conversion between two named derived units is valid only if a conversion path exists between each unit in their compositions.</p>
+                
+                
+              </div>
+            
+          </div>
+        
+      </div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>User Extension Integrity</summary>
+    <div class="domain">
+      <div class="context-list">
+        
+      </div>
+    </div>
+  </details>
+  
+  <details>
+    <summary>Serialization and Streaming</summary>
+    <div class="domain">
+      <div class="context-list">
+        
+      </div>
+    </div>
+  </details>
+  
+</body>
+</html>

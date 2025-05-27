@@ -6,8 +6,7 @@
 namespace Dimension
 {
 
-
-
 }
 
-#endif //STATIC_DIMENSION_TORQUE_H
+
+#endif // STATIC_DIMENSION_TORQUE_H

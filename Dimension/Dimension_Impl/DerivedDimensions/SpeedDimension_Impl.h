@@ -1,215 +1,123 @@
 #ifndef STATIC_DIMENSION_SPEED_IMPL_H
 #define STATIC_DIMENSION_SPEED_IMPL_H
 
+#include "../../BaseDimension.h"
 #include "../../LengthDimension.h"
 #include "../../TimeDimension.h"
 
 namespace Dimension
 {
-   /// @brief Concept for a named Speed unit.
-   /// @tparam NamedSpeed The type to be checked as a named Speed unit.
-   template<typename NamedSpeed>
+   /// @brief Concept to verify a type can serve as a named Speed unit
+   template<typename T>
    concept IsNamedSpeedUnit = requires {
-      typename NamedSpeed::NumTuple;
-      typename NamedSpeed::DenTuple;
+      typename T::units;
+      requires 
+         std::tuple_size_v<typename T::units> == 2 &&
+         IsLengthUnit<typename std::tuple_element_t<0, typename T::units>::unit> &&
+         IsTimeUnit<typename std::tuple_element_t<1, typename T::units>::unit>;
+      requires !std::is_base_of_v<FundamentalUnitTag, T>;
    };
 
-   /// @brief Concept for a Speed dimension.
-   /// @details Checks if the provided types satisfy the Speed dimension requirements.
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Time1 Denominator Time1 type
-   template<typename Length1, typename Time1>
-   concept IsSpeedUnits = 
-      std::is_same_v<typename Length1::Dim, LengthType> &&
-      std::is_same_v<typename Time1::Dim, TimeType>;
-
-   /// @brief Concept for a Speed type.
-   /// @details Ensures that the type meets Speed type requirements, based on numerator and denominator types.
-   /// @tparam T The type to validate.
+   /// @brief Concept to verify a dimension can be treated as a Speed type
    template<typename T>
-   concept IsSpeedType = requires {
-      typename T::NumTuple;
-      typename T::DenTuple;
-   } && std::tuple_size_v<typename T::NumTuple> == 1 && std::tuple_size_v<typename T::DenTuple> == 1 &&
-   IsSpeedUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>>;
+   concept IsSpeed = std::is_convertible_v<T, BaseDimension<
+      UnitExponent<PrimaryLength, 1>, 
+      UnitExponent<PrimaryTime, -1>
+   >>;
 
-   /// @brief Retrieves the value of a Speed object.
-   /// @details Provides access to the underlying value represented by a Speed object.
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam SpeedType The type of the object being accessed.
-   /// @param obj The Speed object.
-   /// @return The underlying value as `PrecisionType`
-   template<typename Length1, typename Time1, typename SpeedType>
-   requires IsSpeedUnits<Length1, Time1> && IsSpeedType<SpeedType>
-   constexpr PrecisionType getSpeed(const SpeedType& obj)
+   /// @brief Retrieves the value of a Speed object with specific units
+   /// @tparam LengthUnit The Length unit used for all Length components of Speed
+   /// @tparam TimeUnit The Time unit used for all Time components of Speed
+   /// @tparam DimType The dimension object type, deduced
+   /// @param obj The dimension to extract a raw value from
+   /// @return The raw value in terms of template units as a PrecisionType
+   template<
+      IsLengthUnit LengthUnit,
+      IsTimeUnit TimeUnit,
+      IsSpeed DimType>
+   constexpr PrecisionType get_speed_as(const DimType& obj)
    {
-      return obj.template GetVal<std::tuple<Length1>, std::tuple<Time1>>();
+      return get_dimension_as<
+         UnitExponent<LengthUnit, 1>,
+         UnitExponent<TimeUnit, -1>
+      >(obj);
    }
 
    /// @brief Retrieves the value of a named Speed object.
-   /// @details Provides access to the value represented by a named Speed object.
-   /// @tparam NamedSpeed The named unit type.
-   /// @tparam SpeedType The type of the object being accessed.
-   /// @param obj The Speed object.
-   /// @return The underlying value as `PrecisionType`.
-   template<typename NamedSpeed, typename SpeedType>
-   requires IsNamedSpeedUnit<NamedSpeed> && IsSpeedType<SpeedType>
-   constexpr PrecisionType getSpeed(const SpeedType& obj)
+   /// @tparam Named The named unit to extract in terms of
+   /// @tparam DimType The dimension object type, deduced
+   /// @param obj The dimension to extract a raw value from
+   /// @return The raw value in terms of template units as a PrecisionType
+   template<IsNamedSpeedUnit Named, IsSpeed DimType>
+   constexpr PrecisionType get_speed_as(const DimType& obj)
    {
-      return obj.template GetVal<typename NamedSpeed::NumTuple, typename NamedSpeed::DenTuple>();
+      return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
 
    template<typename... Ts>
    class Speed;
 
-   /// @brief Represents a default Speed.
-   /// @details This Speed is templated on the primary units of the relevant dimensions.
-   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
-   ///   "Speed" type, without regard for the underlying units.
+   /// @brief Represents the default Speed
    template<>
-   class Speed<> : public BaseDimension<std::tuple<PrimaryLength>, std::tuple<PrimaryTime>>
+   class Speed<> : public BaseDimension<
+      UnitExponent<PrimaryLength, 1>,
+      UnitExponent<PrimaryTime, -1>>
    {
    public:
-      using Base = BaseDimension<std::tuple<PrimaryLength>, std::tuple<PrimaryTime>>;
+      using Base = BaseDimension<
+         UnitExponent<PrimaryLength, 1>,
+         UnitExponent<PrimaryTime, -1>>;
       using Base::Base;
 
-      /// @brief Constructs a Speed object with a value.
-      /// @param val The value of the Speed.
       explicit constexpr Speed(PrecisionType val) : Base(val) {}
 
-      /// @brief Constructs a Speed object from another Speed object.
-      /// @tparam OtherSpeed The other Speed type.
-      /// @param base The base Speed object.
-      template<typename OtherSpeed>
-      requires IsSpeedType<OtherSpeed>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr Speed(const OtherSpeed& base)
-         : Base(base.template GetVal<std::tuple<PrimaryLength>, std::tuple<PrimaryTime>>()) {}
+      template<typename Other>
+      requires IsSpeed<Other>
+      constexpr Speed(const Other& base)
+         : Base(call_unpack<typename Base::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-   /// @brief Represents a Speed.
-   /// @details Defines operations and data storage for Speed dimensions.
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Time1 Denominator Time1 type
-   template<typename Length1, typename Time1>
-   requires IsSpeedUnits<Length1, Time1>
-   class Speed<Length1, Time1> : public BaseDimension<std::tuple<Length1>, std::tuple<Time1>>
+   /// @brief Template specialization for named Speed units
+   /// @tparam Named The named unit this Speed type is in terms of
+   template<IsNamedSpeedUnit Named>
+   class Speed<Named> : public BaseDimensionFromTuple<typename Named::units>::dim
    {
    public:
-      using Base = BaseDimension<std::tuple<Length1>, std::tuple<Time1>>;
+      using Base = typename BaseDimensionFromTuple<typename Named::units>::dim;
       using Base::Base;
 
-      /// @brief Constructs a Speed object with a value.
-      /// @param val The value of the Speed.
-      explicit constexpr Speed(PrecisionType val) : Base(val) {}
-
-      /// @brief Constructs a Speed object from a named unit.
-      /// @tparam NamedSpeed The named unit type.
-      /// @param base The base unit object.
-      template<typename NamedSpeed>
-      requires IsNamedSpeedUnit<NamedSpeed>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr Speed(const NamedSpeed& base) : Base(base) {}
-
-      /// @brief Deprecated function to get the value of Speed.
-      /// @details Prefer using the free function `getSpeed()` instead.
-      /// @return The value of the Speed.
-      template<typename Length1T, typename Time1T>
-      requires IsSpeedUnits<Length1T, Time1T>
-      [[deprecated("Use the free function getSpeed() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetSpeed() const
-      {
-         return getSpeed<Length1T, Time1T>(*this);
-      }
-
-      /// @brief Deprecated function to get the value of Speed.
-      /// @details Prefer using the free function `getSpeed()` instead.
-      /// @return The value of the Speed.
-      template<typename NamedSpeed>
-      requires IsNamedSpeedUnit<NamedSpeed>
-      [[deprecated("Use the free function getSpeed() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetSpeed() const
-      {
-         return getSpeed<NamedSpeed>(*this);
-      }
+      template<typename Other>
+      requires IsSpeed<Other>
+      constexpr Speed(const Other& base)
+         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-   /// @brief Represents a named Speed class.
-   /// @details Provides functionality for named Speed units.
-   /// @tparam NamedSpeed The named unit type.
-   template<typename NamedSpeed>
-   requires IsNamedSpeedUnit<NamedSpeed>
-   class Speed<NamedSpeed> : public BaseDimension<typename NamedSpeed::NumTuple, typename NamedSpeed::DenTuple>
+
+   template<typename... Units>
+   class Speed<Units...> : public BaseDimension<
+      UnitExponent<typename Extractor<LengthType, Units...>::type, 1>,
+      UnitExponent<typename Extractor<TimeType, Units...>::type, -1>
+   >
    {
    public:
-      using Base = BaseDimension<typename NamedSpeed::NumTuple, typename NamedSpeed::DenTuple>;
+      using Base = BaseDimension<
+         UnitExponent<typename Extractor<LengthType, Units...>::type, 1>,
+         UnitExponent<typename Extractor<TimeType, Units...>::type, -1>
+      >;
+   
       using Base::Base;
-
-      /// @brief Constructs a Speed object with a value.
-      /// @param val The value of the Speed.
-      explicit constexpr Speed(PrecisionType val) : Base(val) {}
-
-      /// @brief Constructs a Speed object from another Speed object.
-      /// @tparam OtherSpeed The other Speed type.
-      /// @param base The base Speed object.
-      template<typename OtherSpeed>
-      requires IsSpeedType<OtherSpeed>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr Speed(const OtherSpeed& base)
-         : Base(base.template GetVal<typename NamedSpeed::NumTuple, typename NamedSpeed::DenTuple>()) {}
-
-      /// @brief Deprecated function to get the value of Speed.
-      /// @details Prefer using the free function `getSpeed()` instead.
-      /// @return The value of the Speed.
-      template<typename Length1T, typename Time1T>
-      requires IsSpeedUnits<Length1T, Time1T>
-      [[deprecated("Use the free function getSpeed() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetSpeed() const
-      {
-         return getSpeed<Length1T, Time1T>(*this);
-      }
-
-      /// @brief Deprecated function to get the value of Speed.
-      /// @details Prefer using the free function `getSpeed()` instead.
-      /// @return The value of the Speed.
-      template<typename NamedSpeedUnit>
-      requires IsNamedSpeedUnit<NamedSpeedUnit>
-      [[deprecated("Use the free function getSpeed() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetSpeed() const
-      {
-         return getSpeed<NamedSpeedUnit>(*this);
-      }         
+   
+      template<typename T>
+      requires IsSpeed<T>
+      constexpr Speed(const T& base) : Base(base) {}
    };
 
-   /// @brief Template deduction guide for Speed.
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Time1 Denominator Time1 type
-   template<typename Length1, typename Time1>
-   requires IsSpeedUnits<Length1, Time1>
-   Speed(Length1, Time1) -> Speed<Length1, Time1>;
-
-   /// @brief Template deduction guide for Speed.
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Time1 Denominator Time1 type
-   template<typename NamedSpeed>
-   requires IsNamedSpeedUnit<NamedSpeed>
-   Speed(NamedSpeed) -> Speed<NamedSpeed>;
-
-   /// @brief Template deduction guide for Speed.
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Time1 Denominator Time1 type
-   template<typename Length1, typename Time1>
-   requires IsSpeedUnits<Length1, Time1>
-   Speed(BaseDimension<std::tuple<Length1>, std::tuple<Time1>>) -> Speed<Length1, Time1>;
-
+   template<IsSpeed Dim>
+   Speed(Dim) -> 
+   Speed<
+      DimExtractor<LengthType, Dim>,
+      DimExtractor<TimeType, Dim>
+   >;
 }
 
 #endif // STATIC_DIMENSION_SPEED_IMPL_H

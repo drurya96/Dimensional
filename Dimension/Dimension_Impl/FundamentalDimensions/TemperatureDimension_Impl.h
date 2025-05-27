@@ -16,7 +16,7 @@ namespace Dimension
    /// @brief Concept to check if a type is a valid Temperature unit.
    /// @tparam T The type to check.
    template<typename T>
-   concept IsTemperatureUnit = IsNonQuantityUnitDimension<T, TemperatureType> || IsQuantityUnitDimension<T, TemperatureType>;
+   concept IsTemperatureUnit = std::is_base_of_v<FundamentalUnitTag, T> && std::is_same_v<typename T::Dim, TemperatureType>;//IsNonQuantityUnitDimension<T, TemperatureType> || IsQuantityUnitDimension<T, TemperatureType>;
 
    /// @brief Base class for Temperature units.
    /// @tparam Unit The unit type.
@@ -35,13 +35,22 @@ namespace Dimension
 
    /// @brief Trait to check if a type is a Temperature dimension.
    /// @tparam T The type to check.
-   template<typename T>
-   struct is_Temperature : std::false_type {};
+   //template<typename T>
+   //struct is_Temperature : std::false_type {};
+
+   //template<typename Dim>
+   //struct is_Temperature_Impl
+   //{
+   //   constexpr bool value = IsTemperatureUnit<std::tuple_element_t<0, decltype(FullSimplify(Dim{}))>>;
+   //};
+
 
    /// @brief Specialization for BaseDimension types.
    /// @tparam T The unit type.
-   template<typename T>
-   struct is_Temperature<BaseDimension<std::tuple<T>, std::tuple<>>> : std::bool_constant<IsTemperatureUnit<T>> {};
+   //template<typename T>
+   //struct is_Temperature<BaseDimension<T>> : std::bool_constant<IsTemperatureUnit<T>> {};
+   template<typename Dim>
+   struct is_Temperature : std::bool_constant<IsTemperatureUnit<typename std::tuple_element_t<0, typename decltype(FullSimplify(Dim{}))::units>::unit>> {};
 
    /// @brief Helper variable template for is_Temperature.
    /// @tparam T The type to check.
@@ -58,58 +67,56 @@ namespace Dimension
    /// @param obj The Temperature object.
    /// @return The value in the specified unit.
    template<IsTemperatureUnit T>
-   constexpr PrecisionType getTemperature(Temperature_type auto obj)
+   constexpr PrecisionType get_temperature_as(/*Temperature_type*/ auto obj)
    {
-      return obj.template GetVal<std::tuple<T>, std::tuple<>>();
+      return get_dimension_as<UnitExponent<T>>(obj);
    }
+
+   template<IsTemperatureUnit Unit = PrimaryTemperature, bool isQuantity = false>
+   class Temperature;
 
    /// @brief Represents a dimension type for Temperature.
    /// @tparam Unit The primary unit type.
-   template<IsTemperatureUnit Unit = PrimaryTemperature>
-   class Temperature : public BaseDimension<std::tuple<Unit>, std::tuple<>>
+   template<IsTemperatureUnit Unit>
+   class Temperature<Unit, false> : public BaseDimension<UnitExponent<Unit>>
    {
    public:
       /// @brief Default constructor initializing to zero.
-      constexpr Temperature() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}
+      constexpr Temperature() : BaseDimension<UnitExponent<Unit>>::BaseDimension(0.0) {}
 
       /// @brief Constructs a Temperature object with a specific value.
       /// @param val The value to initialize with.
-      explicit constexpr Temperature(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
+      explicit constexpr Temperature(double val) : BaseDimension<UnitExponent<Unit>>::BaseDimension(val) {}
 
       /// @brief Constructs a Temperature object from another BaseDimension.
-      /// @tparam T The unit type of the BaseDimension.
+      /// @tparam Ts The units of the BaseDimension.
       /// @param base The BaseDimension object to construct from.
-      template<IsTemperatureUnit T>
+      template<typename... Ts>
+      requires matching_dimensions<BaseDimension<UnitExponent<Unit>>, BaseDimension<Ts...>>
       // Implicit conversion between dimensions of the same unit is core to Dimensional
       // cppcheck-suppress noExplicitConstructor
-      constexpr Temperature(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()){}
-
-      /// @brief Deprecated method to retrieve the value of the dimension.
-      /// @tparam T The unit type.
-      /// @return The value in the specified unit.
-      template<IsTemperatureUnit T>
-      [[deprecated("Use the free function getTemperature() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetTemperature() const
-      {
-         return getTemperature<T>(*this);
-      }
+      constexpr Temperature(const BaseDimension<Ts...>& base) : BaseDimension<UnitExponent<Unit>>::BaseDimension(get_dimension_as<UnitExponent<Unit>>(base)) {}
    };
-
-   /// @brief Deduction guide for Temperature constructor.
-   /// @tparam T The unit type.
-   template<IsTemperatureUnit T>
-   Temperature(T) -> Temperature<T>;
-
-   /// @brief Deduction guide for Temperature constructor with BaseDimension.
-   /// @tparam TemperatureUnit The unit type.
-   template<IsTemperatureUnit TemperatureUnit>
-   Temperature(BaseDimension<std::tuple<TemperatureUnit>, std::tuple<>>) -> Temperature<TemperatureUnit>;
 
    /// @brief Specialization for is_Temperature trait for Temperature types.
    /// @tparam T The unit type.
    template<typename T>
    struct is_Temperature<Temperature<T>> : std::bool_constant<IsTemperatureUnit<T>> {};
+
+   /// @brief Deduction guide for Temperature constructor.
+   /// @tparam T The unit type.
+   //template<IsTemperatureUnit T>
+   //Temperature(T) -> Temperature<T>;
+
+   /// @brief Deduction guide for Temperature constructor with BaseDimension.
+   /// @tparam TemperatureUnit The unit type.
+   //template<IsTemperatureUnit TemperatureUnit>
+   //Temperature(BaseDimension<UnitExponent<TemperatureUnit>>) -> Temperature<TemperatureUnit>;
+
+   /// @brief Deduction guide for Temperature constructor with BaseDimension.
+   /// @tparam TemperatureUnit The unit type.
+   template<Temperature_type Dim>
+   Temperature(Dim) -> Temperature<DimExtractor<TemperatureType, Dim>>;
 }
 
-#endif //STATIC_DIMENSION_Temperature_IMPL_H
+#endif // STATIC_DIMENSION_Temperature_IMPL_H

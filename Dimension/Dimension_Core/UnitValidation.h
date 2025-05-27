@@ -8,6 +8,26 @@
 
 namespace Dimension
 {
+
+   static constexpr bool delta = false;
+   static constexpr bool quantity = true;
+
+   // TODO: MOVE THIS
+   template<typename Unit, int Num = 1, int Den = 1, bool isQuantity = delta>
+   struct UnitExponent
+   {
+      using unit = Unit;
+      using exponent = std::ratio<Num, Den>;
+      static constexpr bool quantity = isQuantity;
+   };
+
+
+
+
+
+
+
+
    template <typename> struct is_tuple: std::false_type {};
 
    template <typename ...T> struct is_tuple<std::tuple<T...>>: std::true_type {};
@@ -40,11 +60,23 @@ namespace Dimension
    }
 
    // The IsUnitTuple concept that ensures all types in a tuple satisfy Has_Dim
+   // TODO: REMOVE
    template<typename Tuple>
-   concept IsUnitTuple =
+   concept IsUnitTuple = 
       std::tuple_size_v<Tuple> == 0 || 
       all_satisfy_unit_constraints<Tuple>(std::make_index_sequence<std::tuple_size_v<Tuple>>{});
 
+
+   template<typename T>
+   concept is_unit_exponent = requires {
+         typename T::unit;
+         typename T::exponent;
+   };
+
+   template<typename... Ts>
+   concept are_unit_exponents = (is_unit_exponent<Ts> && ...);
+
+ 
    template<typename T, typename UnitType>
    concept IsNonQuantityUnitDimension = 
       !is_quantity_v<T> &&

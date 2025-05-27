@@ -2,6 +2,7 @@
    {
       "Dimension": "Length",
       "Fundamental": true,
+      "HasExtras": false,
       "BaseUnit": "Meters",
       "SI_Prefixes": true,
       "Units": {
@@ -22,6 +23,7 @@
    {
       "Dimension": "Mass",
       "Fundamental": true,
+      "HasExtras": false,
       "BaseUnit": "Grams",
       "SI_Prefixes": true,
       "Units": {
@@ -39,6 +41,7 @@
    {
       "Dimension": "Amount",
       "Fundamental": true,
+      "HasExtras": false,
       "BaseUnit": "Moles",
       "SI_Prefixes": true,
       "Units": {
@@ -49,6 +52,7 @@
    {
       "Dimension": "Angle",
       "Fundamental": true,
+      "HasExtras": false,
       "BaseUnit": "Radians",
       "SI_Prefixes": false,
       "Units": {
@@ -59,6 +63,7 @@
    {
       "Dimension": "Charge",
       "Fundamental": true,
+      "HasExtras": false,
       "BaseUnit": "Coulombs",
       "SI_Prefixes": true,
       "Units": {
@@ -70,6 +75,7 @@
    {
       "Dimension": "Time",
       "Fundamental": true,
+      "HasExtras": false,
       "BaseUnit": "Seconds",
       "SI_Prefixes": true,
       "Units": {
@@ -81,13 +87,14 @@
    {
       "Dimension": "Temperature",
       "Fundamental": true,
+      "HasExtras": false,
       "BaseUnit": "Kelvin",
       "SI_Prefixes": false,
       "Units": {
          "Kelvin": { "Name": "Kelvin", "Abbreviation": "K", "SI_Prefixes": false },
-         "Celsius": { "Name": "Celsius", "Abbreviation": "°C", "SI_Prefixes": false },
-         "Fahrenheit": { "Name": "Fahrenheit", "Abbreviation": "°F", "SI_Prefixes": false },
-         "Rankine": { "Name": "Rankine", "Abbreviation": "°R", "SI_Prefixes": false }
+         "Celsius": { "Name": "Celsius", "Abbreviation": "C", "SI_Prefixes": false },
+         "Fahrenheit": { "Name": "Fahrenheit", "Abbreviation": "F", "SI_Prefixes": false },
+         "Rankine": { "Name": "Rankine", "Abbreviation": "R", "SI_Prefixes": false }
       }
    }
 ]

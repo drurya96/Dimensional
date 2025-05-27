@@ -1,12 +1,12 @@
-#ifndef STATIC_DIMENSION_MomentOfInertia_H
-#define STATIC_DIMENSION_MomentOfInertia_H
+#ifndef STATIC_DIMENSION_MOMENTOFINERTIA_H
+#define STATIC_DIMENSION_MOMENTOFINERTIA_H
 
-#include "Dimension_Impl/DerivedDimensions/MomentOfInertiaDimension_Impl.h" 
+#include "Dimension_Impl/DerivedDimensions/MomentOfInertiaDimension_Impl.h"
 
 namespace Dimension
 {
 
-
 }
 
-#endif //STATIC_DIMENSION_MomentOfInertia_H
+
+#endif // STATIC_DIMENSION_MOMENTOFINERTIA_H

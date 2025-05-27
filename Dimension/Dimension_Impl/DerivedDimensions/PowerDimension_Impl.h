@@ -1,244 +1,134 @@
 #ifndef STATIC_DIMENSION_POWER_IMPL_H
 #define STATIC_DIMENSION_POWER_IMPL_H
 
+#include "../../BaseDimension.h"
 #include "../../MassDimension.h"
 #include "../../LengthDimension.h"
 #include "../../TimeDimension.h"
 
 namespace Dimension
 {
-   /// @brief Concept for a named Power unit.
-   /// @tparam NamedPower The type to be checked as a named Power unit.
-   template<typename NamedPower>
+   /// @brief Concept to verify a type can serve as a named Power unit
+   template<typename T>
    concept IsNamedPowerUnit = requires {
-      typename NamedPower::NumTuple;
-      typename NamedPower::DenTuple;
+      typename T::units;
+      requires 
+         std::tuple_size_v<typename T::units> == 3 &&
+         IsMassUnit<typename std::tuple_element_t<0, typename T::units>::unit> &&
+         IsLengthUnit<typename std::tuple_element_t<1, typename T::units>::unit> &&
+         IsTimeUnit<typename std::tuple_element_t<2, typename T::units>::unit>;
+      requires !std::is_base_of_v<FundamentalUnitTag, T>;
    };
 
-   /// @brief Concept for a Power dimension.
-   /// @details Checks if the provided types satisfy the Power dimension requirements.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   /// @tparam Time3 Denominator Time3 type
-   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Time3>
-   concept IsPowerUnits = 
-      std::is_same_v<typename Mass1::Dim, MassType> &&
-      std::is_same_v<typename Length1::Dim, LengthType> &&
-      std::is_same_v<typename Length2::Dim, LengthType> &&
-      std::is_same_v<typename Time1::Dim, TimeType> &&
-      std::is_same_v<typename Time2::Dim, TimeType> &&
-      std::is_same_v<typename Time3::Dim, TimeType>;
-
-   /// @brief Concept for a Power type.
-   /// @details Ensures that the type meets Power type requirements, based on numerator and denominator types.
-   /// @tparam T The type to validate.
+   /// @brief Concept to verify a dimension can be treated as a Power type
    template<typename T>
-   concept IsPowerType = requires {
-      typename T::NumTuple;
-      typename T::DenTuple;
-   } && std::tuple_size_v<typename T::NumTuple> == 3 && std::tuple_size_v<typename T::DenTuple> == 3 &&
-   IsPowerUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<2, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>, typename std::tuple_element_t<2, typename T::DenTuple>>;
+   concept IsPower = std::is_convertible_v<T, BaseDimension<
+      UnitExponent<PrimaryMass, 1>, 
+      UnitExponent<PrimaryLength, 2>, 
+      UnitExponent<PrimaryTime, -3>
+   >>;
 
-   /// @brief Retrieves the value of a Power object.
-   /// @details Provides access to the underlying value represented by a Power object.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   /// @tparam Time3 Denominator Time3 type
-   /// @tparam PowerType The type of the object being accessed.
-   /// @param obj The Power object.
-   /// @return The underlying value as `PrecisionType`
-   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Time3, typename PowerType>
-   requires IsPowerUnits<Mass1, Length1, Length2, Time1, Time2, Time3> && IsPowerType<PowerType>
-   constexpr PrecisionType getPower(const PowerType& obj)
+   /// @brief Retrieves the value of a Power object with specific units
+   /// @tparam MassUnit The Mass unit used for all Mass components of Power
+   /// @tparam LengthUnit The Length unit used for all Length components of Power
+   /// @tparam TimeUnit The Time unit used for all Time components of Power
+   /// @tparam DimType The dimension object type, deduced
+   /// @param obj The dimension to extract a raw value from
+   /// @return The raw value in terms of template units as a PrecisionType
+   template<
+      IsMassUnit MassUnit,
+      IsLengthUnit LengthUnit,
+      IsTimeUnit TimeUnit,
+      IsPower DimType>
+   constexpr PrecisionType get_power_as(const DimType& obj)
    {
-      return obj.template GetVal<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Time3>>();
+      return get_dimension_as<
+         UnitExponent<MassUnit, 1>,
+         UnitExponent<LengthUnit, 2>,
+         UnitExponent<TimeUnit, -3>
+      >(obj);
    }
 
    /// @brief Retrieves the value of a named Power object.
-   /// @details Provides access to the value represented by a named Power object.
-   /// @tparam NamedPower The named unit type.
-   /// @tparam PowerType The type of the object being accessed.
-   /// @param obj The Power object.
-   /// @return The underlying value as `PrecisionType`.
-   template<typename NamedPower, typename PowerType>
-   requires IsNamedPowerUnit<NamedPower> && IsPowerType<PowerType>
-   constexpr PrecisionType getPower(const PowerType& obj)
+   /// @tparam Named The named unit to extract in terms of
+   /// @tparam DimType The dimension object type, deduced
+   /// @param obj The dimension to extract a raw value from
+   /// @return The raw value in terms of template units as a PrecisionType
+   template<IsNamedPowerUnit Named, IsPower DimType>
+   constexpr PrecisionType get_power_as(const DimType& obj)
    {
-      return obj.template GetVal<typename NamedPower::NumTuple, typename NamedPower::DenTuple>();
+      return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
 
    template<typename... Ts>
    class Power;
 
-   /// @brief Represents a default Power.
-   /// @details This Power is templated on the primary units of the relevant dimensions.
-   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
-   ///   "Power" type, without regard for the underlying units.
+   /// @brief Represents the default Power
    template<>
-   class Power<> : public BaseDimension<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryTime>>
+   class Power<> : public BaseDimension<
+      UnitExponent<PrimaryMass, 1>,
+      UnitExponent<PrimaryLength, 2>,
+      UnitExponent<PrimaryTime, -3>>
    {
    public:
-      using Base = BaseDimension<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryTime>>;
+      using Base = BaseDimension<
+         UnitExponent<PrimaryMass, 1>,
+         UnitExponent<PrimaryLength, 2>,
+         UnitExponent<PrimaryTime, -3>>;
       using Base::Base;
 
-      /// @brief Constructs a Power object with a value.
-      /// @param val The value of the Power.
       explicit constexpr Power(PrecisionType val) : Base(val) {}
 
-      /// @brief Constructs a Power object from another Power object.
-      /// @tparam OtherPower The other Power type.
-      /// @param base The base Power object.
-      template<typename OtherPower>
-      requires IsPowerType<OtherPower>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr Power(const OtherPower& base)
-         : Base(base.template GetVal<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryTime>>()) {}
+      template<typename Other>
+      requires IsPower<Other>
+      constexpr Power(const Other& base)
+         : Base(call_unpack<typename Base::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-   /// @brief Represents a Power.
-   /// @details Defines operations and data storage for Power dimensions.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   /// @tparam Time3 Denominator Time3 type
-   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Time3>
-   requires IsPowerUnits<Mass1, Length1, Length2, Time1, Time2, Time3>
-   class Power<Mass1, Length1, Length2, Time1, Time2, Time3> : public BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Time3>>
+   /// @brief Template specialization for named Power units
+   /// @tparam Named The named unit this Power type is in terms of
+   template<IsNamedPowerUnit Named>
+   class Power<Named> : public BaseDimensionFromTuple<typename Named::units>::dim
    {
    public:
-      using Base = BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Time3>>;
+      using Base = typename BaseDimensionFromTuple<typename Named::units>::dim;
       using Base::Base;
 
-      /// @brief Constructs a Power object with a value.
-      /// @param val The value of the Power.
-      explicit constexpr Power(PrecisionType val) : Base(val) {}
-
-      /// @brief Constructs a Power object from a named unit.
-      /// @tparam NamedPower The named unit type.
-      /// @param base The base unit object.
-      template<typename NamedPower>
-      requires IsNamedPowerUnit<NamedPower>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr Power(const NamedPower& base) : Base(base) {}
-
-      /// @brief Deprecated function to get the value of Power.
-      /// @details Prefer using the free function `getPower()` instead.
-      /// @return The value of the Power.
-      template<typename Mass1T, typename Length1T, typename Length2T, typename Time1T, typename Time2T, typename Time3T>
-      requires IsPowerUnits<Mass1T, Length1T, Length2T, Time1T, Time2T, Time3T>
-      [[deprecated("Use the free function getPower() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetPower() const
-      {
-         return getPower<Mass1T, Length1T, Length2T, Time1T, Time2T, Time3T>(*this);
-      }
-
-      /// @brief Deprecated function to get the value of Power.
-      /// @details Prefer using the free function `getPower()` instead.
-      /// @return The value of the Power.
-      template<typename NamedPower>
-      requires IsNamedPowerUnit<NamedPower>
-      [[deprecated("Use the free function getPower() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetPower() const
-      {
-         return getPower<NamedPower>(*this);
-      }
+      template<typename Other>
+      requires IsPower<Other>
+      constexpr Power(const Other& base)
+         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-   /// @brief Represents a named Power class.
-   /// @details Provides functionality for named Power units.
-   /// @tparam NamedPower The named unit type.
-   template<typename NamedPower>
-   requires IsNamedPowerUnit<NamedPower>
-   class Power<NamedPower> : public BaseDimension<typename NamedPower::NumTuple, typename NamedPower::DenTuple>
+
+   template<typename... Units>
+   class Power<Units...> : public BaseDimension<
+      UnitExponent<typename Extractor<MassType, Units...>::type, 1>,
+      UnitExponent<typename Extractor<LengthType, Units...>::type, 2>,
+      UnitExponent<typename Extractor<TimeType, Units...>::type, -3>
+   >
    {
    public:
-      using Base = BaseDimension<typename NamedPower::NumTuple, typename NamedPower::DenTuple>;
+      using Base = BaseDimension<
+         UnitExponent<typename Extractor<MassType, Units...>::type, 1>,
+         UnitExponent<typename Extractor<LengthType, Units...>::type, 2>,
+         UnitExponent<typename Extractor<TimeType, Units...>::type, -3>
+      >;
+   
       using Base::Base;
-
-      /// @brief Constructs a Power object with a value.
-      /// @param val The value of the Power.
-      explicit constexpr Power(PrecisionType val) : Base(val) {}
-
-      /// @brief Constructs a Power object from another Power object.
-      /// @tparam OtherPower The other Power type.
-      /// @param base The base Power object.
-      template<typename OtherPower>
-      requires IsPowerType<OtherPower>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr Power(const OtherPower& base)
-         : Base(base.template GetVal<typename NamedPower::NumTuple, typename NamedPower::DenTuple>()) {}
-
-      /// @brief Deprecated function to get the value of Power.
-      /// @details Prefer using the free function `getPower()` instead.
-      /// @return The value of the Power.
-      template<typename Mass1T, typename Length1T, typename Length2T, typename Time1T, typename Time2T, typename Time3T>
-      requires IsPowerUnits<Mass1T, Length1T, Length2T, Time1T, Time2T, Time3T>
-      [[deprecated("Use the free function getPower() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetPower() const
-      {
-         return getPower<Mass1T, Length1T, Length2T, Time1T, Time2T, Time3T>(*this);
-      }
-
-      /// @brief Deprecated function to get the value of Power.
-      /// @details Prefer using the free function `getPower()` instead.
-      /// @return The value of the Power.
-      template<typename NamedPowerUnit>
-      requires IsNamedPowerUnit<NamedPowerUnit>
-      [[deprecated("Use the free function getPower() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetPower() const
-      {
-         return getPower<NamedPowerUnit>(*this);
-      }         
+   
+      template<typename T>
+      requires IsPower<T>
+      constexpr Power(const T& base) : Base(base) {}
    };
 
-   /// @brief Template deduction guide for Power.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   /// @tparam Time3 Denominator Time3 type
-   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Time3>
-   requires IsPowerUnits<Mass1, Length1, Length2, Time1, Time2, Time3>
-   Power(Mass1, Length1, Length2, Time1, Time2, Time3) -> Power<Mass1, Length1, Length2, Time1, Time2, Time3>;
-
-   /// @brief Template deduction guide for Power.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   /// @tparam Time3 Denominator Time3 type
-   template<typename NamedPower>
-   requires IsNamedPowerUnit<NamedPower>
-   Power(NamedPower) -> Power<NamedPower>;
-
-   /// @brief Template deduction guide for Power.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   /// @tparam Time3 Denominator Time3 type
-   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Time3>
-   requires IsPowerUnits<Mass1, Length1, Length2, Time1, Time2, Time3>
-   Power(BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Time3>>) -> Power<Mass1, Length1, Length2, Time1, Time2, Time3>;
-
+   template<IsPower Dim>
+   Power(Dim) -> 
+   Power<
+      DimExtractor<MassType, Dim>,
+      DimExtractor<LengthType, Dim>,
+      DimExtractor<TimeType, Dim>
+   >;
 }
 
 #endif // STATIC_DIMENSION_POWER_IMPL_H

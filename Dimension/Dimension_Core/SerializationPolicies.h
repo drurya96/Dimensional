@@ -11,8 +11,7 @@ namespace Dimension
 {
 
    // Forward declaration
-   template<typename NumTupleT, typename DenTupleT>
-   requires IsUnitTuplePair<NumTupleT, DenTupleT>
+   template<are_unit_exponents... Units>
    class BaseDimension;
 
    /// @brief Validate that an input buffer's tag matches the hashed value corresponding to the type

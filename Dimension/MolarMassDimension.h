@@ -6,7 +6,7 @@
 namespace Dimension
 {
 
-
 }
 
-#endif //STATIC_DIMENSION_MOLARMASS_H
+
+#endif // STATIC_DIMENSION_MOLARMASS_H

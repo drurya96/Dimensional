@@ -1,0 +1,918 @@
+{
+   "terms": [
+   {
+      "term": "base_dimension",
+      "definition": "A compile-time type representing the dimensional structure of a value. It consists of one or more unit_exponents, each associated with a specific unit type and exponent."
+   },
+   {
+      "term": "unit_exponent",
+      "definition": "A type-level pair consisting of a unit type and an associated rational exponent, used to express a unit's contribution to a base_dimension."
+   },
+   {
+      "term": "atomic_dimension",
+      "definition": "A base_dimension containing exactly one unit_exponent, with exponent +1. Represents a dimensionally pure value suitable for point arithmetic."
+   },
+   {
+      "term": "reference_frame",
+      "definition": "A type that anchors a point to a coordinate system and provides offset and unit information for converting to and from dimensional values."
+   },
+   {
+      "term": "point",
+      "definition": "An object representing a direct measurement on some reference_frame"
+   },
+   {
+      "term": "anchor_unit",
+      "definition": "The canonical unit used as a basis for scalar representation and conversion within a reference frame. All offsets and conversions are defined relative to it."
+   },
+   {
+      "term": "dimensionally equivalent",
+      "definition": "Two base_dimensions are dimensionally equivalent when their aggregated exponents for each physical dimension are equal, regardless of unit types or ordering."
+   },
+   {
+      "term": "castable",
+      "definition": "A base_dimension A is castable to base_dimension B if they are dimensionally equivalent and a valid conversion exists between each corresponding unit."
+   },
+   {
+      "term": "conversion",
+      "definition": "Multiple unit types may represent the same physical dimension. Conversions define how such units are related and enable interoperability within dimensioned expressions."
+   },
+   {
+      "term": "scalar value",
+      "definition": "The numeric component associated with a dimensioned value. It represents the magnitude and is affected by arithmetic but does not influence type structure."
+   }
+   ],
+
+
+   "domains": [
+      {
+         "id": "dimension_arithmetic",
+         "name": "Dimension Arithmetic",
+         "description": "Covers how base_dimensions interact through arithmetic operations, ensuring correctness of dimensional algebra at compile time.",
+         "contexts": [
+         {
+            "id": "identity_behavior",
+            "name": "Identity Behavior",
+            "description": "Guarantees that a base_dimension behaves as an identity under arithmetic.",
+            "rules": [
+            {
+               "id": "raise_base_dimension_to_zero",
+               "name": "Exponent zero yields dimensionless",
+               "behaviors": ["Raising a base_dimension to the 0th power yields a dimensionless result."],
+               "kind": "positive_compile_time"
+            },
+            {
+               "id": "raise_base_dimension_to_one",
+               "name": "Exponent one yields self",
+               "behaviors": ["Raising a base_dimension to the 1st power yields the original base_dimension."],
+               "kind": "positive_compile_time"
+            },
+            {
+               "id": "multiply_by_raw_one",
+               "name": "Multiplication by raw one yields self",
+               "behaviors": ["Multiplying a base_dimension by the raw value 1 results in the original base_dimension."],
+               "kind": "positive_compile_time"
+            },
+            {
+               "id": "divide_by_raw_one",
+               "name": "Division by raw one yields self",
+               "behaviors": ["Dividing a base_dimension by the raw value 1 results in the original base_dimension."],
+               "kind": "positive_compile_time"
+            }
+            ]
+         },
+         {
+            "id": "multiplication",
+            "name": "Multiplication of base_dimensions",
+            "description": "Defines behavior when multiplying base_dimensions or raw values.",
+            "rules": [
+            {
+               "id": "multiply_base_dimension_by_base_dimension",
+               "name": "Combining matching and non-matching unit exponents",
+               "kind": "positive_compile_time",
+               "behaviors": [
+                  "When both operands contain the same unit, the resulting base_dimension includes that unit with an exponent equal to the sum of the input exponents.",
+                  "If the resulting exponent of a unit is zero, it is omitted from the resulting base_dimension.",
+                  "Units that appear in only one operand are included in the resulting base_dimension with their original exponents.",
+                  "The scalar value of the resulting dimension is the product of the scalars of the multiplicands.",
+                  "The order of units in the resulting base_dimension is the order of the left-hand operand units followed by the order of the right-hand operand units."
+               ]
+            },
+            {
+               "id": "scalar_times_base_dimension",
+               "name": "Scalar multiplied by base_dimension yields original",
+               "behaviors": ["Multiplying a raw value by a base_dimension yields the original base_dimension with scalar multiplied by the raw value."],
+               "kind": "positive_compile_time"
+            },
+            {
+               "id": "base_dimension_times_scalar",
+               "name": "Base_dimension multiplied by scalar yields original",
+               "behaviors": ["Multiplying a base_dimension by a raw value yields the original base_dimension with scalar multiplied by the raw value."],
+               "kind": "positive_compile_time"
+            }
+            ]
+         },
+         {
+            "id": "division",
+            "name": "Division of base_dimensions",
+            "description": "Defines behavior when dividing base_dimensions or by raw values.",
+            "rules": [
+            {
+               "id": "divide_base_dimension_by_base_dimension",
+               "name": "Division subtracts unit exponents",
+               "kind": "positive_compile_time",
+               "behaviors": [
+                  "When both operands include the same unit, the resulting base_dimension includes that unit with an exponent equal to the difference between the exponents of the numerator and denominator.",
+                  "Units that appear only in the denominator are included in the result with a negated exponent.",
+                  "Units that appear only in the numerator are retained in the result with their original exponents.",
+                  "If the resulting exponent of a unit after subtraction is zero, the unit is omitted from the resulting base_dimension.",
+                  "The order of units in the resulting base_dimension is the order of the left-hand operand units followed by the order of the right-hand operand units.",
+                  "The scalar value of the resulting dimension is the quotient of the scalars of the dividend and divisor."
+               ]
+            },
+            {
+               "id": "base_dimension_divided_by_raw",
+               "name": "Base_dimension divided by raw value yields original",
+               "behaviors": ["Dividing a base_dimension by a raw value yields the original base_dimension with scalar divided by the raw value."],
+               "kind": "positive_compile_time"
+            },
+            {
+               "id": "raw_divided_by_base_dimension",
+               "name": "Raw divided by base_dimension yields reciprocal",
+               "behaviors": ["Dividing a raw value by a base_dimension results in a base_dimension where each unit exponent is negated with the quotient of the raw value and the original scalar as the new scalar."],
+               "kind": "positive_compile_time"
+            },
+            {
+            "id": "division_by_zero_scalar_is_invalid",
+            "name": "Division by zero is invalid",
+            "behaviors": ["Dividing a base_dimension or raw value by zero is a compile-time error."],
+            "kind": "negative_compile_time"
+            }
+            ]
+         },
+         {
+            "id": "exponentiation",
+            "name": "Dimension Exponentiation",
+            "description": "Describes behavior when base_dimensions are raised to integer or fractional powers.",
+            "rules": [
+            {
+               "id": "base_dimension_exponentiation",
+               "name": "Exponentiation of base_dimension",
+               "kind": "positive_compile_time",
+               "behaviors": [
+                  "The resulting base_dimension contains the same units, but with all exponents multiplied by the power.",
+                  "The scalar value of the resulting dimension is the original scalar raised to the input power."
+               ]
+            },
+            {
+               "id": "rational_power",
+               "name": "Rational Power",
+               "behaviors": ["base_dimensions can be raised to a positive rational exponent."],
+               "kind": "positive_compile_time"
+            },
+            {
+            "id": "rational_exponents_may_be_negative",
+            "name": "Rational exponents may be negative",
+            "behaviors": ["A base_dimension may be raised to a negative rational exponent."],
+            "kind": "positive_compile_time"
+            },
+            {
+               "id": "irrational_power_disallowed",
+               "name": "Irrational Power",
+               "behaviors": ["base_dimensions cannot be raised to an irrational exponent."],
+               "kind": "negative_compile_time"
+            }
+            ]
+         },
+         {
+         "id": "addition_and_subtraction",
+         "name": "Addition and Subtraction",
+         "description": "Defines behavior when adding or subtracting base_dimensions, including compatibility requirements and preservation of dimensional meaning.",
+         "rules": [
+            {
+               "id": "addition_requires_compatible_dimensions",
+               "name": "Addition requires compatible dimensions",
+               "behaviors": ["Adding two base_dimensions is only valid when they represent equivalent physical dimensions and are castable to each other."],
+               "kind": "positive_compile_time"
+            },
+            {
+               "id": "subtraction_requires_compatible_dimensions",
+               "name": "Subtraction requires compatible dimensions",
+               "behaviors": ["Subtracting two base_dimensions is only valid when they represent equivalent physical dimensions and are castable to each other."],
+               "kind": "positive_compile_time"
+            },
+            {
+               "id": "addition_incompatible_dimensions_disallowed",
+               "name": "Addition with incompatible dimensions is disallowed",
+               "behaviors": ["Adding base_dimensions with incompatible structures or dimensions results in a compile-time error."],
+               "kind": "negative_compile_time"
+            },
+            {
+               "id": "subtraction_incompatible_dimensions_disallowed",
+               "name": "Subtraction with incompatible dimensions is disallowed",
+               "behaviors": ["Subtracting base_dimensions with incompatible structures or dimensions results in a compile-time error."],
+               "kind": "negative_compile_time"
+            },
+            {
+               "id": "addition_of_raw_scalar_invalid",
+               "name": "Raw scalar addition is invalid",
+               "behaviors": ["Adding a raw scalar to a base_dimension is a compile-time error."],
+               "kind": "negative_compile_time"
+            },
+            {
+               "id": "subtraction_of_raw_scalar_invalid",
+               "name": "Raw scalar subtraction is invalid",
+               "behaviors": ["Subtracting a raw scalar from a base_dimension is a compile-time error."],
+               "kind": "negative_compile_time"
+            },
+            {
+               "id": "subtraction_from_raw_scalar_invalid",
+               "name": "Subtracting from raw scalar is invalid",
+               "behaviors": ["Subtracting a base_dimension from a raw scalar is a compile-time error."],
+               "kind": "negative_compile_time"
+            },
+            {
+               "id": "raw_value_plus_or_minus_dimension_invalid",
+               "name": "Raw value plus or minus dimension is invalid",
+               "kind": "negative_compile_time",
+               "behaviors": [
+                  "Using a raw scalar as the left-hand operand in addition or subtraction with a base_dimension is a compile-time error."
+               ]
+            }
+         ]
+         },
+         {
+         "id": "unary_negation",
+         "name": "Unary Negation",
+         "description": "Covers behavior of unary minus applied to a base_dimension, altering the scalar while preserving dimensional structure.",
+         "rules": [
+            {
+               "id": "unary_negation_preserves_dimension",
+               "name": "Negation preserves dimension",
+               "behaviors": ["Negating a base_dimension yields a base_dimension with the same unit structure and the scalar negated."],
+               "kind": "positive_compile_time"
+            }
+         ]
+         }
+      ]
+      },
+      {
+         "id": "dimension_comparison",
+         "name": "Base Dimension Comparison",
+         "description": "Defines comparison semantics for base_dimension values, including equality and ordering, subject to dimensional compatibility and valid conversions.",
+         "contexts": [
+            {
+               "id": "comparison",
+               "name": "Comparison",
+               "description": "Covers equality and ordering behavior between base_dimension values with compatible structures.",
+               "rules": [
+               {
+                  "id": "base_dimension_comparison_requires_same_dimension",
+                  "name": "Comparison requires same dimension",
+                  "kind": "negative_compile_time",
+                  "behaviors": [
+                     "Comparison operations between base_dimensions are only permitted if their dimensional compositions are equivalent after unit conversion."
+                  ]
+               },
+               {
+                  "id": "base_dimension_comparison_applies_unit_conversion",
+                  "name": "Comparison applies unit conversion",
+                  "kind": "positive_compile_time",
+                  "behaviors": [
+                     "When comparing two base_dimension values, unit conversions are applied as needed to align scalar representations before comparison."
+                  ]
+               },
+               {
+                  "id": "base_dimension_comparison_returns_boolean",
+                  "name": "Comparison yields boolean result",
+                  "kind": "positive_compile_time",
+                  "behaviors": [
+                     "Comparison between two compatible base_dimensions yields a dimensionless boolean result."
+                  ]
+               }
+               ]
+            }
+         ]
+      },
+      {
+      "id": "structure_and_casting",
+      "name": "Structure and Casting",
+      "description": "Covers unit simplification, structural compatibility, and casting between structurally equivalent dimension types.",
+      "contexts": [
+         {
+            "id": "structural_validation",
+            "name": "Structural Validation",
+            "description": "Rules governing the legality of unit composition in a base_dimension, including constraints on unit uniqueness.",
+            "rules": [
+            {
+               "id": "no_duplicate_unit_types",
+               "name": "No duplicate unit types in base_dimension",
+               "behaviors": ["A base_dimension may not contain multiple unit_exponents with the same unit type, regardless of exponent sign."],
+               "kind": "negative_compile_time"
+            }
+            ]
+         },
+         {
+            "id": "structural_compatibility",
+            "name": "Structural Compatibility",
+            "description": "Defines when two base_dimension types are considered structurally compatible for assignment or arithmetic.",
+            "rules": [
+            {
+            "id": "structurally_compatible_base_dimensions_are_assignable",
+            "name": "Structurally compatible base_dimensions are assignable",
+            "kind": "positive_compile_time",
+            "behaviors": [
+               "Two base_dimensions are compatible for assignment when, after aggregating exponents by physical dimension, the resulting dimensional compositions are equal.",
+               "Units used to represent a given physical dimension may differ between base_dimensions as long as a conversion exists between each corresponding unit and a common unit within that dimension.",
+               "The ordering of unit_exponents in the base_dimension type does not affect structural compatibility."
+            ]
+            },
+            {
+            "id": "incompatible_base_dimensions_are_not_assignable",
+            "name": "Incompatible base_dimensions are not assignable",
+            "kind": "negative_compile_time",
+            "behaviors": [
+               "If no conversion exists between units used to represent the same physical dimension, the base_dimensions are not assignable.",
+               "If the aggregated exponent for any physical dimension differs between the two base_dimensions, assignment is disallowed.",
+               "If one base_dimension includes a physical dimension not present in the other, assignment is disallowed."
+            ]
+            }
+            ]
+         },
+         {
+            "id": "casting_and_simplification",
+            "name": "Casting and Simplification",
+            "description": "Describes how explicit casting enables simplification and coercion to a structurally different but dimensionally equivalent type.",
+            "rules": [
+            {
+               "id": "cast_enables_unit_cancellation",
+               "name": "Cast enables cancellation of inverse units",
+               "behaviors": [
+                  "Explicit casting allows a base_dimension to simplify and cancel opposing units to produce a new, structurally valid type."
+               ],
+               "kind": "positive_compile_time"
+            },
+            {
+               "id": "cast_enables_unit_conversion",
+               "name": "Cast enables conversion between compatible units",
+               "behaviors": [
+                  "Implicitly casting a base_dimension to a different but dimensionally equivalent structure performs necessary unit conversions to match the target structure."
+               ],
+               "kind": "positive_compile_time"
+            },
+            {
+               "id": "casting_to_identical_structure_is_noop",
+               "name": "Casting to same structure yields same type",
+               "behaviors": [
+                  "Casting a base_dimension to the same structure is a valid operation that produces a base_dimension of the same type with unchanged scalar value."
+               ],
+               "kind": "positive_compile_time",
+               "notes": "TODO: This behavior is expected but not yet validated in all backends. The result type is guaranteed to be the same, but scalar identity and runtime overhead are not yet guaranteed to be optimized to a true no-op."
+            },
+            {
+               "id": "base_dimension_default_constructs_to_zero",
+               "name": "Default construction yields zero",
+               "kind": "positive_compile_time",
+               "behaviors": [
+                  "Default construction of a base_dimension produces a valid object with scalar value zero and a well-formed dimensional structure."
+               ],
+               "notes": "This behavior is optional and may not apply to all host languages. It is assumed in C++ and other imperative languages where default-constructibility is idiomatic."
+            },
+            {
+               "id": "empty_base_dimension_is_scalar",
+               "name": "Empty base_dimension represents a scalar",
+               "kind": "positive_compile_time",
+               "behaviors": [
+                  "A base_dimension containing no unit_exponents is valid and represents a dimensionless scalar quantity."
+               ]
+            },
+            {
+               "id": "scalar_dimension_casts_to_raw",
+               "name": "Scalar base_dimension casts to raw value",
+               "kind": "positive_compile_time",
+               "behaviors": [
+                  "A base_dimension with no units may be implicitly cast to a raw scalar value for use in non-dimensional expressions."
+               ]
+            }
+            ]
+         }
+      ]
+      },
+      {
+      "id": "point_semantics",
+      "name": "Point Semantics",
+      "description": "Defines the behaviors, constraints, and valid interactions for point types, including reference frame casting, interop with units, and arithmetic semantics.",
+      "contexts": [
+         {
+            "id": "construction_and_validity",
+            "name": "Construction and Validity",
+            "description": "Rules for what types may be constructed as points and under what dimensional restrictions.",
+            "rules": [
+            {
+               "id": "points_must_use_reference_frames",
+               "name": "Points must be constructed from reference frames",
+               "behaviors": [
+                  "A point may only be constructed from a valid reference_frame type and a fundamental dimension tag."
+               ],
+               "kind": "positive_compile_time"
+            },
+            {
+               "id": "points_only_allowed_for_fundamentals",
+               "name": "Points are only defined for fundamental dimensions",
+               "behaviors": [
+                  "Points may not be constructed for compound dimensions or participate in base_dimension expressions."
+               ],
+               "kind": "negative_compile_time"
+            },
+            {
+               "id": "point_scalar_value_may_be_negative",
+               "name": "Point scalar value may be negative",
+               "kind": "positive_compile_time",
+               "behaviors": [
+                  "A point may be constructed with a scalar value less than zero relative to its reference frame's anchor unit. This is structurally valid regardless of whether such values are physically meaningful."
+               ]
+            }
+            ]
+         },
+         {
+         "id": "arithmetic_behavior",
+         "name": "Arithmetic Behavior",
+         "description": "Defines valid arithmetic involving points and atomic_dimensions, and how results propagate through operations.",
+         "rules": [
+            {
+               "id": "point_plus_atomic_dimension_yields_point",
+               "name": "Point plus atomic_dimension yields point",
+               "behaviors": ["Adding an atomic_dimension to a point yields a point on the same reference frame as the original point."],
+               "kind": "positive_compile_time"
+            },
+            {
+               "id": "point_minus_atomic_dimension_yields_point",
+               "name": "Point minus atomic_dimension yields point",
+               "behaviors": ["Subtracting an atomic_dimension from a point yields a point on the same reference frame as the original point."],
+               "kind": "positive_compile_time"
+            },
+            {
+               "id": "point_minus_point_yields_atomic_dimension",
+               "name": "Point minus point yields atomic_dimension",
+               "behaviors": ["Subtracting one point from another yields an atomic_dimension representing the scalar offset between them, expressed in the reference unit of the lhs point's reference frame."],
+               "kind": "positive_compile_time"
+            },
+            {
+               "id": "point_plus_point_is_invalid",
+               "name": "Point plus point is invalid",
+               "behaviors": ["Adding two points is a compile-time error, as the operation is not defined in affine space."],
+               "kind": "negative_compile_time"
+            },
+            {
+               "id": "atomic_dimension_minus_point_is_invalid",
+               "name": "Atomic_dimension minus point is invalid",
+               "behaviors": ["Subtracting a point from an atomic_dimension is a compile-time error."],
+               "kind": "negative_compile_time"
+            }
+         ]
+         },
+         {
+            "id": "casting_and_conversion",
+            "name": "Casting and Conversion",
+            "description": "Rules for converting between points and from points to units.",
+            "rules": [
+            {
+               "id": "point_cast_to_other_frame_applies_offset",
+               "name": "Casting between points applies offset conversion",
+               "behaviors": ["Casting a point from one reference frame to another applies the appropriate offset and unit conversion."],
+               "kind": "positive_compile_time"
+            },
+            {
+               "id": "point_used_in_expression_converts_to_unit",
+               "name": "Points convert to units in expressions",
+               "behaviors": ["When a point is used in an arithmetic expression that requires a base_dimension, it automatically converts to its reference unit, applying the associated reference frame offset."],
+               "kind": "positive_compile_time"
+            }
+            ]
+         },
+         {
+            "id": "reference_frame_behavior",
+            "name": "Reference Frame Behavior",
+            "description": "Defines the requirements and semantics of reference_frame types, including anchor unit resolution, offset handling, and constraints for valid point usage.",
+            "rules": [
+               {
+                  "id": "reference_frame_must_define_anchor_unit",
+                  "name": "Reference frame must define anchor unit",
+                  "behaviors": ["A reference_frame must declare a single anchor unit, representing the canonical unit of the physical dimension it anchors. All offset and unit conversions are performed relative to this anchor."],
+                  "kind": "positive_compile_time"
+               },
+               {
+                  "id": "point_frame_and_dimension_must_match",
+                  "name": "Point must match frame dimension",
+                  "behaviors": ["A point may only be constructed if the reference_frame's physical dimension matches the fundamental dimension tag used by the point."],
+                  "kind": "positive_compile_time"
+               },
+               {
+                  "id": "reference_frame_offset_must_be_defined_relative_to_anchor",
+                  "name": "Reference frame offset defined relative to anchor",
+                  "behaviors": ["The offset applied when converting between two points on different reference frames is computed using the difference between their respective positions relative to the shared anchor unit."],
+                  "kind": "positive_compile_time"
+               },
+               {
+                  "id": "reference_frame_without_conversion_is_invalid",
+                  "name": "Reference frame without conversion is invalid",
+                  "behaviors": ["A reference_frame may not use a unit unless that unit has a conversion path to its declared anchor unit. Frames that do not satisfy this constraint are ill-formed."],
+                  "kind": "negative_compile_time"
+               }
+            ]
+         },
+         {
+            "id": "comparison",
+            "name": "Comparison",
+            "description": "Defines valid comparison behavior for point types, including constraints on dimensional compatibility and frame handling.",
+            "rules": [
+               {
+                  "id": "point_comparison_requires_same_dimension",
+                  "name": "Points must share the same dimension to compare",
+                  "kind": "negative_compile_time",
+                  "behaviors": [
+                  "Points may only be compared using equality or ordering operators if their associated dimension tags are identical."
+                  ]
+               },
+               {
+                  "id": "point_comparison_applies_conversion_between_frames",
+                  "name": "Point comparison allows different frames",
+                  "kind": "positive_compile_time",
+                  "behaviors": [
+                  "Points may be compared even if they are defined on different reference frames, as long as both reference frames are valid for the shared dimension. Appropriate conversion and offset adjustments are applied before comparison."
+                  ]
+               },
+               {
+                  "id": "point_comparison_yields_dimensionless_result",
+                  "name": "Comparison returns a dimensionless result",
+                  "kind": "positive_compile_time",
+                  "behaviors": [
+                  "Comparison operations between valid point operands yield a dimensionless boolean result."
+                  ]
+               }
+            ]
+         }
+      ]
+      },
+      {
+      "id": "conversion_validation",
+      "name": "Conversion Validation",
+      "description": "Defines the compile-time legality and routing rules for converting between dimensioned values whose unit structures differ but represent the same physical dimension.",
+      "contexts": [
+         {
+            "id": "conversion_legality",
+            "name": "Conversion Legality",
+            "description": "Specifies when two dimensioned values may be converted based on unit-level Conversion definitions.",
+            "rules": [
+            {
+               "id": "convertible_units_enable_dimension_casting",
+               "name": "Convertible units enable casting between dimensioned values",
+               "behaviors": ["Two dimensioned values may be cast between each other if a valid conversion exists between their constituent unit types, even if the unit structures differ."],
+               "kind": "positive_compile_time"
+            },
+            {
+               "id": "missing_conversion_disables_casting",
+               "name": "Missing conversion disables casting between dimensioned values",
+               "behaviors": ["If no conversion is defined between any required pair of units, casting between the dimensioned values is disallowed at compile time."],
+               "kind": "negative_compile_time"
+            },
+            {
+            "id": "incompatible_physical_dimensions_disallow_conversion",
+            "name": "Physical dimension mismatch disallows conversion",
+            "behaviors": ["If the aggregated physical dimensions of the source and target base_dimensions differ, casting is disallowed regardless of any defined conversions."],
+            "kind": "negative_compile_time"
+            }
+            ]
+         },
+         {
+            "id": "conversion_routing",
+            "name": "Conversion Routing",
+            "description": "Describes how the system resolves conversions through direct, inverse, or anchor-based routing.",
+            "rules": [
+            {
+               "id": "routing_via_direct_conversion",
+               "name": "Direct Conversion Path",
+               "behaviors": ["When a conversion exists from source to target unit, it is used directly to enable conversion between dimensioned values."],
+               "kind": "positive_compile_time"
+            },
+            {
+               "id": "routing_via_inverse_conversion",
+               "name": "Inverse Conversion Path",
+               "behaviors": ["When a conversion exists from target to source unit, it is used in inverse to convert between dimensioned values."],
+               "kind": "positive_compile_time"
+            },
+            {
+               "id": "routing_via_anchor_unit",
+               "name": "Anchor Unit Conversion Path",
+               "behaviors": ["When both source and target units are convertible to a common anchor unit, that anchor is used as an intermediate to convert between dimensioned values."],
+               "kind": "positive_compile_time"
+            }
+            ]
+         },
+         {
+            "id": "runtime_conversion_behavior",
+            "name": "Runtime Conversion Behavior",
+            "description": "Defines the expected runtime behavior of unit conversions, including how scalar values are transformed and guarantees on determinism and consistency across implementations.",
+            "rules": [
+               {
+                  "id": "unit_conversion_scales_scalar",
+                  "name": "Conversions apply scalar transformation",
+                  "kind": "positive_compile_time",
+                  "behaviors": [
+                  "When a unit conversion is performed between dimensioned values, the scalar component is transformed by applying the associated conversion rule."
+                  ]
+               },
+               {
+                  "id": "conversion_yields_deterministic_scalar",
+                  "name": "Conversions are deterministic",
+                  "kind": "positive_compile_time",
+                  "behaviors": [
+                  "The scalar value resulting from a unit conversion must be uniquely determined by the definition of the conversion, regardless of whether the operation occurs at compile time or runtime."
+                  ]
+               },
+               {
+                  "id": "conversion_may_occur_at_runtime",
+                  "name": "Conversions may occur at runtime",
+                  "kind": "positive_compile_time",
+                  "behaviors": [
+                  "Conversions are permitted to occur at runtime if the host language or environment does not support compile-time evaluation. The semantics must remain consistent regardless of when the conversion is executed."
+                  ]
+               }
+            ]
+         }
+      ]
+      },
+      {
+         "id": "unit_definition_and_constraints",
+         "name": "Unit Definition and Constraints",
+         "description": "Defines the requirements, restrictions, and validity rules for unit types used in base_dimensions. Includes constraints such as anchor connectivity, dimensional consistency, and conversion integrity.",
+         "contexts": [
+            {
+               "id": "unit_structure",
+               "name": "Unit Structure",
+               "description": "Specifies structural rules for valid unit types, including dimensional tagging, naming, and conversion eligibility.",
+               "rules": [
+               {
+                  "id": "unit_must_have_conversion_to_anchor",
+                  "name": "Units must be convertible to anchor unit",
+                  "behaviors": [
+                     "A unit is only valid for use in a base_dimension if it has a defined conversion path to the anchor unit of its physical dimension."
+                  ],
+                  "kind": "negative_compile_time"
+               },
+               {
+                  "id": "unit_must_tag_single_physical_dimension",
+                  "name": "Unit must tag a single physical dimension",
+                  "behaviors": [
+                     "Each unit must be associated with exactly one physical dimension. Units spanning multiple dimensions are invalid."
+                  ],
+                  "kind": "negative_compile_time"
+               },
+               {
+                  "id": "unit_type_must_be_globally_unique",
+                  "name": "Unit type name must be globally unique",
+                  "behaviors": [
+                     "Each unit type must be uniquely identifiable across the system. Duplicate unit type definitions are disallowed."
+                  ],
+                  "kind": "negative_compile_time"
+               }
+               ]
+            },
+            {
+               "id": "conversion_constraints",
+               "name": "Conversion Constraints",
+               "description": "Defines constraints on how conversions between unit types may be defined, including dimensional restrictions and function shape.",
+               "rules": [
+               {
+                  "id": "unit_conversions_must_be_linear_and_zero_aligned",
+                  "name": "Conversions must be linear with zero intersection",
+                  "behaviors": [
+                     "Conversions between units must be strictly linear functions of the form y = k·x, where the origin maps to the origin. Offset conversions are not permitted for unit types."
+                  ],
+                  "kind": "negative_compile_time"
+               },
+               {
+                  "id": "conversions_across_dimensions_disallowed",
+                  "name": "Cross-dimensional conversions disallowed",
+                  "behaviors": [
+                     "Conversions may only be defined between unit types that belong to the same physical dimension. Cross-dimensional conversions are invalid."
+                  ],
+                  "kind": "negative_compile_time"
+               }
+               ]
+            }
+         ]
+      },
+      {
+         "id": "standard_helpers",
+         "name": "Standard Helpers",
+         "description": "Defines optional but canonical mathematical helper functions provided by complete implementations of the Dimensional library. These operations operate over dimensioned values in a dimensionally safe manner, but are not part of the core algebraic system.",
+         "contexts": [
+            {
+               "id": "dimension_preserving_scalar_helpers",
+               "name": "Dimension-Preserving Scalar Helpers",
+               "description": "Covers helper functions that operate on the scalar component of a dimensioned value while preserving its dimensional structure. Includes functions such as abs, floor, ceil, round, modf, and fmod.",
+               "rules": [
+               {
+                  "id": "helpers_affect_scalar_only",
+                  "name": "Helpers affect only scalar",
+                  "behaviors": [
+                     "Helper functions in this category must return a value with the same dimensional structure and unit composition as the input, modifying only the scalar component."
+                  ],
+                  "kind": "positive_compile_time"
+               }
+               ]
+            },
+            {
+               "id": "angle_limited_math_helpers",
+               "name": "Angle-Limited Mathematical Helpers",
+               "description": "Defines helper functions such as sin, cos, tan, and related operations that are restricted to inputs with angle dimension. These functions return dimensionless results.",
+               "rules": [
+               {
+                  "id": "trig_functions_require_angle_input",
+                  "name": "Trigonometric functions require angle input",
+                  "behaviors": [
+                     "Trigonometric functions may only accept inputs whose dimension corresponds to angle. Inputs with incompatible dimensions must be rejected at compile time."
+                  ],
+                  "kind": "negative_compile_time"
+               },
+               {
+                  "id": "trig_functions_return_dimensionless",
+                  "name": "Trigonometric functions return dimensionless result",
+                  "behaviors": [
+                     "Trigonometric functions must return dimensionless values regardless of the input angle unit."
+                  ],
+                  "kind": "positive_compile_time"
+               }
+               ]
+            }
+         ]
+      },
+      {
+         "id": "named_fundamental_dimensions",
+         "name": "Named Fundamental Dimensions",
+         "description": "Defines type aliases representing fundamental physical dimensions such as Length, Mass, and Time. These types are derived from base_dimension and carry a single unit_exponent with exponent +1. They serve as user-facing entry points into the dimensional system.",
+         "contexts": [
+            {
+               "id": "fundamental_dimension_structure",
+               "name": "Fundamental Dimension Structure",
+               "description": "Defines the structural requirements and behaviors of named fundamental dimensions and how they relate to base_dimension.",
+               "rules": [
+               {
+                  "id": "fundamental_dimensions_wrap_base_dimension",
+                  "name": "Named fundamental dimensions wrap base_dimension",
+                  "behaviors": [
+                     "A named fundamental dimension must wrap a base_dimension with exactly one unit_exponent whose exponent is +1."
+                  ],
+                  "kind": "positive_compile_time"
+               },
+               {
+                  "id": "fundamental_dimensions_must_use_fundamental_units",
+                  "name": "Named fundamental dimensions must use fundamental units",
+                  "behaviors": [
+                     "The unit used in a named fundamental dimension must be a fundamental unit, not a named derived unit or composite."
+                  ],
+                  "kind": "negative_compile_time"
+               }
+               ]
+            },
+            {
+               "id": "dimension_forward_usability",
+               "name": "Dimension-Forward Usability",
+               "description": "Captures the optional implementation behavior that supports user interaction primarily through named dimensions rather than unit compositions.",
+               "notes": "Optional",
+               "rules": [
+                  {
+                     "id": "fundamental_dimensions_may_infer_from_expression",
+                     "name": "Named fundamental dimensions may be inferred from expressions",
+                     "behaviors": [
+                        "Implementations may allow expressions involving named dimensions to infer the resulting dimension type automatically, reducing the need for unit specification in user code. This feature is optional and does not affect correctness semantics."
+                     ],
+                     "kind": "positive_compile_time"
+                  }
+               ]
+            }
+                     ]
+      },
+      {
+         "id": "named_derived_dimensions",
+         "name": "Named Derived Dimensions",
+         "description": "Defines named dimensional types representing composed physical properties such as Speed, Acceleration, or Force. These types are defined in terms of base_dimension with a fixed internal composition, and may be instantiated using fundamental units or named derived units.",
+         "contexts": [
+            {
+               "id": "derived_dimension_structure",
+               "name": "Derived Dimension Structure",
+               "description": "Specifies how named derived dimensions relate to their base_dimension composition and how users may instantiate them.",
+               "rules": [
+               {
+                  "id": "named_derived_dimensions_wrap_base_dimension",
+                  "name": "Named derived dimensions wrap base_dimension",
+                  "behaviors": [
+                     "Each named derived dimension must wrap a base_dimension with a fixed unit exponent composition representing its associated physical property."
+                  ],
+                  "kind": "positive_compile_time"
+               },
+               {
+                  "id": "derived_dimensions_accept_fundamental_units_as_parameters",
+                  "name": "Named derived dimensions accept fundamental units",
+                  "behaviors": [
+                     "A named derived dimension may be parameterized with one or more fundamental units, where each position corresponds to a predefined exponent within the internal composition."
+                  ],
+                  "kind": "positive_compile_time"
+               },
+               {
+                  "id": "derived_dimensions_accept_named_derived_unit",
+                  "name": "Named derived dimensions accept named derived unit",
+                  "behaviors": [
+                     "A named derived dimension may be instantiated using a single named derived unit whose internal composition matches the dimensional structure of the derived dimension."
+                  ],
+                  "kind": "positive_compile_time"
+               }
+               ]
+            }
+         ]
+      },
+      {
+         "id": "named_derived_units",
+         "name": "Named Derived Units",
+         "description": "Defines compound units such as Newtons, Pascals, and Knots that are derived from combinations of fundamental units. These types may be used as unit metadata for constructing base_dimensions and participate in conversions through their internal unit composition.",
+         "contexts": [
+            {
+               "id": "composition_and_equivalence",
+               "name": "Composition and Equivalence",
+               "description": "Defines how named derived units relate to their component unit exponents and how this metadata is interpreted in dimensional expressions.",
+               "rules": [
+               {
+                  "id": "derived_unit_composition_must_be_explicit",
+                  "name": "Derived unit composition must be explicit and fundamental",
+                  "behaviors": [
+                     "A named derived unit must explicitly specify a composition consisting of one or more fundamental unit types, each paired with a rational exponent."
+                  ],
+                  "kind": "positive_compile_time"
+               },
+               {
+                  "id": "derived_unit_composition_must_use_valid_units",
+                  "name": "Derived unit composition must use valid units",
+                  "behaviors": [
+                     "Each unit type used in the composition of a named derived unit must be a valid unit defined in the unit registry."
+                  ],
+                  "kind": "negative_compile_time"
+               },
+               {
+                  "id": "derived_unit_exponents_must_be_normalized",
+                  "name": "Derived unit exponents must be normalized",
+                  "behaviors": [
+                     "The unit exponents within a named derived unit must be reduced to their canonical rational representation and must not include duplicate unit types."
+                  ],
+                  "kind": "negative_compile_time"
+               }
+               ]
+            },
+            {
+               "id": "integration_with_dimension_system",
+               "name": "Integration with Dimension System",
+               "description": "Specifies how named derived units integrate with existing dimensional constructs and participate in arithmetic, conversion, and inference.",
+               "rules": [
+               {
+                  "id": "derived_units_construct_base_dimension",
+                  "name": "Derived units are usable in dimension construction",
+                  "behaviors": [
+                     "A named derived unit may be used in the construction of a base_dimension, and its internal composition is treated as contributing to the dimensional structure."
+                  ],
+                  "kind": "positive_compile_time"
+               },
+               {
+                  "id": "derived_units_preserve_arithmetic_behavior",
+                  "name": "Derived units do not alter arithmetic behavior",
+                  "behaviors": [
+                     "The use of a named derived unit in dimensional composition does not change the arithmetic semantics of the resulting base_dimension."
+                  ],
+                  "kind": "positive_compile_time"
+               },
+               {
+                  "id": "derived_units_conversion_requires_component_paths",
+                  "name": "Derived units participate in conversion through composition",
+                  "behaviors": [
+                     "A conversion between two named derived units is valid only if a conversion path exists between each unit in their compositions."
+                  ],
+                  "kind": "positive_compile_time"
+               }
+               ]
+            }
+         ]
+      },
+      {
+         "id": "user_extension_integrity",
+         "name": "User Extension Integrity",
+         "description": "Specifies the requirements and constraints on user-defined units and dimensions to ensure they participate correctly in the dimensional system.",
+         "notes": "TODO: NOT YET WRITTEN",
+         "contexts": []
+      },
+      {
+         "id": "serialization_and_streaming",
+         "name": "Serialization and Streaming",
+         "description": "Specifies the requirements and constraints on user-defined units and dimensions to ensure they participate correctly in the dimensional system.",
+         "notes": "TODO: NOT YET WRITTEN",
+         "contexts": []
+      }
+   ]
+}

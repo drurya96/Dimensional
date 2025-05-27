@@ -1,17 +1,20 @@
-#ifndef STATIC_DIMENSION_Current_H
-#define STATIC_DIMENSION_Current_H
+#ifndef STATIC_DIMENSION_CURRENT_H
+#define STATIC_DIMENSION_CURRENT_H
 
-#include "Dimension_Impl/DerivedDimensions/CurrentDimension_Impl.h" 
+#include "Dimension_Impl/DerivedDimensions/CurrentDimension_Impl.h"
 
 namespace Dimension
 {
 
    struct Amperes
    {
-      using NumTuple = std::tuple<Coulombs>;
-      using DenTuple = std::tuple<Seconds>;
+      using units = std::tuple<
+         UnitExponent<Coulombs, 1, 1>,
+         UnitExponent<Seconds, -1, 1>
+      >;
    };
 
 }
 
-#endif //STATIC_DIMENSION_Current_H
+
+#endif // STATIC_DIMENSION_CURRENT_H

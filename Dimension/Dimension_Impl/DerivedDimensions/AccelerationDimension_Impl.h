@@ -1,222 +1,123 @@
 #ifndef STATIC_DIMENSION_ACCELERATION_IMPL_H
 #define STATIC_DIMENSION_ACCELERATION_IMPL_H
 
+#include "../../BaseDimension.h"
 #include "../../LengthDimension.h"
 #include "../../TimeDimension.h"
 
 namespace Dimension
 {
-   /// @brief Concept for a named Acceleration unit.
-   /// @tparam NamedAcceleration The type to be checked as a named Acceleration unit.
-   template<typename NamedAcceleration>
+   /// @brief Concept to verify a type can serve as a named Acceleration unit
+   template<typename T>
    concept IsNamedAccelerationUnit = requires {
-      typename NamedAcceleration::NumTuple;
-      typename NamedAcceleration::DenTuple;
+      typename T::units;
+      requires 
+         std::tuple_size_v<typename T::units> == 2 &&
+         IsLengthUnit<typename std::tuple_element_t<0, typename T::units>::unit> &&
+         IsTimeUnit<typename std::tuple_element_t<1, typename T::units>::unit>;
+      requires !std::is_base_of_v<FundamentalUnitTag, T>;
    };
 
-   /// @brief Concept for a Acceleration dimension.
-   /// @details Checks if the provided types satisfy the Acceleration dimension requirements.
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   template<typename Length1, typename Time1, typename Time2>
-   concept IsAccelerationUnits = 
-      std::is_same_v<typename Length1::Dim, LengthType> &&
-      std::is_same_v<typename Time1::Dim, TimeType> &&
-      std::is_same_v<typename Time2::Dim, TimeType>;
-
-   /// @brief Concept for a Acceleration type.
-   /// @details Ensures that the type meets Acceleration type requirements, based on numerator and denominator types.
-   /// @tparam T The type to validate.
+   /// @brief Concept to verify a dimension can be treated as a Acceleration type
    template<typename T>
-   concept IsAccelerationType = requires {
-      typename T::NumTuple;
-      typename T::DenTuple;
-   } && std::tuple_size_v<typename T::NumTuple> == 1 && std::tuple_size_v<typename T::DenTuple> == 2 &&
-   IsAccelerationUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>>;
+   concept IsAcceleration = std::is_convertible_v<T, BaseDimension<
+      UnitExponent<PrimaryLength, 1>, 
+      UnitExponent<PrimaryTime, -2>
+   >>;
 
-   /// @brief Retrieves the value of a Acceleration object.
-   /// @details Provides access to the underlying value represented by a Acceleration object.
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   /// @tparam AccelerationType The type of the object being accessed.
-   /// @param obj The Acceleration object.
-   /// @return The underlying value as `PrecisionType`
-   template<typename Length1, typename Time1, typename Time2, typename AccelerationType>
-   requires IsAccelerationUnits<Length1, Time1, Time2> && IsAccelerationType<AccelerationType>
-   constexpr PrecisionType getAcceleration(const AccelerationType& obj)
+   /// @brief Retrieves the value of a Acceleration object with specific units
+   /// @tparam LengthUnit The Length unit used for all Length components of Acceleration
+   /// @tparam TimeUnit The Time unit used for all Time components of Acceleration
+   /// @tparam DimType The dimension object type, deduced
+   /// @param obj The dimension to extract a raw value from
+   /// @return The raw value in terms of template units as a PrecisionType
+   template<
+      IsLengthUnit LengthUnit,
+      IsTimeUnit TimeUnit,
+      IsAcceleration DimType>
+   constexpr PrecisionType get_acceleration_as(const DimType& obj)
    {
-      return obj.template GetVal<std::tuple<Length1>, std::tuple<Time1, Time2>>();
+      return get_dimension_as<
+         UnitExponent<LengthUnit, 1>,
+         UnitExponent<TimeUnit, -2>
+      >(obj);
    }
 
    /// @brief Retrieves the value of a named Acceleration object.
-   /// @details Provides access to the value represented by a named Acceleration object.
-   /// @tparam NamedAcceleration The named unit type.
-   /// @tparam AccelerationType The type of the object being accessed.
-   /// @param obj The Acceleration object.
-   /// @return The underlying value as `PrecisionType`.
-   template<typename NamedAcceleration, typename AccelerationType>
-   requires IsNamedAccelerationUnit<NamedAcceleration> && IsAccelerationType<AccelerationType>
-   constexpr PrecisionType getAcceleration(const AccelerationType& obj)
+   /// @tparam Named The named unit to extract in terms of
+   /// @tparam DimType The dimension object type, deduced
+   /// @param obj The dimension to extract a raw value from
+   /// @return The raw value in terms of template units as a PrecisionType
+   template<IsNamedAccelerationUnit Named, IsAcceleration DimType>
+   constexpr PrecisionType get_acceleration_as(const DimType& obj)
    {
-      return obj.template GetVal<typename NamedAcceleration::NumTuple, typename NamedAcceleration::DenTuple>();
+      return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
 
    template<typename... Ts>
    class Acceleration;
 
-   /// @brief Represents a default Acceleration.
-   /// @details This Acceleration is templated on the primary units of the relevant dimensions.
-   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
-   ///   "Acceleration" type, without regard for the underlying units.
+   /// @brief Represents the default Acceleration
    template<>
-   class Acceleration<> : public BaseDimension<std::tuple<PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime>>
+   class Acceleration<> : public BaseDimension<
+      UnitExponent<PrimaryLength, 1>,
+      UnitExponent<PrimaryTime, -2>>
    {
    public:
-      using Base = BaseDimension<std::tuple<PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime>>;
+      using Base = BaseDimension<
+         UnitExponent<PrimaryLength, 1>,
+         UnitExponent<PrimaryTime, -2>>;
       using Base::Base;
 
-      /// @brief Constructs a Acceleration object with a value.
-      /// @param val The value of the Acceleration.
       explicit constexpr Acceleration(PrecisionType val) : Base(val) {}
 
-      /// @brief Constructs a Acceleration object from another Acceleration object.
-      /// @tparam OtherAcceleration The other Acceleration type.
-      /// @param base The base Acceleration object.
-      template<typename OtherAcceleration>
-      requires IsAccelerationType<OtherAcceleration>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr Acceleration(const OtherAcceleration& base)
-         : Base(base.template GetVal<std::tuple<PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime>>()) {}
+      template<typename Other>
+      requires IsAcceleration<Other>
+      constexpr Acceleration(const Other& base)
+         : Base(call_unpack<typename Base::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-   /// @brief Represents a Acceleration.
-   /// @details Defines operations and data storage for Acceleration dimensions.
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   template<typename Length1, typename Time1, typename Time2>
-   requires IsAccelerationUnits<Length1, Time1, Time2>
-   class Acceleration<Length1, Time1, Time2> : public BaseDimension<std::tuple<Length1>, std::tuple<Time1, Time2>>
+   /// @brief Template specialization for named Acceleration units
+   /// @tparam Named The named unit this Acceleration type is in terms of
+   template<IsNamedAccelerationUnit Named>
+   class Acceleration<Named> : public BaseDimensionFromTuple<typename Named::units>::dim
    {
    public:
-      using Base = BaseDimension<std::tuple<Length1>, std::tuple<Time1, Time2>>;
+      using Base = typename BaseDimensionFromTuple<typename Named::units>::dim;
       using Base::Base;
 
-      /// @brief Constructs a Acceleration object with a value.
-      /// @param val The value of the Acceleration.
-      explicit constexpr Acceleration(PrecisionType val) : Base(val) {}
-
-      /// @brief Constructs a Acceleration object from a named unit.
-      /// @tparam NamedAcceleration The named unit type.
-      /// @param base The base unit object.
-      template<typename NamedAcceleration>
-      requires IsNamedAccelerationUnit<NamedAcceleration>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr Acceleration(const NamedAcceleration& base) : Base(base) {}
-
-      /// @brief Deprecated function to get the value of Acceleration.
-      /// @details Prefer using the free function `getAcceleration()` instead.
-      /// @return The value of the Acceleration.
-      template<typename Length1T, typename Time1T, typename Time2T>
-      requires IsAccelerationUnits<Length1T, Time1T, Time2T>
-      [[deprecated("Use the free function getAcceleration() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetAcceleration() const
-      {
-         return getAcceleration<Length1T, Time1T, Time2T>(*this);
-      }
-
-      /// @brief Deprecated function to get the value of Acceleration.
-      /// @details Prefer using the free function `getAcceleration()` instead.
-      /// @return The value of the Acceleration.
-      template<typename NamedAcceleration>
-      requires IsNamedAccelerationUnit<NamedAcceleration>
-      [[deprecated("Use the free function getAcceleration() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetAcceleration() const
-      {
-         return getAcceleration<NamedAcceleration>(*this);
-      }
+      template<typename Other>
+      requires IsAcceleration<Other>
+      constexpr Acceleration(const Other& base)
+         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-   /// @brief Represents a named Acceleration class.
-   /// @details Provides functionality for named Acceleration units.
-   /// @tparam NamedAcceleration The named unit type.
-   template<typename NamedAcceleration>
-   requires IsNamedAccelerationUnit<NamedAcceleration>
-   class Acceleration<NamedAcceleration> : public BaseDimension<typename NamedAcceleration::NumTuple, typename NamedAcceleration::DenTuple>
+
+   template<typename... Units>
+   class Acceleration<Units...> : public BaseDimension<
+      UnitExponent<typename Extractor<LengthType, Units...>::type, 1>,
+      UnitExponent<typename Extractor<TimeType, Units...>::type, -2>
+   >
    {
    public:
-      using Base = BaseDimension<typename NamedAcceleration::NumTuple, typename NamedAcceleration::DenTuple>;
+      using Base = BaseDimension<
+         UnitExponent<typename Extractor<LengthType, Units...>::type, 1>,
+         UnitExponent<typename Extractor<TimeType, Units...>::type, -2>
+      >;
+   
       using Base::Base;
-
-      /// @brief Constructs a Acceleration object with a value.
-      /// @param val The value of the Acceleration.
-      explicit constexpr Acceleration(PrecisionType val) : Base(val) {}
-
-      /// @brief Constructs a Acceleration object from another Acceleration object.
-      /// @tparam OtherAcceleration The other Acceleration type.
-      /// @param base The base Acceleration object.
-      template<typename OtherAcceleration>
-      requires IsAccelerationType<OtherAcceleration>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr Acceleration(const OtherAcceleration& base)
-         : Base(base.template GetVal<typename NamedAcceleration::NumTuple, typename NamedAcceleration::DenTuple>()) {}
-
-      /// @brief Deprecated function to get the value of Acceleration.
-      /// @details Prefer using the free function `getAcceleration()` instead.
-      /// @return The value of the Acceleration.
-      template<typename Length1T, typename Time1T, typename Time2T>
-      requires IsAccelerationUnits<Length1T, Time1T, Time2T>
-      [[deprecated("Use the free function getAcceleration() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetAcceleration() const
-      {
-         return getAcceleration<Length1T, Time1T, Time2T>(*this);
-      }
-
-      /// @brief Deprecated function to get the value of Acceleration.
-      /// @details Prefer using the free function `getAcceleration()` instead.
-      /// @return The value of the Acceleration.
-      template<typename NamedAccelerationUnit>
-      requires IsNamedAccelerationUnit<NamedAccelerationUnit>
-      [[deprecated("Use the free function getAcceleration() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetAcceleration() const
-      {
-         return getAcceleration<NamedAccelerationUnit>(*this);
-      }         
+   
+      template<typename T>
+      requires IsAcceleration<T>
+      constexpr Acceleration(const T& base) : Base(base) {}
    };
 
-   /// @brief Template deduction guide for Acceleration.
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   template<typename Length1, typename Time1, typename Time2>
-   requires IsAccelerationUnits<Length1, Time1, Time2>
-   Acceleration(Length1, Time1, Time2) -> Acceleration<Length1, Time1, Time2>;
-
-   /// @brief Template deduction guide for Acceleration.
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   template<typename NamedAcceleration>
-   requires IsNamedAccelerationUnit<NamedAcceleration>
-   Acceleration(NamedAcceleration) -> Acceleration<NamedAcceleration>;
-
-   /// @brief Template deduction guide for Acceleration.
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   template<typename Length1, typename Time1, typename Time2>
-   requires IsAccelerationUnits<Length1, Time1, Time2>
-   Acceleration(BaseDimension<std::tuple<Length1>, std::tuple<Time1, Time2>>) -> Acceleration<Length1, Time1, Time2>;
-
+   template<IsAcceleration Dim>
+   Acceleration(Dim) -> 
+   Acceleration<
+      DimExtractor<LengthType, Dim>,
+      DimExtractor<TimeType, Dim>
+   >;
 }
 
 #endif // STATIC_DIMENSION_ACCELERATION_IMPL_H

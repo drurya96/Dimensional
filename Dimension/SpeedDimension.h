@@ -8,10 +8,13 @@ namespace Dimension
 
    struct Knots
    {
-      using NumTuple = std::tuple<NauticalMiles>;
-      using DenTuple = std::tuple<Hours>;
+      using units = std::tuple<
+         UnitExponent<NauticalMiles, 1, 1>,
+         UnitExponent<Hours, -1, 1>
+      >;
    };
 
 }
 
-#endif //STATIC_DIMENSION_SPEED_H
+
+#endif // STATIC_DIMENSION_SPEED_H

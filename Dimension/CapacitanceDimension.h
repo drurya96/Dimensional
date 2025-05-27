@@ -1,17 +1,22 @@
-#ifndef STATIC_DIMENSION_Capacitance_H
-#define STATIC_DIMENSION_Capacitance_H
+#ifndef STATIC_DIMENSION_CAPACITANCE_H
+#define STATIC_DIMENSION_CAPACITANCE_H
 
-#include "Dimension_Impl/DerivedDimensions/CapacitanceDimension_Impl.h" 
+#include "Dimension_Impl/DerivedDimensions/CapacitanceDimension_Impl.h"
 
 namespace Dimension
 {
 
    struct Farads
    {
-      using NumTuple = std::tuple<Coulombs, Coulombs,Seconds, Seconds>;
-      using DenTuple = std::tuple<KiloGrams, Meters, Meters>;
+      using units = std::tuple<
+         UnitExponent<Coulombs, 2, 1>,
+         UnitExponent<Seconds, 2, 1>,
+         UnitExponent<KiloGrams, -1, 1>,
+         UnitExponent<Meters, -2, 1>
+      >;
    };
 
 }
 
-#endif //STATIC_DIMENSION_Capacitance_H
+
+#endif // STATIC_DIMENSION_CAPACITANCE_H

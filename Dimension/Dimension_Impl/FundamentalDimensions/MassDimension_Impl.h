@@ -16,7 +16,7 @@ namespace Dimension
    /// @brief Concept to check if a type is a valid Mass unit.
    /// @tparam T The type to check.
    template<typename T>
-   concept IsMassUnit = IsNonQuantityUnitDimension<T, MassType> || IsQuantityUnitDimension<T, MassType>;
+   concept IsMassUnit = std::is_base_of_v<FundamentalUnitTag, T> && std::is_same_v<typename T::Dim, MassType>;//IsNonQuantityUnitDimension<T, MassType> || IsQuantityUnitDimension<T, MassType>;
 
    /// @brief Base class for Mass units.
    /// @tparam Unit The unit type.
@@ -35,13 +35,22 @@ namespace Dimension
 
    /// @brief Trait to check if a type is a Mass dimension.
    /// @tparam T The type to check.
-   template<typename T>
-   struct is_Mass : std::false_type {};
+   //template<typename T>
+   //struct is_Mass : std::false_type {};
+
+   //template<typename Dim>
+   //struct is_Mass_Impl
+   //{
+   //   constexpr bool value = IsMassUnit<std::tuple_element_t<0, decltype(FullSimplify(Dim{}))>>;
+   //};
+
 
    /// @brief Specialization for BaseDimension types.
    /// @tparam T The unit type.
-   template<typename T>
-   struct is_Mass<BaseDimension<std::tuple<T>, std::tuple<>>> : std::bool_constant<IsMassUnit<T>> {};
+   //template<typename T>
+   //struct is_Mass<BaseDimension<T>> : std::bool_constant<IsMassUnit<T>> {};
+   template<typename Dim>
+   struct is_Mass : std::bool_constant<IsMassUnit<typename std::tuple_element_t<0, typename decltype(FullSimplify(Dim{}))::units>::unit>> {};
 
    /// @brief Helper variable template for is_Mass.
    /// @tparam T The type to check.
@@ -58,58 +67,56 @@ namespace Dimension
    /// @param obj The Mass object.
    /// @return The value in the specified unit.
    template<IsMassUnit T>
-   constexpr PrecisionType getMass(Mass_type auto obj)
+   constexpr PrecisionType get_mass_as(/*Mass_type*/ auto obj)
    {
-      return obj.template GetVal<std::tuple<T>, std::tuple<>>();
+      return get_dimension_as<UnitExponent<T>>(obj);
    }
+
+   template<IsMassUnit Unit = PrimaryMass, bool isQuantity = false>
+   class Mass;
 
    /// @brief Represents a dimension type for Mass.
    /// @tparam Unit The primary unit type.
-   template<IsMassUnit Unit = PrimaryMass>
-   class Mass : public BaseDimension<std::tuple<Unit>, std::tuple<>>
+   template<IsMassUnit Unit>
+   class Mass<Unit, false> : public BaseDimension<UnitExponent<Unit>>
    {
    public:
       /// @brief Default constructor initializing to zero.
-      constexpr Mass() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}
+      constexpr Mass() : BaseDimension<UnitExponent<Unit>>::BaseDimension(0.0) {}
 
       /// @brief Constructs a Mass object with a specific value.
       /// @param val The value to initialize with.
-      explicit constexpr Mass(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
+      explicit constexpr Mass(double val) : BaseDimension<UnitExponent<Unit>>::BaseDimension(val) {}
 
       /// @brief Constructs a Mass object from another BaseDimension.
-      /// @tparam T The unit type of the BaseDimension.
+      /// @tparam Ts The units of the BaseDimension.
       /// @param base The BaseDimension object to construct from.
-      template<IsMassUnit T>
+      template<typename... Ts>
+      requires matching_dimensions<BaseDimension<UnitExponent<Unit>>, BaseDimension<Ts...>>
       // Implicit conversion between dimensions of the same unit is core to Dimensional
       // cppcheck-suppress noExplicitConstructor
-      constexpr Mass(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()){}
-
-      /// @brief Deprecated method to retrieve the value of the dimension.
-      /// @tparam T The unit type.
-      /// @return The value in the specified unit.
-      template<IsMassUnit T>
-      [[deprecated("Use the free function getMass() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetMass() const
-      {
-         return getMass<T>(*this);
-      }
+      constexpr Mass(const BaseDimension<Ts...>& base) : BaseDimension<UnitExponent<Unit>>::BaseDimension(get_dimension_as<UnitExponent<Unit>>(base)) {}
    };
-
-   /// @brief Deduction guide for Mass constructor.
-   /// @tparam T The unit type.
-   template<IsMassUnit T>
-   Mass(T) -> Mass<T>;
-
-   /// @brief Deduction guide for Mass constructor with BaseDimension.
-   /// @tparam MassUnit The unit type.
-   template<IsMassUnit MassUnit>
-   Mass(BaseDimension<std::tuple<MassUnit>, std::tuple<>>) -> Mass<MassUnit>;
 
    /// @brief Specialization for is_Mass trait for Mass types.
    /// @tparam T The unit type.
    template<typename T>
    struct is_Mass<Mass<T>> : std::bool_constant<IsMassUnit<T>> {};
+
+   /// @brief Deduction guide for Mass constructor.
+   /// @tparam T The unit type.
+   //template<IsMassUnit T>
+   //Mass(T) -> Mass<T>;
+
+   /// @brief Deduction guide for Mass constructor with BaseDimension.
+   /// @tparam MassUnit The unit type.
+   //template<IsMassUnit MassUnit>
+   //Mass(BaseDimension<UnitExponent<MassUnit>>) -> Mass<MassUnit>;
+
+   /// @brief Deduction guide for Mass constructor with BaseDimension.
+   /// @tparam MassUnit The unit type.
+   template<Mass_type Dim>
+   Mass(Dim) -> Mass<DimExtractor<MassType, Dim>>;
 }
 
-#endif //STATIC_DIMENSION_Mass_IMPL_H
+#endif // STATIC_DIMENSION_Mass_IMPL_H

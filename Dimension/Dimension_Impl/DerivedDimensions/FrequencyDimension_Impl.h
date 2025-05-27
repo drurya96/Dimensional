@@ -1,208 +1,112 @@
 #ifndef STATIC_DIMENSION_FREQUENCY_IMPL_H
 #define STATIC_DIMENSION_FREQUENCY_IMPL_H
 
-
+#include "../../BaseDimension.h"
 #include "../../TimeDimension.h"
 
 namespace Dimension
 {
-   /// @brief Concept for a named Frequency unit.
-   /// @tparam NamedFrequency The type to be checked as a named Frequency unit.
-   template<typename NamedFrequency>
+   /// @brief Concept to verify a type can serve as a named Frequency unit
+   template<typename T>
    concept IsNamedFrequencyUnit = requires {
-      typename NamedFrequency::NumTuple;
-      typename NamedFrequency::DenTuple;
+      typename T::units;
+      requires 
+         std::tuple_size_v<typename T::units> == 1 &&
+         IsTimeUnit<typename std::tuple_element_t<0, typename T::units>::unit>;
+      requires !std::is_base_of_v<FundamentalUnitTag, T>;
    };
 
-   /// @brief Concept for a Frequency dimension.
-   /// @details Checks if the provided types satisfy the Frequency dimension requirements.
-   /// @tparam Time1 Denominator Time1 type
-   template<typename Time1>
-   concept IsFrequencyUnits = 
-      std::is_same_v<typename Time1::Dim, TimeType>;
-
-   /// @brief Concept for a Frequency type.
-   /// @details Ensures that the type meets Frequency type requirements, based on numerator and denominator types.
-   /// @tparam T The type to validate.
+   /// @brief Concept to verify a dimension can be treated as a Frequency type
    template<typename T>
-   concept IsFrequencyType = requires {
-      typename T::NumTuple;
-      typename T::DenTuple;
-   } && std::tuple_size_v<typename T::NumTuple> == 0 && std::tuple_size_v<typename T::DenTuple> == 1 &&
-   IsFrequencyUnits<typename std::tuple_element_t<0, typename T::DenTuple>>;
+   concept IsFrequency = std::is_convertible_v<T, BaseDimension<
+      UnitExponent<PrimaryTime, -1>
+   >>;
 
-   /// @brief Retrieves the value of a Frequency object.
-   /// @details Provides access to the underlying value represented by a Frequency object.
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam FrequencyType The type of the object being accessed.
-   /// @param obj The Frequency object.
-   /// @return The underlying value as `PrecisionType`
-   template<typename Time1, typename FrequencyType>
-   requires IsFrequencyUnits<Time1> && IsFrequencyType<FrequencyType>
-   constexpr PrecisionType getFrequency(const FrequencyType& obj)
+   /// @brief Retrieves the value of a Frequency object with specific units
+   /// @tparam TimeUnit The Time unit used for all Time components of Frequency
+   /// @tparam DimType The dimension object type, deduced
+   /// @param obj The dimension to extract a raw value from
+   /// @return The raw value in terms of template units as a PrecisionType
+   template<
+      IsTimeUnit TimeUnit,
+      IsFrequency DimType>
+   constexpr PrecisionType get_frequency_as(const DimType& obj)
    {
-      return obj.template GetVal<std::tuple<>, std::tuple<Time1>>();
+      return get_dimension_as<
+         UnitExponent<TimeUnit, -1>
+      >(obj);
    }
 
    /// @brief Retrieves the value of a named Frequency object.
-   /// @details Provides access to the value represented by a named Frequency object.
-   /// @tparam NamedFrequency The named unit type.
-   /// @tparam FrequencyType The type of the object being accessed.
-   /// @param obj The Frequency object.
-   /// @return The underlying value as `PrecisionType`.
-   template<typename NamedFrequency, typename FrequencyType>
-   requires IsNamedFrequencyUnit<NamedFrequency> && IsFrequencyType<FrequencyType>
-   constexpr PrecisionType getFrequency(const FrequencyType& obj)
+   /// @tparam Named The named unit to extract in terms of
+   /// @tparam DimType The dimension object type, deduced
+   /// @param obj The dimension to extract a raw value from
+   /// @return The raw value in terms of template units as a PrecisionType
+   template<IsNamedFrequencyUnit Named, IsFrequency DimType>
+   constexpr PrecisionType get_frequency_as(const DimType& obj)
    {
-      return obj.template GetVal<typename NamedFrequency::NumTuple, typename NamedFrequency::DenTuple>();
+      return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
 
    template<typename... Ts>
    class Frequency;
 
-   /// @brief Represents a default Frequency.
-   /// @details This Frequency is templated on the primary units of the relevant dimensions.
-   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
-   ///   "Frequency" type, without regard for the underlying units.
+   /// @brief Represents the default Frequency
    template<>
-   class Frequency<> : public BaseDimension<std::tuple<>, std::tuple<PrimaryTime>>
+   class Frequency<> : public BaseDimension<
+      UnitExponent<PrimaryTime, -1>>
    {
    public:
-      using Base = BaseDimension<std::tuple<>, std::tuple<PrimaryTime>>;
+      using Base = BaseDimension<
+         UnitExponent<PrimaryTime, -1>>;
       using Base::Base;
 
-      /// @brief Constructs a Frequency object with a value.
-      /// @param val The value of the Frequency.
       explicit constexpr Frequency(PrecisionType val) : Base(val) {}
 
-      /// @brief Constructs a Frequency object from another Frequency object.
-      /// @tparam OtherFrequency The other Frequency type.
-      /// @param base The base Frequency object.
-      template<typename OtherFrequency>
-      requires IsFrequencyType<OtherFrequency>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr Frequency(const OtherFrequency& base)
-         : Base(base.template GetVal<std::tuple<>, std::tuple<PrimaryTime>>()) {}
+      template<typename Other>
+      requires IsFrequency<Other>
+      constexpr Frequency(const Other& base)
+         : Base(call_unpack<typename Base::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-   /// @brief Represents a Frequency.
-   /// @details Defines operations and data storage for Frequency dimensions.
-   /// @tparam Time1 Denominator Time1 type
-   template<typename Time1>
-   requires IsFrequencyUnits<Time1>
-   class Frequency<Time1> : public BaseDimension<std::tuple<>, std::tuple<Time1>>
+   /// @brief Template specialization for named Frequency units
+   /// @tparam Named The named unit this Frequency type is in terms of
+   template<IsNamedFrequencyUnit Named>
+   class Frequency<Named> : public BaseDimensionFromTuple<typename Named::units>::dim
    {
    public:
-      using Base = BaseDimension<std::tuple<>, std::tuple<Time1>>;
+      using Base = typename BaseDimensionFromTuple<typename Named::units>::dim;
       using Base::Base;
 
-      /// @brief Constructs a Frequency object with a value.
-      /// @param val The value of the Frequency.
-      explicit constexpr Frequency(PrecisionType val) : Base(val) {}
-
-      /// @brief Constructs a Frequency object from a named unit.
-      /// @tparam NamedFrequency The named unit type.
-      /// @param base The base unit object.
-      template<typename NamedFrequency>
-      requires IsNamedFrequencyUnit<NamedFrequency>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr Frequency(const NamedFrequency& base) : Base(base) {}
-
-      /// @brief Deprecated function to get the value of Frequency.
-      /// @details Prefer using the free function `getFrequency()` instead.
-      /// @return The value of the Frequency.
-      template<typename Time1T>
-      requires IsFrequencyUnits<Time1T>
-      [[deprecated("Use the free function getFrequency() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetFrequency() const
-      {
-         return getFrequency<Time1T>(*this);
-      }
-
-      /// @brief Deprecated function to get the value of Frequency.
-      /// @details Prefer using the free function `getFrequency()` instead.
-      /// @return The value of the Frequency.
-      template<typename NamedFrequency>
-      requires IsNamedFrequencyUnit<NamedFrequency>
-      [[deprecated("Use the free function getFrequency() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetFrequency() const
-      {
-         return getFrequency<NamedFrequency>(*this);
-      }
+      template<typename Other>
+      requires IsFrequency<Other>
+      constexpr Frequency(const Other& base)
+         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-   /// @brief Represents a named Frequency class.
-   /// @details Provides functionality for named Frequency units.
-   /// @tparam NamedFrequency The named unit type.
-   template<typename NamedFrequency>
-   requires IsNamedFrequencyUnit<NamedFrequency>
-   class Frequency<NamedFrequency> : public BaseDimension<typename NamedFrequency::NumTuple, typename NamedFrequency::DenTuple>
+
+   template<typename... Units>
+   class Frequency<Units...> : public BaseDimension<
+      UnitExponent<typename Extractor<TimeType, Units...>::type, -1>
+   >
    {
    public:
-      using Base = BaseDimension<typename NamedFrequency::NumTuple, typename NamedFrequency::DenTuple>;
+      using Base = BaseDimension<
+         UnitExponent<typename Extractor<TimeType, Units...>::type, -1>
+      >;
+   
       using Base::Base;
-
-      /// @brief Constructs a Frequency object with a value.
-      /// @param val The value of the Frequency.
-      explicit constexpr Frequency(PrecisionType val) : Base(val) {}
-
-      /// @brief Constructs a Frequency object from another Frequency object.
-      /// @tparam OtherFrequency The other Frequency type.
-      /// @param base The base Frequency object.
-      template<typename OtherFrequency>
-      requires IsFrequencyType<OtherFrequency>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr Frequency(const OtherFrequency& base)
-         : Base(base.template GetVal<typename NamedFrequency::NumTuple, typename NamedFrequency::DenTuple>()) {}
-
-      /// @brief Deprecated function to get the value of Frequency.
-      /// @details Prefer using the free function `getFrequency()` instead.
-      /// @return The value of the Frequency.
-      template<typename Time1T>
-      requires IsFrequencyUnits<Time1T>
-      [[deprecated("Use the free function getFrequency() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetFrequency() const
-      {
-         return getFrequency<Time1T>(*this);
-      }
-
-      /// @brief Deprecated function to get the value of Frequency.
-      /// @details Prefer using the free function `getFrequency()` instead.
-      /// @return The value of the Frequency.
-      template<typename NamedFrequencyUnit>
-      requires IsNamedFrequencyUnit<NamedFrequencyUnit>
-      [[deprecated("Use the free function getFrequency() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetFrequency() const
-      {
-         return getFrequency<NamedFrequencyUnit>(*this);
-      }         
+   
+      template<typename T>
+      requires IsFrequency<T>
+      constexpr Frequency(const T& base) : Base(base) {}
    };
 
-   /// @brief Template deduction guide for Frequency.
-   /// @tparam Time1 Denominator Time1 type
-   template<typename Time1>
-   requires IsFrequencyUnits<Time1>
-   Frequency(Time1) -> Frequency<Time1>;
-
-   /// @brief Template deduction guide for Frequency.
-   /// @tparam Time1 Denominator Time1 type
-   template<typename NamedFrequency>
-   requires IsNamedFrequencyUnit<NamedFrequency>
-   Frequency(NamedFrequency) -> Frequency<NamedFrequency>;
-
-   /// @brief Template deduction guide for Frequency.
-   /// @tparam Time1 Denominator Time1 type
-   template<typename Time1>
-   requires IsFrequencyUnits<Time1>
-   Frequency(BaseDimension<std::tuple<>, std::tuple<Time1>>) -> Frequency<Time1>;
-
+   template<IsFrequency Dim>
+   Frequency(Dim) -> 
+   Frequency<
+      DimExtractor<TimeType, Dim>
+   >;
 }
 
 #endif // STATIC_DIMENSION_FREQUENCY_IMPL_H

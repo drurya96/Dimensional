@@ -1,17 +1,21 @@
-#ifndef STATIC_DIMENSION_DynamicViscosity_H
-#define STATIC_DIMENSION_DynamicViscosity_H
+#ifndef STATIC_DIMENSION_DYNAMICVISCOSITY_H
+#define STATIC_DIMENSION_DYNAMICVISCOSITY_H
 
-#include "Dimension_Impl/DerivedDimensions/DynamicViscosityDimension_Impl.h" 
+#include "Dimension_Impl/DerivedDimensions/DynamicViscosityDimension_Impl.h"
 
 namespace Dimension
 {
 
    struct Poises
    {
-      using NumTuple = std::tuple<Grams>;
-      using DenTuple = std::tuple<Seconds, CentiMeters>;
+      using units = std::tuple<
+         UnitExponent<Grams, 1, 1>,
+         UnitExponent<Seconds, -1, 1>,
+         UnitExponent<CentiMeters, -1, 1>
+      >;
    };
 
 }
 
-#endif //STATIC_DIMENSION_DynamicViscosity_H
+
+#endif // STATIC_DIMENSION_DYNAMICVISCOSITY_H

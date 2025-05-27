@@ -1,215 +1,123 @@
 #ifndef STATIC_DIMENSION_ANGULARSPEED_IMPL_H
 #define STATIC_DIMENSION_ANGULARSPEED_IMPL_H
 
+#include "../../BaseDimension.h"
 #include "../../AngleDimension.h"
 #include "../../TimeDimension.h"
 
 namespace Dimension
 {
-   /// @brief Concept for a named AngularSpeed unit.
-   /// @tparam NamedAngularSpeed The type to be checked as a named AngularSpeed unit.
-   template<typename NamedAngularSpeed>
+   /// @brief Concept to verify a type can serve as a named AngularSpeed unit
+   template<typename T>
    concept IsNamedAngularSpeedUnit = requires {
-      typename NamedAngularSpeed::NumTuple;
-      typename NamedAngularSpeed::DenTuple;
+      typename T::units;
+      requires 
+         std::tuple_size_v<typename T::units> == 2 &&
+         IsAngleUnit<typename std::tuple_element_t<0, typename T::units>::unit> &&
+         IsTimeUnit<typename std::tuple_element_t<1, typename T::units>::unit>;
+      requires !std::is_base_of_v<FundamentalUnitTag, T>;
    };
 
-   /// @brief Concept for a AngularSpeed dimension.
-   /// @details Checks if the provided types satisfy the AngularSpeed dimension requirements.
-   /// @tparam Angle1 Numerator Angle1 type
-   /// @tparam Time1 Denominator Time1 type
-   template<typename Angle1, typename Time1>
-   concept IsAngularSpeedUnits = 
-      std::is_same_v<typename Angle1::Dim, AngleType> &&
-      std::is_same_v<typename Time1::Dim, TimeType>;
-
-   /// @brief Concept for a AngularSpeed type.
-   /// @details Ensures that the type meets AngularSpeed type requirements, based on numerator and denominator types.
-   /// @tparam T The type to validate.
+   /// @brief Concept to verify a dimension can be treated as a AngularSpeed type
    template<typename T>
-   concept IsAngularSpeedType = requires {
-      typename T::NumTuple;
-      typename T::DenTuple;
-   } && std::tuple_size_v<typename T::NumTuple> == 1 && std::tuple_size_v<typename T::DenTuple> == 1 &&
-   IsAngularSpeedUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>>;
+   concept IsAngularSpeed = std::is_convertible_v<T, BaseDimension<
+      UnitExponent<PrimaryAngle, 1>, 
+      UnitExponent<PrimaryTime, -1>
+   >>;
 
-   /// @brief Retrieves the value of a AngularSpeed object.
-   /// @details Provides access to the underlying value represented by a AngularSpeed object.
-   /// @tparam Angle1 Numerator Angle1 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam AngularSpeedType The type of the object being accessed.
-   /// @param obj The AngularSpeed object.
-   /// @return The underlying value as `PrecisionType`
-   template<typename Angle1, typename Time1, typename AngularSpeedType>
-   requires IsAngularSpeedUnits<Angle1, Time1> && IsAngularSpeedType<AngularSpeedType>
-   constexpr PrecisionType getAngularSpeed(const AngularSpeedType& obj)
+   /// @brief Retrieves the value of a AngularSpeed object with specific units
+   /// @tparam AngleUnit The Angle unit used for all Angle components of AngularSpeed
+   /// @tparam TimeUnit The Time unit used for all Time components of AngularSpeed
+   /// @tparam DimType The dimension object type, deduced
+   /// @param obj The dimension to extract a raw value from
+   /// @return The raw value in terms of template units as a PrecisionType
+   template<
+      IsAngleUnit AngleUnit,
+      IsTimeUnit TimeUnit,
+      IsAngularSpeed DimType>
+   constexpr PrecisionType get_angularspeed_as(const DimType& obj)
    {
-      return obj.template GetVal<std::tuple<Angle1>, std::tuple<Time1>>();
+      return get_dimension_as<
+         UnitExponent<AngleUnit, 1>,
+         UnitExponent<TimeUnit, -1>
+      >(obj);
    }
 
    /// @brief Retrieves the value of a named AngularSpeed object.
-   /// @details Provides access to the value represented by a named AngularSpeed object.
-   /// @tparam NamedAngularSpeed The named unit type.
-   /// @tparam AngularSpeedType The type of the object being accessed.
-   /// @param obj The AngularSpeed object.
-   /// @return The underlying value as `PrecisionType`.
-   template<typename NamedAngularSpeed, typename AngularSpeedType>
-   requires IsNamedAngularSpeedUnit<NamedAngularSpeed> && IsAngularSpeedType<AngularSpeedType>
-   constexpr PrecisionType getAngularSpeed(const AngularSpeedType& obj)
+   /// @tparam Named The named unit to extract in terms of
+   /// @tparam DimType The dimension object type, deduced
+   /// @param obj The dimension to extract a raw value from
+   /// @return The raw value in terms of template units as a PrecisionType
+   template<IsNamedAngularSpeedUnit Named, IsAngularSpeed DimType>
+   constexpr PrecisionType get_angularspeed_as(const DimType& obj)
    {
-      return obj.template GetVal<typename NamedAngularSpeed::NumTuple, typename NamedAngularSpeed::DenTuple>();
+      return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
 
    template<typename... Ts>
    class AngularSpeed;
 
-   /// @brief Represents a default AngularSpeed.
-   /// @details This AngularSpeed is templated on the primary units of the relevant dimensions.
-   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
-   ///   "AngularSpeed" type, without regard for the underlying units.
+   /// @brief Represents the default AngularSpeed
    template<>
-   class AngularSpeed<> : public BaseDimension<std::tuple<PrimaryAngle>, std::tuple<PrimaryTime>>
+   class AngularSpeed<> : public BaseDimension<
+      UnitExponent<PrimaryAngle, 1>,
+      UnitExponent<PrimaryTime, -1>>
    {
    public:
-      using Base = BaseDimension<std::tuple<PrimaryAngle>, std::tuple<PrimaryTime>>;
+      using Base = BaseDimension<
+         UnitExponent<PrimaryAngle, 1>,
+         UnitExponent<PrimaryTime, -1>>;
       using Base::Base;
 
-      /// @brief Constructs a AngularSpeed object with a value.
-      /// @param val The value of the AngularSpeed.
       explicit constexpr AngularSpeed(PrecisionType val) : Base(val) {}
 
-      /// @brief Constructs a AngularSpeed object from another AngularSpeed object.
-      /// @tparam OtherAngularSpeed The other AngularSpeed type.
-      /// @param base The base AngularSpeed object.
-      template<typename OtherAngularSpeed>
-      requires IsAngularSpeedType<OtherAngularSpeed>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr AngularSpeed(const OtherAngularSpeed& base)
-         : Base(base.template GetVal<std::tuple<PrimaryAngle>, std::tuple<PrimaryTime>>()) {}
+      template<typename Other>
+      requires IsAngularSpeed<Other>
+      constexpr AngularSpeed(const Other& base)
+         : Base(call_unpack<typename Base::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-   /// @brief Represents a AngularSpeed.
-   /// @details Defines operations and data storage for AngularSpeed dimensions.
-   /// @tparam Angle1 Numerator Angle1 type
-   /// @tparam Time1 Denominator Time1 type
-   template<typename Angle1, typename Time1>
-   requires IsAngularSpeedUnits<Angle1, Time1>
-   class AngularSpeed<Angle1, Time1> : public BaseDimension<std::tuple<Angle1>, std::tuple<Time1>>
+   /// @brief Template specialization for named AngularSpeed units
+   /// @tparam Named The named unit this AngularSpeed type is in terms of
+   template<IsNamedAngularSpeedUnit Named>
+   class AngularSpeed<Named> : public BaseDimensionFromTuple<typename Named::units>::dim
    {
    public:
-      using Base = BaseDimension<std::tuple<Angle1>, std::tuple<Time1>>;
+      using Base = typename BaseDimensionFromTuple<typename Named::units>::dim;
       using Base::Base;
 
-      /// @brief Constructs a AngularSpeed object with a value.
-      /// @param val The value of the AngularSpeed.
-      explicit constexpr AngularSpeed(PrecisionType val) : Base(val) {}
-
-      /// @brief Constructs a AngularSpeed object from a named unit.
-      /// @tparam NamedAngularSpeed The named unit type.
-      /// @param base The base unit object.
-      template<typename NamedAngularSpeed>
-      requires IsNamedAngularSpeedUnit<NamedAngularSpeed>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr AngularSpeed(const NamedAngularSpeed& base) : Base(base) {}
-
-      /// @brief Deprecated function to get the value of AngularSpeed.
-      /// @details Prefer using the free function `getAngularSpeed()` instead.
-      /// @return The value of the AngularSpeed.
-      template<typename Angle1T, typename Time1T>
-      requires IsAngularSpeedUnits<Angle1T, Time1T>
-      [[deprecated("Use the free function getAngularSpeed() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetAngularSpeed() const
-      {
-         return getAngularSpeed<Angle1T, Time1T>(*this);
-      }
-
-      /// @brief Deprecated function to get the value of AngularSpeed.
-      /// @details Prefer using the free function `getAngularSpeed()` instead.
-      /// @return The value of the AngularSpeed.
-      template<typename NamedAngularSpeed>
-      requires IsNamedAngularSpeedUnit<NamedAngularSpeed>
-      [[deprecated("Use the free function getAngularSpeed() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetAngularSpeed() const
-      {
-         return getAngularSpeed<NamedAngularSpeed>(*this);
-      }
+      template<typename Other>
+      requires IsAngularSpeed<Other>
+      constexpr AngularSpeed(const Other& base)
+         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-   /// @brief Represents a named AngularSpeed class.
-   /// @details Provides functionality for named AngularSpeed units.
-   /// @tparam NamedAngularSpeed The named unit type.
-   template<typename NamedAngularSpeed>
-   requires IsNamedAngularSpeedUnit<NamedAngularSpeed>
-   class AngularSpeed<NamedAngularSpeed> : public BaseDimension<typename NamedAngularSpeed::NumTuple, typename NamedAngularSpeed::DenTuple>
+
+   template<typename... Units>
+   class AngularSpeed<Units...> : public BaseDimension<
+      UnitExponent<typename Extractor<AngleType, Units...>::type, 1>,
+      UnitExponent<typename Extractor<TimeType, Units...>::type, -1>
+   >
    {
    public:
-      using Base = BaseDimension<typename NamedAngularSpeed::NumTuple, typename NamedAngularSpeed::DenTuple>;
+      using Base = BaseDimension<
+         UnitExponent<typename Extractor<AngleType, Units...>::type, 1>,
+         UnitExponent<typename Extractor<TimeType, Units...>::type, -1>
+      >;
+   
       using Base::Base;
-
-      /// @brief Constructs a AngularSpeed object with a value.
-      /// @param val The value of the AngularSpeed.
-      explicit constexpr AngularSpeed(PrecisionType val) : Base(val) {}
-
-      /// @brief Constructs a AngularSpeed object from another AngularSpeed object.
-      /// @tparam OtherAngularSpeed The other AngularSpeed type.
-      /// @param base The base AngularSpeed object.
-      template<typename OtherAngularSpeed>
-      requires IsAngularSpeedType<OtherAngularSpeed>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr AngularSpeed(const OtherAngularSpeed& base)
-         : Base(base.template GetVal<typename NamedAngularSpeed::NumTuple, typename NamedAngularSpeed::DenTuple>()) {}
-
-      /// @brief Deprecated function to get the value of AngularSpeed.
-      /// @details Prefer using the free function `getAngularSpeed()` instead.
-      /// @return The value of the AngularSpeed.
-      template<typename Angle1T, typename Time1T>
-      requires IsAngularSpeedUnits<Angle1T, Time1T>
-      [[deprecated("Use the free function getAngularSpeed() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetAngularSpeed() const
-      {
-         return getAngularSpeed<Angle1T, Time1T>(*this);
-      }
-
-      /// @brief Deprecated function to get the value of AngularSpeed.
-      /// @details Prefer using the free function `getAngularSpeed()` instead.
-      /// @return The value of the AngularSpeed.
-      template<typename NamedAngularSpeedUnit>
-      requires IsNamedAngularSpeedUnit<NamedAngularSpeedUnit>
-      [[deprecated("Use the free function getAngularSpeed() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetAngularSpeed() const
-      {
-         return getAngularSpeed<NamedAngularSpeedUnit>(*this);
-      }         
+   
+      template<typename T>
+      requires IsAngularSpeed<T>
+      constexpr AngularSpeed(const T& base) : Base(base) {}
    };
 
-   /// @brief Template deduction guide for AngularSpeed.
-   /// @tparam Angle1 Numerator Angle1 type
-   /// @tparam Time1 Denominator Time1 type
-   template<typename Angle1, typename Time1>
-   requires IsAngularSpeedUnits<Angle1, Time1>
-   AngularSpeed(Angle1, Time1) -> AngularSpeed<Angle1, Time1>;
-
-   /// @brief Template deduction guide for AngularSpeed.
-   /// @tparam Angle1 Numerator Angle1 type
-   /// @tparam Time1 Denominator Time1 type
-   template<typename NamedAngularSpeed>
-   requires IsNamedAngularSpeedUnit<NamedAngularSpeed>
-   AngularSpeed(NamedAngularSpeed) -> AngularSpeed<NamedAngularSpeed>;
-
-   /// @brief Template deduction guide for AngularSpeed.
-   /// @tparam Angle1 Numerator Angle1 type
-   /// @tparam Time1 Denominator Time1 type
-   template<typename Angle1, typename Time1>
-   requires IsAngularSpeedUnits<Angle1, Time1>
-   AngularSpeed(BaseDimension<std::tuple<Angle1>, std::tuple<Time1>>) -> AngularSpeed<Angle1, Time1>;
-
+   template<IsAngularSpeed Dim>
+   AngularSpeed(Dim) -> 
+   AngularSpeed<
+      DimExtractor<AngleType, Dim>,
+      DimExtractor<TimeType, Dim>
+   >;
 }
 
 #endif // STATIC_DIMENSION_ANGULARSPEED_IMPL_H

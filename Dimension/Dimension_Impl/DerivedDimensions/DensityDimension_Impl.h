@@ -1,229 +1,123 @@
 #ifndef STATIC_DIMENSION_DENSITY_IMPL_H
 #define STATIC_DIMENSION_DENSITY_IMPL_H
 
+#include "../../BaseDimension.h"
 #include "../../MassDimension.h"
 #include "../../LengthDimension.h"
 
 namespace Dimension
 {
-   /// @brief Concept for a named Density unit.
-   /// @tparam NamedDensity The type to be checked as a named Density unit.
-   template<typename NamedDensity>
+   /// @brief Concept to verify a type can serve as a named Density unit
+   template<typename T>
    concept IsNamedDensityUnit = requires {
-      typename NamedDensity::NumTuple;
-      typename NamedDensity::DenTuple;
+      typename T::units;
+      requires 
+         std::tuple_size_v<typename T::units> == 2 &&
+         IsMassUnit<typename std::tuple_element_t<0, typename T::units>::unit> &&
+         IsLengthUnit<typename std::tuple_element_t<1, typename T::units>::unit>;
+      requires !std::is_base_of_v<FundamentalUnitTag, T>;
    };
 
-   /// @brief Concept for a Density dimension.
-   /// @details Checks if the provided types satisfy the Density dimension requirements.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Denominator Length1 type
-   /// @tparam Length2 Denominator Length2 type
-   /// @tparam Length3 Denominator Length3 type
-   template<typename Mass1, typename Length1, typename Length2, typename Length3>
-   concept IsDensityUnits = 
-      std::is_same_v<typename Mass1::Dim, MassType> &&
-      std::is_same_v<typename Length1::Dim, LengthType> &&
-      std::is_same_v<typename Length2::Dim, LengthType> &&
-      std::is_same_v<typename Length3::Dim, LengthType>;
-
-   /// @brief Concept for a Density type.
-   /// @details Ensures that the type meets Density type requirements, based on numerator and denominator types.
-   /// @tparam T The type to validate.
+   /// @brief Concept to verify a dimension can be treated as a Density type
    template<typename T>
-   concept IsDensityType = requires {
-      typename T::NumTuple;
-      typename T::DenTuple;
-   } && std::tuple_size_v<typename T::NumTuple> == 1 && std::tuple_size_v<typename T::DenTuple> == 3 &&
-   IsDensityUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>, typename std::tuple_element_t<2, typename T::DenTuple>>;
+   concept IsDensity = std::is_convertible_v<T, BaseDimension<
+      UnitExponent<PrimaryMass, 1>, 
+      UnitExponent<PrimaryLength, -3>
+   >>;
 
-   /// @brief Retrieves the value of a Density object.
-   /// @details Provides access to the underlying value represented by a Density object.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Denominator Length1 type
-   /// @tparam Length2 Denominator Length2 type
-   /// @tparam Length3 Denominator Length3 type
-   /// @tparam DensityType The type of the object being accessed.
-   /// @param obj The Density object.
-   /// @return The underlying value as `PrecisionType`
-   template<typename Mass1, typename Length1, typename Length2, typename Length3, typename DensityType>
-   requires IsDensityUnits<Mass1, Length1, Length2, Length3> && IsDensityType<DensityType>
-   constexpr PrecisionType getDensity(const DensityType& obj)
+   /// @brief Retrieves the value of a Density object with specific units
+   /// @tparam MassUnit The Mass unit used for all Mass components of Density
+   /// @tparam LengthUnit The Length unit used for all Length components of Density
+   /// @tparam DimType The dimension object type, deduced
+   /// @param obj The dimension to extract a raw value from
+   /// @return The raw value in terms of template units as a PrecisionType
+   template<
+      IsMassUnit MassUnit,
+      IsLengthUnit LengthUnit,
+      IsDensity DimType>
+   constexpr PrecisionType get_density_as(const DimType& obj)
    {
-      return obj.template GetVal<std::tuple<Mass1>, std::tuple<Length1, Length2, Length3>>();
+      return get_dimension_as<
+         UnitExponent<MassUnit, 1>,
+         UnitExponent<LengthUnit, -3>
+      >(obj);
    }
 
    /// @brief Retrieves the value of a named Density object.
-   /// @details Provides access to the value represented by a named Density object.
-   /// @tparam NamedDensity The named unit type.
-   /// @tparam DensityType The type of the object being accessed.
-   /// @param obj The Density object.
-   /// @return The underlying value as `PrecisionType`.
-   template<typename NamedDensity, typename DensityType>
-   requires IsNamedDensityUnit<NamedDensity> && IsDensityType<DensityType>
-   constexpr PrecisionType getDensity(const DensityType& obj)
+   /// @tparam Named The named unit to extract in terms of
+   /// @tparam DimType The dimension object type, deduced
+   /// @param obj The dimension to extract a raw value from
+   /// @return The raw value in terms of template units as a PrecisionType
+   template<IsNamedDensityUnit Named, IsDensity DimType>
+   constexpr PrecisionType get_density_as(const DimType& obj)
    {
-      return obj.template GetVal<typename NamedDensity::NumTuple, typename NamedDensity::DenTuple>();
+      return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
 
    template<typename... Ts>
    class Density;
 
-   /// @brief Represents a default Density.
-   /// @details This Density is templated on the primary units of the relevant dimensions.
-   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
-   ///   "Density" type, without regard for the underlying units.
+   /// @brief Represents the default Density
    template<>
-   class Density<> : public BaseDimension<std::tuple<PrimaryMass>, std::tuple<PrimaryLength, PrimaryLength, PrimaryLength>>
+   class Density<> : public BaseDimension<
+      UnitExponent<PrimaryMass, 1>,
+      UnitExponent<PrimaryLength, -3>>
    {
    public:
-      using Base = BaseDimension<std::tuple<PrimaryMass>, std::tuple<PrimaryLength, PrimaryLength, PrimaryLength>>;
+      using Base = BaseDimension<
+         UnitExponent<PrimaryMass, 1>,
+         UnitExponent<PrimaryLength, -3>>;
       using Base::Base;
 
-      /// @brief Constructs a Density object with a value.
-      /// @param val The value of the Density.
       explicit constexpr Density(PrecisionType val) : Base(val) {}
 
-      /// @brief Constructs a Density object from another Density object.
-      /// @tparam OtherDensity The other Density type.
-      /// @param base The base Density object.
-      template<typename OtherDensity>
-      requires IsDensityType<OtherDensity>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr Density(const OtherDensity& base)
-         : Base(base.template GetVal<std::tuple<PrimaryMass>, std::tuple<PrimaryLength, PrimaryLength, PrimaryLength>>()) {}
+      template<typename Other>
+      requires IsDensity<Other>
+      constexpr Density(const Other& base)
+         : Base(call_unpack<typename Base::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-   /// @brief Represents a Density.
-   /// @details Defines operations and data storage for Density dimensions.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Denominator Length1 type
-   /// @tparam Length2 Denominator Length2 type
-   /// @tparam Length3 Denominator Length3 type
-   template<typename Mass1, typename Length1, typename Length2, typename Length3>
-   requires IsDensityUnits<Mass1, Length1, Length2, Length3>
-   class Density<Mass1, Length1, Length2, Length3> : public BaseDimension<std::tuple<Mass1>, std::tuple<Length1, Length2, Length3>>
+   /// @brief Template specialization for named Density units
+   /// @tparam Named The named unit this Density type is in terms of
+   template<IsNamedDensityUnit Named>
+   class Density<Named> : public BaseDimensionFromTuple<typename Named::units>::dim
    {
    public:
-      using Base = BaseDimension<std::tuple<Mass1>, std::tuple<Length1, Length2, Length3>>;
+      using Base = typename BaseDimensionFromTuple<typename Named::units>::dim;
       using Base::Base;
 
-      /// @brief Constructs a Density object with a value.
-      /// @param val The value of the Density.
-      explicit constexpr Density(PrecisionType val) : Base(val) {}
-
-      /// @brief Constructs a Density object from a named unit.
-      /// @tparam NamedDensity The named unit type.
-      /// @param base The base unit object.
-      template<typename NamedDensity>
-      requires IsNamedDensityUnit<NamedDensity>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr Density(const NamedDensity& base) : Base(base) {}
-
-      /// @brief Deprecated function to get the value of Density.
-      /// @details Prefer using the free function `getDensity()` instead.
-      /// @return The value of the Density.
-      template<typename Mass1T, typename Length1T, typename Length2T, typename Length3T>
-      requires IsDensityUnits<Mass1T, Length1T, Length2T, Length3T>
-      [[deprecated("Use the free function getDensity() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetDensity() const
-      {
-         return getDensity<Mass1T, Length1T, Length2T, Length3T>(*this);
-      }
-
-      /// @brief Deprecated function to get the value of Density.
-      /// @details Prefer using the free function `getDensity()` instead.
-      /// @return The value of the Density.
-      template<typename NamedDensity>
-      requires IsNamedDensityUnit<NamedDensity>
-      [[deprecated("Use the free function getDensity() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetDensity() const
-      {
-         return getDensity<NamedDensity>(*this);
-      }
+      template<typename Other>
+      requires IsDensity<Other>
+      constexpr Density(const Other& base)
+         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-   /// @brief Represents a named Density class.
-   /// @details Provides functionality for named Density units.
-   /// @tparam NamedDensity The named unit type.
-   template<typename NamedDensity>
-   requires IsNamedDensityUnit<NamedDensity>
-   class Density<NamedDensity> : public BaseDimension<typename NamedDensity::NumTuple, typename NamedDensity::DenTuple>
+
+   template<typename... Units>
+   class Density<Units...> : public BaseDimension<
+      UnitExponent<typename Extractor<MassType, Units...>::type, 1>,
+      UnitExponent<typename Extractor<LengthType, Units...>::type, -3>
+   >
    {
    public:
-      using Base = BaseDimension<typename NamedDensity::NumTuple, typename NamedDensity::DenTuple>;
+      using Base = BaseDimension<
+         UnitExponent<typename Extractor<MassType, Units...>::type, 1>,
+         UnitExponent<typename Extractor<LengthType, Units...>::type, -3>
+      >;
+   
       using Base::Base;
-
-      /// @brief Constructs a Density object with a value.
-      /// @param val The value of the Density.
-      explicit constexpr Density(PrecisionType val) : Base(val) {}
-
-      /// @brief Constructs a Density object from another Density object.
-      /// @tparam OtherDensity The other Density type.
-      /// @param base The base Density object.
-      template<typename OtherDensity>
-      requires IsDensityType<OtherDensity>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr Density(const OtherDensity& base)
-         : Base(base.template GetVal<typename NamedDensity::NumTuple, typename NamedDensity::DenTuple>()) {}
-
-      /// @brief Deprecated function to get the value of Density.
-      /// @details Prefer using the free function `getDensity()` instead.
-      /// @return The value of the Density.
-      template<typename Mass1T, typename Length1T, typename Length2T, typename Length3T>
-      requires IsDensityUnits<Mass1T, Length1T, Length2T, Length3T>
-      [[deprecated("Use the free function getDensity() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetDensity() const
-      {
-         return getDensity<Mass1T, Length1T, Length2T, Length3T>(*this);
-      }
-
-      /// @brief Deprecated function to get the value of Density.
-      /// @details Prefer using the free function `getDensity()` instead.
-      /// @return The value of the Density.
-      template<typename NamedDensityUnit>
-      requires IsNamedDensityUnit<NamedDensityUnit>
-      [[deprecated("Use the free function getDensity() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetDensity() const
-      {
-         return getDensity<NamedDensityUnit>(*this);
-      }         
+   
+      template<typename T>
+      requires IsDensity<T>
+      constexpr Density(const T& base) : Base(base) {}
    };
 
-   /// @brief Template deduction guide for Density.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Denominator Length1 type
-   /// @tparam Length2 Denominator Length2 type
-   /// @tparam Length3 Denominator Length3 type
-   template<typename Mass1, typename Length1, typename Length2, typename Length3>
-   requires IsDensityUnits<Mass1, Length1, Length2, Length3>
-   Density(Mass1, Length1, Length2, Length3) -> Density<Mass1, Length1, Length2, Length3>;
-
-   /// @brief Template deduction guide for Density.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Denominator Length1 type
-   /// @tparam Length2 Denominator Length2 type
-   /// @tparam Length3 Denominator Length3 type
-   template<typename NamedDensity>
-   requires IsNamedDensityUnit<NamedDensity>
-   Density(NamedDensity) -> Density<NamedDensity>;
-
-   /// @brief Template deduction guide for Density.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Denominator Length1 type
-   /// @tparam Length2 Denominator Length2 type
-   /// @tparam Length3 Denominator Length3 type
-   template<typename Mass1, typename Length1, typename Length2, typename Length3>
-   requires IsDensityUnits<Mass1, Length1, Length2, Length3>
-   Density(BaseDimension<std::tuple<Mass1>, std::tuple<Length1, Length2, Length3>>) -> Density<Mass1, Length1, Length2, Length3>;
-
+   template<IsDensity Dim>
+   Density(Dim) -> 
+   Density<
+      DimExtractor<MassType, Dim>,
+      DimExtractor<LengthType, Dim>
+   >;
 }
 
 #endif // STATIC_DIMENSION_DENSITY_IMPL_H

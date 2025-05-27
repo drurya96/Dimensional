@@ -16,7 +16,7 @@ namespace Dimension
    /// @brief Concept to check if a type is a valid Time unit.
    /// @tparam T The type to check.
    template<typename T>
-   concept IsTimeUnit = IsNonQuantityUnitDimension<T, TimeType> || IsQuantityUnitDimension<T, TimeType>;
+   concept IsTimeUnit = std::is_base_of_v<FundamentalUnitTag, T> && std::is_same_v<typename T::Dim, TimeType>;//IsNonQuantityUnitDimension<T, TimeType> || IsQuantityUnitDimension<T, TimeType>;
 
    /// @brief Base class for Time units.
    /// @tparam Unit The unit type.
@@ -35,13 +35,22 @@ namespace Dimension
 
    /// @brief Trait to check if a type is a Time dimension.
    /// @tparam T The type to check.
-   template<typename T>
-   struct is_Time : std::false_type {};
+   //template<typename T>
+   //struct is_Time : std::false_type {};
+
+   //template<typename Dim>
+   //struct is_Time_Impl
+   //{
+   //   constexpr bool value = IsTimeUnit<std::tuple_element_t<0, decltype(FullSimplify(Dim{}))>>;
+   //};
+
 
    /// @brief Specialization for BaseDimension types.
    /// @tparam T The unit type.
-   template<typename T>
-   struct is_Time<BaseDimension<std::tuple<T>, std::tuple<>>> : std::bool_constant<IsTimeUnit<T>> {};
+   //template<typename T>
+   //struct is_Time<BaseDimension<T>> : std::bool_constant<IsTimeUnit<T>> {};
+   template<typename Dim>
+   struct is_Time : std::bool_constant<IsTimeUnit<typename std::tuple_element_t<0, typename decltype(FullSimplify(Dim{}))::units>::unit>> {};
 
    /// @brief Helper variable template for is_Time.
    /// @tparam T The type to check.
@@ -58,58 +67,56 @@ namespace Dimension
    /// @param obj The Time object.
    /// @return The value in the specified unit.
    template<IsTimeUnit T>
-   constexpr PrecisionType getTime(Time_type auto obj)
+   constexpr PrecisionType get_time_as(/*Time_type*/ auto obj)
    {
-      return obj.template GetVal<std::tuple<T>, std::tuple<>>();
+      return get_dimension_as<UnitExponent<T>>(obj);
    }
+
+   template<IsTimeUnit Unit = PrimaryTime, bool isQuantity = false>
+   class Time;
 
    /// @brief Represents a dimension type for Time.
    /// @tparam Unit The primary unit type.
-   template<IsTimeUnit Unit = PrimaryTime>
-   class Time : public BaseDimension<std::tuple<Unit>, std::tuple<>>
+   template<IsTimeUnit Unit>
+   class Time<Unit, false> : public BaseDimension<UnitExponent<Unit>>
    {
    public:
       /// @brief Default constructor initializing to zero.
-      constexpr Time() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}
+      constexpr Time() : BaseDimension<UnitExponent<Unit>>::BaseDimension(0.0) {}
 
       /// @brief Constructs a Time object with a specific value.
       /// @param val The value to initialize with.
-      explicit constexpr Time(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
+      explicit constexpr Time(double val) : BaseDimension<UnitExponent<Unit>>::BaseDimension(val) {}
 
       /// @brief Constructs a Time object from another BaseDimension.
-      /// @tparam T The unit type of the BaseDimension.
+      /// @tparam Ts The units of the BaseDimension.
       /// @param base The BaseDimension object to construct from.
-      template<IsTimeUnit T>
+      template<typename... Ts>
+      requires matching_dimensions<BaseDimension<UnitExponent<Unit>>, BaseDimension<Ts...>>
       // Implicit conversion between dimensions of the same unit is core to Dimensional
       // cppcheck-suppress noExplicitConstructor
-      constexpr Time(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()){}
-
-      /// @brief Deprecated method to retrieve the value of the dimension.
-      /// @tparam T The unit type.
-      /// @return The value in the specified unit.
-      template<IsTimeUnit T>
-      [[deprecated("Use the free function getTime() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetTime() const
-      {
-         return getTime<T>(*this);
-      }
+      constexpr Time(const BaseDimension<Ts...>& base) : BaseDimension<UnitExponent<Unit>>::BaseDimension(get_dimension_as<UnitExponent<Unit>>(base)) {}
    };
-
-   /// @brief Deduction guide for Time constructor.
-   /// @tparam T The unit type.
-   template<IsTimeUnit T>
-   Time(T) -> Time<T>;
-
-   /// @brief Deduction guide for Time constructor with BaseDimension.
-   /// @tparam TimeUnit The unit type.
-   template<IsTimeUnit TimeUnit>
-   Time(BaseDimension<std::tuple<TimeUnit>, std::tuple<>>) -> Time<TimeUnit>;
 
    /// @brief Specialization for is_Time trait for Time types.
    /// @tparam T The unit type.
    template<typename T>
    struct is_Time<Time<T>> : std::bool_constant<IsTimeUnit<T>> {};
+
+   /// @brief Deduction guide for Time constructor.
+   /// @tparam T The unit type.
+   //template<IsTimeUnit T>
+   //Time(T) -> Time<T>;
+
+   /// @brief Deduction guide for Time constructor with BaseDimension.
+   /// @tparam TimeUnit The unit type.
+   //template<IsTimeUnit TimeUnit>
+   //Time(BaseDimension<UnitExponent<TimeUnit>>) -> Time<TimeUnit>;
+
+   /// @brief Deduction guide for Time constructor with BaseDimension.
+   /// @tparam TimeUnit The unit type.
+   template<Time_type Dim>
+   Time(Dim) -> Time<DimExtractor<TimeType, Dim>>;
 }
 
-#endif //STATIC_DIMENSION_Time_IMPL_H
+#endif // STATIC_DIMENSION_Time_IMPL_H

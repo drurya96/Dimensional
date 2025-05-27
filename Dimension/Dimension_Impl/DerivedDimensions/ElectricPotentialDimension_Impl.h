@@ -1,6 +1,7 @@
 #ifndef STATIC_DIMENSION_ELECTRICPOTENTIAL_IMPL_H
 #define STATIC_DIMENSION_ELECTRICPOTENTIAL_IMPL_H
 
+#include "../../BaseDimension.h"
 #include "../../MassDimension.h"
 #include "../../LengthDimension.h"
 #include "../../TimeDimension.h"
@@ -8,238 +9,137 @@
 
 namespace Dimension
 {
-   /// @brief Concept for a named ElectricPotential unit.
-   /// @tparam NamedElectricPotential The type to be checked as a named ElectricPotential unit.
-   template<typename NamedElectricPotential>
+   /// @brief Concept to verify a type can serve as a named ElectricPotential unit
+   template<typename T>
    concept IsNamedElectricPotentialUnit = requires {
-      typename NamedElectricPotential::NumTuple;
-      typename NamedElectricPotential::DenTuple;
+      typename T::units;
+      requires 
+         std::tuple_size_v<typename T::units> == 4 &&
+         IsMassUnit<typename std::tuple_element_t<0, typename T::units>::unit> &&
+         IsLengthUnit<typename std::tuple_element_t<1, typename T::units>::unit> &&
+         IsTimeUnit<typename std::tuple_element_t<2, typename T::units>::unit> &&
+         IsChargeUnit<typename std::tuple_element_t<3, typename T::units>::unit>;
+      requires !std::is_base_of_v<FundamentalUnitTag, T>;
    };
 
-   /// @brief Concept for a ElectricPotential dimension.
-   /// @details Checks if the provided types satisfy the ElectricPotential dimension requirements.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Charge1>
-   concept IsElectricPotentialUnits = 
-      std::is_same_v<typename Mass1::Dim, MassType> &&
-      std::is_same_v<typename Length1::Dim, LengthType> &&
-      std::is_same_v<typename Length2::Dim, LengthType> &&
-      std::is_same_v<typename Time1::Dim, TimeType> &&
-      std::is_same_v<typename Time2::Dim, TimeType> &&
-      std::is_same_v<typename Charge1::Dim, ChargeType>;
-
-   /// @brief Concept for a ElectricPotential type.
-   /// @details Ensures that the type meets ElectricPotential type requirements, based on numerator and denominator types.
-   /// @tparam T The type to validate.
+   /// @brief Concept to verify a dimension can be treated as a ElectricPotential type
    template<typename T>
-   concept IsElectricPotentialType = requires {
-      typename T::NumTuple;
-      typename T::DenTuple;
-   } && std::tuple_size_v<typename T::NumTuple> == 3 && std::tuple_size_v<typename T::DenTuple> == 3 &&
-   IsElectricPotentialUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<2, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>, typename std::tuple_element_t<2, typename T::DenTuple>>;
+   concept IsElectricPotential = std::is_convertible_v<T, BaseDimension<
+      UnitExponent<PrimaryMass, 1>, 
+      UnitExponent<PrimaryLength, 2>, 
+      UnitExponent<PrimaryTime, -2>, 
+      UnitExponent<PrimaryCharge, -1>
+   >>;
 
-   /// @brief Retrieves the value of a ElectricPotential object.
-   /// @details Provides access to the underlying value represented by a ElectricPotential object.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   /// @tparam Charge1 Denominator Charge1 type
-   /// @tparam ElectricPotentialType The type of the object being accessed.
-   /// @param obj The ElectricPotential object.
-   /// @return The underlying value as `PrecisionType`
-   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Charge1, typename ElectricPotentialType>
-   requires IsElectricPotentialUnits<Mass1, Length1, Length2, Time1, Time2, Charge1> && IsElectricPotentialType<ElectricPotentialType>
-   constexpr PrecisionType getElectricPotential(const ElectricPotentialType& obj)
+   /// @brief Retrieves the value of a ElectricPotential object with specific units
+   /// @tparam MassUnit The Mass unit used for all Mass components of ElectricPotential
+   /// @tparam LengthUnit The Length unit used for all Length components of ElectricPotential
+   /// @tparam TimeUnit The Time unit used for all Time components of ElectricPotential
+   /// @tparam ChargeUnit The Charge unit used for all Charge components of ElectricPotential
+   /// @tparam DimType The dimension object type, deduced
+   /// @param obj The dimension to extract a raw value from
+   /// @return The raw value in terms of template units as a PrecisionType
+   template<
+      IsMassUnit MassUnit,
+      IsLengthUnit LengthUnit,
+      IsTimeUnit TimeUnit,
+      IsChargeUnit ChargeUnit,
+      IsElectricPotential DimType>
+   constexpr PrecisionType get_electricpotential_as(const DimType& obj)
    {
-      return obj.template GetVal<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Charge1>>();
+      return get_dimension_as<
+         UnitExponent<MassUnit, 1>,
+         UnitExponent<LengthUnit, 2>,
+         UnitExponent<TimeUnit, -2>,
+         UnitExponent<ChargeUnit, -1>
+      >(obj);
    }
 
    /// @brief Retrieves the value of a named ElectricPotential object.
-   /// @details Provides access to the value represented by a named ElectricPotential object.
-   /// @tparam NamedElectricPotential The named unit type.
-   /// @tparam ElectricPotentialType The type of the object being accessed.
-   /// @param obj The ElectricPotential object.
-   /// @return The underlying value as `PrecisionType`.
-   template<typename NamedElectricPotential, typename ElectricPotentialType>
-   requires IsNamedElectricPotentialUnit<NamedElectricPotential> && IsElectricPotentialType<ElectricPotentialType>
-   constexpr PrecisionType getElectricPotential(const ElectricPotentialType& obj)
+   /// @tparam Named The named unit to extract in terms of
+   /// @tparam DimType The dimension object type, deduced
+   /// @param obj The dimension to extract a raw value from
+   /// @return The raw value in terms of template units as a PrecisionType
+   template<IsNamedElectricPotentialUnit Named, IsElectricPotential DimType>
+   constexpr PrecisionType get_electricpotential_as(const DimType& obj)
    {
-      return obj.template GetVal<typename NamedElectricPotential::NumTuple, typename NamedElectricPotential::DenTuple>();
+      return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
 
    template<typename... Ts>
    class ElectricPotential;
 
-   /// @brief Represents a default ElectricPotential.
-   /// @details This ElectricPotential is templated on the primary units of the relevant dimensions.
-   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
-   ///   "ElectricPotential" type, without regard for the underlying units.
+   /// @brief Represents the default ElectricPotential
    template<>
-   class ElectricPotential<> : public BaseDimension<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryCharge>>
+   class ElectricPotential<> : public BaseDimension<
+      UnitExponent<PrimaryMass, 1>,
+      UnitExponent<PrimaryLength, 2>,
+      UnitExponent<PrimaryTime, -2>,
+      UnitExponent<PrimaryCharge, -1>>
    {
    public:
-      using Base = BaseDimension<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryCharge>>;
+      using Base = BaseDimension<
+         UnitExponent<PrimaryMass, 1>,
+         UnitExponent<PrimaryLength, 2>,
+         UnitExponent<PrimaryTime, -2>,
+         UnitExponent<PrimaryCharge, -1>>;
       using Base::Base;
 
-      /// @brief Constructs a ElectricPotential object with a value.
-      /// @param val The value of the ElectricPotential.
       explicit constexpr ElectricPotential(PrecisionType val) : Base(val) {}
 
-      /// @brief Constructs a ElectricPotential object from another ElectricPotential object.
-      /// @tparam OtherElectricPotential The other ElectricPotential type.
-      /// @param base The base ElectricPotential object.
-      template<typename OtherElectricPotential>
-      requires IsElectricPotentialType<OtherElectricPotential>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr ElectricPotential(const OtherElectricPotential& base)
-         : Base(base.template GetVal<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryCharge>>()) {}
+      template<typename Other>
+      requires IsElectricPotential<Other>
+      constexpr ElectricPotential(const Other& base)
+         : Base(call_unpack<typename Base::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-   /// @brief Represents a ElectricPotential.
-   /// @details Defines operations and data storage for ElectricPotential dimensions.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Charge1>
-   requires IsElectricPotentialUnits<Mass1, Length1, Length2, Time1, Time2, Charge1>
-   class ElectricPotential<Mass1, Length1, Length2, Time1, Time2, Charge1> : public BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Charge1>>
+   /// @brief Template specialization for named ElectricPotential units
+   /// @tparam Named The named unit this ElectricPotential type is in terms of
+   template<IsNamedElectricPotentialUnit Named>
+   class ElectricPotential<Named> : public BaseDimensionFromTuple<typename Named::units>::dim
    {
    public:
-      using Base = BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Charge1>>;
+      using Base = typename BaseDimensionFromTuple<typename Named::units>::dim;
       using Base::Base;
 
-      /// @brief Constructs a ElectricPotential object with a value.
-      /// @param val The value of the ElectricPotential.
-      explicit constexpr ElectricPotential(PrecisionType val) : Base(val) {}
-
-      /// @brief Constructs a ElectricPotential object from a named unit.
-      /// @tparam NamedElectricPotential The named unit type.
-      /// @param base The base unit object.
-      template<typename NamedElectricPotential>
-      requires IsNamedElectricPotentialUnit<NamedElectricPotential>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr ElectricPotential(const NamedElectricPotential& base) : Base(base) {}
-
-      /// @brief Deprecated function to get the value of ElectricPotential.
-      /// @details Prefer using the free function `getElectricPotential()` instead.
-      /// @return The value of the ElectricPotential.
-      template<typename Mass1T, typename Length1T, typename Length2T, typename Time1T, typename Time2T, typename Charge1T>
-      requires IsElectricPotentialUnits<Mass1T, Length1T, Length2T, Time1T, Time2T, Charge1T>
-      [[deprecated("Use the free function getElectricPotential() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetElectricPotential() const
-      {
-         return getElectricPotential<Mass1T, Length1T, Length2T, Time1T, Time2T, Charge1T>(*this);
-      }
-
-      /// @brief Deprecated function to get the value of ElectricPotential.
-      /// @details Prefer using the free function `getElectricPotential()` instead.
-      /// @return The value of the ElectricPotential.
-      template<typename NamedElectricPotential>
-      requires IsNamedElectricPotentialUnit<NamedElectricPotential>
-      [[deprecated("Use the free function getElectricPotential() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetElectricPotential() const
-      {
-         return getElectricPotential<NamedElectricPotential>(*this);
-      }
+      template<typename Other>
+      requires IsElectricPotential<Other>
+      constexpr ElectricPotential(const Other& base)
+         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-   /// @brief Represents a named ElectricPotential class.
-   /// @details Provides functionality for named ElectricPotential units.
-   /// @tparam NamedElectricPotential The named unit type.
-   template<typename NamedElectricPotential>
-   requires IsNamedElectricPotentialUnit<NamedElectricPotential>
-   class ElectricPotential<NamedElectricPotential> : public BaseDimension<typename NamedElectricPotential::NumTuple, typename NamedElectricPotential::DenTuple>
+
+   template<typename... Units>
+   class ElectricPotential<Units...> : public BaseDimension<
+      UnitExponent<typename Extractor<MassType, Units...>::type, 1>,
+      UnitExponent<typename Extractor<LengthType, Units...>::type, 2>,
+      UnitExponent<typename Extractor<TimeType, Units...>::type, -2>,
+      UnitExponent<typename Extractor<ChargeType, Units...>::type, -1>
+   >
    {
    public:
-      using Base = BaseDimension<typename NamedElectricPotential::NumTuple, typename NamedElectricPotential::DenTuple>;
+      using Base = BaseDimension<
+         UnitExponent<typename Extractor<MassType, Units...>::type, 1>,
+         UnitExponent<typename Extractor<LengthType, Units...>::type, 2>,
+         UnitExponent<typename Extractor<TimeType, Units...>::type, -2>,
+         UnitExponent<typename Extractor<ChargeType, Units...>::type, -1>
+      >;
+   
       using Base::Base;
-
-      /// @brief Constructs a ElectricPotential object with a value.
-      /// @param val The value of the ElectricPotential.
-      explicit constexpr ElectricPotential(PrecisionType val) : Base(val) {}
-
-      /// @brief Constructs a ElectricPotential object from another ElectricPotential object.
-      /// @tparam OtherElectricPotential The other ElectricPotential type.
-      /// @param base The base ElectricPotential object.
-      template<typename OtherElectricPotential>
-      requires IsElectricPotentialType<OtherElectricPotential>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr ElectricPotential(const OtherElectricPotential& base)
-         : Base(base.template GetVal<typename NamedElectricPotential::NumTuple, typename NamedElectricPotential::DenTuple>()) {}
-
-      /// @brief Deprecated function to get the value of ElectricPotential.
-      /// @details Prefer using the free function `getElectricPotential()` instead.
-      /// @return The value of the ElectricPotential.
-      template<typename Mass1T, typename Length1T, typename Length2T, typename Time1T, typename Time2T, typename Charge1T>
-      requires IsElectricPotentialUnits<Mass1T, Length1T, Length2T, Time1T, Time2T, Charge1T>
-      [[deprecated("Use the free function getElectricPotential() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetElectricPotential() const
-      {
-         return getElectricPotential<Mass1T, Length1T, Length2T, Time1T, Time2T, Charge1T>(*this);
-      }
-
-      /// @brief Deprecated function to get the value of ElectricPotential.
-      /// @details Prefer using the free function `getElectricPotential()` instead.
-      /// @return The value of the ElectricPotential.
-      template<typename NamedElectricPotentialUnit>
-      requires IsNamedElectricPotentialUnit<NamedElectricPotentialUnit>
-      [[deprecated("Use the free function getElectricPotential() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetElectricPotential() const
-      {
-         return getElectricPotential<NamedElectricPotentialUnit>(*this);
-      }         
+   
+      template<typename T>
+      requires IsElectricPotential<T>
+      constexpr ElectricPotential(const T& base) : Base(base) {}
    };
 
-   /// @brief Template deduction guide for ElectricPotential.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Charge1>
-   requires IsElectricPotentialUnits<Mass1, Length1, Length2, Time1, Time2, Charge1>
-   ElectricPotential(Mass1, Length1, Length2, Time1, Time2, Charge1) -> ElectricPotential<Mass1, Length1, Length2, Time1, Time2, Charge1>;
-
-   /// @brief Template deduction guide for ElectricPotential.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   /// @tparam Charge1 Denominator Charge1 type
-   template<typename NamedElectricPotential>
-   requires IsNamedElectricPotentialUnit<NamedElectricPotential>
-   ElectricPotential(NamedElectricPotential) -> ElectricPotential<NamedElectricPotential>;
-
-   /// @brief Template deduction guide for ElectricPotential.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Time2, typename Charge1>
-   requires IsElectricPotentialUnits<Mass1, Length1, Length2, Time1, Time2, Charge1>
-   ElectricPotential(BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Time2, Charge1>>) -> ElectricPotential<Mass1, Length1, Length2, Time1, Time2, Charge1>;
-
+   template<IsElectricPotential Dim>
+   ElectricPotential(Dim) -> 
+   ElectricPotential<
+      DimExtractor<MassType, Dim>,
+      DimExtractor<LengthType, Dim>,
+      DimExtractor<TimeType, Dim>,
+      DimExtractor<ChargeType, Dim>
+   >;
 }
 
 #endif // STATIC_DIMENSION_ELECTRICPOTENTIAL_IMPL_H

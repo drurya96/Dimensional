@@ -1,0 +1,64 @@
+{
+  "domains": [
+    {
+      "id": "dimension_arithmetic",
+      "name": "Dimension Arithmetic",
+      "description": "Covers how base_dimensions interact through arithmetic operations, ensuring correctness of dimensional algebra at compile time."
+    },
+    {
+      "id": "structure_and_casting",
+      "name": "Structure and Casting",
+      "description": "Covers unit simplification, structural compatibility, and casting between structurally equivalent dimension types."
+    },
+    {
+      "id": "point_semantics",
+      "name": "Point Semantics",
+      "description": "Defines the behaviors, constraints, and valid interactions for point types, including reference frame casting, interop with units, and arithmetic semantics."
+    },
+    {
+      "id": "conversion_validation",
+      "name": "Conversion Validation",
+      "description": "Defines the compile-time legality and routing rules for converting between dimensioned values whose unit structures differ but represent the same physical dimension."
+    },
+    {
+      "id": "unit_definition_and_constraints",
+      "name": "Unit Definition and Constraints",
+      "description": "Defines the requirements, restrictions, and validity rules for unit types used in base_dimensions. Includes constraints such as anchor connectivity and uniqueness within dimensional composition."
+    },
+    {
+      "id": "mathematical_helpers",
+      "name": "Mathematical Helpers",
+      "description": "Specifies permitted mathematical operations over dimensioned values, such as abs, sqrt, pow, and rounding. These operations affect scalar values while respecting dimensional structure."
+    },
+    {
+      "id": "named_fundamental_dimensions",
+      "name": "Named Fundamental Dimensions",
+      "description": "Defines type aliases representing fundamental physical dimensions such as Length, Mass, and Time. These aliases inherit from base_dimension with a single unit_exponent and serve as user-facing entry points into the dimensional system. Implementations may enable type deduction or category-based traits via these types."
+    },
+    {
+      "id": "named_derived_dimensions",
+      "name": "Named Derived Dimensions",
+      "description": "Defines type aliases representing dimensionally composed properties such as Speed, Acceleration, or Force. These types wrap specific base_dimension compositions and may provide semantic meaning, improved usability, or specialization opportunities."
+    },
+    {
+      "id": "named_derived_units",
+      "name": "Named Derived Units",
+      "description": "Defines compound units such as Newtons, Pascals, and Knots that are derived from combinations of fundamental units. These types may be used within base_dimensions as if they were fundamental units and participate in conversions accordingly."
+    },
+    {
+      "id": "unit_catalog",
+      "name": "Unit Catalog",
+      "description": "Describes the set of all concrete unit types available in the system, such as Meters, Seconds, and Grams. This domain assumes the existence of an external metadata registry that enumerates units, their conversion rules, and anchor associations."
+    },
+    {
+      "id": "user_extension_integrity",
+      "name": "User Extension Integrity",
+      "description": "Specifies the requirements and constraints on user-defined units and dimensions to ensure they participate correctly in the dimensional system."
+    },
+    {
+      "id": "serialization_and_streaming",
+      "name": "User Extension Integrity",
+      "description": "Specifies the requirements and constraints on user-defined units and dimensions to ensure they participate correctly in the dimensional system."
+    }
+  ]
+}

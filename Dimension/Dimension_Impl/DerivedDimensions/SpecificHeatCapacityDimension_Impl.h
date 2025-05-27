@@ -1,237 +1,134 @@
 #ifndef STATIC_DIMENSION_SPECIFICHEATCAPACITY_IMPL_H
 #define STATIC_DIMENSION_SPECIFICHEATCAPACITY_IMPL_H
 
+#include "../../BaseDimension.h"
 #include "../../LengthDimension.h"
 #include "../../TimeDimension.h"
 #include "../../TemperatureDimension.h"
 
 namespace Dimension
 {
-   /// @brief Concept for a named SpecificHeatCapacity unit.
-   /// @tparam NamedSpecificHeatCapacity The type to be checked as a named SpecificHeatCapacity unit.
-   template<typename NamedSpecificHeatCapacity>
+   /// @brief Concept to verify a type can serve as a named SpecificHeatCapacity unit
+   template<typename T>
    concept IsNamedSpecificHeatCapacityUnit = requires {
-      typename NamedSpecificHeatCapacity::NumTuple;
-      typename NamedSpecificHeatCapacity::DenTuple;
+      typename T::units;
+      requires 
+         std::tuple_size_v<typename T::units> == 3 &&
+         IsLengthUnit<typename std::tuple_element_t<0, typename T::units>::unit> &&
+         IsTimeUnit<typename std::tuple_element_t<1, typename T::units>::unit> &&
+         IsTemperatureUnit<typename std::tuple_element_t<2, typename T::units>::unit>;
+      requires !std::is_base_of_v<FundamentalUnitTag, T>;
    };
 
-   /// @brief Concept for a SpecificHeatCapacity dimension.
-   /// @details Checks if the provided types satisfy the SpecificHeatCapacity dimension requirements.
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   /// @tparam Temperature1 Denominator Temperature1 type
-   template<typename Length1, typename Length2, typename Time1, typename Time2, typename Temperature1>
-   concept IsSpecificHeatCapacityUnits = 
-      std::is_same_v<typename Length1::Dim, LengthType> &&
-      std::is_same_v<typename Length2::Dim, LengthType> &&
-      std::is_same_v<typename Time1::Dim, TimeType> &&
-      std::is_same_v<typename Time2::Dim, TimeType> &&
-      std::is_same_v<typename Temperature1::Dim, TemperatureType>;
-
-   /// @brief Concept for a SpecificHeatCapacity type.
-   /// @details Ensures that the type meets SpecificHeatCapacity type requirements, based on numerator and denominator types.
-   /// @tparam T The type to validate.
+   /// @brief Concept to verify a dimension can be treated as a SpecificHeatCapacity type
    template<typename T>
-   concept IsSpecificHeatCapacityType = requires {
-      typename T::NumTuple;
-      typename T::DenTuple;
-   } && std::tuple_size_v<typename T::NumTuple> == 2 && std::tuple_size_v<typename T::DenTuple> == 3 &&
-   IsSpecificHeatCapacityUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>, typename std::tuple_element_t<2, typename T::DenTuple>>;
+   concept IsSpecificHeatCapacity = std::is_convertible_v<T, BaseDimension<
+      UnitExponent<PrimaryLength, 2>, 
+      UnitExponent<PrimaryTime, -2>, 
+      UnitExponent<PrimaryTemperature, -1>
+   >>;
 
-   /// @brief Retrieves the value of a SpecificHeatCapacity object.
-   /// @details Provides access to the underlying value represented by a SpecificHeatCapacity object.
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   /// @tparam Temperature1 Denominator Temperature1 type
-   /// @tparam SpecificHeatCapacityType The type of the object being accessed.
-   /// @param obj The SpecificHeatCapacity object.
-   /// @return The underlying value as `PrecisionType`
-   template<typename Length1, typename Length2, typename Time1, typename Time2, typename Temperature1, typename SpecificHeatCapacityType>
-   requires IsSpecificHeatCapacityUnits<Length1, Length2, Time1, Time2, Temperature1> && IsSpecificHeatCapacityType<SpecificHeatCapacityType>
-   constexpr PrecisionType getSpecificHeatCapacity(const SpecificHeatCapacityType& obj)
+   /// @brief Retrieves the value of a SpecificHeatCapacity object with specific units
+   /// @tparam LengthUnit The Length unit used for all Length components of SpecificHeatCapacity
+   /// @tparam TimeUnit The Time unit used for all Time components of SpecificHeatCapacity
+   /// @tparam TemperatureUnit The Temperature unit used for all Temperature components of SpecificHeatCapacity
+   /// @tparam DimType The dimension object type, deduced
+   /// @param obj The dimension to extract a raw value from
+   /// @return The raw value in terms of template units as a PrecisionType
+   template<
+      IsLengthUnit LengthUnit,
+      IsTimeUnit TimeUnit,
+      IsTemperatureUnit TemperatureUnit,
+      IsSpecificHeatCapacity DimType>
+   constexpr PrecisionType get_specificheatcapacity_as(const DimType& obj)
    {
-      return obj.template GetVal<std::tuple<Length1, Length2>, std::tuple<Time1, Time2, Temperature1>>();
+      return get_dimension_as<
+         UnitExponent<LengthUnit, 2>,
+         UnitExponent<TimeUnit, -2>,
+         UnitExponent<TemperatureUnit, -1>
+      >(obj);
    }
 
    /// @brief Retrieves the value of a named SpecificHeatCapacity object.
-   /// @details Provides access to the value represented by a named SpecificHeatCapacity object.
-   /// @tparam NamedSpecificHeatCapacity The named unit type.
-   /// @tparam SpecificHeatCapacityType The type of the object being accessed.
-   /// @param obj The SpecificHeatCapacity object.
-   /// @return The underlying value as `PrecisionType`.
-   template<typename NamedSpecificHeatCapacity, typename SpecificHeatCapacityType>
-   requires IsNamedSpecificHeatCapacityUnit<NamedSpecificHeatCapacity> && IsSpecificHeatCapacityType<SpecificHeatCapacityType>
-   constexpr PrecisionType getSpecificHeatCapacity(const SpecificHeatCapacityType& obj)
+   /// @tparam Named The named unit to extract in terms of
+   /// @tparam DimType The dimension object type, deduced
+   /// @param obj The dimension to extract a raw value from
+   /// @return The raw value in terms of template units as a PrecisionType
+   template<IsNamedSpecificHeatCapacityUnit Named, IsSpecificHeatCapacity DimType>
+   constexpr PrecisionType get_specificheatcapacity_as(const DimType& obj)
    {
-      return obj.template GetVal<typename NamedSpecificHeatCapacity::NumTuple, typename NamedSpecificHeatCapacity::DenTuple>();
+      return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
 
    template<typename... Ts>
    class SpecificHeatCapacity;
 
-   /// @brief Represents a default SpecificHeatCapacity.
-   /// @details This SpecificHeatCapacity is templated on the primary units of the relevant dimensions.
-   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
-   ///   "SpecificHeatCapacity" type, without regard for the underlying units.
+   /// @brief Represents the default SpecificHeatCapacity
    template<>
-   class SpecificHeatCapacity<> : public BaseDimension<std::tuple<PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryTemperature>>
+   class SpecificHeatCapacity<> : public BaseDimension<
+      UnitExponent<PrimaryLength, 2>,
+      UnitExponent<PrimaryTime, -2>,
+      UnitExponent<PrimaryTemperature, -1>>
    {
    public:
-      using Base = BaseDimension<std::tuple<PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryTemperature>>;
+      using Base = BaseDimension<
+         UnitExponent<PrimaryLength, 2>,
+         UnitExponent<PrimaryTime, -2>,
+         UnitExponent<PrimaryTemperature, -1>>;
       using Base::Base;
 
-      /// @brief Constructs a SpecificHeatCapacity object with a value.
-      /// @param val The value of the SpecificHeatCapacity.
       explicit constexpr SpecificHeatCapacity(PrecisionType val) : Base(val) {}
 
-      /// @brief Constructs a SpecificHeatCapacity object from another SpecificHeatCapacity object.
-      /// @tparam OtherSpecificHeatCapacity The other SpecificHeatCapacity type.
-      /// @param base The base SpecificHeatCapacity object.
-      template<typename OtherSpecificHeatCapacity>
-      requires IsSpecificHeatCapacityType<OtherSpecificHeatCapacity>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr SpecificHeatCapacity(const OtherSpecificHeatCapacity& base)
-         : Base(base.template GetVal<std::tuple<PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryTime, PrimaryTemperature>>()) {}
+      template<typename Other>
+      requires IsSpecificHeatCapacity<Other>
+      constexpr SpecificHeatCapacity(const Other& base)
+         : Base(call_unpack<typename Base::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-   /// @brief Represents a SpecificHeatCapacity.
-   /// @details Defines operations and data storage for SpecificHeatCapacity dimensions.
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   /// @tparam Temperature1 Denominator Temperature1 type
-   template<typename Length1, typename Length2, typename Time1, typename Time2, typename Temperature1>
-   requires IsSpecificHeatCapacityUnits<Length1, Length2, Time1, Time2, Temperature1>
-   class SpecificHeatCapacity<Length1, Length2, Time1, Time2, Temperature1> : public BaseDimension<std::tuple<Length1, Length2>, std::tuple<Time1, Time2, Temperature1>>
+   /// @brief Template specialization for named SpecificHeatCapacity units
+   /// @tparam Named The named unit this SpecificHeatCapacity type is in terms of
+   template<IsNamedSpecificHeatCapacityUnit Named>
+   class SpecificHeatCapacity<Named> : public BaseDimensionFromTuple<typename Named::units>::dim
    {
    public:
-      using Base = BaseDimension<std::tuple<Length1, Length2>, std::tuple<Time1, Time2, Temperature1>>;
+      using Base = typename BaseDimensionFromTuple<typename Named::units>::dim;
       using Base::Base;
 
-      /// @brief Constructs a SpecificHeatCapacity object with a value.
-      /// @param val The value of the SpecificHeatCapacity.
-      explicit constexpr SpecificHeatCapacity(PrecisionType val) : Base(val) {}
-
-      /// @brief Constructs a SpecificHeatCapacity object from a named unit.
-      /// @tparam NamedSpecificHeatCapacity The named unit type.
-      /// @param base The base unit object.
-      template<typename NamedSpecificHeatCapacity>
-      requires IsNamedSpecificHeatCapacityUnit<NamedSpecificHeatCapacity>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr SpecificHeatCapacity(const NamedSpecificHeatCapacity& base) : Base(base) {}
-
-      /// @brief Deprecated function to get the value of SpecificHeatCapacity.
-      /// @details Prefer using the free function `getSpecificHeatCapacity()` instead.
-      /// @return The value of the SpecificHeatCapacity.
-      template<typename Length1T, typename Length2T, typename Time1T, typename Time2T, typename Temperature1T>
-      requires IsSpecificHeatCapacityUnits<Length1T, Length2T, Time1T, Time2T, Temperature1T>
-      [[deprecated("Use the free function getSpecificHeatCapacity() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetSpecificHeatCapacity() const
-      {
-         return getSpecificHeatCapacity<Length1T, Length2T, Time1T, Time2T, Temperature1T>(*this);
-      }
-
-      /// @brief Deprecated function to get the value of SpecificHeatCapacity.
-      /// @details Prefer using the free function `getSpecificHeatCapacity()` instead.
-      /// @return The value of the SpecificHeatCapacity.
-      template<typename NamedSpecificHeatCapacity>
-      requires IsNamedSpecificHeatCapacityUnit<NamedSpecificHeatCapacity>
-      [[deprecated("Use the free function getSpecificHeatCapacity() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetSpecificHeatCapacity() const
-      {
-         return getSpecificHeatCapacity<NamedSpecificHeatCapacity>(*this);
-      }
+      template<typename Other>
+      requires IsSpecificHeatCapacity<Other>
+      constexpr SpecificHeatCapacity(const Other& base)
+         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-   /// @brief Represents a named SpecificHeatCapacity class.
-   /// @details Provides functionality for named SpecificHeatCapacity units.
-   /// @tparam NamedSpecificHeatCapacity The named unit type.
-   template<typename NamedSpecificHeatCapacity>
-   requires IsNamedSpecificHeatCapacityUnit<NamedSpecificHeatCapacity>
-   class SpecificHeatCapacity<NamedSpecificHeatCapacity> : public BaseDimension<typename NamedSpecificHeatCapacity::NumTuple, typename NamedSpecificHeatCapacity::DenTuple>
+
+   template<typename... Units>
+   class SpecificHeatCapacity<Units...> : public BaseDimension<
+      UnitExponent<typename Extractor<LengthType, Units...>::type, 2>,
+      UnitExponent<typename Extractor<TimeType, Units...>::type, -2>,
+      UnitExponent<typename Extractor<TemperatureType, Units...>::type, -1>
+   >
    {
    public:
-      using Base = BaseDimension<typename NamedSpecificHeatCapacity::NumTuple, typename NamedSpecificHeatCapacity::DenTuple>;
+      using Base = BaseDimension<
+         UnitExponent<typename Extractor<LengthType, Units...>::type, 2>,
+         UnitExponent<typename Extractor<TimeType, Units...>::type, -2>,
+         UnitExponent<typename Extractor<TemperatureType, Units...>::type, -1>
+      >;
+   
       using Base::Base;
-
-      /// @brief Constructs a SpecificHeatCapacity object with a value.
-      /// @param val The value of the SpecificHeatCapacity.
-      explicit constexpr SpecificHeatCapacity(PrecisionType val) : Base(val) {}
-
-      /// @brief Constructs a SpecificHeatCapacity object from another SpecificHeatCapacity object.
-      /// @tparam OtherSpecificHeatCapacity The other SpecificHeatCapacity type.
-      /// @param base The base SpecificHeatCapacity object.
-      template<typename OtherSpecificHeatCapacity>
-      requires IsSpecificHeatCapacityType<OtherSpecificHeatCapacity>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr SpecificHeatCapacity(const OtherSpecificHeatCapacity& base)
-         : Base(base.template GetVal<typename NamedSpecificHeatCapacity::NumTuple, typename NamedSpecificHeatCapacity::DenTuple>()) {}
-
-      /// @brief Deprecated function to get the value of SpecificHeatCapacity.
-      /// @details Prefer using the free function `getSpecificHeatCapacity()` instead.
-      /// @return The value of the SpecificHeatCapacity.
-      template<typename Length1T, typename Length2T, typename Time1T, typename Time2T, typename Temperature1T>
-      requires IsSpecificHeatCapacityUnits<Length1T, Length2T, Time1T, Time2T, Temperature1T>
-      [[deprecated("Use the free function getSpecificHeatCapacity() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetSpecificHeatCapacity() const
-      {
-         return getSpecificHeatCapacity<Length1T, Length2T, Time1T, Time2T, Temperature1T>(*this);
-      }
-
-      /// @brief Deprecated function to get the value of SpecificHeatCapacity.
-      /// @details Prefer using the free function `getSpecificHeatCapacity()` instead.
-      /// @return The value of the SpecificHeatCapacity.
-      template<typename NamedSpecificHeatCapacityUnit>
-      requires IsNamedSpecificHeatCapacityUnit<NamedSpecificHeatCapacityUnit>
-      [[deprecated("Use the free function getSpecificHeatCapacity() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetSpecificHeatCapacity() const
-      {
-         return getSpecificHeatCapacity<NamedSpecificHeatCapacityUnit>(*this);
-      }         
+   
+      template<typename T>
+      requires IsSpecificHeatCapacity<T>
+      constexpr SpecificHeatCapacity(const T& base) : Base(base) {}
    };
 
-   /// @brief Template deduction guide for SpecificHeatCapacity.
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   /// @tparam Temperature1 Denominator Temperature1 type
-   template<typename Length1, typename Length2, typename Time1, typename Time2, typename Temperature1>
-   requires IsSpecificHeatCapacityUnits<Length1, Length2, Time1, Time2, Temperature1>
-   SpecificHeatCapacity(Length1, Length2, Time1, Time2, Temperature1) -> SpecificHeatCapacity<Length1, Length2, Time1, Time2, Temperature1>;
-
-   /// @brief Template deduction guide for SpecificHeatCapacity.
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   /// @tparam Temperature1 Denominator Temperature1 type
-   template<typename NamedSpecificHeatCapacity>
-   requires IsNamedSpecificHeatCapacityUnit<NamedSpecificHeatCapacity>
-   SpecificHeatCapacity(NamedSpecificHeatCapacity) -> SpecificHeatCapacity<NamedSpecificHeatCapacity>;
-
-   /// @brief Template deduction guide for SpecificHeatCapacity.
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Time2 Denominator Time2 type
-   /// @tparam Temperature1 Denominator Temperature1 type
-   template<typename Length1, typename Length2, typename Time1, typename Time2, typename Temperature1>
-   requires IsSpecificHeatCapacityUnits<Length1, Length2, Time1, Time2, Temperature1>
-   SpecificHeatCapacity(BaseDimension<std::tuple<Length1, Length2>, std::tuple<Time1, Time2, Temperature1>>) -> SpecificHeatCapacity<Length1, Length2, Time1, Time2, Temperature1>;
-
+   template<IsSpecificHeatCapacity Dim>
+   SpecificHeatCapacity(Dim) -> 
+   SpecificHeatCapacity<
+      DimExtractor<LengthType, Dim>,
+      DimExtractor<TimeType, Dim>,
+      DimExtractor<TemperatureType, Dim>
+   >;
 }
 
 #endif // STATIC_DIMENSION_SPECIFICHEATCAPACITY_IMPL_H

@@ -1,12 +1,12 @@
-#ifndef STATIC_DIMENSION_Entropy_H
-#define STATIC_DIMENSION_Entropy_H
+#ifndef STATIC_DIMENSION_ENTROPY_H
+#define STATIC_DIMENSION_ENTROPY_H
 
-#include "Dimension_Impl/DerivedDimensions/EntropyDimension_Impl.h" 
+#include "Dimension_Impl/DerivedDimensions/EntropyDimension_Impl.h"
 
 namespace Dimension
 {
 
-
 }
 
-#endif //STATIC_DIMENSION_Entropy_H
+
+#endif // STATIC_DIMENSION_ENTROPY_H

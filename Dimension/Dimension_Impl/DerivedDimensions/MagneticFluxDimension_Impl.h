@@ -1,6 +1,7 @@
 #ifndef STATIC_DIMENSION_MAGNETICFLUX_IMPL_H
 #define STATIC_DIMENSION_MAGNETICFLUX_IMPL_H
 
+#include "../../BaseDimension.h"
 #include "../../MassDimension.h"
 #include "../../LengthDimension.h"
 #include "../../TimeDimension.h"
@@ -8,231 +9,137 @@
 
 namespace Dimension
 {
-   /// @brief Concept for a named MagneticFlux unit.
-   /// @tparam NamedMagneticFlux The type to be checked as a named MagneticFlux unit.
-   template<typename NamedMagneticFlux>
+   /// @brief Concept to verify a type can serve as a named MagneticFlux unit
+   template<typename T>
    concept IsNamedMagneticFluxUnit = requires {
-      typename NamedMagneticFlux::NumTuple;
-      typename NamedMagneticFlux::DenTuple;
+      typename T::units;
+      requires 
+         std::tuple_size_v<typename T::units> == 4 &&
+         IsMassUnit<typename std::tuple_element_t<0, typename T::units>::unit> &&
+         IsLengthUnit<typename std::tuple_element_t<1, typename T::units>::unit> &&
+         IsTimeUnit<typename std::tuple_element_t<2, typename T::units>::unit> &&
+         IsChargeUnit<typename std::tuple_element_t<3, typename T::units>::unit>;
+      requires !std::is_base_of_v<FundamentalUnitTag, T>;
    };
 
-   /// @brief Concept for a MagneticFlux dimension.
-   /// @details Checks if the provided types satisfy the MagneticFlux dimension requirements.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Charge1>
-   concept IsMagneticFluxUnits = 
-      std::is_same_v<typename Mass1::Dim, MassType> &&
-      std::is_same_v<typename Length1::Dim, LengthType> &&
-      std::is_same_v<typename Length2::Dim, LengthType> &&
-      std::is_same_v<typename Time1::Dim, TimeType> &&
-      std::is_same_v<typename Charge1::Dim, ChargeType>;
-
-   /// @brief Concept for a MagneticFlux type.
-   /// @details Ensures that the type meets MagneticFlux type requirements, based on numerator and denominator types.
-   /// @tparam T The type to validate.
+   /// @brief Concept to verify a dimension can be treated as a MagneticFlux type
    template<typename T>
-   concept IsMagneticFluxType = requires {
-      typename T::NumTuple;
-      typename T::DenTuple;
-   } && std::tuple_size_v<typename T::NumTuple> == 3 && std::tuple_size_v<typename T::DenTuple> == 2 &&
-   IsMagneticFluxUnits<typename std::tuple_element_t<0, typename T::NumTuple>, typename std::tuple_element_t<1, typename T::NumTuple>, typename std::tuple_element_t<2, typename T::NumTuple>, typename std::tuple_element_t<0, typename T::DenTuple>, typename std::tuple_element_t<1, typename T::DenTuple>>;
+   concept IsMagneticFlux = std::is_convertible_v<T, BaseDimension<
+      UnitExponent<PrimaryMass, 1>, 
+      UnitExponent<PrimaryLength, 2>, 
+      UnitExponent<PrimaryTime, -1>, 
+      UnitExponent<PrimaryCharge, -1>
+   >>;
 
-   /// @brief Retrieves the value of a MagneticFlux object.
-   /// @details Provides access to the underlying value represented by a MagneticFlux object.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Charge1 Denominator Charge1 type
-   /// @tparam MagneticFluxType The type of the object being accessed.
-   /// @param obj The MagneticFlux object.
-   /// @return The underlying value as `PrecisionType`
-   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Charge1, typename MagneticFluxType>
-   requires IsMagneticFluxUnits<Mass1, Length1, Length2, Time1, Charge1> && IsMagneticFluxType<MagneticFluxType>
-   constexpr PrecisionType getMagneticFlux(const MagneticFluxType& obj)
+   /// @brief Retrieves the value of a MagneticFlux object with specific units
+   /// @tparam MassUnit The Mass unit used for all Mass components of MagneticFlux
+   /// @tparam LengthUnit The Length unit used for all Length components of MagneticFlux
+   /// @tparam TimeUnit The Time unit used for all Time components of MagneticFlux
+   /// @tparam ChargeUnit The Charge unit used for all Charge components of MagneticFlux
+   /// @tparam DimType The dimension object type, deduced
+   /// @param obj The dimension to extract a raw value from
+   /// @return The raw value in terms of template units as a PrecisionType
+   template<
+      IsMassUnit MassUnit,
+      IsLengthUnit LengthUnit,
+      IsTimeUnit TimeUnit,
+      IsChargeUnit ChargeUnit,
+      IsMagneticFlux DimType>
+   constexpr PrecisionType get_magneticflux_as(const DimType& obj)
    {
-      return obj.template GetVal<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Charge1>>();
+      return get_dimension_as<
+         UnitExponent<MassUnit, 1>,
+         UnitExponent<LengthUnit, 2>,
+         UnitExponent<TimeUnit, -1>,
+         UnitExponent<ChargeUnit, -1>
+      >(obj);
    }
 
    /// @brief Retrieves the value of a named MagneticFlux object.
-   /// @details Provides access to the value represented by a named MagneticFlux object.
-   /// @tparam NamedMagneticFlux The named unit type.
-   /// @tparam MagneticFluxType The type of the object being accessed.
-   /// @param obj The MagneticFlux object.
-   /// @return The underlying value as `PrecisionType`.
-   template<typename NamedMagneticFlux, typename MagneticFluxType>
-   requires IsNamedMagneticFluxUnit<NamedMagneticFlux> && IsMagneticFluxType<MagneticFluxType>
-   constexpr PrecisionType getMagneticFlux(const MagneticFluxType& obj)
+   /// @tparam Named The named unit to extract in terms of
+   /// @tparam DimType The dimension object type, deduced
+   /// @param obj The dimension to extract a raw value from
+   /// @return The raw value in terms of template units as a PrecisionType
+   template<IsNamedMagneticFluxUnit Named, IsMagneticFlux DimType>
+   constexpr PrecisionType get_magneticflux_as(const DimType& obj)
    {
-      return obj.template GetVal<typename NamedMagneticFlux::NumTuple, typename NamedMagneticFlux::DenTuple>();
+      return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
 
    template<typename... Ts>
    class MagneticFlux;
 
-   /// @brief Represents a default MagneticFlux.
-   /// @details This MagneticFlux is templated on the primary units of the relevant dimensions.
-   ///   While this is a specific type, its intended use is to treat an object or parameter as an abstract
-   ///   "MagneticFlux" type, without regard for the underlying units.
+   /// @brief Represents the default MagneticFlux
    template<>
-   class MagneticFlux<> : public BaseDimension<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryCharge>>
+   class MagneticFlux<> : public BaseDimension<
+      UnitExponent<PrimaryMass, 1>,
+      UnitExponent<PrimaryLength, 2>,
+      UnitExponent<PrimaryTime, -1>,
+      UnitExponent<PrimaryCharge, -1>>
    {
    public:
-      using Base = BaseDimension<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryCharge>>;
+      using Base = BaseDimension<
+         UnitExponent<PrimaryMass, 1>,
+         UnitExponent<PrimaryLength, 2>,
+         UnitExponent<PrimaryTime, -1>,
+         UnitExponent<PrimaryCharge, -1>>;
       using Base::Base;
 
-      /// @brief Constructs a MagneticFlux object with a value.
-      /// @param val The value of the MagneticFlux.
       explicit constexpr MagneticFlux(PrecisionType val) : Base(val) {}
 
-      /// @brief Constructs a MagneticFlux object from another MagneticFlux object.
-      /// @tparam OtherMagneticFlux The other MagneticFlux type.
-      /// @param base The base MagneticFlux object.
-      template<typename OtherMagneticFlux>
-      requires IsMagneticFluxType<OtherMagneticFlux>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr MagneticFlux(const OtherMagneticFlux& base)
-         : Base(base.template GetVal<std::tuple<PrimaryMass, PrimaryLength, PrimaryLength>, std::tuple<PrimaryTime, PrimaryCharge>>()) {}
+      template<typename Other>
+      requires IsMagneticFlux<Other>
+      constexpr MagneticFlux(const Other& base)
+         : Base(call_unpack<typename Base::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-   /// @brief Represents a MagneticFlux.
-   /// @details Defines operations and data storage for MagneticFlux dimensions.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Charge1>
-   requires IsMagneticFluxUnits<Mass1, Length1, Length2, Time1, Charge1>
-   class MagneticFlux<Mass1, Length1, Length2, Time1, Charge1> : public BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Charge1>>
+   /// @brief Template specialization for named MagneticFlux units
+   /// @tparam Named The named unit this MagneticFlux type is in terms of
+   template<IsNamedMagneticFluxUnit Named>
+   class MagneticFlux<Named> : public BaseDimensionFromTuple<typename Named::units>::dim
    {
    public:
-      using Base = BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Charge1>>;
+      using Base = typename BaseDimensionFromTuple<typename Named::units>::dim;
       using Base::Base;
 
-      /// @brief Constructs a MagneticFlux object with a value.
-      /// @param val The value of the MagneticFlux.
-      explicit constexpr MagneticFlux(PrecisionType val) : Base(val) {}
-
-      /// @brief Constructs a MagneticFlux object from a named unit.
-      /// @tparam NamedMagneticFlux The named unit type.
-      /// @param base The base unit object.
-      template<typename NamedMagneticFlux>
-      requires IsNamedMagneticFluxUnit<NamedMagneticFlux>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr MagneticFlux(const NamedMagneticFlux& base) : Base(base) {}
-
-      /// @brief Deprecated function to get the value of MagneticFlux.
-      /// @details Prefer using the free function `getMagneticFlux()` instead.
-      /// @return The value of the MagneticFlux.
-      template<typename Mass1T, typename Length1T, typename Length2T, typename Time1T, typename Charge1T>
-      requires IsMagneticFluxUnits<Mass1T, Length1T, Length2T, Time1T, Charge1T>
-      [[deprecated("Use the free function getMagneticFlux() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetMagneticFlux() const
-      {
-         return getMagneticFlux<Mass1T, Length1T, Length2T, Time1T, Charge1T>(*this);
-      }
-
-      /// @brief Deprecated function to get the value of MagneticFlux.
-      /// @details Prefer using the free function `getMagneticFlux()` instead.
-      /// @return The value of the MagneticFlux.
-      template<typename NamedMagneticFlux>
-      requires IsNamedMagneticFluxUnit<NamedMagneticFlux>
-      [[deprecated("Use the free function getMagneticFlux() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetMagneticFlux() const
-      {
-         return getMagneticFlux<NamedMagneticFlux>(*this);
-      }
+      template<typename Other>
+      requires IsMagneticFlux<Other>
+      constexpr MagneticFlux(const Other& base)
+         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-   /// @brief Represents a named MagneticFlux class.
-   /// @details Provides functionality for named MagneticFlux units.
-   /// @tparam NamedMagneticFlux The named unit type.
-   template<typename NamedMagneticFlux>
-   requires IsNamedMagneticFluxUnit<NamedMagneticFlux>
-   class MagneticFlux<NamedMagneticFlux> : public BaseDimension<typename NamedMagneticFlux::NumTuple, typename NamedMagneticFlux::DenTuple>
+
+   template<typename... Units>
+   class MagneticFlux<Units...> : public BaseDimension<
+      UnitExponent<typename Extractor<MassType, Units...>::type, 1>,
+      UnitExponent<typename Extractor<LengthType, Units...>::type, 2>,
+      UnitExponent<typename Extractor<TimeType, Units...>::type, -1>,
+      UnitExponent<typename Extractor<ChargeType, Units...>::type, -1>
+   >
    {
    public:
-      using Base = BaseDimension<typename NamedMagneticFlux::NumTuple, typename NamedMagneticFlux::DenTuple>;
+      using Base = BaseDimension<
+         UnitExponent<typename Extractor<MassType, Units...>::type, 1>,
+         UnitExponent<typename Extractor<LengthType, Units...>::type, 2>,
+         UnitExponent<typename Extractor<TimeType, Units...>::type, -1>,
+         UnitExponent<typename Extractor<ChargeType, Units...>::type, -1>
+      >;
+   
       using Base::Base;
-
-      /// @brief Constructs a MagneticFlux object with a value.
-      /// @param val The value of the MagneticFlux.
-      explicit constexpr MagneticFlux(PrecisionType val) : Base(val) {}
-
-      /// @brief Constructs a MagneticFlux object from another MagneticFlux object.
-      /// @tparam OtherMagneticFlux The other MagneticFlux type.
-      /// @param base The base MagneticFlux object.
-      template<typename OtherMagneticFlux>
-      requires IsMagneticFluxType<OtherMagneticFlux>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
-      // cppcheck-suppress noExplicitConstructor
-      constexpr MagneticFlux(const OtherMagneticFlux& base)
-         : Base(base.template GetVal<typename NamedMagneticFlux::NumTuple, typename NamedMagneticFlux::DenTuple>()) {}
-
-      /// @brief Deprecated function to get the value of MagneticFlux.
-      /// @details Prefer using the free function `getMagneticFlux()` instead.
-      /// @return The value of the MagneticFlux.
-      template<typename Mass1T, typename Length1T, typename Length2T, typename Time1T, typename Charge1T>
-      requires IsMagneticFluxUnits<Mass1T, Length1T, Length2T, Time1T, Charge1T>
-      [[deprecated("Use the free function getMagneticFlux() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetMagneticFlux() const
-      {
-         return getMagneticFlux<Mass1T, Length1T, Length2T, Time1T, Charge1T>(*this);
-      }
-
-      /// @brief Deprecated function to get the value of MagneticFlux.
-      /// @details Prefer using the free function `getMagneticFlux()` instead.
-      /// @return The value of the MagneticFlux.
-      template<typename NamedMagneticFluxUnit>
-      requires IsNamedMagneticFluxUnit<NamedMagneticFluxUnit>
-      [[deprecated("Use the free function getMagneticFlux() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetMagneticFlux() const
-      {
-         return getMagneticFlux<NamedMagneticFluxUnit>(*this);
-      }         
+   
+      template<typename T>
+      requires IsMagneticFlux<T>
+      constexpr MagneticFlux(const T& base) : Base(base) {}
    };
 
-   /// @brief Template deduction guide for MagneticFlux.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Charge1>
-   requires IsMagneticFluxUnits<Mass1, Length1, Length2, Time1, Charge1>
-   MagneticFlux(Mass1, Length1, Length2, Time1, Charge1) -> MagneticFlux<Mass1, Length1, Length2, Time1, Charge1>;
-
-   /// @brief Template deduction guide for MagneticFlux.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Charge1 Denominator Charge1 type
-   template<typename NamedMagneticFlux>
-   requires IsNamedMagneticFluxUnit<NamedMagneticFlux>
-   MagneticFlux(NamedMagneticFlux) -> MagneticFlux<NamedMagneticFlux>;
-
-   /// @brief Template deduction guide for MagneticFlux.
-   /// @tparam Mass1 Numerator Mass1 type
-   /// @tparam Length1 Numerator Length1 type
-   /// @tparam Length2 Numerator Length2 type
-   /// @tparam Time1 Denominator Time1 type
-   /// @tparam Charge1 Denominator Charge1 type
-   template<typename Mass1, typename Length1, typename Length2, typename Time1, typename Charge1>
-   requires IsMagneticFluxUnits<Mass1, Length1, Length2, Time1, Charge1>
-   MagneticFlux(BaseDimension<std::tuple<Mass1, Length1, Length2>, std::tuple<Time1, Charge1>>) -> MagneticFlux<Mass1, Length1, Length2, Time1, Charge1>;
-
+   template<IsMagneticFlux Dim>
+   MagneticFlux(Dim) -> 
+   MagneticFlux<
+      DimExtractor<MassType, Dim>,
+      DimExtractor<LengthType, Dim>,
+      DimExtractor<TimeType, Dim>,
+      DimExtractor<ChargeType, Dim>
+   >;
 }
 
 #endif // STATIC_DIMENSION_MAGNETICFLUX_IMPL_H

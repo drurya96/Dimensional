@@ -8,4 +8,5 @@ namespace Dimension
 
 }
 
-#endif //STATIC_DIMENSION_ACCELERATION_H
+
+#endif // STATIC_DIMENSION_ACCELERATION_H

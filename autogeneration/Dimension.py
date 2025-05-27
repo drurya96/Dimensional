@@ -27,6 +27,7 @@ class dimension:
       self.name = None
       self.fundamental = None
       self.primary = None
+      self.units = dimension_list()
       self.num = dimension_list()
       self.den = dimension_list()
 

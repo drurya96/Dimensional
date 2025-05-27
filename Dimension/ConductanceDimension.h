@@ -1,17 +1,22 @@
-#ifndef STATIC_DIMENSION_Conductance_H
-#define STATIC_DIMENSION_Conductance_H
+#ifndef STATIC_DIMENSION_CONDUCTANCE_H
+#define STATIC_DIMENSION_CONDUCTANCE_H
 
-#include "Dimension_Impl/DerivedDimensions/ConductanceDimension_Impl.h" 
+#include "Dimension_Impl/DerivedDimensions/ConductanceDimension_Impl.h"
 
 namespace Dimension
 {
 
    struct Siemens
    {
-      using NumTuple = std::tuple<Seconds, Coulombs, Coulombs>;
-      using DenTuple = std::tuple<KiloGrams, Meters, Meters>;
+      using units = std::tuple<
+         UnitExponent<Seconds, 1, 1>,
+         UnitExponent<Coulombs, 2, 1>,
+         UnitExponent<KiloGrams, -1, 1>,
+         UnitExponent<Meters, -2, 1>
+      >;
    };
 
 }
 
-#endif //STATIC_DIMENSION_Conductance_H
+
+#endif // STATIC_DIMENSION_CONDUCTANCE_H

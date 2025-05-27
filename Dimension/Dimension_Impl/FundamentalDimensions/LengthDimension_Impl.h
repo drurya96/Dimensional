@@ -16,7 +16,7 @@ namespace Dimension
    /// @brief Concept to check if a type is a valid Length unit.
    /// @tparam T The type to check.
    template<typename T>
-   concept IsLengthUnit = IsNonQuantityUnitDimension<T, LengthType> || IsQuantityUnitDimension<T, LengthType>;
+   concept IsLengthUnit = std::is_base_of_v<FundamentalUnitTag, T> && std::is_same_v<typename T::Dim, LengthType>;//IsNonQuantityUnitDimension<T, LengthType> || IsQuantityUnitDimension<T, LengthType>;
 
    /// @brief Base class for Length units.
    /// @tparam Unit The unit type.
@@ -35,13 +35,22 @@ namespace Dimension
 
    /// @brief Trait to check if a type is a Length dimension.
    /// @tparam T The type to check.
-   template<typename T>
-   struct is_Length : std::false_type {};
+   //template<typename T>
+   //struct is_Length : std::false_type {};
+
+   //template<typename Dim>
+   //struct is_Length_Impl
+   //{
+   //   constexpr bool value = IsLengthUnit<std::tuple_element_t<0, decltype(FullSimplify(Dim{}))>>;
+   //};
+
 
    /// @brief Specialization for BaseDimension types.
    /// @tparam T The unit type.
-   template<typename T>
-   struct is_Length<BaseDimension<std::tuple<T>, std::tuple<>>> : std::bool_constant<IsLengthUnit<T>> {};
+   //template<typename T>
+   //struct is_Length<BaseDimension<T>> : std::bool_constant<IsLengthUnit<T>> {};
+   template<typename Dim>
+   struct is_Length : std::bool_constant<IsLengthUnit<typename std::tuple_element_t<0, typename decltype(FullSimplify(Dim{}))::units>::unit>> {};
 
    /// @brief Helper variable template for is_Length.
    /// @tparam T The type to check.
@@ -58,58 +67,56 @@ namespace Dimension
    /// @param obj The Length object.
    /// @return The value in the specified unit.
    template<IsLengthUnit T>
-   constexpr PrecisionType getLength(Length_type auto obj)
+   constexpr PrecisionType get_length_as(/*Length_type*/ auto obj)
    {
-      return obj.template GetVal<std::tuple<T>, std::tuple<>>();
+      return get_dimension_as<UnitExponent<T>>(obj);
    }
+
+   template<IsLengthUnit Unit = PrimaryLength, bool isQuantity = false>
+   class Length;
 
    /// @brief Represents a dimension type for Length.
    /// @tparam Unit The primary unit type.
-   template<IsLengthUnit Unit = PrimaryLength>
-   class Length : public BaseDimension<std::tuple<Unit>, std::tuple<>>
+   template<IsLengthUnit Unit>
+   class Length<Unit, false> : public BaseDimension<UnitExponent<Unit>>
    {
    public:
       /// @brief Default constructor initializing to zero.
-      constexpr Length() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}
+      constexpr Length() : BaseDimension<UnitExponent<Unit>>::BaseDimension(0.0) {}
 
       /// @brief Constructs a Length object with a specific value.
       /// @param val The value to initialize with.
-      explicit constexpr Length(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
+      explicit constexpr Length(double val) : BaseDimension<UnitExponent<Unit>>::BaseDimension(val) {}
 
       /// @brief Constructs a Length object from another BaseDimension.
-      /// @tparam T The unit type of the BaseDimension.
+      /// @tparam Ts The units of the BaseDimension.
       /// @param base The BaseDimension object to construct from.
-      template<IsLengthUnit T>
+      template<typename... Ts>
+      requires matching_dimensions<BaseDimension<UnitExponent<Unit>>, BaseDimension<Ts...>>
       // Implicit conversion between dimensions of the same unit is core to Dimensional
       // cppcheck-suppress noExplicitConstructor
-      constexpr Length(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()){}
-
-      /// @brief Deprecated method to retrieve the value of the dimension.
-      /// @tparam T The unit type.
-      /// @return The value in the specified unit.
-      template<IsLengthUnit T>
-      [[deprecated("Use the free function getLength() instead.")]]
-      // cppcheck-suppress unusedFunction
-      double GetLength() const
-      {
-         return getLength<T>(*this);
-      }
+      constexpr Length(const BaseDimension<Ts...>& base) : BaseDimension<UnitExponent<Unit>>::BaseDimension(get_dimension_as<UnitExponent<Unit>>(base)) {}
    };
-
-   /// @brief Deduction guide for Length constructor.
-   /// @tparam T The unit type.
-   template<IsLengthUnit T>
-   Length(T) -> Length<T>;
-
-   /// @brief Deduction guide for Length constructor with BaseDimension.
-   /// @tparam LengthUnit The unit type.
-   template<IsLengthUnit LengthUnit>
-   Length(BaseDimension<std::tuple<LengthUnit>, std::tuple<>>) -> Length<LengthUnit>;
 
    /// @brief Specialization for is_Length trait for Length types.
    /// @tparam T The unit type.
    template<typename T>
    struct is_Length<Length<T>> : std::bool_constant<IsLengthUnit<T>> {};
+
+   /// @brief Deduction guide for Length constructor.
+   /// @tparam T The unit type.
+   //template<IsLengthUnit T>
+   //Length(T) -> Length<T>;
+
+   /// @brief Deduction guide for Length constructor with BaseDimension.
+   /// @tparam LengthUnit The unit type.
+   //template<IsLengthUnit LengthUnit>
+   //Length(BaseDimension<UnitExponent<LengthUnit>>) -> Length<LengthUnit>;
+
+   /// @brief Deduction guide for Length constructor with BaseDimension.
+   /// @tparam LengthUnit The unit type.
+   template<Length_type Dim>
+   Length(Dim) -> Length<DimExtractor<LengthType, Dim>>;
 }
 
-#endif //STATIC_DIMENSION_Length_IMPL_H
+#endif // STATIC_DIMENSION_Length_IMPL_H
