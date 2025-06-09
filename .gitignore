@@ -4,3 +4,4 @@ test_package/build/
 cache/
 .vscode/
 *__pycache__*
+*.obj
