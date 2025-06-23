@@ -3,16 +3,16 @@
 
 #include "Dimension_Impl/DerivedDimensions/CapacitanceDimension_Impl.h"
 
-namespace Dimension
+namespace dimension
 {
 
    struct Farads
    {
       using units = std::tuple<
-         UnitExponent<Coulombs, 2, 1>
-         UnitExponent<Seconds, 2, 1>
-         UnitExponent<KiloGrams, -1, 1>
-         UnitExponent<Meters, -2, 1>,
+         unit_exponent<Coulombs, 2, 1>
+         unit_exponent<seconds, 2, 1>
+         unit_exponent<KiloGrams, -1, 1>
+         unit_exponent<meters, -2, 1>,
       >;
    };
    

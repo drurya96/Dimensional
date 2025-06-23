@@ -1,16 +1,16 @@
 #ifndef STATIC_DIMENSION_SPEED_H
 #define STATIC_DIMENSION_SPEED_H
 
-#include "Dimension_Impl/DerivedDimensions/SpeedDimension_Impl.h"
+#include "Dimension_Impl/DerivedDimensions/speedDimension_Impl.h"
 
-namespace Dimension
+namespace dimension
 {
 
    struct Knots
    {
       using units = std::tuple<
-         UnitExponent<NauticalMiles, 1, 1>
-         UnitExponent<Hours, -1, 1>,
+         unit_exponent<NauticalMiles, 1, 1>
+         unit_exponent<Hours, -1, 1>,
       >;
    };
    

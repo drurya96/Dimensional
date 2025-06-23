@@ -10,9 +10,9 @@
 #include "Conversion.h"
 
 
-//#include "TemperatureDimension.h" // Just for testing
+//#include "temperatureDimension.h" // Just for testing
 
-namespace Dimension {
+namespace dimension {
 
    struct FundamentalUnitTag;
 
@@ -51,9 +51,9 @@ namespace Dimension {
       //constexpr double value() const { return value_; }
 
       // Convert to raw quantity in base dimension
-      //constexpr operator BaseDimension<UnitExponent<unit>> () const {
+      //constexpr operator base_dimension<unit_exponent<unit>> () const {
          // Apply affine transform from Frame
-      //   return BaseDimension<UnitExponent<unit>>(Frame::slope * value_ + Frame::offset);
+      //   return base_dimension<unit_exponent<unit>>(Frame::slope * value_ + Frame::offset);
       //}
 
    private:
@@ -126,7 +126,7 @@ namespace Dimension {
       template<typename P>
       static constexpr double convert(const P& obj) {
          double raw = get_point_as_impl<SourceFrame, SourceFrame>::convert(obj) + point_offset<SourceFrame>();
-         return DoConversion<TargetUnit,  UnitExponent<typename SourceFrame::unit>>(raw);
+         return DoConversion<TargetUnit,  unit_exponent<typename SourceFrame::unit>>(raw);
       }
    };
    
@@ -141,7 +141,7 @@ namespace Dimension {
       template<typename P>
       static constexpr double convert(const P& obj) {
          double raw = get_point_as_impl<SourceFrame, SourceFrame>::convert(obj) + point_offset<SourceFrame>();
-         double in_target_unit = DoConversion<typename TargetFrame::unit, UnitExponent<typename SourceFrame::unit>>(raw);
+         double in_target_unit = DoConversion<typename TargetFrame::unit, unit_exponent<typename SourceFrame::unit>>(raw);
          return in_target_unit - point_offset<TargetFrame>();
       }
    };
@@ -170,7 +170,7 @@ namespace Dimension {
       template<typename P>
       static constexpr double convert(const P& obj) {
          double raw = get_point_as_impl<SourceUnit, SourceUnit>::convert(obj);
-         double in_target_unit = DoConversion<typename TargetFrame::unit, UnitExponent<typename SourceUnit::unit>>(raw);
+         double in_target_unit = DoConversion<typename TargetFrame::unit, unit_exponent<typename SourceUnit::unit>>(raw);
          return in_target_unit - point_offset<TargetFrame>();
       }
    };
@@ -197,33 +197,33 @@ namespace Dimension {
    // point + unit -> point
    template<typename T, typename U, typename Dim>
    requires true // Requires a basedimension which matches lhs
-   constexpr point<T, Dim> operator+(point<T, Dim> lhs, BaseDimension<UnitExponent<U>> rhs)
+   constexpr point<T, Dim> operator+(point<T, Dim> lhs, base_dimension<unit_exponent<U>> rhs)
    {
-      return point<T, Dim>(get_point_as<T>(lhs) + get_dimension_as<UnitExponent<typename T::unit>>(rhs));
+      return point<T, Dim>(get_point_as<T>(lhs) + get_dimension_as<unit_exponent<typename T::unit>>(rhs));
    }
 
    // unit + point -> point
    template<typename T, typename U, typename Dim>
    requires true // Requires a basedimension which matches lhs
-   constexpr point<T, Dim> operator+(BaseDimension<UnitExponent<U>> lhs, point<T, Dim> rhs)
+   constexpr point<T, Dim> operator+(base_dimension<unit_exponent<U>> lhs, point<T, Dim> rhs)
    {
-      return point<T, Dim>(get_point_as<T>(rhs) + get_dimension_as<UnitExponent<typename T::unit>>(lhs));
+      return point<T, Dim>(get_point_as<T>(rhs) + get_dimension_as<unit_exponent<typename T::unit>>(lhs));
    }
 
    // point - unit -> point
    template<typename T, typename U, typename Dim>
    requires true // Requires a basedimension which matches lhs
-   constexpr point<T, Dim> operator-(point<T, Dim> lhs, BaseDimension<UnitExponent<U>> rhs)
+   constexpr point<T, Dim> operator-(point<T, Dim> lhs, base_dimension<unit_exponent<U>> rhs)
    {
-      return point<T, Dim>(get_point_as<T>(lhs) - get_dimension_as<UnitExponent<typename T::unit>>(rhs));
+      return point<T, Dim>(get_point_as<T>(lhs) - get_dimension_as<unit_exponent<typename T::unit>>(rhs));
    }
 
    // point - point
    template<typename T, typename U, typename Dim>
    requires true // Requires a basedimension which matches lhs
-   constexpr BaseDimension<UnitExponent<typename T::unit>> operator-(point<T, Dim> lhs, point<U, Dim> rhs)
+   constexpr base_dimension<unit_exponent<typename T::unit>> operator-(point<T, Dim> lhs, point<U, Dim> rhs)
    {
-      return BaseDimension<UnitExponent<typename T::unit>>(get_point_as<typename T::unit>(lhs) - get_point_as<typename T::unit>(rhs));
+      return base_dimension<unit_exponent<typename T::unit>>(get_point_as<typename T::unit>(lhs) - get_point_as<typename T::unit>(rhs));
    }
 
 
@@ -241,32 +241,32 @@ namespace Dimension {
 
    // Need to figure out the return type, probably using auto
    // ===================== Multiplication/Division =====================
-   template<typename T, base_dimension Rhs, typename Dim>
+   template<typename T, is_base_dimension Rhs, typename Dim>
    requires true // Requires a basedimension which matches lhs
    constexpr auto operator*(point<T, Dim> lhs, Rhs rhs)
    {
-      return BaseDimension<UnitExponent<typename T::unit>>(get_point_as<typename T::unit>(lhs)) * rhs;
+      return base_dimension<unit_exponent<typename T::unit>>(get_point_as<typename T::unit>(lhs)) * rhs;
    }
 
-   template<typename T, base_dimension Lhs, typename Dim>
+   template<typename T, is_base_dimension Lhs, typename Dim>
    requires true // Requires a basedimension which matches lhs
    constexpr auto operator*(Lhs lhs, point<T, Dim> rhs)
    {
-      return lhs * BaseDimension<UnitExponent<typename T::unit>>(get_point_as<typename T::unit>(rhs));
+      return lhs * base_dimension<unit_exponent<typename T::unit>>(get_point_as<typename T::unit>(rhs));
    }
 
-   template<typename T, base_dimension Rhs, typename Dim>
+   template<typename T, is_base_dimension Rhs, typename Dim>
    requires true // Requires a basedimension which matches lhs
    constexpr auto operator/(point<T, Dim> lhs, Rhs rhs)
    {
-      return BaseDimension<UnitExponent<typename T::unit>>(get_point_as<typename T::unit>(lhs)) / rhs;
+      return base_dimension<unit_exponent<typename T::unit>>(get_point_as<typename T::unit>(lhs)) / rhs;
    }
 
-   template<typename T, base_dimension Lhs, typename Dim>
+   template<typename T, is_base_dimension Lhs, typename Dim>
    requires true // Requires a basedimension which matches lhs
    constexpr auto operator/(Lhs lhs, point<T, Dim> rhs)
    {
-      return lhs / BaseDimension<UnitExponent<typename T::unit>>(get_point_as<typename T::unit>(rhs));
+      return lhs / base_dimension<unit_exponent<typename T::unit>>(get_point_as<typename T::unit>(rhs));
    }
 
 

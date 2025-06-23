@@ -3,15 +3,15 @@
 
 #include "Dimension_Impl/DerivedDimensions/DynamicViscosityDimension_Impl.h"
 
-namespace Dimension
+namespace dimension
 {
 
    struct Poises
    {
       using units = std::tuple<
-         UnitExponent<Grams, 1, 1>
-         UnitExponent<Seconds, -1, 1>
-         UnitExponent<CentiMeters, -1, 1>,
+         unit_exponent<Grams, 1, 1>
+         unit_exponent<seconds, -1, 1>
+         unit_exponent<Centimeters, -1, 1>,
       >;
    };
    

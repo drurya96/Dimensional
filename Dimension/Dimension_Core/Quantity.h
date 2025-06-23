@@ -1,7 +1,7 @@
 #ifndef DIMENSION_QUANTITY_H
 #define DIMENSION_QUANTITY_H
 
-namespace Dimension
+namespace dimension
 {
 
    /// @brief A type-trait with void Dim and Primary, only used to satisfy a metaprogramming condition

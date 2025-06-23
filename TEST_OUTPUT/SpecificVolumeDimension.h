@@ -3,7 +3,7 @@
 
 #include "Dimension_Impl/DerivedDimensions/SpecificVolumeDimension_Impl.h"
 
-namespace Dimension
+namespace dimension
 {
 
 

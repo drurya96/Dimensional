@@ -1,70 +1,70 @@
 [
    {
-      "Dimension": "Acceleration",
+      "Dimension": "acceleration",
       "Fundamental": false,
-      "Numerator": ["Length"],
+      "Numerator": ["length"],
       "Denominator": ["Time", "Time"],
       "Units": {}
    },
    {
       "Dimension": "Energy",
       "Fundamental": false,
-      "Numerator": ["Mass", "Length", "Length"],
+      "Numerator": ["mass", "length", "length"],
       "Denominator": ["Time", "Time"],
       "Units": {}
    },
    {
-      "Dimension": "Force",
+      "Dimension": "force",
       "Fundamental": false,
-      "Numerator": ["Mass", "Length"],
+      "Numerator": ["mass", "length"],
       "Denominator": ["Time", "Time"],
       "Units": {
-         "Newtons": [
+         "newtons": [
             { "Unit": "KiloGrams", "Exponent": 1 },
-            { "Unit": "Meters", "Exponent": 1 },
-            { "Unit": "Seconds", "Exponent": -2 }
+            { "Unit": "meters", "Exponent": 1 },
+            { "Unit": "seconds", "Exponent": -2 }
          ],
-         "Newtons": [
+         "newtons": [
             { "Unit": "KiloGrams", "Exponent": 1 },
-            { "Unit": "Meters", "Exponent": 1 },
-            { "Unit": "Seconds", "Exponent": -2 }
+            { "Unit": "meters", "Exponent": 1 },
+            { "Unit": "seconds", "Exponent": -2 }
          ]
       },
       "HelperUnits": {}
   },
    },
    {
-      "Dimension": "MolarMass",
+      "Dimension": "Molarmass",
       "Fundamental": false,
-      "Numerator": ["Mass"],
+      "Numerator": ["mass"],
       "Denominator": ["Amount"],
       "Units": {}
    },
    {
       "Dimension": "Pressure",
       "Fundamental": false,
-      "Numerator": ["Mass"],
-      "Denominator": ["Length", "Time", "Time"],
+      "Numerator": ["mass"],
+      "Denominator": ["length", "Time", "Time"],
       "Units": {}
    },
    {
-      "Dimension": "Speed",
+      "Dimension": "speed",
       "Fundamental": false,
-      "Numerator": ["Length"],
+      "Numerator": ["length"],
       "Denominator": ["Time"],
       "Units": {}
    },
    {
       "Dimension": "Volume",
       "Fundamental": false,
-      "Numerator": ["Length", "Length", "Length"],
+      "Numerator": ["length", "length", "length"],
       "Denominator": [],
       "Units": {}
    },
    {
       "Dimension": "Area",
       "Fundamental": false,
-      "Numerator": ["Length", "Length"],
+      "Numerator": ["length", "length"],
       "Denominator": [],
       "Units": {}
    },
@@ -78,169 +78,169 @@
    {
       "Dimension": "Momentum",
       "Fundamental": false,
-      "Numerator": ["Mass", "Length"],
+      "Numerator": ["mass", "length"],
       "Denominator": ["Time"],
       "Units": {}
    },
    {
       "Dimension": "Power",
       "Fundamental": false,
-      "Numerator": ["Mass", "Length", "Length"],
+      "Numerator": ["mass", "length", "length"],
       "Denominator": ["Time", "Time", "Time"],
       "Units": {}
    },
    {
       "Dimension": "Current",
       "Fundamental": false,
-      "Numerator": ["Charge"],
+      "Numerator": ["charge"],
       "Denominator": ["Time"],
       "Units": {}
    },
    {
       "Dimension": "ElectricPotential",
       "Fundamental": false,
-      "Numerator": ["Mass", "Length", "Length"],
-      "Denominator": ["Time", "Time", "Charge"],
+      "Numerator": ["mass", "length", "length"],
+      "Denominator": ["Time", "Time", "charge"],
       "Units": {}
    },
    {
       "Dimension": "Resistance",
       "Fundamental": false,
-      "Numerator": ["Mass", "Length", "Length"],
-      "Denominator": ["Time", "Charge", "Charge"],
+      "Numerator": ["mass", "length", "length"],
+      "Denominator": ["Time", "charge", "charge"],
       "Units": {}
    },
    {
       "Dimension": "Capacitance",
       "Fundamental": false,
-      "Numerator": ["Charge", "Charge", "Time", "Time"],
-      "Denominator": ["Mass", "Length", "Length"],
+      "Numerator": ["charge", "charge", "Time", "Time"],
+      "Denominator": ["mass", "length", "length"],
       "Units": {}
    },
    {
       "Dimension": "Inductance",
       "Fundamental": false,
-      "Numerator": ["Mass", "Length", "Length"],
-      "Denominator": ["Charge", "Charge"],
+      "Numerator": ["mass", "length", "length"],
+      "Denominator": ["charge", "charge"],
       "Units": {}
    },
    {
       "Dimension": "MagneticFlux",
       "Fundamental": false,
-      "Numerator": ["Mass", "Length", "Length"],
-      "Denominator": ["Time", "Charge"],
+      "Numerator": ["mass", "length", "length"],
+      "Denominator": ["Time", "charge"],
       "Units": {}
    },
    {
       "Dimension": "MagneticField",
       "Fundamental": false,
-      "Numerator": ["Mass"],
-      "Denominator": ["Time", "Charge"],
+      "Numerator": ["mass"],
+      "Denominator": ["Time", "charge"],
       "Units": {}
    },
    {
       "Dimension": "ElectricField",
       "Fundamental": false,
-      "Numerator": ["Mass", "Length"],
-      "Denominator": ["Time", "Time", "Charge"],
+      "Numerator": ["mass", "length"],
+      "Denominator": ["Time", "Time", "charge"],
       "Units": {}
    },
    {
       "Dimension": "Conductance",
       "Fundamental": false,
-      "Numerator": ["Time", "Charge", "Charge"],
-      "Denominator": ["Mass", "Length", "Length"],
+      "Numerator": ["Time", "charge", "charge"],
+      "Denominator": ["mass", "length", "length"],
       "Units": {}
    },
    {
       "Dimension": "Entropy",
       "Fundamental": false,
-      "Numerator": ["Mass", "Length", "Length"],
-      "Denominator": ["Time", "Time", "Temperature"],
+      "Numerator": ["mass", "length", "length"],
+      "Denominator": ["Time", "Time", "temperature"],
       "Units": {}
    },
    {
       "Dimension": "HeatFlux",
       "Fundamental": false,
-      "Numerator": ["Mass"],
+      "Numerator": ["mass"],
       "Denominator": ["Time", "Time", "Time"],
       "Units": {}
    },
    {
       "Dimension": "SpecificHeatCapacity",
       "Fundamental": false,
-      "Numerator": ["Length", "Length"],
-      "Denominator": ["Time", "Time", "Temperature"],
+      "Numerator": ["length", "length"],
+      "Denominator": ["Time", "Time", "temperature"],
       "Units": {}
    },
    {
       "Dimension": "DiffusionCoefficient",
       "Fundamental": false,
-      "Numerator": ["Length", "Length"],
+      "Numerator": ["length", "length"],
       "Denominator": ["Time"],
       "Units": {}
    },
    {
       "Dimension": "DynamicViscosity",
       "Fundamental": false,
-      "Numerator": ["Mass"],
-      "Denominator": ["Time", "Length"],
+      "Numerator": ["mass"],
+      "Denominator": ["Time", "length"],
       "Units": {}
    },
    {
       "Dimension": "Density",
       "Fundamental": false,
-      "Numerator": ["Mass"],
-      "Denominator": ["Length", "Length", "Length"],
+      "Numerator": ["mass"],
+      "Denominator": ["length", "length", "length"],
       "Units": {}
    },
    {
       "Dimension": "VolumetricFlowRate",
       "Fundamental": false,
-      "Numerator": ["Length", "Length", "Length"],
+      "Numerator": ["length", "length", "length"],
       "Denominator": ["Time"],
       "Units": {}
    },
    {
-      "Dimension": "MassFlowRate",
+      "Dimension": "massFlowRate",
       "Fundamental": false,
-      "Numerator": ["Mass"],
+      "Numerator": ["mass"],
       "Denominator": ["Time"],
       "Units": {}
    },
    {
       "Dimension": "SpecificVolume",
       "Fundamental": false,
-      "Numerator": ["Length", "Length", "Length"],
-      "Denominator": ["Mass"],
+      "Numerator": ["length", "length", "length"],
+      "Denominator": ["mass"],
       "Units": {}
    },
    {
       "Dimension": "MomentOfInertia",
       "Fundamental": false,
-      "Numerator": ["Mass", "Length", "Length"],
+      "Numerator": ["mass", "length", "length"],
       "Denominator": [],
       "Units": {}
    },
    {
-      "Dimension": "AngularSpeed",
+      "Dimension": "Angularspeed",
       "Fundamental": false,
-      "Numerator": ["Angle"],
+      "Numerator": ["angle"],
       "Denominator": ["Time"],
       "Units": {}
    },
    {
-      "Dimension": "AngularAcceleration",
+      "Dimension": "Angularacceleration",
       "Fundamental": false,
-      "Numerator": ["Angle"],
+      "Numerator": ["angle"],
       "Denominator": ["Time", "Time"],
       "Units": {}
    },
    {
       "Dimension": "Torque",
       "Fundamental": false,
-      "Numerator": ["Mass", "Length", "Length"],
-      "Denominator": ["Time", "Time", "Angle"],
+      "Numerator": ["mass", "length", "length"],
+      "Denominator": ["Time", "Time", "angle"],
       "Units": {}
    }
 ]

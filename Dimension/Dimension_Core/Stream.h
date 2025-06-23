@@ -7,7 +7,7 @@
 #include <string>
 #include <sstream>
 
-namespace Dimension
+namespace dimension
 {
 
    // Forward declare dimension and unit
@@ -15,7 +15,7 @@ namespace Dimension
    struct BaseUnit;
 
    template<are_unit_exponents... Units>
-   class BaseDimension;
+   class base_dimension;
 
    /// @brief Type of string to print
    enum class UnitNameTypes{Name, Abbr, DimName};
@@ -48,10 +48,10 @@ namespace Dimension
    /// @param obj object to write
    /// @return reference to stream written
    template<typename NumTupleT, typename DenTupleT>
-   std::ostream& to_stream(std::ostream& os, const BaseDimension<NumTupleT, DenTupleT>& obj)
+   std::ostream& to_stream(std::ostream& os, const base_dimension<NumTupleT, DenTupleT>& obj)
    {
-      using NumTuple = BaseDimension<NumTupleT, DenTupleT>::NumTuple;
-      using DenTuple = BaseDimension<NumTupleT, DenTupleT>::DenTuple;
+      using NumTuple = base_dimension<NumTupleT, DenTupleT>::NumTuple;
+      using DenTuple = base_dimension<NumTupleT, DenTupleT>::DenTuple;
 
       os << obj.template GetVal<NumTuple, DenTuple>() << " [";
 
@@ -88,21 +88,21 @@ namespace Dimension
    /// @param obj Dimension object to write
    /// @return string representation of object
    template<typename NumTuple, typename DenTuple>
-   std::string to_string(const BaseDimension<NumTuple, DenTuple>& obj)
+   std::string to_string(const base_dimension<NumTuple, DenTuple>& obj)
    {
       std::ostringstream os;
       to_stream(os, obj);
       return os.str();
    }
 
-   /// @brief Stream operator from BaseDimension to ostream
+   /// @brief Stream operator from base_dimension to ostream
    /// @tparam NumTuple Numerator tuple
    /// @tparam DenTuple Denominator tuple
    /// @param os stream object
    /// @param obj dimension object
    /// @return reference to stream object
    template<typename NumTuple, typename DenTuple>
-   std::ostream& operator<<(std::ostream& os, const BaseDimension<NumTuple, DenTuple>& obj)
+   std::ostream& operator<<(std::ostream& os, const base_dimension<NumTuple, DenTuple>& obj)
    {
       return to_stream(os, obj);
    }

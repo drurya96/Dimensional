@@ -3,75 +3,75 @@
 
 #include "Dimension_Impl/DerivedDimensions/PressureDimension_Impl.h"
 
-namespace Dimension
+namespace dimension
 {
    // Helper fundamental units that exist only to compose derived units
    //   These don't map to typical physical units, but are necessary to
    //   produce some derived units
-   struct AtmosphereMass : public MassUnit<AtmosphereMass, "AtmosphereMass", "AtmosphereMass"> {};
-   template<> struct Conversion<AtmosphereMass, Grams> { static constexpr PrecisionType slope = 101325000.0; };
+   struct Atmospheremass : public massUnit<Atmospheremass, "Atmospheremass", "Atmospheremass"> {};
+   template<> struct Conversion<Atmospheremass, Grams> { static constexpr PrecisionType slope = 101325000.0; };
 
-   struct BarMass : public MassUnit<BarMass, "BarMass", "BarMass"> {};
-   template<> struct Conversion<BarMass, Grams> { static constexpr PrecisionType slope = 100000000.0; };
+   struct Barmass : public massUnit<Barmass, "Barmass", "Barmass"> {};
+   template<> struct Conversion<Barmass, Grams> { static constexpr PrecisionType slope = 100000000.0; };
 
-   struct TorrMass : public MassUnit<TorrMass, "TorrMass", "TorrMass"> {};
-   template<> struct Conversion<TorrMass, Grams> { static constexpr PrecisionType slope = 133322.31202220617; };
+   struct Torrmass : public massUnit<Torrmass, "Torrmass", "Torrmass"> {};
+   template<> struct Conversion<Torrmass, Grams> { static constexpr PrecisionType slope = 133322.31202220617; };
 
-   struct inHgMass : public MassUnit<inHgMass, "inHgMass", "inHgMass"> {};
-   template<> struct Conversion<inHgMass, Grams> { static constexpr PrecisionType slope = 3386386.725364; };
+   struct inHgmass : public massUnit<inHgmass, "inHgmass", "inHgmass"> {};
+   template<> struct Conversion<inHgmass, Grams> { static constexpr PrecisionType slope = 3386386.725364; };
 
 
-   struct Pascals
+   struct pascals
    {
       using units = std::tuple<
-         UnitExponent<KiloGrams, 1, 1>
-         UnitExponent<Meters, -1, 1>
-         UnitExponent<Seconds, -2, 1>,
+         unit_exponent<KiloGrams, 1, 1>
+         unit_exponent<meters, -1, 1>
+         unit_exponent<seconds, -2, 1>,
       >;
    };
    
    struct Atmospheres
    {
       using units = std::tuple<
-         UnitExponent<AtmosphereMass, 1, 1>
-         UnitExponent<Meters, -1, 1>
-         UnitExponent<Seconds, -2, 1>,
+         unit_exponent<Atmospheremass, 1, 1>
+         unit_exponent<meters, -1, 1>
+         unit_exponent<seconds, -2, 1>,
       >;
    };
    
    struct Bar
    {
       using units = std::tuple<
-         UnitExponent<BarMass, 1, 1>
-         UnitExponent<Meters, -1, 1>
-         UnitExponent<Seconds, -2, 1>,
+         unit_exponent<Barmass, 1, 1>
+         unit_exponent<meters, -1, 1>
+         unit_exponent<seconds, -2, 1>,
       >;
    };
    
    struct Torr
    {
       using units = std::tuple<
-         UnitExponent<TorrMass, 1, 1>
-         UnitExponent<Meters, -1, 1>
-         UnitExponent<Seconds, -2, 1>,
+         unit_exponent<Torrmass, 1, 1>
+         unit_exponent<meters, -1, 1>
+         unit_exponent<seconds, -2, 1>,
       >;
    };
    
    struct inHg
    {
       using units = std::tuple<
-         UnitExponent<inHgMass, 1, 1>
-         UnitExponent<Meters, -1, 1>
-         UnitExponent<Seconds, -2, 1>,
+         unit_exponent<inHgmass, 1, 1>
+         unit_exponent<meters, -1, 1>
+         unit_exponent<seconds, -2, 1>,
       >;
    };
    
    struct mmHg
    {
       using units = std::tuple<
-         UnitExponent<TorrMass, 1, 1>
-         UnitExponent<Meters, -1, 1>
-         UnitExponent<Seconds, -2, 1>,
+         unit_exponent<Torrmass, 1, 1>
+         unit_exponent<meters, -1, 1>
+         unit_exponent<seconds, -2, 1>,
       >;
    };
    

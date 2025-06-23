@@ -1,12 +1,12 @@
 #ifndef STATIC_DIMENSION_{{ dim.name.upper() }}_IMPL_H
 #define STATIC_DIMENSION_{{ dim.name.upper() }}_IMPL_H
 
-#include "../../BaseDimension.h"
+#include "../../base_dimension.h"
 {% for de in dim.definition %}
-#include "../../{{ de.dim }}Dimension.h"
+#include "../../dimensions/fundamental/{{ de.dim }}_dimension.h"
 {% endfor %}
 
-namespace Dimension
+namespace dimension
 {
    /// @brief Concept to verify a type can serve as a named {{ dim.name }} unit
    template<typename T>
@@ -15,16 +15,16 @@ namespace Dimension
       requires 
          std::tuple_size_v<typename T::units> == {{ dim.definition | length }} &&
          {% for i in range(dim.definition | length) %}
-         Is{{dim.definition[i].dim}}Unit<typename std::tuple_element_t<{{ i }}, typename T::units>::unit>{{ " &&" if not loop.last else ";"}}
+         is_{{dim.definition[i].dim}}_unit<typename std::tuple_element_t<{{ i }}, typename T::units>::unit>{{ " &&" if not loop.last else ";"}}
          {% endfor %}
       requires !std::is_base_of_v<FundamentalUnitTag, T>;
    };
 
    /// @brief Concept to verify a dimension can be treated as a {{ dim.name }} type
    template<typename T>
-   concept Is{{ dim.name }} = std::is_convertible_v<T, BaseDimension<
+   concept Is{{ dim.name }} = std::is_convertible_v<T, base_dimension<
       {% for de in dim.definition %}
-      UnitExponent<Primary{{ de.dim }}, {{ de.exponent_num }}>{{ ", " if not loop.last }}
+      unit_exponent<Primary{{ de.dim }}, {{ de.exponent_num }}>{{ ", " if not loop.last }}
       {% endfor %}
    >>;
 
@@ -37,14 +37,14 @@ namespace Dimension
    /// @return The raw value in terms of template units as a PrecisionType
    template<
       {% for de in dim.definition %}
-      Is{{ de.dim }}Unit {{ de.dim }}Unit,
+      is_{{ de.dim }}_unit {{ de.dim }}Unit,
       {% endfor %}
       Is{{ dim.name }} DimType>
    constexpr PrecisionType get_{{ dim.name.lower() }}_as(const DimType& obj)
    {
       return get_dimension_as<
          {% for de in dim.definition %}
-         UnitExponent<{{ de.dim }}Unit, {{ de.exponent_num }}>{{ "," if not loop.last }}
+         unit_exponent<{{ de.dim }}Unit, {{ de.exponent_num }}>{{ "," if not loop.last }}
          {% endfor %}
       >(obj);
    }
@@ -65,15 +65,15 @@ namespace Dimension
 
    /// @brief Represents the default {{ dim.name }}
    template<>
-   class {{ dim.name }}<> : public BaseDimension<
+   class {{ dim.name }}<> : public base_dimension<
       {% for de in dim.definition %}
-      UnitExponent<Primary{{ de.dim }}, {{ de.exponent_num }}>{{ "," if not loop.last else ">" }}
+      unit_exponent<Primary{{ de.dim }}, {{ de.exponent_num }}>{{ "," if not loop.last else ">" }}
       {% endfor %}
    {
    public:
-      using Base = BaseDimension<
+      using Base = base_dimension<
          {% for de in dim.definition %}
-         UnitExponent<Primary{{ de.dim }}, {{ de.exponent_num }}>{{ "," if not loop.last else ">;" }}
+         unit_exponent<Primary{{ de.dim }}, {{ de.exponent_num }}>{{ "," if not loop.last else ">;" }}
          {% endfor %}
       using Base::Base;
 
@@ -88,10 +88,10 @@ namespace Dimension
    /// @brief Template specialization for named {{ dim.name }} units
    /// @tparam Named The named unit this {{ dim.name }} type is in terms of
    template<IsNamed{{ dim.name }}Unit Named>
-   class {{ dim.name }}<Named> : public BaseDimensionFromTuple<typename Named::units>::dim
+   class {{ dim.name }}<Named> : public base_dimensionFromTuple<typename Named::units>::dim
    {
    public:
-      using Base = typename BaseDimensionFromTuple<typename Named::units>::dim;
+      using Base = typename base_dimensionFromTuple<typename Named::units>::dim;
       using Base::Base;
 
       template<typename Other>
@@ -102,16 +102,16 @@ namespace Dimension
 
 
    template<typename... Units>
-   class {{ dim.name }}<Units...> : public BaseDimension<
+   class {{ dim.name }}<Units...> : public base_dimension<
       {% for de in dim.definition %}
-      UnitExponent<typename Extractor<{{ de.dim }}Type, Units...>::type, {{ de.exponent_num }}>{{ "," if not loop.last }}
+      unit_exponent<typename Extractor<{{ de.dim }}Type, Units...>::type, {{ de.exponent_num }}>{{ "," if not loop.last }}
       {% endfor %}
    >
    {
    public:
-      using Base = BaseDimension<
+      using Base = base_dimension<
          {% for de in dim.definition %}
-         UnitExponent<typename Extractor<{{ de.dim }}Type, Units...>::type, {{ de.exponent_num }}>{{ "," if not loop.last }}
+         unit_exponent<typename Extractor<{{ de.dim }}Type, Units...>::type, {{ de.exponent_num }}>{{ "," if not loop.last }}
          {% endfor %}
       >;
    

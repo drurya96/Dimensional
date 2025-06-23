@@ -3,7 +3,7 @@
 
 #include "Dimension_Impl/DerivedDimensions/HeatFluxDimension_Impl.h"
 
-namespace Dimension
+namespace dimension
 {
 
 

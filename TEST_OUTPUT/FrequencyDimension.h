@@ -3,13 +3,13 @@
 
 #include "Dimension_Impl/DerivedDimensions/FrequencyDimension_Impl.h"
 
-namespace Dimension
+namespace dimension
 {
 
    struct Hertz
    {
       using units = std::tuple<
-         UnitExponent<Seconds, -1, 1>,
+         unit_exponent<seconds, -1, 1>,
       >;
    };
    

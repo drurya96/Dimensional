@@ -1,0 +1,14 @@
+#ifndef DIMENSIONS_H
+#define DIMENSIONS_H
+
+// Fundamental Dimensions
+{% for dim in dims.fundamental_dims.keys() %}
+#include "dimensions/fundamental/{{ dim }}_dimension.h"
+{% endfor %}
+
+// Derived Dimensions
+{% for dim in dims.derived_dims.keys() %}
+#include "dimensions/derived/{{ dim }}_dimension.h"
+{% endfor %}
+
+#endif // DIMENSIONS_H

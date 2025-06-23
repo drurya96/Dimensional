@@ -8,7 +8,7 @@
 
 #include "StringLiteral.h"
 
-namespace Dimension
+namespace dimension
 {
    /// @brief Check if two units are of the same dimension
    template<typename T, typename U>

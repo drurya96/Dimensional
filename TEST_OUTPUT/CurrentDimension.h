@@ -3,14 +3,14 @@
 
 #include "Dimension_Impl/DerivedDimensions/CurrentDimension_Impl.h"
 
-namespace Dimension
+namespace dimension
 {
 
    struct Amperes
    {
       using units = std::tuple<
-         UnitExponent<Coulombs, 1, 1>
-         UnitExponent<Seconds, -1, 1>,
+         unit_exponent<Coulombs, 1, 1>
+         unit_exponent<seconds, -1, 1>,
       >;
    };
    

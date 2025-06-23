@@ -33,22 +33,22 @@
     {
       "id": "named_fundamental_dimensions",
       "name": "Named Fundamental Dimensions",
-      "description": "Defines type aliases representing fundamental physical dimensions such as Length, Mass, and Time. These aliases inherit from base_dimension with a single unit_exponent and serve as user-facing entry points into the dimensional system. Implementations may enable type deduction or category-based traits via these types."
+      "description": "Defines type aliases representing fundamental physical dimensions such as length, mass, and Time. These aliases inherit from base_dimension with a single unit_exponent and serve as user-facing entry points into the dimensional system. Implementations may enable type deduction or category-based traits via these types."
     },
     {
       "id": "named_derived_dimensions",
       "name": "Named Derived Dimensions",
-      "description": "Defines type aliases representing dimensionally composed properties such as Speed, Acceleration, or Force. These types wrap specific base_dimension compositions and may provide semantic meaning, improved usability, or specialization opportunities."
+      "description": "Defines type aliases representing dimensionally composed properties such as speed, acceleration, or force. These types wrap specific base_dimension compositions and may provide semantic meaning, improved usability, or specialization opportunities."
     },
     {
       "id": "named_derived_units",
       "name": "Named Derived Units",
-      "description": "Defines compound units such as Newtons, Pascals, and Knots that are derived from combinations of fundamental units. These types may be used within base_dimensions as if they were fundamental units and participate in conversions accordingly."
+      "description": "Defines compound units such as newtons, pascals, and Knots that are derived from combinations of fundamental units. These types may be used within base_dimensions as if they were fundamental units and participate in conversions accordingly."
     },
     {
       "id": "unit_catalog",
       "name": "Unit Catalog",
-      "description": "Describes the set of all concrete unit types available in the system, such as Meters, Seconds, and Grams. This domain assumes the existence of an external metadata registry that enumerates units, their conversion rules, and anchor associations."
+      "description": "Describes the set of all concrete unit types available in the system, such as meters, seconds, and Grams. This domain assumes the existence of an external metadata registry that enumerates units, their conversion rules, and anchor associations."
     },
     {
       "id": "user_extension_integrity",

@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-namespace Dimension
+namespace dimension
 {
 
 
@@ -435,7 +435,7 @@ namespace Dimension
       using FromT = type_from_quantity_or_delta<From>::type;
       using ToT = type_from_quantity_or_delta<To>::type;
 
-      // Checks on BaseDimension ensure a conversion to/from Primary exists.
+      // Checks on base_dimension ensure a conversion to/from Primary exists.
       // No need to further constrain this function.
 
       if constexpr (std::is_same_v<FromT, ToT>) // Conversion to self

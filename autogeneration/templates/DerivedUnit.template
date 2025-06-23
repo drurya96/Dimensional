@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_{{ dim.name.upper() }}_H
 #define STATIC_DIMENSION_{{ dim.name.upper() }}_H
 
-#include "Dimension_Impl/DerivedDimensions/{{ dim.name }}Dimension_Impl.h"
+#include "Dimension_Impl/DerivedDimensions/{{ dim.name }}_dimension_Impl.h"
 
-namespace Dimension
+namespace dimension
 {
    {% if dim.helper_units %}
    // Helper fundamental units that exist only to compose derived units
@@ -23,7 +23,7 @@ namespace Dimension
    {
       using units = std::tuple<
          {% for ue in unit %}
-         UnitExponent<{{ ue.unit }}, {{ ue.exponent_num }}, {{ ue.exponent_den }}>{{ "," if not loop.last }}
+         unit_exponent<{{ ue.unit }}, {{ ue.exponent_num }}, {{ ue.exponent_den }}>{{ "," if not loop.last }}
          {% endfor %}
       >;
    };

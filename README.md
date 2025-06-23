@@ -10,10 +10,10 @@
 
 ## Key Features
 
-- Dimension-Centric Design: Central class `BaseDimension` is templated on two tuples representing the numerator and denominator unit types.
-- Type-Trait Units: Units like `Meters`, `Seconds`, and `Grams` are implemented as type-traits derived from their respective base unit types (`LengthUnit`, `TimeUnit`, `MassUnit`).
+- Dimension-Centric Design: Central class `base_dimension` is templated on two tuples representing the numerator and denominator unit types.
+- Type-Trait Units: Units like `meters`, `seconds`, and `Grams` are implemented as type-traits derived from their respective base unit types (`lengthUnit`, `TimeUnit`, `massUnit`).
 - Dimensional Analysis in Arithmetic: Arithmetic operations automatically perform dimensional analysis, ensuring the correctness of physical computations.
-- Clean Syntax: Simplified syntax for common dimensions, e.g., `Length<Meters>`.
+- Clean Syntax: Simplified syntax for common dimensions, e.g., `length<meters>`.
 - **Conversions**
   - Supported only between units of the **same dimension**.
   - Define conversions using:
@@ -28,8 +28,8 @@
 - Distinction between Quantity and Delta types.
   - See [Deltas and Quantities section](#deltas-and-quantities)
 - Common constants provided in `DimensionalConstants.h`
-  - For example, to use the `ideal_gas_constant`, use `Dimension::Constants::ideal_gas_constant`
-- Molar Mass of every element and some compounds provided in `DimensionalMolarMasses.h`
+  - For example, to use the `ideal_gas_constant`, use `dimension::Constants::ideal_gas_constant`
+- Molar mass of every element and some compounds provided in `DimensionalMolarmasses.h`
 - Compile-time errors: All dimensionality is resolved at compile time, so errors can be addressed earlier in development.
 - Efficiency: `Dimensional` performs on-par with simply using `double` arithmetic in benchmarks.
   - TODO: Perform more complex benchmarking [issue #43](https://gitlab.com/dimensionalanalysis/dimensional/-/issues/43)
@@ -62,32 +62,32 @@ For the most robust usage examples, see the [Unit Tests](https://gitlab.com/dime
 Below is an example usage of `Dimensional`
 
 ```cpp
-#include "LengthDimension.h"
-#include "TimeDimension.h"
-#include "SpeedDimension.h"
+#include "length_dimension.h"
+#include "timespan_dimension.h"
+#include "speed_dimension.h"
 
 int main() {
    using namespace std;
 
    // Define some quantities
-   auto length = Dimension::BaseDimension<tuple<Dimension::Meters>, tuple<>>{25.0};
-   auto time = Dimension::BaseDimension<tuple<Dimension::Minutes>, tuple<>>{10};
+   auto length = dimension::base_dimension<tuple<dimension::meters>, tuple<>>{25.0};
+   auto time = dimension::base_dimension<tuple<dimension::minutes>, tuple<>>{10};
 
    // Perform arithmetic operations with dimensional analysis
-   // Note this will result in a type BaseDimension<tuple<Meters>, tuple<Seconds>>
+   // Note this will result in a type base_dimension<tuple<meters>, tuple<seconds>>
    auto velocity = length / time;
 
    // Note: Dimensions can be streamed directly, this is to illustrate `GetVal`
-   cout << "Velocity: " << velocity.GetVal<tuple<Dimension::Feet>, tuple<Dimension::Seconds>>() << " f/sec" << endl;
+   cout << "Velocity: " << velocity.GetVal<tuple<dimension::Feet>, tuple<dimension::seconds>>() << " f/sec" << endl;
 
    // Cleaner syntax for common dimensions
-   Dimension::Length<Dimension::Meters> distance{100.0};
-   Dimension::Time<Dimension::Seconds> duration{5.0};
+   dimension::length<dimension::meters> distance{100.0};
+   dimension::Time<dimension::seconds> duration{5.0};
 
-   Dimension::Speed speed = distance / duration;
+   dimension::speed speed = distance / duration;
 
-   // Note: Dimensions can be streamed directly, this is to illustrate `getSpeed`
-   cout << "Speed: " << getSpeed<Dimension::Feet, Dimension::Seconds>(speed) << " f/s" << endl;
+   // Note: Dimensions can be streamed directly, this is to illustrate `getspeed`
+   cout << "speed: " << getspeed<dimension::Feet, dimension::seconds>(speed) << " f/s" << endl;
 
    return 0;
 }
@@ -98,14 +98,14 @@ int main() {
 ### Overview
 
 In the context of this library, units within a dimension are treated as deltas—representing differences or durations—unless explicitly wrapped by the Quantity type.
-For example, `BaseDimension<tuple<Meters>, tuple<Seconds>>` interprets `Meters` and `Seconds` as delta units.
+For example, `base_dimension<tuple<meters>, tuple<seconds>>` interprets `meters` and `seconds` as delta units.
 This default behavior is suitable for most basic applications where only changes or durations are relevant.
 
 However, any fundamental unit can be wrapped by the `Quantity` type to indicate that the unit represents a state rather than a difference.
 For example, `Quantity<Kelvin>` represents a specific temperature, whereas `Kelvin` alone represents a change in temperature.
-Quantities are especially important when dealing with units like Temperature where distinguishing between current temperatures and temperature differences is crucial.
+Quantities are especially important when dealing with units like temperature where distinguishing between current temperatures and temperature differences is crucial.
 
-*Note: Named-Compound dimensions, like `Joules`, `Newtons`, `Liters`, etc. cannot (yet) be wrapped by `Quantity`. If this behavior is desired, please [open an issue](https://gitlab.com/dimensionalanalysis/dimensional/-/issues/new)*
+*Note: Named-Compound dimensions, like `Joules`, `newtons`, `Liters`, etc. cannot (yet) be wrapped by `Quantity`. If this behavior is desired, please [open an issue](https://gitlab.com/dimensionalanalysis/dimensional/-/issues/new)*
 
 ### Conversions
 
@@ -134,7 +134,7 @@ Quantities and deltas interact differently during arithmetic operations. For any
 - **Quantity + Quantity -> INVALID**: Adding two absolute quantities is undefined and results in a compilation error.
 
 These rules **are maintained** for compound units. For example:
-`BaseDimension<tuple<Meters>, tuple<Quantity<Kelvin>>> - BaseDimension<tuple<Meters>, tuple<Quantity<Kelvin>>>` -> `BaseDimension<tuple<Meters>, tuple<Kelvin>>`
+`base_dimension<tuple<meters>, tuple<Quantity<Kelvin>>> - base_dimension<tuple<meters>, tuple<Quantity<Kelvin>>>` -> `base_dimension<tuple<meters>, tuple<Kelvin>>`
 
 ### Absolute vs. Non-Absolute Units:
 
@@ -156,7 +156,7 @@ While compound dimensions can include non-absolute units, they cannot include no
 This means that you cannot have a `Quantity` wrapping a non-absolute unit within a compound dimension.
 **Invalid Example**:
 ```cpp
-BaseDimension<tuple<Meters>, tuple<Quantity<Celsius>>> // INVALID
+base_dimension<tuple<meters>, tuple<Quantity<Celsius>>> // INVALID
 ```
 
 Here, `Quantity<Celsius>` is invalid because `Celsius` is a non-absolute unit.
@@ -178,15 +178,15 @@ When performing multiplication or division involving non-absolute quantities (e.
 **Avoid Implicit Casting**: To maintain type consistency and avoid unexpected results, explicitly cast non-absolute quantities to an absolute unit before performing multiplication or division operations.
 - Example:
 ```cpp
-Temperature<Quantity<Celsius>> currentTemp(25.0);
+temperature<Quantity<Celsius>> currentTemp(25.0);
 
-Time<Seconds> time(20.0);
+Time<seconds> time(20.0);
 
 // This will emit a warning
-BaseDimension<tuple<Quantity<Kelvin>>, tuple<Seconds>> resultBad = currentTemp / time; // Notice the Kelvin in the result type rather than Celsius
+base_dimension<tuple<Quantity<Kelvin>>, tuple<seconds>> resultBad = currentTemp / time; // Notice the Kelvin in the result type rather than Celsius
 
 // This is preferred, no warning emitted
-BaseDimension<tuple<Quantity<Kelvin>>, tuple<Seconds>> resultBad = Temperature<Quantity<Kelvin>>(currentTemp) / time;
+base_dimension<tuple<Quantity<Kelvin>>, tuple<seconds>> resultBad = temperature<Quantity<Kelvin>>(currentTemp) / time;
 ```
 
 ## Serialization

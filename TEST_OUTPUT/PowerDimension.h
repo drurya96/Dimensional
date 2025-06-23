@@ -3,15 +3,15 @@
 
 #include "Dimension_Impl/DerivedDimensions/PowerDimension_Impl.h"
 
-namespace Dimension
+namespace dimension
 {
 
    struct Watts
    {
       using units = std::tuple<
-         UnitExponent<KiloGrams, 1, 1>
-         UnitExponent<Meters, 2, 1>
-         UnitExponent<Seconds, -3, 1>,
+         unit_exponent<KiloGrams, 1, 1>
+         unit_exponent<meters, 2, 1>
+         unit_exponent<seconds, -3, 1>,
       >;
    };
    

@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_MASSFLOWRATE_H
 #define STATIC_DIMENSION_MASSFLOWRATE_H
 
-#include "Dimension_Impl/DerivedDimensions/MassFlowRateDimension_Impl.h"
+#include "Dimension_Impl/DerivedDimensions/massFlowRateDimension_Impl.h"
 
-namespace Dimension
+namespace dimension
 {
 
 

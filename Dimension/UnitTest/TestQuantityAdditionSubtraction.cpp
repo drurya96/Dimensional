@@ -1,32 +1,19 @@
 #include "DimensionTest.h"
 
-#include "AngleDimension.h"
-#include "LengthDimension.h"
-#include "TemperatureDimension.h"
-#include "MassDimension.h"
-#include "TimeDimension.h"
-
-#include "EnergyDimension.h"
-#include "SpeedDimension.h"
-#include "AccelerationDimension.h"
-#include "ForceDimension.h"
-#include "VolumeDimension.h"
-
 #include <ostream>
-
 #include <iostream>
 
-using namespace Dimension;
+using namespace dimension;
 
-using Dim = Meters::Dim;
+using Dim = meters::Dim;
 
 // Test Suite for subtract_tuples
-TEST(SubtractTuplesTest, QuantityMinusQuantity_SameUnit_Meters) {
-    using Test1Tup1 = std::tuple<Quantity<Meters>>;
-    using Test1Tup2 = std::tuple<Quantity<Meters>>;
+TEST(SubtractTuplesTest, QuantityMinusQuantity_SameUnit_meters) {
+    using Test1Tup1 = std::tuple<Quantity<meters>>;
+    using Test1Tup2 = std::tuple<Quantity<meters>>;
 
     using Test1Result = subtract_tuples<Dim, Test1Tup1, Test1Tup2>::type;
-    using ExpectedResult = std::tuple<Meters>;
+    using ExpectedResult = std::tuple<meters>;
 
     EXPECT_TRUE((std::is_same_v<Test1Result, ExpectedResult>));
 }
@@ -63,32 +50,32 @@ TEST(SubtractTuplesTest, QuantityMinusQuantity_SameUnit_Miles) {
     EXPECT_TRUE((std::is_same_v<Test4Result, ExpectedResult>));
 }
 
-TEST(SubtractTuplesTest, QuantityMinusQuantity_SameUnit_KiloMeters) {
-    using Test5Tup1 = std::tuple<Quantity<KiloMeters>>;
-    using Test5Tup2 = std::tuple<Quantity<KiloMeters>>;
+TEST(SubtractTuplesTest, QuantityMinusQuantity_SameUnit_Kilometers) {
+    using Test5Tup1 = std::tuple<Quantity<Kilometers>>;
+    using Test5Tup2 = std::tuple<Quantity<Kilometers>>;
 
     using Test5Result = subtract_tuples<Dim, Test5Tup1, Test5Tup2>::type;
-    using ExpectedResult = std::tuple<KiloMeters>;
+    using ExpectedResult = std::tuple<Kilometers>;
 
     EXPECT_TRUE((std::is_same_v<Test5Result, ExpectedResult>));
 }
 
-TEST(SubtractTuplesTest, QuantityMinusQuantity_SameUnit_CentiMeters) {
-    using Test6Tup1 = std::tuple<Quantity<CentiMeters>>;
-    using Test6Tup2 = std::tuple<Quantity<CentiMeters>>;
+TEST(SubtractTuplesTest, QuantityMinusQuantity_SameUnit_Centimeters) {
+    using Test6Tup1 = std::tuple<Quantity<Centimeters>>;
+    using Test6Tup2 = std::tuple<Quantity<Centimeters>>;
 
     using Test6Result = subtract_tuples<Dim, Test6Tup1, Test6Tup2>::type;
-    using ExpectedResult = std::tuple<CentiMeters>;
+    using ExpectedResult = std::tuple<Centimeters>;
 
     EXPECT_TRUE((std::is_same_v<Test6Result, ExpectedResult>));
 }
 
-TEST(SubtractTuplesTest, QuantityMinusQuantity_SameUnit_MilliMeters) {
-    using Test7Tup1 = std::tuple<Quantity<MilliMeters>>;
-    using Test7Tup2 = std::tuple<Quantity<MilliMeters>>;
+TEST(SubtractTuplesTest, QuantityMinusQuantity_SameUnit_Millimeters) {
+    using Test7Tup1 = std::tuple<Quantity<Millimeters>>;
+    using Test7Tup2 = std::tuple<Quantity<Millimeters>>;
 
     using Test7Result = subtract_tuples<Dim, Test7Tup1, Test7Tup2>::type;
-    using ExpectedResult = std::tuple<MilliMeters>;
+    using ExpectedResult = std::tuple<Millimeters>;
 
     EXPECT_TRUE((std::is_same_v<Test7Result, ExpectedResult>));
 }
@@ -103,12 +90,12 @@ TEST(SubtractTuplesTest, QuantityMinusQuantity_SameUnit_Inches) {
     EXPECT_TRUE((std::is_same_v<Test8Result, ExpectedResult>));
 }
 
-TEST(SubtractTuplesTest, QuantityMinusQuantity_DifferentUnits_MetersFeet) {
-    using Test9Tup1 = std::tuple<Quantity<Meters>, Quantity<Feet>>;
-    using Test9Tup2 = std::tuple<Quantity<Feet>, Quantity<Meters>>;
+TEST(SubtractTuplesTest, QuantityMinusQuantity_DifferentUnits_metersFeet) {
+    using Test9Tup1 = std::tuple<Quantity<meters>, Quantity<Feet>>;
+    using Test9Tup2 = std::tuple<Quantity<Feet>, Quantity<meters>>;
 
     using Test9Result = subtract_tuples<Dim, Test9Tup1, Test9Tup2>::type;
-    using ExpectedResult = std::tuple<Meters, Feet>;
+    using ExpectedResult = std::tuple<meters, Feet>;
 
     EXPECT_TRUE((std::is_same_v<Test9Result, ExpectedResult>));
 }
@@ -123,12 +110,12 @@ TEST(SubtractTuplesTest, QuantityMinusQuantity_DifferentUnits_YardsInches) {
     EXPECT_TRUE((std::is_same_v<Test10Result, ExpectedResult>));
 }
 
-TEST(SubtractTuplesTest, DeltaMinusDelta_SameUnit_Meters) {
-    using Test11Tup1 = std::tuple<Meters>;
-    using Test11Tup2 = std::tuple<Meters>;
+TEST(SubtractTuplesTest, DeltaMinusDelta_SameUnit_meters) {
+    using Test11Tup1 = std::tuple<meters>;
+    using Test11Tup2 = std::tuple<meters>;
 
     using Test11Result = subtract_tuples<Dim, Test11Tup1, Test11Tup2>::type;
-    using ExpectedResult = std::tuple<Meters>;
+    using ExpectedResult = std::tuple<meters>;
 
     EXPECT_TRUE((std::is_same_v<Test11Result, ExpectedResult>));
 }
@@ -163,32 +150,32 @@ TEST(SubtractTuplesTest, DeltaMinusDelta_SameUnit_Miles) {
     EXPECT_TRUE((std::is_same_v<Test14Result, ExpectedResult>));
 }
 
-TEST(SubtractTuplesTest, DeltaMinusDelta_SameUnit_KiloMeters) {
-    using Test15Tup1 = std::tuple<KiloMeters>;
-    using Test15Tup2 = std::tuple<KiloMeters>;
+TEST(SubtractTuplesTest, DeltaMinusDelta_SameUnit_Kilometers) {
+    using Test15Tup1 = std::tuple<Kilometers>;
+    using Test15Tup2 = std::tuple<Kilometers>;
 
     using Test15Result = subtract_tuples<Dim, Test15Tup1, Test15Tup2>::type;
-    using ExpectedResult = std::tuple<KiloMeters>;
+    using ExpectedResult = std::tuple<Kilometers>;
 
     EXPECT_TRUE((std::is_same_v<Test15Result, ExpectedResult>));
 }
 
-TEST(SubtractTuplesTest, DeltaMinusDelta_SameUnit_CentiMeters) {
-    using Test16Tup1 = std::tuple<CentiMeters>;
-    using Test16Tup2 = std::tuple<CentiMeters>;
+TEST(SubtractTuplesTest, DeltaMinusDelta_SameUnit_Centimeters) {
+    using Test16Tup1 = std::tuple<Centimeters>;
+    using Test16Tup2 = std::tuple<Centimeters>;
 
     using Test16Result = subtract_tuples<Dim, Test16Tup1, Test16Tup2>::type;
-    using ExpectedResult = std::tuple<CentiMeters>;
+    using ExpectedResult = std::tuple<Centimeters>;
 
     EXPECT_TRUE((std::is_same_v<Test16Result, ExpectedResult>));
 }
 
-TEST(SubtractTuplesTest, DeltaMinusDelta_SameUnit_MilliMeters) {
-    using Test17Tup1 = std::tuple<MilliMeters>;
-    using Test17Tup2 = std::tuple<MilliMeters>;
+TEST(SubtractTuplesTest, DeltaMinusDelta_SameUnit_Millimeters) {
+    using Test17Tup1 = std::tuple<Millimeters>;
+    using Test17Tup2 = std::tuple<Millimeters>;
 
     using Test17Result = subtract_tuples<Dim, Test17Tup1, Test17Tup2>::type;
-    using ExpectedResult = std::tuple<MilliMeters>;
+    using ExpectedResult = std::tuple<Millimeters>;
 
     EXPECT_TRUE((std::is_same_v<Test17Result, ExpectedResult>));
 }
@@ -203,12 +190,12 @@ TEST(SubtractTuplesTest, DeltaMinusDelta_SameUnit_Inches) {
     EXPECT_TRUE((std::is_same_v<Test18Result, ExpectedResult>));
 }
 
-TEST(SubtractTuplesTest, QuantityMinusDelta_SameUnit_Meters) {
-    using Test19Tup1 = std::tuple<Quantity<Meters>>;
-    using Test19Tup2 = std::tuple<Meters>;
+TEST(SubtractTuplesTest, QuantityMinusDelta_SameUnit_meters) {
+    using Test19Tup1 = std::tuple<Quantity<meters>>;
+    using Test19Tup2 = std::tuple<meters>;
 
     using Test19Result = subtract_tuples<Dim, Test19Tup1, Test19Tup2>::type;
-    using ExpectedResult = std::tuple<Quantity<Meters>>;
+    using ExpectedResult = std::tuple<Quantity<meters>>;
 
     EXPECT_TRUE((std::is_same_v<Test19Result, ExpectedResult>));
 }
@@ -243,32 +230,32 @@ TEST(SubtractTuplesTest, QuantityMinusDelta_SameUnit_Miles) {
     EXPECT_TRUE((std::is_same_v<Test22Result, ExpectedResult>));
 }
 
-TEST(SubtractTuplesTest, QuantityMinusDelta_SameUnit_KiloMeters) {
-    using Test23Tup1 = std::tuple<Quantity<KiloMeters>>;
-    using Test23Tup2 = std::tuple<KiloMeters>;
+TEST(SubtractTuplesTest, QuantityMinusDelta_SameUnit_Kilometers) {
+    using Test23Tup1 = std::tuple<Quantity<Kilometers>>;
+    using Test23Tup2 = std::tuple<Kilometers>;
 
     using Test23Result = subtract_tuples<Dim, Test23Tup1, Test23Tup2>::type;
-    using ExpectedResult = std::tuple<Quantity<KiloMeters>>;
+    using ExpectedResult = std::tuple<Quantity<Kilometers>>;
 
     EXPECT_TRUE((std::is_same_v<Test23Result, ExpectedResult>));
 }
 
-TEST(SubtractTuplesTest, QuantityMinusDelta_SameUnit_CentiMeters) {
-    using Test24Tup1 = std::tuple<Quantity<CentiMeters>>;
-    using Test24Tup2 = std::tuple<CentiMeters>;
+TEST(SubtractTuplesTest, QuantityMinusDelta_SameUnit_Centimeters) {
+    using Test24Tup1 = std::tuple<Quantity<Centimeters>>;
+    using Test24Tup2 = std::tuple<Centimeters>;
 
     using Test24Result = subtract_tuples<Dim, Test24Tup1, Test24Tup2>::type;
-    using ExpectedResult = std::tuple<Quantity<CentiMeters>>;
+    using ExpectedResult = std::tuple<Quantity<Centimeters>>;
 
     EXPECT_TRUE((std::is_same_v<Test24Result, ExpectedResult>));
 }
 
-TEST(SubtractTuplesTest, QuantityMinusDelta_SameUnit_MilliMeters) {
-    using Test25Tup1 = std::tuple<Quantity<MilliMeters>>;
-    using Test25Tup2 = std::tuple<MilliMeters>;
+TEST(SubtractTuplesTest, QuantityMinusDelta_SameUnit_Millimeters) {
+    using Test25Tup1 = std::tuple<Quantity<Millimeters>>;
+    using Test25Tup2 = std::tuple<Millimeters>;
 
     using Test25Result = subtract_tuples<Dim, Test25Tup1, Test25Tup2>::type;
-    using ExpectedResult = std::tuple<Quantity<MilliMeters>>;
+    using ExpectedResult = std::tuple<Quantity<Millimeters>>;
 
     EXPECT_TRUE((std::is_same_v<Test25Result, ExpectedResult>));
 }
@@ -283,9 +270,9 @@ TEST(SubtractTuplesTest, QuantityMinusDelta_SameUnit_Inches) {
     EXPECT_TRUE((std::is_same_v<Test26Result, ExpectedResult>));
 }
 
-TEST(SubtractTuplesTest, DeltaMinusQuantity_SameUnit_Meters_INVALID) {
-    //using Test27Tup1 = std::tuple<Meters>;
-    //using Test27Tup2 = std::tuple<Quantity<Meters>>;
+TEST(SubtractTuplesTest, DeltaMinusQuantity_SameUnit_meters_INVALID) {
+    //using Test27Tup1 = std::tuple<meters>;
+    //using Test27Tup2 = std::tuple<Quantity<meters>>;
 
     // This should cause a compile-time error
     // Uncommenting the following lines should trigger a static_assert failure
@@ -308,48 +295,48 @@ TEST(SubtractTuplesTest, DeltaMinusQuantity_SameUnit_Feet_INVALID) {
 }
 
 TEST(SubtractTuplesTest, MultipleQuantityMinusQuantity_SameUnits) {
-    using Test29Tup1 = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>>;
-    using Test29Tup2 = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>>;
+    using Test29Tup1 = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>>;
+    using Test29Tup2 = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>>;
 
     using Test29Result = subtract_tuples<Dim, Test29Tup1, Test29Tup2>::type;
-    using ExpectedResult = std::tuple<Meters, Feet, Yards>;
+    using ExpectedResult = std::tuple<meters, Feet, Yards>;
 
     EXPECT_TRUE((std::is_same_v<Test29Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, MultipleQuantityMinusQuantity_DifferentOrder) {
-    using Test30Tup1 = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>>;
-    using Test30Tup2 = std::tuple<Quantity<Yards>, Quantity<Meters>, Quantity<Feet>>;
+    using Test30Tup1 = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>>;
+    using Test30Tup2 = std::tuple<Quantity<Yards>, Quantity<meters>, Quantity<Feet>>;
 
     using Test30Result = subtract_tuples<Dim, Test30Tup1, Test30Tup2>::type;
-    using ExpectedResult = std::tuple<Meters, Feet, Yards>;
+    using ExpectedResult = std::tuple<meters, Feet, Yards>;
 
     EXPECT_TRUE((std::is_same_v<Test30Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, MultipleDeltaMinusDelta_SameUnits) {
-    using Test31Tup1 = std::tuple<Meters, Feet, Yards>;
-    using Test31Tup2 = std::tuple<Meters, Feet, Yards>;
+    using Test31Tup1 = std::tuple<meters, Feet, Yards>;
+    using Test31Tup2 = std::tuple<meters, Feet, Yards>;
 
     using Test31Result = subtract_tuples<Dim, Test31Tup1, Test31Tup2>::type;
-    using ExpectedResult = std::tuple<Meters, Feet, Yards>;
+    using ExpectedResult = std::tuple<meters, Feet, Yards>;
 
     EXPECT_TRUE((std::is_same_v<Test31Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, MultipleQuantityMinusDelta_MixedUnits) {
-    using Test32Tup1 = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>>;
-    using Test32Tup2 = std::tuple<Meters, Feet, Yards>;
+    using Test32Tup1 = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>>;
+    using Test32Tup2 = std::tuple<meters, Feet, Yards>;
 
     using Test32Result = subtract_tuples<Dim, Test32Tup1, Test32Tup2>::type;
-    using ExpectedResult = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>>;
+    using ExpectedResult = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>>;
 
     EXPECT_TRUE((std::is_same_v<Test32Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, MultipleDeltaMinusQuantity_MixedUnits_INVALID) {
-    //using Test33Tup1 = std::tuple<Meters, Feet, Yards>;
-    //using Test33Tup2 = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>>;
+    //using Test33Tup1 = std::tuple<meters, Feet, Yards>;
+    //using Test33Tup2 = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>>;
 
     // This should cause a compile-time error
     // Uncommenting the following lines should trigger a static_assert failure
@@ -360,138 +347,138 @@ TEST(SubtractTuplesTest, MultipleDeltaMinusQuantity_MixedUnits_INVALID) {
 }
 
 TEST(SubtractTuplesTest, MixedUnits_SameOrder) {
-    using Test34Tup1 = std::tuple<Quantity<Meters>, Feet, Quantity<Yards>>;
-    using Test34Tup2 = std::tuple<Meters, Feet, Yards>;
+    using Test34Tup1 = std::tuple<Quantity<meters>, Feet, Quantity<Yards>>;
+    using Test34Tup2 = std::tuple<meters, Feet, Yards>;
 
     using Test34Result = subtract_tuples<Dim, Test34Tup1, Test34Tup2>::type;
-    using ExpectedResult = std::tuple<Feet, Quantity<Meters>, Quantity<Yards>>;
+    using ExpectedResult = std::tuple<Feet, Quantity<meters>, Quantity<Yards>>;
 
     EXPECT_TRUE((std::is_same_v<Test34Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, MixedUnits_DifferentOrder) {
-    using Test35Tup1 = std::tuple<Yards, Quantity<Meters>, Feet>;
-    using Test35Tup2 = std::tuple<Feet, Yards, Quantity<Meters>>;
+    using Test35Tup1 = std::tuple<Yards, Quantity<meters>, Feet>;
+    using Test35Tup2 = std::tuple<Feet, Yards, Quantity<meters>>;
 
     using Test35Result = subtract_tuples<Dim, Test35Tup1, Test35Tup2>::type;
-    using ExpectedResult = std::tuple<Yards, Feet, Meters>;
+    using ExpectedResult = std::tuple<Yards, Feet, meters>;
 
     EXPECT_TRUE((std::is_same_v<Test35Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, MultipleQuantityMinusQuantity_DifferentUnitsReordered) {
-    using Test36Tup1 = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>>;
-    using Test36Tup2 = std::tuple<Quantity<Miles>, Quantity<Yards>, Quantity<Feet>, Quantity<Meters>>;
+    using Test36Tup1 = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>>;
+    using Test36Tup2 = std::tuple<Quantity<Miles>, Quantity<Yards>, Quantity<Feet>, Quantity<meters>>;
 
     using Test36Result = subtract_tuples<Dim, Test36Tup1, Test36Tup2>::type;
-    using ExpectedResult = std::tuple<Meters, Feet, Yards, Miles>;
+    using ExpectedResult = std::tuple<meters, Feet, Yards, Miles>;
 
     EXPECT_TRUE((std::is_same_v<Test36Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, MultipleQuantityDeltaMinusQuantityDelta_MixedUnits) {
-    using Test37Tup1 = std::tuple<Quantity<Meters>, Feet, Quantity<Yards>>;
-    using Test37Tup2 = std::tuple<Meters, Feet, Yards>;
+    using Test37Tup1 = std::tuple<Quantity<meters>, Feet, Quantity<Yards>>;
+    using Test37Tup2 = std::tuple<meters, Feet, Yards>;
 
     using Test37Result = subtract_tuples<Dim, Test37Tup1, Test37Tup2>::type;
-    using ExpectedResult = std::tuple<Feet, Quantity<Meters>, Quantity<Yards>>;
+    using ExpectedResult = std::tuple<Feet, Quantity<meters>, Quantity<Yards>>;
 
     EXPECT_TRUE((std::is_same_v<Test37Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, MixedUnits_SameOrder_WithQuantitiesAndDeltas) {
-    using Test38Tup1 = std::tuple<Quantity<Meters>, Feet, Quantity<Yards>>;
-    using Test38Tup2 = std::tuple<Quantity<Meters>, Feet, Quantity<Yards>>;
+    using Test38Tup1 = std::tuple<Quantity<meters>, Feet, Quantity<Yards>>;
+    using Test38Tup2 = std::tuple<Quantity<meters>, Feet, Quantity<Yards>>;
 
     using Test38Result = subtract_tuples<Dim, Test38Tup1, Test38Tup2>::type;
-    using ExpectedResult = std::tuple<Feet, Meters, Yards>;
+    using ExpectedResult = std::tuple<Feet, meters, Yards>;
 
     EXPECT_TRUE((std::is_same_v<Test38Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, MixedUnits_DifferentOrder_WithQuantitiesAndDeltas) {
-    using Test39Tup1 = std::tuple<Yards, Quantity<Meters>, Feet>;
-    using Test39Tup2 = std::tuple<Feet, Yards, Quantity<Meters>>;
+    using Test39Tup1 = std::tuple<Yards, Quantity<meters>, Feet>;
+    using Test39Tup2 = std::tuple<Feet, Yards, Quantity<meters>>;
 
     using Test39Result = subtract_tuples<Dim, Test39Tup1, Test39Tup2>::type;
-    using ExpectedResult = std::tuple<Yards, Feet, Meters>;
+    using ExpectedResult = std::tuple<Yards, Feet, meters>;
 
     EXPECT_TRUE((std::is_same_v<Test39Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, MixedUnits_MultipleQuantitiesAndDeltas_SameOrder) {
-    using Test40Tup1 = std::tuple<Quantity<Meters>, Feet, Quantity<Yards>, Inches>;
-    using Test40Tup2 = std::tuple<Quantity<Meters>, Feet, Quantity<Yards>, Inches>;
+    using Test40Tup1 = std::tuple<Quantity<meters>, Feet, Quantity<Yards>, Inches>;
+    using Test40Tup2 = std::tuple<Quantity<meters>, Feet, Quantity<Yards>, Inches>;
 
     using Test40Result = subtract_tuples<Dim, Test40Tup1, Test40Tup2>::type;
-    using ExpectedResult = std::tuple<Feet, Inches, Meters, Yards>;
+    using ExpectedResult = std::tuple<Feet, Inches, meters, Yards>;
 
     EXPECT_TRUE((std::is_same_v<Test40Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, MixedUnits_MultipleQuantitiesAndDeltas_DifferentOrder) {
-    using Test41Tup1 = std::tuple<Inches, Quantity<Meters>, Feet, Quantity<Yards>>;
-    using Test41Tup2 = std::tuple<Feet, Quantity<Yards>, Quantity<Meters>, Inches>;
+    using Test41Tup1 = std::tuple<Inches, Quantity<meters>, Feet, Quantity<Yards>>;
+    using Test41Tup2 = std::tuple<Feet, Quantity<Yards>, Quantity<meters>, Inches>;
 
     using Test41Result = subtract_tuples<Dim, Test41Tup1, Test41Tup2>::type;
-    using ExpectedResult = std::tuple<Inches, Feet, Meters, Yards>;
+    using ExpectedResult = std::tuple<Inches, Feet, meters, Yards>;
 
     EXPECT_TRUE((std::is_same_v<Test41Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, MixedUnits_QuantitiesAndDeltas_SameUnitOrder) {
-    using Test42Tup1 = std::tuple<Quantity<Meters>, Feet, Quantity<Yards>, Inches>;
-    using Test42Tup2 = std::tuple<Quantity<Meters>, Feet, Quantity<Yards>, Inches>;
+    using Test42Tup1 = std::tuple<Quantity<meters>, Feet, Quantity<Yards>, Inches>;
+    using Test42Tup2 = std::tuple<Quantity<meters>, Feet, Quantity<Yards>, Inches>;
 
     using Test42Result = subtract_tuples<Dim, Test42Tup1, Test42Tup2>::type;
-    using ExpectedResult = std::tuple<Feet, Inches, Meters, Yards>;
+    using ExpectedResult = std::tuple<Feet, Inches, meters, Yards>;
 
     EXPECT_TRUE((std::is_same_v<Test42Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, MixedUnits_QuantitiesAndDeltas_DifferentUnitOrder) {
-    using Test43Tup1 = std::tuple<Feet, Quantity<Yards>, Inches, Quantity<Meters>>;
-    using Test43Tup2 = std::tuple<Quantity<Meters>, Inches, Feet, Quantity<Yards>>;
+    using Test43Tup1 = std::tuple<Feet, Quantity<Yards>, Inches, Quantity<meters>>;
+    using Test43Tup2 = std::tuple<Quantity<meters>, Inches, Feet, Quantity<Yards>>;
 
     using Test43Result = subtract_tuples<Dim, Test43Tup1, Test43Tup2>::type;
-    using ExpectedResult = std::tuple<Feet, Inches, Yards, Meters>;
+    using ExpectedResult = std::tuple<Feet, Inches, Yards, meters>;
 
     EXPECT_TRUE((std::is_same_v<Test43Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, AllQuantitiesMinusAllQuantities_SameUnits) {
-    using Test44Tup1 = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>>;
-    using Test44Tup2 = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>>;
+    using Test44Tup1 = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>>;
+    using Test44Tup2 = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>>;
 
     using Test44Result = subtract_tuples<Dim, Test44Tup1, Test44Tup2>::type;
-    using ExpectedResult = std::tuple<Meters, Feet, Yards, Miles>;
+    using ExpectedResult = std::tuple<meters, Feet, Yards, Miles>;
 
     EXPECT_TRUE((std::is_same_v<Test44Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, AllDeltasMinusAllDeltas_SameUnits) {
-    using Test45Tup1 = std::tuple<Meters, Feet, Yards, Miles>;
-    using Test45Tup2 = std::tuple<Meters, Feet, Yards, Miles>;
+    using Test45Tup1 = std::tuple<meters, Feet, Yards, Miles>;
+    using Test45Tup2 = std::tuple<meters, Feet, Yards, Miles>;
 
     using Test45Result = subtract_tuples<Dim, Test45Tup1, Test45Tup2>::type;
-    using ExpectedResult = std::tuple<Meters, Feet, Yards, Miles>;
+    using ExpectedResult = std::tuple<meters, Feet, Yards, Miles>;
 
     EXPECT_TRUE((std::is_same_v<Test45Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, AllQuantitiesMinusAllDeltas_MixedUnits) {
-    using Test46Tup1 = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>>;
-    using Test46Tup2 = std::tuple<Meters, Feet, Yards, Miles>;
+    using Test46Tup1 = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>>;
+    using Test46Tup2 = std::tuple<meters, Feet, Yards, Miles>;
 
     using Test46Result = subtract_tuples<Dim, Test46Tup1, Test46Tup2>::type;
-    using ExpectedResult = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>>;
+    using ExpectedResult = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>>;
 
     EXPECT_TRUE((std::is_same_v<Test46Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, AllDeltasMinusAllQuantities_MixedUnits_INVALID) {
-    //using Test47Tup1 = std::tuple<Meters, Feet, Yards, Miles>;
-    //using Test47Tup2 = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>>;
+    //using Test47Tup1 = std::tuple<meters, Feet, Yards, Miles>;
+    //using Test47Tup2 = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>>;
 
     // This should cause a compile-time error
     // Uncommenting the following lines should trigger a static_assert failure
@@ -502,38 +489,38 @@ TEST(SubtractTuplesTest, AllDeltasMinusAllQuantities_MixedUnits_INVALID) {
 }
 
 TEST(SubtractTuplesTest, PartialQuantitiesMinusPartialQuantities_SameUnits) {
-    using Test48Tup1 = std::tuple<Quantity<Meters>, Quantity<Feet>>;
-    using Test48Tup2 = std::tuple<Quantity<Meters>, Quantity<Feet>>;
+    using Test48Tup1 = std::tuple<Quantity<meters>, Quantity<Feet>>;
+    using Test48Tup2 = std::tuple<Quantity<meters>, Quantity<Feet>>;
 
     using Test48Result = subtract_tuples<Dim, Test48Tup1, Test48Tup2>::type;
-    using ExpectedResult = std::tuple<Meters, Feet>;
+    using ExpectedResult = std::tuple<meters, Feet>;
 
     EXPECT_TRUE((std::is_same_v<Test48Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, PartialDeltasMinusPartialDeltas_SameUnits) {
-    using Test49Tup1 = std::tuple<Meters, Feet>;
-    using Test49Tup2 = std::tuple<Meters, Feet>;
+    using Test49Tup1 = std::tuple<meters, Feet>;
+    using Test49Tup2 = std::tuple<meters, Feet>;
 
     using Test49Result = subtract_tuples<Dim, Test49Tup1, Test49Tup2>::type;
-    using ExpectedResult = std::tuple<Meters, Feet>;
+    using ExpectedResult = std::tuple<meters, Feet>;
 
     EXPECT_TRUE((std::is_same_v<Test49Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, PartialQuantitiesMinusPartialDeltas_MixedUnits) {
-    using Test50Tup1 = std::tuple<Quantity<Meters>, Feet>;
-    using Test50Tup2 = std::tuple<Meters, Quantity<Feet>>;
+    using Test50Tup1 = std::tuple<Quantity<meters>, Feet>;
+    using Test50Tup2 = std::tuple<meters, Quantity<Feet>>;
 
     using Test50Result = subtract_tuples<Dim, Test50Tup1, Test50Tup2>::type;
-    using ExpectedResult = std::tuple<Feet, Meters>;
+    using ExpectedResult = std::tuple<Feet, meters>;
 
     EXPECT_TRUE((std::is_same_v<Test50Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, PartialDeltasMinusPartialQuantities_MixedUnits_INVALID) {
-    //using Test51Tup1 = std::tuple<Meters, Feet>;
-    //using Test51Tup2 = std::tuple<Quantity<Meters>, Quantity<Feet>>;
+    //using Test51Tup1 = std::tuple<meters, Feet>;
+    //using Test51Tup2 = std::tuple<Quantity<meters>, Quantity<Feet>>;
 
     // This should cause a compile-time error
     // Uncommenting the following lines should trigger a static_assert failure
@@ -554,11 +541,11 @@ TEST(SubtractTuplesTest, EmptyTuples) {
 }
 
 TEST(SubtractTuplesTest, SingleQuantityMinusSingleDelta_DifferentUnits) {
-    using Test53Tup1 = std::tuple<Quantity<Meters>>;
+    using Test53Tup1 = std::tuple<Quantity<meters>>;
     using Test53Tup2 = std::tuple<Feet>;
 
     using Test53Result = subtract_tuples<Dim, Test53Tup1, Test53Tup2>::type;
-    using ExpectedResult = std::tuple<Quantity<Meters>>;
+    using ExpectedResult = std::tuple<Quantity<meters>>;
 
     EXPECT_TRUE((std::is_same_v<Test53Result, ExpectedResult>));
 }
@@ -576,18 +563,18 @@ TEST(SubtractTuplesTest, SingleDeltaMinusSingleQuantity_DifferentUnits_INVALID) 
 }
 
 TEST(SubtractTuplesTest, MultipleQuantitiesMinusMultipleDeltas_MixedUnits) {
-    using Test55Tup1 = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>>;
-    using Test55Tup2 = std::tuple<Meters, Feet, Yards, Miles>;
+    using Test55Tup1 = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>>;
+    using Test55Tup2 = std::tuple<meters, Feet, Yards, Miles>;
 
     using Test55Result = subtract_tuples<Dim, Test55Tup1, Test55Tup2>::type;
-    using ExpectedResult = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>>;
+    using ExpectedResult = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>>;
 
     EXPECT_TRUE((std::is_same_v<Test55Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, MultipleDeltasMinusMultipleQuantities_MixedUnits_INVALID) {
-    //using Test56Tup1 = std::tuple<Meters, Feet, Yards, Miles>;
-    //using Test56Tup2 = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>>;
+    //using Test56Tup1 = std::tuple<meters, Feet, Yards, Miles>;
+    //using Test56Tup2 = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>>;
 
     // This should cause a compile-time error
     // Uncommenting the following lines should trigger a static_assert failure
@@ -598,41 +585,41 @@ TEST(SubtractTuplesTest, MultipleDeltasMinusMultipleQuantities_MixedUnits_INVALI
 }
 
 TEST(SubtractTuplesTest, QuantitiesAndDeltas_WithSomeUnitsMissing) {
-    using Test57Tup1 = std::tuple<Quantity<Meters>, Quantity<Yards>>;
-    using Test57Tup2 = std::tuple<Meters, Yards>;
+    using Test57Tup1 = std::tuple<Quantity<meters>, Quantity<Yards>>;
+    using Test57Tup2 = std::tuple<meters, Yards>;
 
     using Test57Result = subtract_tuples<Dim, Test57Tup1, Test57Tup2>::type;
-    using ExpectedResult = std::tuple<Quantity<Meters>, Quantity<Yards>>;
+    using ExpectedResult = std::tuple<Quantity<meters>, Quantity<Yards>>;
 
     EXPECT_TRUE((std::is_same_v<Test57Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, QuantitiesAndDeltas_WithSomeUnitsReordered) {
-    using Test58Tup1 = std::tuple<Quantity<Yards>, Quantity<Meters>>;
-    using Test58Tup2 = std::tuple<Meters, Yards>;
+    using Test58Tup1 = std::tuple<Quantity<Yards>, Quantity<meters>>;
+    using Test58Tup2 = std::tuple<meters, Yards>;
 
     using Test58Result = subtract_tuples<Dim, Test58Tup1, Test58Tup2>::type;
-    using ExpectedResult = std::tuple<Quantity<Yards>, Quantity<Meters>>;
+    using ExpectedResult = std::tuple<Quantity<Yards>, Quantity<meters>>;
 
     EXPECT_TRUE((std::is_same_v<Test58Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, QuantitiesAndDeltas_PartialOverlap) {
-    using Test59Tup1 = std::tuple<Quantity<Meters>, Feet>;
-    using Test59Tup2 = std::tuple<Meters, Quantity<Feet>>;
+    using Test59Tup1 = std::tuple<Quantity<meters>, Feet>;
+    using Test59Tup2 = std::tuple<meters, Quantity<Feet>>;
 
     using Test59Result = subtract_tuples<Dim, Test59Tup1, Test59Tup2>::type;
-    using ExpectedResult = std::tuple<Feet, Meters>;
+    using ExpectedResult = std::tuple<Feet, meters>;
 
     EXPECT_TRUE((std::is_same_v<Test59Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, QuantitiesAndDeltas_AllUnitsDifferent) {
-    //using Test60Tup1 = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>>;
-    //using Test60Tup2 = std::tuple<Quantity<KiloMeters>, Quantity<CentiMeters>, Quantity<MilliMeters>, Quantity<Inches>>;
+    //using Test60Tup1 = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>>;
+    //using Test60Tup2 = std::tuple<Quantity<Kilometers>, Quantity<Centimeters>, Quantity<Millimeters>, Quantity<Inches>>;
 
     //using Test60Result = subtract_tuples<Dim, Test60Tup1, Test60Tup2>::type;
-    //using ExpectedResult = std::tuple<Meters, Feet, Yards, Miles, KiloMeters, CentiMeters, MilliMeters, Inches>; // Adjust based on actual handling
+    //using ExpectedResult = std::tuple<meters, Feet, Yards, Miles, Kilometers, Centimeters, Millimeters, Inches>; // Adjust based on actual handling
 
     // Note: This test assumes that subtract_tuples can handle different units,
     // which may not be desired. Typically, units should match.
@@ -642,38 +629,38 @@ TEST(SubtractTuplesTest, QuantitiesAndDeltas_AllUnitsDifferent) {
 }
 
 TEST(SubtractTuplesTest, SingleQuantityMultipleSubtractions) {
-    using Test61Tup1 = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>>;
-    using Test61Tup2 = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>>;
+    using Test61Tup1 = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>>;
+    using Test61Tup2 = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>>;
 
     using Test61Result = subtract_tuples<Dim, Test61Tup1, Test61Tup2>::type;
-    using ExpectedResult = std::tuple<Meters, Feet, Yards>;
+    using ExpectedResult = std::tuple<meters, Feet, Yards>;
 
     EXPECT_TRUE((std::is_same_v<Test61Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, SingleQuantityMultipleSubtractions_DifferentOrder) {
-    using Test62Tup1 = std::tuple<Quantity<Yards>, Quantity<Meters>, Quantity<Feet>>;
-    using Test62Tup2 = std::tuple<Quantity<Feet>, Quantity<Yards>, Quantity<Meters>>;
+    using Test62Tup1 = std::tuple<Quantity<Yards>, Quantity<meters>, Quantity<Feet>>;
+    using Test62Tup2 = std::tuple<Quantity<Feet>, Quantity<Yards>, Quantity<meters>>;
 
     using Test62Result = subtract_tuples<Dim, Test62Tup1, Test62Tup2>::type;
-    using ExpectedResult = std::tuple<Yards, Meters, Feet>;
+    using ExpectedResult = std::tuple<Yards, meters, Feet>;
 
     EXPECT_TRUE((std::is_same_v<Test62Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, MixedQuantitiesAndDeltas_WithSomeUnitsReordered) {
-    using Test63Tup1 = std::tuple<Quantity<Meters>, Feet, Quantity<Yards>, Inches>;
-    using Test63Tup2 = std::tuple<Meters, Inches, Feet, Quantity<Yards>>;
+    using Test63Tup1 = std::tuple<Quantity<meters>, Feet, Quantity<Yards>, Inches>;
+    using Test63Tup2 = std::tuple<meters, Inches, Feet, Quantity<Yards>>;
 
     using Test63Result = subtract_tuples<Dim, Test63Tup1, Test63Tup2>::type;
-    using ExpectedResult = std::tuple<Feet, Inches, Yards, Quantity<Meters>>;
+    using ExpectedResult = std::tuple<Feet, Inches, Yards, Quantity<meters>>;
 
     EXPECT_TRUE((std::is_same_v<Test63Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, MultipleQuantitiesAndDeltas_WithDuplicates_INVALID) {
-    //using Test64Tup1 = std::tuple<Quantity<Meters>, Quantity<Meters>>;
-    //using Test64Tup2 = std::tuple<Quantity<Meters>, Quantity<Meters>>;
+    //using Test64Tup1 = std::tuple<Quantity<meters>, Quantity<meters>>;
+    //using Test64Tup2 = std::tuple<Quantity<meters>, Quantity<meters>>;
 
     // This should cause a compile-time error if duplicate units are not allowed
     // Uncommenting the following lines should trigger a static_assert failure
@@ -694,78 +681,78 @@ TEST(SubtractTuplesTest, SingleUnit_EmptyTuples) {
 }
 
 TEST(SubtractTuplesTest, SingleQuantityMinusMultipleDeltas_SameUnit) {
-    //using Test66Tup1 = std::tuple<Quantity<Meters>>;
-    //using Test66Tup2 = std::tuple<Meters, Feet>;
+    //using Test66Tup1 = std::tuple<Quantity<meters>>;
+    //using Test66Tup2 = std::tuple<meters, Feet>;
 
     //using Test66Result = subtract_tuples<Dim, Test66Tup1, Test66Tup2>::type;
-    //using ExpectedResult = std::tuple<Quantity<Meters>, Feet>;
+    //using ExpectedResult = std::tuple<Quantity<meters>, Feet>;
 
     //EXPECT_TRUE((std::is_same_v<Test66Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, MultipleQuantitiesMinusSingleDelta_SameUnit) {
-    //using Test67Tup1 = std::tuple<Quantity<Meters>, Quantity<Feet>>;
-    //using Test67Tup2 = std::tuple<Meters>;
+    //using Test67Tup1 = std::tuple<Quantity<meters>, Quantity<Feet>>;
+    //using Test67Tup2 = std::tuple<meters>;
 
     //using Test67Result = subtract_tuples<Dim, Test67Tup1, Test67Tup2>::type;
-    //using ExpectedResult = std::tuple<Quantity<Meters>, Quantity<Feet>>;
+    //using ExpectedResult = std::tuple<Quantity<meters>, Quantity<Feet>>;
 
     //EXPECT_TRUE((std::is_same_v<Test67Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, MultipleQuantitiesMinusMultipleDeltas_SameUnits) {
-    using Test68Tup1 = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>>;
-    using Test68Tup2 = std::tuple<Meters, Feet, Yards>;
+    using Test68Tup1 = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>>;
+    using Test68Tup2 = std::tuple<meters, Feet, Yards>;
 
     using Test68Result = subtract_tuples<Dim, Test68Tup1, Test68Tup2>::type;
-    using ExpectedResult = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>>;
+    using ExpectedResult = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>>;
 
     EXPECT_TRUE((std::is_same_v<Test68Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, ComplexTuple_MixedQuantitiesAndDeltas) {
-    using Test69Tup1 = std::tuple<Quantity<Meters>, Feet, Quantity<Yards>, Inches>;
-    using Test69Tup2 = std::tuple<Meters, Inches, Feet, Quantity<Yards>>;
+    using Test69Tup1 = std::tuple<Quantity<meters>, Feet, Quantity<Yards>, Inches>;
+    using Test69Tup2 = std::tuple<meters, Inches, Feet, Quantity<Yards>>;
 
     using Test69Result = subtract_tuples<Dim, Test69Tup1, Test69Tup2>::type;
-    using ExpectedResult = std::tuple<Feet, Inches, Yards, Quantity<Meters>>;
+    using ExpectedResult = std::tuple<Feet, Inches, Yards, Quantity<meters>>;
 
     EXPECT_TRUE((std::is_same_v<Test69Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, AllUnits_QuantitiesMinusQuantities) {
-    using Test70Tup1 = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>, Quantity<KiloMeters>, Quantity<CentiMeters>, Quantity<MilliMeters>, Quantity<Inches>>;
-    using Test70Tup2 = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>, Quantity<KiloMeters>, Quantity<CentiMeters>, Quantity<MilliMeters>, Quantity<Inches>>;
+    using Test70Tup1 = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>, Quantity<Kilometers>, Quantity<Centimeters>, Quantity<Millimeters>, Quantity<Inches>>;
+    using Test70Tup2 = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>, Quantity<Kilometers>, Quantity<Centimeters>, Quantity<Millimeters>, Quantity<Inches>>;
 
     using Test70Result = subtract_tuples<Dim, Test70Tup1, Test70Tup2>::type;
-    using ExpectedResult = std::tuple<Meters, Feet, Yards, Miles, KiloMeters, CentiMeters, MilliMeters, Inches>;
+    using ExpectedResult = std::tuple<meters, Feet, Yards, Miles, Kilometers, Centimeters, Millimeters, Inches>;
 
     EXPECT_TRUE((std::is_same_v<Test70Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, AllUnits_DeltasMinusDeltas) {
-    using Test71Tup1 = std::tuple<Meters, Feet, Yards, Miles, KiloMeters, CentiMeters, MilliMeters, Inches>;
-    using Test71Tup2 = std::tuple<Meters, Feet, Yards, Miles, KiloMeters, CentiMeters, MilliMeters, Inches>;
+    using Test71Tup1 = std::tuple<meters, Feet, Yards, Miles, Kilometers, Centimeters, Millimeters, Inches>;
+    using Test71Tup2 = std::tuple<meters, Feet, Yards, Miles, Kilometers, Centimeters, Millimeters, Inches>;
 
     using Test71Result = subtract_tuples<Dim, Test71Tup1, Test71Tup2>::type;
-    using ExpectedResult = std::tuple<Meters, Feet, Yards, Miles, KiloMeters, CentiMeters, MilliMeters, Inches>;
+    using ExpectedResult = std::tuple<meters, Feet, Yards, Miles, Kilometers, Centimeters, Millimeters, Inches>;
 
     EXPECT_TRUE((std::is_same_v<Test71Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, AllUnits_QuantitiesMinusDeltas_MixedUnits) {
-    using Test72Tup1 = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>, Quantity<KiloMeters>, Quantity<CentiMeters>, Quantity<MilliMeters>, Quantity<Inches>>;
-    using Test72Tup2 = std::tuple<Meters, Feet, Yards, Miles, KiloMeters, CentiMeters, MilliMeters, Inches>;
+    using Test72Tup1 = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>, Quantity<Kilometers>, Quantity<Centimeters>, Quantity<Millimeters>, Quantity<Inches>>;
+    using Test72Tup2 = std::tuple<meters, Feet, Yards, Miles, Kilometers, Centimeters, Millimeters, Inches>;
 
     using Test72Result = subtract_tuples<Dim, Test72Tup1, Test72Tup2>::type;
-    using ExpectedResult = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>, Quantity<KiloMeters>, Quantity<CentiMeters>, Quantity<MilliMeters>, Quantity<Inches>>;
+    using ExpectedResult = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>, Quantity<Kilometers>, Quantity<Centimeters>, Quantity<Millimeters>, Quantity<Inches>>;
 
     EXPECT_TRUE((std::is_same_v<Test72Result, ExpectedResult>));
 }
 
 TEST(SubtractTuplesTest, AllUnits_DeltasMinusQuantities_Invalid) {
-    //using Test73Tup1 = std::tuple<Meters, Feet, Yards, Miles, KiloMeters, CentiMeters, MilliMeters, Inches>;
-    //using Test73Tup2 = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>, Quantity<KiloMeters>, Quantity<CentiMeters>, Quantity<MilliMeters>, Quantity<Inches>>;
+    //using Test73Tup1 = std::tuple<meters, Feet, Yards, Miles, Kilometers, Centimeters, Millimeters, Inches>;
+    //using Test73Tup2 = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>, Quantity<Miles>, Quantity<Kilometers>, Quantity<Centimeters>, Quantity<Millimeters>, Quantity<Inches>>;
 
     // This should cause a compile-time error
     // Uncommenting the following lines should trigger a static_assert failure
@@ -776,8 +763,8 @@ TEST(SubtractTuplesTest, AllUnits_DeltasMinusQuantities_Invalid) {
 }
 
 TEST(SubtractTuplesTest, PartialDeltasMinusPartialQuantities_MixedUnits_Invalid) {
-    //using Test74Tup1 = std::tuple<Meters, Feet, Yards>;
-    //using Test74Tup2 = std::tuple<Quantity<Meters>, Quantity<Feet>, Quantity<Yards>>;
+    //using Test74Tup1 = std::tuple<meters, Feet, Yards>;
+    //using Test74Tup2 = std::tuple<Quantity<meters>, Quantity<Feet>, Quantity<Yards>>;
 
     // This should cause a compile-time error
     // Uncommenting the following lines should trigger a static_assert failure
@@ -790,22 +777,22 @@ TEST(SubtractTuplesTest, PartialDeltasMinusPartialQuantities_MixedUnits_Invalid)
 
 
 TEST(SubtractTuplesTest, Test1) {
-    using TestA1Tup1 = std::tuple<Meters, Seconds, Quantity<Minutes>>;
-    using TestA1Tup2 = std::tuple<Hours, Quantity<Seconds>, Yards>;
+    using TestA1Tup1 = std::tuple<meters, seconds, Quantity<minutes>>;
+    using TestA1Tup2 = std::tuple<Hours, Quantity<seconds>, Yards>;
 
     using TestA1Result = subtract_all<TestA1Tup1, TestA1Tup2>::type;
-    using ExpectedResult = std::tuple<Seconds, Minutes, Meters>;
+    using ExpectedResult = std::tuple<seconds, minutes, meters>;
 
     EXPECT_TRUE((std::is_same_v<TestA1Result, ExpectedResult>));
     
 }
 
 TEST(AddTuplesTest, Test1) {
-    using TestA1Tup1 = std::tuple<Meters, Seconds, Quantity<Minutes>>;
-    using TestA1Tup2 = std::tuple<Hours, Quantity<Seconds>, Yards>;
+    using TestA1Tup1 = std::tuple<meters, seconds, Quantity<minutes>>;
+    using TestA1Tup2 = std::tuple<Hours, Quantity<seconds>, Yards>;
 
     using TestA1Result = add_all<TestA1Tup1, TestA1Tup2>::type;
-    using ExpectedResult = std::tuple<Quantity<Minutes>, Quantity<Seconds>, Meters>;
+    using ExpectedResult = std::tuple<Quantity<minutes>, Quantity<seconds>, meters>;
 
     EXPECT_TRUE((std::is_same_v<TestA1Result, ExpectedResult>));
     
@@ -814,10 +801,10 @@ TEST(AddTuplesTest, Test1) {
 TEST(DimensionAdditionSubtraction, AddAndSubtract)
 {
 
-    using namespace Dimension;
+    using namespace dimension;
 
-    Temperature<Celsius> t1(10.0);
-    Temperature<Quantity<Celsius>> t2(5.0);
+    temperature<Celsius> t1(10.0);
+    temperature<Quantity<Celsius>> t2(5.0);
 
     auto t3 = t2 - t1;
     auto t4 = t1 + t2;

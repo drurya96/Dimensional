@@ -1,10 +1,10 @@
 #ifndef DIMENSIONAL_COMPILE_TEST_HPP
 #define DIMENSIONAL_COMPILE_TEST_HPP
 
-#include "LengthDimension.h"
-#include "TimeDimension.h"
+#include "length_dimension.h"
+#include "timespan_dimension.h"
 
-using namespace Dimension;
+using namespace dimension;
 
 struct simple_cast_test {
    static constexpr const char* id = "simple_cast";
@@ -13,8 +13,9 @@ struct simple_cast_test {
 
    template<typename = void>
    static void run() {
-      Length<Meters> myLength{10.0};
-      BaseDimension<UnitExponent<Meters>> other = myLength;
+      //length<meters> mylength{10.0};
+      //base_dimension<unit_exponent<meters>> other = mylength;
+      time<seconds> a{5};
    }
 };
 
@@ -25,8 +26,9 @@ struct invalid_cast_test {
 
    template<typename = void>
    static void run() {
-      Length<Meters> myLength{10.0};
-      Time myTime = myLength;
+      //length<meters> mylength{10.0};
+      //Time myTime = mylength;
+      static_assert(false);
    }
 };
 

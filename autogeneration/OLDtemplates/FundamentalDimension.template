@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_{{ dim.name }}_IMPL_H
 #define STATIC_DIMENSION_{{ dim.name }}_IMPL_H
 
-#include "../../BaseDimension.h"
+#include "../../base_dimension.h"
 
-namespace Dimension
+namespace dimension
 {
    /// @brief Represents the {{ dim.name }} type tag.
    struct {{ dim.name }}Type {};
@@ -38,10 +38,10 @@ namespace Dimension
    template<typename T>
    struct is_{{ dim.name }} : std::false_type {};
 
-   /// @brief Specialization for BaseDimension types.
+   /// @brief Specialization for base_dimension types.
    /// @tparam T The unit type.
    template<typename T>
-   struct is_{{ dim.name }}<BaseDimension<std::tuple<T>, std::tuple<>>> : std::bool_constant<Is{{ dim.name }}Unit<T>> {};
+   struct is_{{ dim.name }}<base_dimension<std::tuple<T>, std::tuple<>>> : std::bool_constant<Is{{ dim.name }}Unit<T>> {};
 
    /// @brief Helper variable template for is_{{ dim.name }}.
    /// @tparam T The type to check.
@@ -66,23 +66,23 @@ namespace Dimension
    /// @brief Represents a dimension type for {{ dim.name }}.
    /// @tparam Unit The primary unit type.
    template<Is{{ dim.name }}Unit Unit = Primary{{ dim.name }}>
-   class {{ dim.name }} : public BaseDimension<std::tuple<Unit>, std::tuple<>>
+   class {{ dim.name }} : public base_dimension<std::tuple<Unit>, std::tuple<>>
    {
    public:
       /// @brief Default constructor initializing to zero.
-      constexpr {{ dim.name }}() : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(0.0) {}
+      constexpr {{ dim.name }}() : base_dimension<std::tuple<Unit>, std::tuple<>>::base_dimension(0.0) {}
 
       /// @brief Constructs a {{ dim.name }} object with a specific value.
       /// @param val The value to initialize with.
-      explicit constexpr {{ dim.name }}(double val) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(val) {}
+      explicit constexpr {{ dim.name }}(double val) : base_dimension<std::tuple<Unit>, std::tuple<>>::base_dimension(val) {}
 
-      /// @brief Constructs a {{ dim.name }} object from another BaseDimension.
-      /// @tparam T The unit type of the BaseDimension.
-      /// @param base The BaseDimension object to construct from.
+      /// @brief Constructs a {{ dim.name }} object from another base_dimension.
+      /// @tparam T The unit type of the base_dimension.
+      /// @param base The base_dimension object to construct from.
       template<Is{{ dim.name }}Unit T>
       // Implicit conversion between dimensions of the same unit is core to Dimensional
       // cppcheck-suppress noExplicitConstructor
-      constexpr {{ dim.name }}(const BaseDimension<std::tuple<T>, std::tuple<>>& base) : BaseDimension<std::tuple<Unit>, std::tuple<>>::BaseDimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()){}
+      constexpr {{ dim.name }}(const base_dimension<std::tuple<T>, std::tuple<>>& base) : base_dimension<std::tuple<Unit>, std::tuple<>>::base_dimension(base.template GetVal<std::tuple<Unit>, std::tuple<>>()){}
 
       /// @brief Deprecated method to retrieve the value of the dimension.
       /// @tparam T The unit type.
@@ -101,10 +101,10 @@ namespace Dimension
    template<Is{{ dim.name }}Unit T>
    {{ dim.name }}(T) -> {{ dim.name }}<T>;
 
-   /// @brief Deduction guide for {{ dim.name }} constructor with BaseDimension.
+   /// @brief Deduction guide for {{ dim.name }} constructor with base_dimension.
    /// @tparam {{ dim.name }}Unit The unit type.
    template<Is{{ dim.name }}Unit {{ dim.name }}Unit>
-   {{ dim.name }}(BaseDimension<std::tuple<{{ dim.name }}Unit>, std::tuple<>>) -> {{ dim.name }}<{{ dim.name }}Unit>;
+   {{ dim.name }}(base_dimension<std::tuple<{{ dim.name }}Unit>, std::tuple<>>) -> {{ dim.name }}<{{ dim.name }}Unit>;
 
    /// @brief Specialization for is_{{ dim.name }} trait for {{ dim.name }} types.
    /// @tparam T The unit type.

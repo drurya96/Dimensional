@@ -6,7 +6,7 @@
 #include "FundamentalUnitExtractor.h"
 #include "UnitValidation.h"
 
-namespace Dimension
+namespace dimension
 {
 
 
@@ -30,7 +30,7 @@ namespace Dimension
       // Use a conditional to set `units` to either the added value or empty tuple
       static constexpr bool success = std::is_same_v<typename IncomingUnit::unit, typename Unit::unit>;
 
-      using added = UnitExponent<typename Unit::unit, std::ratio_add<typename Unit::exponent, typename IncomingUnit::exponent>::num, std::ratio_add<typename Unit::exponent, typename IncomingUnit::exponent>::den>;
+      using added = unit_exponent<typename Unit::unit, std::ratio_add<typename Unit::exponent, typename IncomingUnit::exponent>::num, std::ratio_add<typename Unit::exponent, typename IncomingUnit::exponent>::den>;
 
       using units = std::conditional_t<success,
          std::tuple<added>,
@@ -106,7 +106,7 @@ namespace Dimension
    {
       using exponent = typename CombinePower_Impl<IncomingUnit, std::tuple<Units...>>::exponent;
       //using exponent = std::ratio<2>;
-      using unit = UnitExponent<IncomingUnit, exponent::num, exponent::den>;
+      using unit = unit_exponent<IncomingUnit, exponent::num, exponent::den>;
    };
 
 
@@ -322,7 +322,7 @@ namespace Dimension
 
    // Forward declarations
    template<are_unit_exponents... Units>
-   class BaseDimension;
+   class base_dimension;
 
 
 
@@ -337,7 +337,7 @@ namespace Dimension
    /// @tparam DenTypes2... The types in the second group of denominator types
    /// @typedef newNum The simplified numerator types
    /// @typedef newDen The simplified denominator types
-   /// @typedef dimType A BaseDimension templated on the simplified types
+   /// @typedef dimType A base_dimension templated on the simplified types
    template<typename ... NumTypes1, typename ... NumTypes2, typename ... DenTypes1, typename ... DenTypes2>
    struct UnitSimplifier<std::tuple<NumTypes1...>, std::tuple<NumTypes2...>, std::tuple<DenTypes1...>, std::tuple<DenTypes2...>>
    {
@@ -362,7 +362,7 @@ namespace Dimension
       using numSimple = tuple_cat_t<typename num1AfterSimpleCancel::type, typename num2AfterSimpleCancel::type>;
       using denSimple = tuple_cat_t<typename den1AfterSimpleCancel::type, typename den2AfterSimpleCancel::type>;
 
-      using dimType = BaseDimension<newNum, newDen>;
+      using dimType = base_dimension<newNum, newDen>;
 
       constexpr static bool isDelta = !((std::tuple_size_v<newNum> == 1) && (std::tuple_size_v<newDen> == 0));
       constexpr static bool isScalar = (std::tuple_size_v<newNum> == 0) && (std::tuple_size_v<newDen> == 0);

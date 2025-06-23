@@ -4,7 +4,7 @@
 #include "TupleHandling.h"
 #include "UnitValidation.h"
 
-namespace Dimension
+namespace dimension
 {
 
 
@@ -23,7 +23,7 @@ namespace Dimension
    template<typename Power, typename Unit>
    struct ApplyPower<Power, std::tuple<Unit>>
    {
-      using units = std::tuple<UnitExponent<typename Unit::unit, std::ratio_multiply<typename Unit::exponent, Power>::num, std::ratio_multiply<typename Unit::exponent, Power>::den>>;
+      using units = std::tuple<unit_exponent<typename Unit::unit, std::ratio_multiply<typename Unit::exponent, Power>::num, std::ratio_multiply<typename Unit::exponent, Power>::den>>;
    };
 
    template<typename Power, typename Unit, typename... Units>

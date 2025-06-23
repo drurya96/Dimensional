@@ -3,7 +3,7 @@
 
 #include <tuple>
 
-namespace Dimension
+namespace dimension
 {
    template<typename Tuple, typename State, template<typename, typename> class Func>
    struct fold_over_tuple_with_state;

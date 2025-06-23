@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_MOLARMASS_H
 #define STATIC_DIMENSION_MOLARMASS_H
 
-#include "Dimension_Impl/DerivedDimensions/MolarMassDimension_Impl.h"
+#include "Dimension_Impl/DerivedDimensions/MolarmassDimension_Impl.h"
 
-namespace Dimension
+namespace dimension
 {
 
 

@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Dict
+from typing import List, Dict, Union
 import json
 from pathlib import Path
 
@@ -9,8 +9,8 @@ class Conversions:
     """
     Represents a set of conversions between a unit and other units.
     """
-    From: Dict[str, float] = field(default_factory={})
-    To: Dict[str, float] = field(default_factory={})
+    From: Dict[str, Union[float, List[int]]] = field(default_factory={})
+    To: Dict[str, Union[float, List[int]]] = field(default_factory={})
 
     def __str__(self) -> str:
         return f"Conversion(From={self.From}, To={self.To})"
@@ -35,7 +35,7 @@ class Unit:
     conversions: Conversions = field(default_factory=Conversions)
 
     def __str__(self) -> str:
-        return f"Unit(name='{self.name}', abbreviation='{self.abbreviation}', si_prefixes={self.si_prefixes}, conversion={self.conversion})"
+        return f"Unit(name='{self.name}', abbreviation='{self.abbreviation}', si_prefixes={self.si_prefixes}, conversion={self.conversions})"
 
     @classmethod
     def parse(cls, obj: Dict) -> "Unit":
@@ -54,7 +54,7 @@ class Unit:
         return {name: cls.parse(value) for name, value in obj.items()}
 
 @dataclass
-class UnitExponent:
+class unit_exponent:
     """
     Represents a unit raised to a rational exponent (e.g., meters^2, seconds^-1).
     """
@@ -63,11 +63,11 @@ class UnitExponent:
     exponent_den: int = field(default = 1)
 
     def __str__(self) -> str:
-        return f"UnitExponent(unit='{self.unit}', exponent={self.exponent_num}/{self.exponent_den})"
+        return f"unit_exponent(unit='{self.unit}', exponent={self.exponent_num}/{self.exponent_den})"
 
     @classmethod
-    def parse(cls, obj: Dict) -> "UnitExponent":
-        """Parse a UnitExponent object from a JSON dictionary."""
+    def parse(cls, obj: Dict) -> "unit_exponent":
+        """Parse a unit_exponent object from a JSON dictionary."""
         exponent = obj.get("Exponent")
         if isinstance(exponent, int):
             return cls(
@@ -85,7 +85,7 @@ class UnitExponent:
 @dataclass
 class DimensionExponent:
     """
-    Represents a dimension raised to a rational exponent (e.g., Length^2, Time^-1).
+    Represents a dimension raised to a rational exponent (e.g., length^2, Time^-1).
     """
     dim: str
     exponent_num: int
@@ -136,10 +136,11 @@ class Dimension:
 @dataclass
 class FundamentalDimension(Dimension):
     """
-    Represents a fundamental physical dimension (e.g., Length, Mass, Time).
+    Represents a fundamental physical dimension (e.g., length, mass, Time).
     """
     base_unit: str
     units: Dict[str, Unit]
+    base: Unit
 
     def __str__(self) -> str:
         return f"FundamentalDimension(name='{self.name}', base_unit='{self.base_unit}', units=[{', '.join(self.units.keys())}])"
@@ -147,21 +148,29 @@ class FundamentalDimension(Dimension):
     @classmethod
     def parse(cls, obj: Dict) -> "FundamentalDimension":
         """Parse a FundamentalDimension object from a JSON dictionary."""
-        return cls(
+        ret = cls(
             name=obj.get("Dimension"),
             is_fundamental = True,
             has_extras=obj.get("HasExtras", False),
             base_unit=obj.get("BaseUnit"),
-            units=Unit.parse_units(obj.get("Units", {}))
+            units=Unit.parse_units(obj.get("Units", {})),
+            base=None
         )
+        ret.populate_base()
+        return ret
+    
+    def populate_base(self) -> None:
+        for name, unit in self.units.items():
+            if name == self.base_unit:
+                self.base = unit
 
 @dataclass
 class DerivedDimension(Dimension):
     """
-    Represents a derived physical dimension (e.g., Speed = Length/Time).
+    Represents a derived physical dimension (e.g., speed = length/Time).
     """
     definition: List[DimensionExponent]
-    units: Dict[str, List[UnitExponent]]
+    units: Dict[str, List[unit_exponent]]
     helper_units: Dict[str, Unit]
 
     def __str__(self) -> str:
@@ -176,7 +185,7 @@ class DerivedDimension(Dimension):
             has_extras=obj.get("HasExtras", False),
             definition=[DimensionExponent.parse(d) for d in obj.get("Definition", [])],
             units={
-                unit_name: [UnitExponent.parse(e) for e in exponents]
+                unit_name: [unit_exponent.parse(e) for e in exponents]
                 for unit_name, exponents in obj.get("Units", {}).items()
             },
             helper_units=Unit.parse_units(obj.get("HelperUnits", {}))

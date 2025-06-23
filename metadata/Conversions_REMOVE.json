@@ -1,0 +1,63 @@
+{
+   "length": {
+       "PrimaryUnit": "meters",
+       "Conversions": {
+           "feet": { "Slope": 3.28084 },
+           "inches": { "Slope": 39.3701 },
+           "astronomical_units": { "Slope": 6.68459e-12 },
+           "data_miles": { "Slope": 0.000546807 },
+           "nautical_miles": { "Slope": 0.000539957 },
+           "miles": { "Slope": 0.000621371 },
+           "leagues": { "Slope": 0.000207123 },
+           "fathoms": { "Slope": 0.546807 },
+           "furlong": { "Slope": 0.00497096 },
+           "yards": { "Slope": 1.09361 },
+           "us_survey_feet": { "Slope": 3.28083333333 }
+       }
+   },
+   "mass": {
+       "PrimaryUnit": "Grams",
+       "Conversions": {
+           "pound_mass": { "Slope": 0.00220462 },
+           "ounces": { "Slope": 0.035274 },
+           "slugs": { "Slope": 6.85218e-5 },
+           "grains": { "Slope": 15.4324 },
+           "stone": { "Slope": 0.000157473 },
+           "short_ton": { "Slope": 1.10231e-6 },
+           "long_ton": { "Slope": 9.84207e-7 },
+           "tonne": { "Slope": 1e-6 }
+       }
+   },
+   "Time": {
+       "PrimaryUnit": "seconds",
+       "Conversions": {
+           "minutes": { "Slope": 0.0166667 },
+           "hours": { "Slope": 0.000277778 }
+       }
+   },
+   "angle": {
+       "PrimaryUnit": "radians",
+       "Conversions": {
+           "degrees": { "Slope": 57.2958 }
+       }
+   },
+   "Amount": {
+       "PrimaryUnit": "Moles",
+       "Conversions": {
+           "pound_moles": { "Slope": 0.00220462 }
+       }
+   },
+   "charge": {
+       "PrimaryUnit": "Coulombs",
+       "Conversions": {
+           "stat_coulombs": { "Slope": 2.9979245799996e9 },
+           "elementary_charges": { "Slope": 6.241506363094e18 }
+       }
+   },
+   "temperature": {
+       "PrimaryUnit": "Kelvin",
+       "Conversions": {
+           "rankine": { "Slope": 1.8 }
+       }
+   }
+}

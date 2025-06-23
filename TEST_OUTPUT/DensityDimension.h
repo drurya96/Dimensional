@@ -3,7 +3,7 @@
 
 #include "Dimension_Impl/DerivedDimensions/DensityDimension_Impl.h"
 
-namespace Dimension
+namespace dimension
 {
 
 

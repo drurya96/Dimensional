@@ -724,7 +724,7 @@
             },
             {
                "id": "angle_limited_math_helpers",
-               "name": "Angle-Limited Mathematical Helpers",
+               "name": "angle-Limited Mathematical Helpers",
                "description": "Defines helper functions such as sin, cos, tan, and related operations that are restricted to inputs with angle dimension. These functions return dimensionless results.",
                "rules": [
                {
@@ -750,7 +750,7 @@
       {
          "id": "named_fundamental_dimensions",
          "name": "Named Fundamental Dimensions",
-         "description": "Defines type aliases representing fundamental physical dimensions such as Length, Mass, and Time. These types are derived from base_dimension and carry a single unit_exponent with exponent +1. They serve as user-facing entry points into the dimensional system.",
+         "description": "Defines type aliases representing fundamental physical dimensions such as length, mass, and Time. These types are derived from base_dimension and carry a single unit_exponent with exponent +1. They serve as user-facing entry points into the dimensional system.",
          "contexts": [
             {
                "id": "fundamental_dimension_structure",
@@ -796,7 +796,7 @@
       {
          "id": "named_derived_dimensions",
          "name": "Named Derived Dimensions",
-         "description": "Defines named dimensional types representing composed physical properties such as Speed, Acceleration, or Force. These types are defined in terms of base_dimension with a fixed internal composition, and may be instantiated using fundamental units or named derived units.",
+         "description": "Defines named dimensional types representing composed physical properties such as speed, acceleration, or force. These types are defined in terms of base_dimension with a fixed internal composition, and may be instantiated using fundamental units or named derived units.",
          "contexts": [
             {
                "id": "derived_dimension_structure",
@@ -834,7 +834,7 @@
       {
          "id": "named_derived_units",
          "name": "Named Derived Units",
-         "description": "Defines compound units such as Newtons, Pascals, and Knots that are derived from combinations of fundamental units. These types may be used as unit metadata for constructing base_dimensions and participate in conversions through their internal unit composition.",
+         "description": "Defines compound units such as newtons, pascals, and Knots that are derived from combinations of fundamental units. These types may be used as unit metadata for constructing base_dimensions and participate in conversions through their internal unit composition.",
          "contexts": [
             {
                "id": "composition_and_equivalence",

@@ -3,7 +3,7 @@
 
 #include "Dimension_Impl/DerivedDimensions/VolumetricFlowRateDimension_Impl.h"
 
-namespace Dimension
+namespace dimension
 {
 
 

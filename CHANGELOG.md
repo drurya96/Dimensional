@@ -84,15 +84,15 @@ All notable changes to this project will be documented in this file. Semantic ve
 - `is_absolute` to distinguish absolute from non-absolute units
 - `Amount` as a fundamental unit, with `Moles` and `PoundMoles`
 - `Energy` as a named compound unit with `Joules`, `Calories`, etc.
-- `Pressure` as a named compound unit with `Pascals`
+- `Pressure` as a named compound unit with `pascals`
 - `DimensionalConstants.h`
   - Contains many universal and commonly used constants
-- `DimensionalMolarMasses.h`
-  - Contains the molar mass (as `MolarMass<Grams,Moles>`) of every element as well as some common compounds
+- `DimensionalMolarmasses.h`
+  - Contains the molar mass (as `Molarmass<Grams,Moles>`) of every element as well as some common compounds
 - Python scripts to autogenerate Fundamental and Derived units
-  - Generate fundamental dimensions by calling `python GenerateFundamentalDimension <dimension name> <primary unit>` (e.g. `python GenerateFundamentalDimension Length Meters`)
-  - Generate derived dimensions by calling `python GenerateDerivedDimension <dimension name> <numerator> <denominator>` (e.g. `python GenerateFundamentalDimension Force Mass,Length Time,Time`)
-- Added fundamental dimension `Charge` with base unit `Coulombs`
+  - Generate fundamental dimensions by calling `python GenerateFundamentalDimension <dimension name> <primary unit>` (e.g. `python GenerateFundamentalDimension length meters`)
+  - Generate derived dimensions by calling `python GenerateDerivedDimension <dimension name> <numerator> <denominator>` (e.g. `python GenerateFundamentalDimension force mass,length Time,Time`)
+- Added fundamental dimension `charge` with base unit `Coulombs`
 - Added many new derived dimensions
 
 ### Deprecated
@@ -132,8 +132,8 @@ All notable changes to this project will be documented in this file. Semantic ve
 ### Changed
 - Reorganized implementation headers
   - `Dimension_Impl` contains implementations for each dimension, nested in either
-    - `FundamentalDimensions` (Mass, Time, etc.)
-    - `DerivedDimensions` which are derived from Fundamental (Speed, Force, etc.)
+    - `FundamentalDimensions` (mass, Time, etc.)
+    - `DerivedDimensions` which are derived from Fundamental (speed, force, etc.)
 - Constructor inheritance removed from units
   - Minimal effect since the BaseUnit constructor was already deleted.
 - Units do not need to inherit from BaseUnit anymore, instead they simply must meet the concept `IsUnitType` 
@@ -159,18 +159,18 @@ All notable changes to this project will be documented in this file. Semantic ve
 ### Added
 - Constructor from dimension to similar dimension of different units
 - Getters for each named dimension as free functions.
-  - These work on the named dimension and corresponding BaseDimensions
+  - These work on the named dimension and corresponding base_dimensions
 
 ### Deprecated
 - Get<Dimension> member functions of named dimensions. These include
-  - GetLength
+  - Getlength
   - GetTime
-  - GetMass
-  - GetAngle
-  - GetTemperature
-  - GetSpeed
-  - GetAcceleration
-  - GetForce
+  - Getmass
+  - Getangle
+  - Gettemperature
+  - Getspeed
+  - Getacceleration
+  - Getforce
   - GetVolume
 
 ### Removed
@@ -178,7 +178,7 @@ All notable changes to this project will be documented in this file. Semantic ve
 
 ### Fixed
 - Corrected requirements for derived dimensions
-- Added constraints for BaseDimension functions
+- Added constraints for base_dimension functions
 
 ## [2.1.1] - 2024-11-3
 
@@ -196,7 +196,7 @@ All notable changes to this project will be documented in this file. Semantic ve
 - 
 
 ### Fixed
-- Instantiation of a `BaseDimension` using any units that cannot be converted to the appropriate `Primary` unit results in a compiler error.
+- Instantiation of a `base_dimension` using any units that cannot be converted to the appropriate `Primary` unit results in a compiler error.
   - In previous behavior, the object could be instantiated but conversion would fail at compile time.
 - Added include for `stdexcept`
 
@@ -206,7 +206,7 @@ All notable changes to this project will be documented in this file. Semantic ve
 - 
 
 ### Added
-- Negative unary operator (allows `-BaseDimension<...>` syntax)
+- Negative unary operator (allows `-base_dimension<...>` syntax)
 
 ### Deprecated
 - 
@@ -221,9 +221,9 @@ All notable changes to this project will be documented in this file. Semantic ve
 ## [2.0.0] - 2024-10-30
 
 ### Changed
-- Renamed `Degree` to `Degrees` and `Radian` to `Radians`
+- Renamed `Degree` to `Degrees` and `Radian` to `radians`
 - Templated `BaseUnit` for CRTP
-- "Derived" dimensions (Newtons, Gallon, Liter, etc.) do not inherit from `DerivedUnit` in favor of CRTP in `BaseUnit`
+- "Derived" dimensions (newtons, Gallon, Liter, etc.) do not inherit from `DerivedUnit` in favor of CRTP in `BaseUnit`
 - Split `DimensionUtilities` into several files under the directory `Dimension_Impl`
 - Some metaprogramming structs now require a new template parameter (first position) indicating a comparison type-trait
   - For example, `std::is_same`, `dimension::is_same_dim`
@@ -245,7 +245,7 @@ All notable changes to this project will be documented in this file. Semantic ve
 - `tuple_diff_dim` (in favor of `tuple_diff<is_same_dim, ...>`)
 
 ### Fixed
-- Marked `GetAcceleration` `const`
+- Marked `Getacceleration` `const`
 
 ## [1.0.1] - 2024-10-24
 

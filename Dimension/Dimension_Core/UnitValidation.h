@@ -6,7 +6,7 @@
 
 #include "Conversion.h"
 
-namespace Dimension
+namespace dimension
 {
 
    static constexpr bool delta = false;
@@ -14,7 +14,7 @@ namespace Dimension
 
    // TODO: MOVE THIS
    template<typename Unit, int Num = 1, int Den = 1, bool isQuantity = delta>
-   struct UnitExponent
+   struct unit_exponent
    {
       using unit = Unit;
       using exponent = std::ratio<Num, Den>;

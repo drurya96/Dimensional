@@ -1,9 +1,9 @@
 #ifndef STATIC_DIMENSION_{{ dim.name }}_IMPL_H
 #define STATIC_DIMENSION_{{ dim.name }}_IMPL_H
 
-#include "../../BaseDimension.h"
+#include "../../base_dimension.h"
 
-namespace Dimension
+namespace dimension
 {
    /// @brief Represents the {{ dim.name }} type tag.
    struct {{ dim.name }}Type {};
@@ -16,7 +16,7 @@ namespace Dimension
    /// @brief Concept to check if a type is a valid {{ dim.name }} unit.
    /// @tparam T The type to check.
    template<typename T>
-   concept Is{{ dim.name }}Unit = std::is_base_of_v<FundamentalUnitTag, T> && std::is_same_v<typename T::Dim, {{ dim.name }}Type>;//IsNonQuantityUnitDimension<T, {{ dim.name }}Type> || IsQuantityUnitDimension<T, {{ dim.name }}Type>;
+   concept is_{{ dim.name }}_unit = std::is_base_of_v<FundamentalUnitTag, T> && std::is_same_v<typename T::Dim, {{ dim.name }}Type>;
 
    /// @brief Base class for {{ dim.name }} units.
    /// @tparam Unit The unit type.
@@ -33,89 +33,54 @@ namespace Dimension
       using Primary = Primary{{ dim.name }};
    };
 
-   /// @brief Trait to check if a type is a {{ dim.name }} dimension.
-   /// @tparam T The type to check.
-   //template<typename T>
-   //struct is_{{ dim.name }} : std::false_type {};
-
-   //template<typename Dim>
-   //struct is_{{dim.name}}_Impl
-   //{
-   //   constexpr bool value = Is{{ dim.name }}Unit<std::tuple_element_t<0, decltype(FullSimplify(Dim{}))>>;
-   //};
-
-
-   /// @brief Specialization for BaseDimension types.
-   /// @tparam T The unit type.
-   //template<typename T>
-   //struct is_{{ dim.name }}<BaseDimension<T>> : std::bool_constant<Is{{ dim.name }}Unit<T>> {};
-   template<typename Dim>
-   struct is_{{ dim.name }} : std::bool_constant<Is{{ dim.name }}Unit<typename std::tuple_element_t<0, typename decltype(FullSimplify(Dim{}))::units>::unit>> {};
-
-   /// @brief Helper variable template for is_{{ dim.name }}.
+   /// @brief Concept to check if a type is a {{ dim.name }} dimension.
    /// @tparam T The type to check.
    template<typename T>
-   constexpr bool is_{{ dim.name }}_v = is_{{ dim.name }}<T>::value;
-
-   /// @brief Concept to verify if a type is a valid {{ dim.name }} type.
-   /// @tparam T The type to check.
-   template<typename T>
-   concept {{ dim.name }}_type = is_{{ dim.name }}_v<T>;
+   concept is_{{ dim.name }} = requires {
+      typename decltype(FullSimplify(T{}))::units;
+   } &&
+   std::tuple_size_v<typename decltype(FullSimplify(T{}))::units> == 1 &&
+   is_{{ dim.name }}_unit<typename std::tuple_element_t<0, typename decltype(FullSimplify(T{}))::units>::unit>;
 
    /// @brief Retrieves the value of a {{ dim.name }} object in the specified unit.
    /// @tparam T The unit type.
    /// @param obj The {{ dim.name }} object.
    /// @return The value in the specified unit.
-   template<Is{{ dim.name }}Unit T>
+   template<is_{{ dim.name }}_unit T>
    constexpr PrecisionType get_{{ dim.name.lower() }}_as(/*{{ dim.name }}_type*/ auto obj)
    {
-      return get_dimension_as<UnitExponent<T>>(obj);
+      return get_dimension_as<unit_exponent<T>>(obj);
    }
 
-   template<Is{{ dim.name }}Unit Unit = Primary{{ dim.name }}, bool isQuantity = false>
+   template<is_{{ dim.name }}_unit Unit = Primary{{ dim.name }}, bool isQuantity = false>
    class {{dim.name}};
 
    /// @brief Represents a dimension type for {{ dim.name }}.
    /// @tparam Unit The primary unit type.
-   template<Is{{ dim.name }}Unit Unit>
-   class {{ dim.name }}<Unit, false> : public BaseDimension<UnitExponent<Unit>>
+   template<is_{{ dim.name }}_unit Unit>
+   class {{ dim.name }}<Unit, false> : public base_dimension<unit_exponent<Unit>>
    {
    public:
       /// @brief Default constructor initializing to zero.
-      constexpr {{ dim.name }}() : BaseDimension<UnitExponent<Unit>>::BaseDimension(0.0) {}
+      constexpr {{ dim.name }}() : base_dimension<unit_exponent<Unit>>::base_dimension(0.0) {}
 
       /// @brief Constructs a {{ dim.name }} object with a specific value.
       /// @param val The value to initialize with.
-      explicit constexpr {{ dim.name }}(double val) : BaseDimension<UnitExponent<Unit>>::BaseDimension(val) {}
+      explicit constexpr {{ dim.name }}(double val) : base_dimension<unit_exponent<Unit>>::base_dimension(val) {}
 
-      /// @brief Constructs a {{ dim.name }} object from another BaseDimension.
-      /// @tparam Ts The units of the BaseDimension.
-      /// @param base The BaseDimension object to construct from.
+      /// @brief Constructs a {{ dim.name }} object from another base_dimension.
+      /// @tparam Ts The units of the base_dimension.
+      /// @param base The base_dimension object to construct from.
       template<typename... Ts>
-      requires matching_dimensions<BaseDimension<UnitExponent<Unit>>, BaseDimension<Ts...>>
+      requires matching_dimensions<base_dimension<unit_exponent<Unit>>, base_dimension<Ts...>>
       // Implicit conversion between dimensions of the same unit is core to Dimensional
       // cppcheck-suppress noExplicitConstructor
-      constexpr {{ dim.name }}(const BaseDimension<Ts...>& base) : BaseDimension<UnitExponent<Unit>>::BaseDimension(get_dimension_as<UnitExponent<Unit>>(base)) {}
+      constexpr {{ dim.name }}(const base_dimension<Ts...>& base) : base_dimension<unit_exponent<Unit>>::base_dimension(get_dimension_as<unit_exponent<Unit>>(base)) {}
    };
 
-   /// @brief Specialization for is_{{ dim.name }} trait for {{ dim.name }} types.
-   /// @tparam T The unit type.
-   template<typename T>
-   struct is_{{ dim.name }}<{{ dim.name }}<T>> : std::bool_constant<Is{{ dim.name }}Unit<T>> {};
-
-   /// @brief Deduction guide for {{ dim.name }} constructor.
-   /// @tparam T The unit type.
-   //template<Is{{ dim.name }}Unit T>
-   //{{ dim.name }}(T) -> {{ dim.name }}<T>;
-
-   /// @brief Deduction guide for {{ dim.name }} constructor with BaseDimension.
+   /// @brief Deduction guide for {{ dim.name }} constructor with base_dimension.
    /// @tparam {{ dim.name }}Unit The unit type.
-   //template<Is{{ dim.name }}Unit {{ dim.name }}Unit>
-   //{{ dim.name }}(BaseDimension<UnitExponent<{{ dim.name }}Unit>>) -> {{ dim.name }}<{{ dim.name }}Unit>;
-
-   /// @brief Deduction guide for {{ dim.name }} constructor with BaseDimension.
-   /// @tparam {{ dim.name }}Unit The unit type.
-   template<{{ dim.name }}_type Dim>
+   template<is_{{ dim.name }} Dim>
    {{ dim.name }}(Dim) -> {{ dim.name }}<DimExtractor<{{ dim.name }}Type, Dim>>;
 }
 

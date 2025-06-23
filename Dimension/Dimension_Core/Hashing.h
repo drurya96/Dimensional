@@ -5,7 +5,7 @@
 
 #include "StringLiteral.h"
 
-namespace Dimension
+namespace dimension
 {
 
    /// @brief Wrapper for tags to allow return of void types

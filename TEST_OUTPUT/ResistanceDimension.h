@@ -3,16 +3,16 @@
 
 #include "Dimension_Impl/DerivedDimensions/ResistanceDimension_Impl.h"
 
-namespace Dimension
+namespace dimension
 {
 
    struct Ohms
    {
       using units = std::tuple<
-         UnitExponent<KiloGrams, 1, 1>
-         UnitExponent<Meters, 2, 1>
-         UnitExponent<Seconds, -1, 1>
-         UnitExponent<Coulombs, -2, 1>,
+         unit_exponent<KiloGrams, 1, 1>
+         unit_exponent<meters, 2, 1>
+         unit_exponent<seconds, -1, 1>
+         unit_exponent<Coulombs, -2, 1>,
       >;
    };
    

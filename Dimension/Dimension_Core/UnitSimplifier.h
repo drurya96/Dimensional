@@ -9,12 +9,12 @@
 #include "TemplateUtils/GenericUtils.h"
 #include "Conversion.h"
 
-namespace Dimension
+namespace dimension
 {
 
 
    template<are_unit_exponents... Units>
-   class BaseDimension;
+   class base_dimension;
 
 
    // TODO: Maybe not needed? Keep until verified
@@ -34,7 +34,7 @@ namespace Dimension
       // Use a conditional to set `units` to either the added value or empty tuple
       static constexpr bool success = std::is_same_v<typename IncomingUnit::unit, typename Unit::unit>;
 
-      using added = UnitExponent<typename Unit::unit, std::ratio_add<typename Unit::exponent, typename IncomingUnit::exponent>::num, std::ratio_add<typename Unit::exponent, typename IncomingUnit::exponent>::den>;
+      using added = unit_exponent<typename Unit::unit, std::ratio_add<typename Unit::exponent, typename IncomingUnit::exponent>::num, std::ratio_add<typename Unit::exponent, typename IncomingUnit::exponent>::den>;
 
       using units = std::conditional_t<success,
          std::tuple<added>,
@@ -85,7 +85,7 @@ namespace Dimension
     >;
 
    public:
-      using unit = UnitExponent<IncomingUnit, combined_exponent::num, combined_exponent::den>;
+      using unit = unit_exponent<IncomingUnit, combined_exponent::num, combined_exponent::den>;
    };
 
    // ============================================================
@@ -379,7 +379,7 @@ namespace Dimension
    
        using converted_unit = std::conditional_t<
            same_dim,
-           UnitExponent<TargetUnit, Unit::exponent::num, Unit::exponent::den>,
+           unit_exponent<TargetUnit, Unit::exponent::num, Unit::exponent::den>,
            Unit
        >;
    
@@ -439,15 +439,15 @@ namespace Dimension
    };
    
    // ============================================================
-   // ================ BaseDimension From Tuple ==================
+   // ================ base_dimension From Tuple ==================
    // ============================================================
    template<typename... T>
-   struct BaseDimensionFromTuple;
+   struct base_dimensionFromTuple;
 
    template<typename... T>
-   struct BaseDimensionFromTuple<std::tuple<T...>>
+   struct base_dimensionFromTuple<std::tuple<T...>>
    {
-      using dim = typename BaseDimension<T...>;
+      using dim = typename base_dimension<T...>;
    };
 
 
@@ -465,7 +465,7 @@ namespace Dimension
       using initial_simplified = typename InitialSimplifier<std::tuple<Units...>>::units;
       using after_conversion = Convert_All_Dims<initial_simplified>;
       using final_units = typename InitialSimplifier<typename after_conversion::units>::units;
-      using dimType = typename BaseDimensionFromTuple<final_units>::dim;
+      using dimType = typename base_dimensionFromTuple<final_units>::dim;
    };
 
    template<typename Dim>
@@ -529,17 +529,17 @@ namespace Dimension
    // ============================================================
 
    template<typename TupleA, typename TupleB>
-   struct SubtractUnitExponents;
+   struct Subtractunit_exponents;
 
    // Empty base case
    template<>
-   struct SubtractUnitExponents<std::tuple<>, std::tuple<>> {
+   struct Subtractunit_exponents<std::tuple<>, std::tuple<>> {
       using type = std::tuple<>;
    };
 
-   // General case: A and B are std::tuple<UnitExponent<...>...>
+   // General case: A and B are std::tuple<unit_exponent<...>...>
    template<typename... UnitsA, typename... UnitsB>
-   struct SubtractUnitExponents<std::tuple<UnitsA...>, std::tuple<UnitsB...>> {
+   struct Subtractunit_exponents<std::tuple<UnitsA...>, std::tuple<UnitsB...>> {
    private:
       template<typename UnitA>
       struct subtract_one {
@@ -547,7 +547,7 @@ namespace Dimension
          
          using result = std::conditional_t<
                matching::found,
-               UnitExponent<
+               unit_exponent<
                   typename UnitA::unit,
                   std::ratio_subtract<
                      typename UnitA::exponent,
@@ -647,7 +647,7 @@ namespace Dimension
    };
 
    struct Coulombs;
-   struct Meters;
+   struct meters;
 
    template<typename FromUnit, typename... FromRest, typename... ToUnits>
    struct ConvertSimplified<std::tuple<FromUnit, FromRest...>, std::tuple<ToUnits...>>
@@ -670,8 +670,8 @@ namespace Dimension
        using SimplifiedFrom = typename InitialSimplifier<FromTuple>::units;
        using SimplifiedTo = typename InitialSimplifier<ToTuple>::units;
    
-       using FromRemainingRaw = typename SubtractUnitExponents<SimplifiedFrom, SimplifiedTo>::type;
-       using ToRemainingRaw = typename SubtractUnitExponents<SimplifiedTo, SimplifiedFrom>::type;
+       using FromRemainingRaw = typename Subtractunit_exponents<SimplifiedFrom, SimplifiedTo>::type;
+       using ToRemainingRaw = typename Subtractunit_exponents<SimplifiedTo, SimplifiedFrom>::type;
    
        using FromRemaining = typename RemoveZeros<FromRemainingRaw>::units;
        using ToRemaining = typename RemoveZeros<ToRemainingRaw>::units;
@@ -679,11 +679,11 @@ namespace Dimension
       static constexpr double Convert(double value) 
       {
 
-         using FromFullySimplified = decltype(FullSimplify(typename BaseDimensionFromTuple<FromTuple>::dim(1.0)));
-         using ToFullySimplified = decltype(FullSimplify(typename BaseDimensionFromTuple<ToTuple>::dim(1.0)));
+         using FromFullySimplified = decltype(FullSimplify(typename base_dimensionFromTuple<FromTuple>::dim(1.0)));
+         using ToFullySimplified = decltype(FullSimplify(typename base_dimensionFromTuple<ToTuple>::dim(1.0)));
 
-         FromFullySimplified fullSimplified = FullSimplify(typename BaseDimensionFromTuple<FromTuple>::dim(value));
-         double inverse_scalar = 1.0 / (FullSimplify(typename BaseDimensionFromTuple<ToTuple>::dim(1.0)).GetRaw());
+         FromFullySimplified fullSimplified = FullSimplify(typename base_dimensionFromTuple<FromTuple>::dim(value));
+         double inverse_scalar = 1.0 / (FullSimplify(typename base_dimensionFromTuple<ToTuple>::dim(1.0)).GetRaw());
 
          using converter = ConvertSimplified<typename FromFullySimplified::units, typename ToFullySimplified::units>;
 
@@ -709,7 +709,7 @@ namespace Dimension
    template<typename Unit, typename... Rest>
    struct FlipExponents<std::tuple<Unit, Rest...>> {
        using units = tuple_cat_t<
-           std::tuple<UnitExponent<typename Unit::unit, -Unit::exponent::num, Unit::exponent::den>>,
+           std::tuple<unit_exponent<typename Unit::unit, -Unit::exponent::num, Unit::exponent::den>>,
            typename FlipExponents<std::tuple<Rest...>>::units
        >;
    };
@@ -727,7 +727,7 @@ namespace Dimension
    class base_dimension_marker;
 
    template<typename T>
-   concept base_dimension = std::is_base_of_v<base_dimension_marker, T>;
+   concept is_base_dimension = std::is_base_of_v<base_dimension_marker, T>;
 
 
 
@@ -741,7 +741,7 @@ namespace Dimension
 
 
    template<is_unit_exponent T, is_unit_exponent U>
-   struct ConvertibleUnitExponent
+   struct Convertibleunit_exponent
    {
       static constexpr bool value =
          is_same_dim<typename T::unit, typename U::unit>::value &&
@@ -754,7 +754,7 @@ namespace Dimension
    template<typename Unit, typename First, typename... Rest>
    struct ContainsEquivalentUnit<Unit, std::tuple<First, Rest...>> {
        static constexpr bool value =
-         ConvertibleUnitExponent<Unit, First>::value ||
+         Convertibleunit_exponent<Unit, First>::value ||
          ContainsEquivalentUnit<Unit, std::tuple<Rest...>>::value;
    };
    
@@ -859,7 +859,7 @@ namespace Dimension
 
    // Forward declarations
    template<are_unit_exponents... Units>
-   class BaseDimension;
+   class base_dimension;
 
 
 
@@ -874,7 +874,7 @@ namespace Dimension
    /// @tparam DenTypes2... The types in the second group of denominator types
    /// @typedef newNum The simplified numerator types
    /// @typedef newDen The simplified denominator types
-   /// @typedef dimType A BaseDimension templated on the simplified types
+   /// @typedef dimType A base_dimension templated on the simplified types
    template<typename ... NumTypes1, typename ... NumTypes2, typename ... DenTypes1, typename ... DenTypes2>
    struct UnitSimplifier<std::tuple<NumTypes1...>, std::tuple<NumTypes2...>, std::tuple<DenTypes1...>, std::tuple<DenTypes2...>>
    {
@@ -899,7 +899,7 @@ namespace Dimension
       using numSimple = tuple_cat_t<typename num1AfterSimpleCancel::type, typename num2AfterSimpleCancel::type>;
       using denSimple = tuple_cat_t<typename den1AfterSimpleCancel::type, typename den2AfterSimpleCancel::type>;
 
-      using dimType = BaseDimension<newNum, newDen>;
+      using dimType = base_dimension<newNum, newDen>;
 
       constexpr static bool isDelta = !((std::tuple_size_v<newNum> == 1) && (std::tuple_size_v<newDen> == 0));
       constexpr static bool isScalar = (std::tuple_size_v<newNum> == 0) && (std::tuple_size_v<newDen> == 0);

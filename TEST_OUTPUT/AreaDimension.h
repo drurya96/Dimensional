@@ -3,7 +3,7 @@
 
 #include "Dimension_Impl/DerivedDimensions/AreaDimension_Impl.h"
 
-namespace Dimension
+namespace dimension
 {
 
 

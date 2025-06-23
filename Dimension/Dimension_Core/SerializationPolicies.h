@@ -7,12 +7,12 @@
 #include "UnitSimplifier.h"
 #include <vector>
 
-namespace Dimension
+namespace dimension
 {
 
    // Forward declaration
    template<are_unit_exponents... Units>
-   class BaseDimension;
+   class base_dimension;
 
    /// @brief Validate that an input buffer's tag matches the hashed value corresponding to the type
    /// @tparam NumTuple Numerator tuple
@@ -45,7 +45,7 @@ namespace Dimension
    {
    private:
       template <typename NumTuple, typename DenTuple, typename OutputIt, typename BufferSizeType>
-      static void serialize_impl(OutputIt out, const BaseDimension<NumTuple, DenTuple>& obj)
+      static void serialize_impl(OutputIt out, const base_dimension<NumTuple, DenTuple>& obj)
       {
          if constexpr(!std::is_void_v<typename HashPolicy::tag_type::type>)
          {
@@ -76,14 +76,14 @@ namespace Dimension
       }
 
    public:
-      /// @brief serialize a BaseDimension object into a passed buffer
+      /// @brief serialize a base_dimension object into a passed buffer
       /// @tparam NumTuple numerator tuple to template Serializer on
       /// @tparam DenTuple denominator tuple to template Serializer on
       /// @tparam OutputBuf The buffer type
       /// @param out The buffer to serialize into
       /// @param obj The object to serialize
       template <typename NumTuple, typename DenTuple, typename OutputBuf>
-      static void serialize(OutputBuf& out, const BaseDimension<NumTuple, DenTuple>& obj)
+      static void serialize(OutputBuf& out, const base_dimension<NumTuple, DenTuple>& obj)
       {
          constexpr size_t required_size = HashPolicy::tag_size + sizeof(PrecisionType);
 
@@ -94,14 +94,14 @@ namespace Dimension
          serialize_impl<NumTuple, DenTuple, decltype(out.begin()), typename OutputBuf::value_type>(out.begin(), obj);
       }
 
-      /// @brief serialize a BaseDimension object and return the buffer
+      /// @brief serialize a base_dimension object and return the buffer
       /// @tparam NumTuple numerator tuple to template Serializer on
       /// @tparam DenTuple denominator tuple to template Serializer on
       /// @tparam OutputBuf The buffer type
       /// @param obj The object to serialize
       /// @return A new buffer populated with data from serializing obj
       template <typename NumTuple, typename DenTuple, typename OutputBuf = std::vector<uint8_t>>
-      static OutputBuf serialize(const BaseDimension<NumTuple, DenTuple>& obj)
+      static OutputBuf serialize(const base_dimension<NumTuple, DenTuple>& obj)
       {
          // Generate the unique type tag based on `NumTuple` and `DenTuple`
          OutputBuf out;
@@ -117,12 +117,12 @@ namespace Dimension
       /// @tparam DenTuple denominator tuple to template Serializer on
       /// @tparam InputBuf The buffer type
       /// @param in The buffer to deserialize
-      /// @return A new BaseDimension object populated with data from deserializing input buffer
+      /// @return A new base_dimension object populated with data from deserializing input buffer
       template <typename NumTuple, typename DenTuple, typename InputBuf>
-      static BaseDimension<NumTuple, DenTuple> deserialize(const InputBuf& in)
+      static base_dimension<NumTuple, DenTuple> deserialize(const InputBuf& in)
       {
          PrecisionType val = deserialize_impl<NumTuple, DenTuple, decltype(in.begin()), typename InputBuf::value_type>(in.begin());
-         return BaseDimension<NumTuple, DenTuple>(val);
+         return base_dimension<NumTuple, DenTuple>(val);
       }
 
       /// @brief deserialize a buffer and update the input object
@@ -132,7 +132,7 @@ namespace Dimension
       /// @param in The buffer to deserialize
       /// @param obj The object to deserialize into
       template <typename NumTuple, typename DenTuple, typename InputBuf>
-      static void deserialize(const InputBuf& in, BaseDimension<NumTuple, DenTuple>& obj)
+      static void deserialize(const InputBuf& in, base_dimension<NumTuple, DenTuple>& obj)
       {
          PrecisionType val = deserialize_impl<NumTuple, DenTuple, decltype(in.begin()), typename InputBuf::value_type>(in.begin());
          obj.template SetVal<NumTuple, DenTuple>(val);

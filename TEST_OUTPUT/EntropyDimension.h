@@ -3,7 +3,7 @@
 
 #include "Dimension_Impl/DerivedDimensions/EntropyDimension_Impl.h"
 
-namespace Dimension
+namespace dimension
 {
 
 

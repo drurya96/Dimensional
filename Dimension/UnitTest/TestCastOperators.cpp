@@ -1,68 +1,64 @@
 #include "DimensionTest.h"
 
-#include "TimeDimension.h"
-#include "LengthDimension.h"
-#include "SpeedDimension.h"
-
-using namespace Dimension;
+using namespace dimension;
 using namespace std;
 
-TEST(CastOperatorTests, CastSpeed) {
+TEST(CastOperatorTests, Castspeed) {
 
-   BaseDimension<UnitExponent<Meters>, UnitExponent<Seconds, -1>> testSpeed(10.0);
+   base_dimension<unit_exponent<meters>, unit_exponent<seconds, -1>> testspeed(10.0);
 
-   Speed<Meters, Seconds> mySpeed1 = testSpeed;
-   Speed mySpeed2 = testSpeed; // Uses template deduction guide
-   Speed<Feet, Minutes> mySpeed3 = testSpeed; // Cast to different unit
+   speed<meters, seconds> myspeed1 = testspeed;
+   speed myspeed2 = testspeed; // Uses template deduction guide
+   speed<feet, minutes> myspeed3 = testspeed; // Cast to different unit
 
-   ASSERT_NEAR((get_speed_as<Meters, Seconds>(mySpeed1)), 10.0, TOLERANCE);
-   ASSERT_NEAR((get_speed_as<Meters, Seconds>(mySpeed2)), 10.0, TOLERANCE);
-   ASSERT_NEAR((get_speed_as<Meters, Seconds>(mySpeed3)), 10.0, TOLERANCE);
+   ASSERT_NEAR((get_speed_as<meters, seconds>(myspeed1)), 10.0, TOLERANCE);
+   ASSERT_NEAR((get_speed_as<meters, seconds>(myspeed2)), 10.0, TOLERANCE);
+   ASSERT_NEAR((get_speed_as<meters, seconds>(myspeed3)), 10.0, TOLERANCE);
 
    // TODO: I need to find a way to ensure the following DOES NOT compile
-   // BaseDimension<tuple<Meters, Seconds>, tuple<>> testNotSpeed(10.0);
-   // Speed notSpeed = testNotSpeed;
+   // base_dimension<tuple<meters, seconds>, tuple<>> testNotspeed(10.0);
+   // speed notspeed = testNotspeed;
 }
 
-TEST(CastOperatorTests, CastLength) {
+TEST(CastOperatorTests, Castlength) {
 
-   BaseDimension<UnitExponent<Meters>> testLength(10.0);
+   base_dimension<unit_exponent<meters>> testlength(10.0);
 
-   Length<Meters> myLength1 = testLength;
-   Length myLength2 = testLength; // Uses template deduction guide
-   Length<Feet> myLength3 = testLength; // Cast to different unit
+   length<meters> mylength1 = testlength;
+   length mylength2 = testlength; // Uses template deduction guide
+   length<feet> mylength3 = testlength; // Cast to different unit
 
-   ASSERT_NEAR(get_length_as<Meters>(myLength1), 10.0, TOLERANCE);
-   ASSERT_NEAR(get_length_as<Meters>(myLength2), 10.0, TOLERANCE);
-   ASSERT_NEAR(get_length_as<Meters>(myLength3), 10.0, TOLERANCE);
+   ASSERT_NEAR(get_length_as<meters>(mylength1), 10.0, TOLERANCE);
+   ASSERT_NEAR(get_length_as<meters>(mylength2), 10.0, TOLERANCE);
+   ASSERT_NEAR(get_length_as<meters>(mylength3), 10.0, TOLERANCE);
 
    // TODO: I need to find a way to ensure the following DOES NOT compile
-   // BaseDimension<tuple<Seconds>, tuple<>> testNotLength(10.0);
-   // Length notLength = testNotLength;
+   // base_dimension<tuple<seconds>, tuple<>> testNotlength(10.0);
+   // length notlength = testNotlength;
 }
 
-TEST(CastOperatorTests, CastTime) {
+TEST(CastOperatorTests, Casttimespan) {
 
-   BaseDimension<UnitExponent<Seconds>> testTime(10.0);
+   base_dimension<unit_exponent<seconds>> testtimespan(10.0);
 
-   Time<Seconds> myTime1 = testTime;
-   Time myTime2 = testTime; // Uses template deduction guide
-   Time<Minutes> myTime3 = testTime; // Cast to different unit
+   timespan<seconds> mytimespan1 = testtimespan;
+   timespan mytimespan2 = testtimespan; // Uses template deduction guide
+   timespan<minutes> mytimespan3 = testtimespan; // Cast to different unit
 
-   ASSERT_NEAR(get_time_as<Seconds>(myTime1), 10.0, TOLERANCE);
-   ASSERT_NEAR(get_time_as<Seconds>(myTime2), 10.0, TOLERANCE);
-   ASSERT_NEAR(get_time_as<Seconds>(myTime3), 10.0, TOLERANCE);
+   ASSERT_NEAR(get_timespan_as<seconds>(mytimespan1), 10.0, TOLERANCE);
+   ASSERT_NEAR(get_timespan_as<seconds>(mytimespan2), 10.0, TOLERANCE);
+   ASSERT_NEAR(get_timespan_as<seconds>(mytimespan3), 10.0, TOLERANCE);
 
    // TODO: I need to find a way to ensure the following DOES NOT compile
-   // BaseDimension<tuple<Meters>, tuple<>> testNotTime(10.0);
-   // Time notTime = testNotTime;
+   // base_dimension<tuple<meters>, tuple<>> testNottimespan(10.0);
+   // timespan nottimespan = testNottimespan;
 }
 
 TEST(CastOperatorTests, CastScalar) {
 
-   BaseDimension<UnitExponent<Seconds>> testTime(10.0);
+   base_dimension<unit_exponent<seconds>> testtimespan(10.0);
 
-   BaseDimension<> scalar = testTime / Time<Seconds>(5.0);
+   base_dimension<> scalar = testtimespan / timespan<seconds>(5.0);
 
    ASSERT_NEAR(scalar, 2.0, TOLERANCE);
 }

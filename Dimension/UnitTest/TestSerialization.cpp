@@ -1,24 +1,16 @@
 #include "DimensionTest.h"
 
-#include "BaseDimension.h"
-
-#include "TimeDimension.h"
-#include "LengthDimension.h"
-#include "MassDimension.h"
-#include "AngleDimension.h"
-#include "SpeedDimension.h"
-
 #include "Dimension_Core/Stream.h"
 
 #include <iostream>
 #include <sstream>
 
-using namespace Dimension;
+using namespace dimension;
 
 template<typename NumTuple, typename DenTuple>
 void ValidateWrapperWithReturns()
 {
-    BaseDimension<NumTuple, DenTuple> obj(25.0);
+    base_dimension<NumTuple, DenTuple> obj(25.0);
     auto buffer = serialize(obj);
 
     EXPECT_EQ(buffer.size(), sizeof(uint32_t) + sizeof(PrecisionType));
@@ -37,12 +29,12 @@ void ValidateWrapperWithRefs()
     BufferType buffer;
     buffer.resize(requiredSize);
 
-    BaseDimension<NumTuple, DenTuple> obj(25.0);
+    base_dimension<NumTuple, DenTuple> obj(25.0);
     serialize(buffer, obj);
 
     EXPECT_EQ(buffer.size() * sizeof(elementType), sizeof(uint32_t) + sizeof(PrecisionType));
 
-    BaseDimension<NumTuple, DenTuple> result;
+    base_dimension<NumTuple, DenTuple> result;
     deserialize<NumTuple, DenTuple>(buffer, result);
 
     EXPECT_NEAR((result.template GetVal<NumTuple, DenTuple>()), 25.0, TOLERANCE);
@@ -55,7 +47,7 @@ void ValidateNoHash()
 
     using TestSerializer = Serializer<NumTuple, DenTuple, DefaultSerializationPolicy<NoHash>>;
 
-    BaseDimension<NumTuple, DenTuple> obj(25.0);
+    base_dimension<NumTuple, DenTuple> obj(25.0);
     auto buffer = TestSerializer::serialize(obj);
 
     EXPECT_EQ(buffer.size(), sizeof(PrecisionType));
@@ -93,7 +85,7 @@ TEST(Serialization, TestSingleNum)
 TEST(Serialization, TestSingleInverse)
 {
     using NumTuple = std::tuple<>;
-    using DenTuple = std::tuple<Seconds>;
+    using DenTuple = std::tuple<seconds>;
 
     ValidateAll<NumTuple, DenTuple>();
 }
@@ -101,23 +93,23 @@ TEST(Serialization, TestSingleInverse)
 TEST(Serialization, TestOneEach)
 {
     using NumTuple = std::tuple<Grams>;
-    using DenTuple = std::tuple<Radians>;
+    using DenTuple = std::tuple<radians>;
 
     ValidateAll<NumTuple, DenTuple>();
 }
 
 TEST(Serialization, TestMultipleEach)
 {
-    using NumTuple = std::tuple<Grams, Meters>;
-    using DenTuple = std::tuple<Radians, Seconds>;
+    using NumTuple = std::tuple<Grams, meters>;
+    using DenTuple = std::tuple<radians, seconds>;
 
     ValidateAll<NumTuple, DenTuple>();
 }
 
 TEST(Serialization, TestShouldCancel)
 {
-    using NumTuple = std::tuple<Meters>;
-    using DenTuple = std::tuple<Meters>;
+    using NumTuple = std::tuple<meters>;
+    using DenTuple = std::tuple<meters>;
 
     ValidateAll<NumTuple, DenTuple>();
 }

@@ -1,0 +1,11 @@
+{
+  "compiler": "cl.exe",
+  "compiler_type": "cl",
+  "flags": [
+    "/std:c++20",
+    "/nologo",
+    "/c",
+    "/EHsc",
+    "/I../../../Dimension"
+  ]
+}

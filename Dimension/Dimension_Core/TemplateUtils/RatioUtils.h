@@ -3,7 +3,7 @@
 
 #include <ratio>
 
-namespace Dimension
+namespace dimension
 {
    
    template<typename R>
