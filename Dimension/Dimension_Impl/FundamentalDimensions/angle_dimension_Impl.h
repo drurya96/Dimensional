@@ -52,36 +52,42 @@ namespace dimension
       return get_dimension_as<unit_exponent<T>>(obj);
    }
 
-   template<is_angle_unit Unit = Primaryangle, bool isQuantity = false>
+   template<typename RepOrUnit = double, typename MaybeUnit = void>
    class angle;
 
    /// @brief Represents a dimension type for angle.
    /// @tparam Unit The primary unit type.
-   template<is_angle_unit Unit>
-   class angle<Unit, false> : public base_dimension<unit_exponent<Unit>>
+   template<rep_type Rep, is_angle_unit Unit>
+   class angle<Rep, Unit> : public base_dimension_impl<Rep, unit_exponent<Unit>>
    {
    public:
       /// @brief Default constructor initializing to zero.
-      constexpr angle() : base_dimension<unit_exponent<Unit>>::base_dimension(0.0) {}
+      constexpr angle() : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(0.0) {}
 
       /// @brief Constructs a angle object with a specific value.
       /// @param val The value to initialize with.
-      explicit constexpr angle(double val) : base_dimension<unit_exponent<Unit>>::base_dimension(val) {}
+      explicit constexpr angle(double val) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(val) {}
 
       /// @brief Constructs a angle object from another base_dimension.
       /// @tparam Ts The units of the base_dimension.
       /// @param base The base_dimension object to construct from.
       template<typename... Ts>
-      requires matching_dimensions<base_dimension<unit_exponent<Unit>>, base_dimension<Ts...>>
+      requires matching_dimensions<base_dimension_impl<Rep, unit_exponent<Unit>>, base_dimension_impl<Rep, Ts...>>
       // Implicit conversion between dimensions of the same unit is core to Dimensional
       // cppcheck-suppress noExplicitConstructor
-      constexpr angle(const base_dimension<Ts...>& base) : base_dimension<unit_exponent<Unit>>::base_dimension(get_dimension_as<unit_exponent<Unit>>(base)) {}
+      constexpr angle(const base_dimension_impl<Rep, Ts...>& base) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(get_dimension_as<unit_exponent<Unit>>(base)) {}
+   };
+
+   template<is_angle_unit Unit>
+   class angle<Unit, void> : public angle<double, Unit> {
+   public:
+      using angle<double, Unit>::angle;
    };
 
    /// @brief Deduction guide for angle constructor with base_dimension.
    /// @tparam angleUnit The unit type.
    template<is_angle Dim>
-   angle(Dim) -> angle<DimExtractor<angleType, Dim>>;
+   angle(Dim) -> angle<typename Dim::rep, DimExtractor<angleType, Dim>>;
 }
 
 #endif // STATIC_DIMENSION_angle_IMPL_H

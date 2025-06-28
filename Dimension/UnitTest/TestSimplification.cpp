@@ -43,17 +43,15 @@ TEST(Simplification, Simplification) {
 
 TEST(Simplification, SimplificationspeedTypes)
 {
-   speed<meters, seconds> speed(1);
-   timespan<minutes> time(1);
+   speed<meters, seconds> s(1);
+   timespan<minutes> t(1);
 
-   length length = speed * time;
-   //length<> l = speed * time;
-   //length length = l;
+   length l = s * t;
 
-
-   ASSERT_NEAR(get_length_as<meters>(length), 60.0, TOLERANCE);
+   ASSERT_NEAR(get_length_as<meters>(l), 60.0, TOLERANCE);
 
 }
+
 
 // TODO: Validate simplification resulting in unitless
 // TODO: How to handle unitless?

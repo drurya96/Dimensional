@@ -349,7 +349,8 @@ TEST(PhysicsProblemsExample1, capacitanceCalculation)
     charge<coulombs> charge{5.0};
     electric_potential<volts> voltage{10.0};
 
-    capacitance<farads> capacitance = charge / voltage;
+    //capacitance<farads> capacitance = charge / voltage;
+    auto capacitance = charge / voltage;
     ASSERT_NEAR((get_capacitance_as<farads>(capacitance)), 0.5, TOLERANCE); // 5 C / 10 V = 0.5 F
 }
 

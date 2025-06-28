@@ -23,7 +23,7 @@ set(TEST_SOURCES
     #${CMAKE_CURRENT_LIST_DIR}/TestUtilities.cpp
 
 
-    #${CMAKE_CURRENT_LIST_DIR}/TestTemp.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/TestTemp.cpp
 )
 
 add_executable(Dimension_UnitTests ${TEST_SOURCES})

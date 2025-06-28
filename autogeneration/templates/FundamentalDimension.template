@@ -52,36 +52,42 @@ namespace dimension
       return get_dimension_as<unit_exponent<T>>(obj);
    }
 
-   template<is_{{ dim.name }}_unit Unit = Primary{{ dim.name }}, bool isQuantity = false>
+   template<typename RepOrUnit = double, typename MaybeUnit = void>
    class {{dim.name}};
 
    /// @brief Represents a dimension type for {{ dim.name }}.
    /// @tparam Unit The primary unit type.
-   template<is_{{ dim.name }}_unit Unit>
-   class {{ dim.name }}<Unit, false> : public base_dimension<unit_exponent<Unit>>
+   template<rep_type Rep, is_{{ dim.name }}_unit Unit>
+   class {{ dim.name }}<Rep, Unit> : public base_dimension_impl<Rep, unit_exponent<Unit>>
    {
    public:
       /// @brief Default constructor initializing to zero.
-      constexpr {{ dim.name }}() : base_dimension<unit_exponent<Unit>>::base_dimension(0.0) {}
+      constexpr {{ dim.name }}() : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(0.0) {}
 
       /// @brief Constructs a {{ dim.name }} object with a specific value.
       /// @param val The value to initialize with.
-      explicit constexpr {{ dim.name }}(double val) : base_dimension<unit_exponent<Unit>>::base_dimension(val) {}
+      explicit constexpr {{ dim.name }}(double val) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(val) {}
 
       /// @brief Constructs a {{ dim.name }} object from another base_dimension.
       /// @tparam Ts The units of the base_dimension.
       /// @param base The base_dimension object to construct from.
       template<typename... Ts>
-      requires matching_dimensions<base_dimension<unit_exponent<Unit>>, base_dimension<Ts...>>
+      requires matching_dimensions<base_dimension_impl<Rep, unit_exponent<Unit>>, base_dimension_impl<Rep, Ts...>>
       // Implicit conversion between dimensions of the same unit is core to Dimensional
       // cppcheck-suppress noExplicitConstructor
-      constexpr {{ dim.name }}(const base_dimension<Ts...>& base) : base_dimension<unit_exponent<Unit>>::base_dimension(get_dimension_as<unit_exponent<Unit>>(base)) {}
+      constexpr {{ dim.name }}(const base_dimension_impl<Rep, Ts...>& base) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(get_dimension_as<unit_exponent<Unit>>(base)) {}
+   };
+
+   template<is_{{ dim.name }}_unit Unit>
+   class {{ dim.name }}<Unit, void> : public {{ dim.name }}<double, Unit> {
+   public:
+      using {{ dim.name }}<double, Unit>::{{ dim.name }};
    };
 
    /// @brief Deduction guide for {{ dim.name }} constructor with base_dimension.
    /// @tparam {{ dim.name }}Unit The unit type.
    template<is_{{ dim.name }} Dim>
-   {{ dim.name }}(Dim) -> {{ dim.name }}<DimExtractor<{{ dim.name }}Type, Dim>>;
+   {{ dim.name }}(Dim) -> {{ dim.name }}<typename Dim::rep, DimExtractor<{{ dim.name }}Type, Dim>>;
 }
 
 #endif // STATIC_DIMENSION_{{ dim.name }}_IMPL_H

@@ -52,36 +52,42 @@ namespace dimension
       return get_dimension_as<unit_exponent<T>>(obj);
    }
 
-   template<is_temperature_unit Unit = Primarytemperature, bool isQuantity = false>
+   template<typename RepOrUnit = double, typename MaybeUnit = void>
    class temperature;
 
    /// @brief Represents a dimension type for temperature.
    /// @tparam Unit The primary unit type.
-   template<is_temperature_unit Unit>
-   class temperature<Unit, false> : public base_dimension<unit_exponent<Unit>>
+   template<rep_type Rep, is_temperature_unit Unit>
+   class temperature<Rep, Unit> : public base_dimension_impl<Rep, unit_exponent<Unit>>
    {
    public:
       /// @brief Default constructor initializing to zero.
-      constexpr temperature() : base_dimension<unit_exponent<Unit>>::base_dimension(0.0) {}
+      constexpr temperature() : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(0.0) {}
 
       /// @brief Constructs a temperature object with a specific value.
       /// @param val The value to initialize with.
-      explicit constexpr temperature(double val) : base_dimension<unit_exponent<Unit>>::base_dimension(val) {}
+      explicit constexpr temperature(double val) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(val) {}
 
       /// @brief Constructs a temperature object from another base_dimension.
       /// @tparam Ts The units of the base_dimension.
       /// @param base The base_dimension object to construct from.
       template<typename... Ts>
-      requires matching_dimensions<base_dimension<unit_exponent<Unit>>, base_dimension<Ts...>>
+      requires matching_dimensions<base_dimension_impl<Rep, unit_exponent<Unit>>, base_dimension_impl<Rep, Ts...>>
       // Implicit conversion between dimensions of the same unit is core to Dimensional
       // cppcheck-suppress noExplicitConstructor
-      constexpr temperature(const base_dimension<Ts...>& base) : base_dimension<unit_exponent<Unit>>::base_dimension(get_dimension_as<unit_exponent<Unit>>(base)) {}
+      constexpr temperature(const base_dimension_impl<Rep, Ts...>& base) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(get_dimension_as<unit_exponent<Unit>>(base)) {}
+   };
+
+   template<is_temperature_unit Unit>
+   class temperature<Unit, void> : public temperature<double, Unit> {
+   public:
+      using temperature<double, Unit>::temperature;
    };
 
    /// @brief Deduction guide for temperature constructor with base_dimension.
    /// @tparam temperatureUnit The unit type.
    template<is_temperature Dim>
-   temperature(Dim) -> temperature<DimExtractor<temperatureType, Dim>>;
+   temperature(Dim) -> temperature<typename Dim::rep, DimExtractor<temperatureType, Dim>>;
 }
 
 #endif // STATIC_DIMENSION_temperature_IMPL_H

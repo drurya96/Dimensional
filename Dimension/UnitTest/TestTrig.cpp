@@ -80,7 +80,7 @@ TEST(TrigFunctions, Atan2Test) {
    ASSERT_NEAR(get_angle_as<radians>(dimension::atan2(length<meters>(-1.0), length<meters>(-1.0))), -3.0 * pi / 4.0, TOLERANCE);
 
    // Ensure resolution of base_dimension to named dimensions work
-   ASSERT_NEAR(get_angle_as<radians>(dimension::atan2(length<meters>(0.0), base_dimension<unit_exponent<meters>>(1.0))), 0.0, TOLERANCE);
+   ASSERT_NEAR(get_angle_as<radians>(dimension::atan2(length<meters>(0.0), base_dimension_impl<double, unit_exponent<meters>>(1.0))), 0.0, TOLERANCE);
 }
 
 TEST(TrigFunctions, HypotTest) {

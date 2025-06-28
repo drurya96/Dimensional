@@ -52,36 +52,42 @@ namespace dimension
       return get_dimension_as<unit_exponent<T>>(obj);
    }
 
-   template<is_amount_unit Unit = Primaryamount, bool isQuantity = false>
+   template<typename RepOrUnit = double, typename MaybeUnit = void>
    class amount;
 
    /// @brief Represents a dimension type for amount.
    /// @tparam Unit The primary unit type.
-   template<is_amount_unit Unit>
-   class amount<Unit, false> : public base_dimension<unit_exponent<Unit>>
+   template<rep_type Rep, is_amount_unit Unit>
+   class amount<Rep, Unit> : public base_dimension_impl<Rep, unit_exponent<Unit>>
    {
    public:
       /// @brief Default constructor initializing to zero.
-      constexpr amount() : base_dimension<unit_exponent<Unit>>::base_dimension(0.0) {}
+      constexpr amount() : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(0.0) {}
 
       /// @brief Constructs a amount object with a specific value.
       /// @param val The value to initialize with.
-      explicit constexpr amount(double val) : base_dimension<unit_exponent<Unit>>::base_dimension(val) {}
+      explicit constexpr amount(double val) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(val) {}
 
       /// @brief Constructs a amount object from another base_dimension.
       /// @tparam Ts The units of the base_dimension.
       /// @param base The base_dimension object to construct from.
       template<typename... Ts>
-      requires matching_dimensions<base_dimension<unit_exponent<Unit>>, base_dimension<Ts...>>
+      requires matching_dimensions<base_dimension_impl<Rep, unit_exponent<Unit>>, base_dimension_impl<Rep, Ts...>>
       // Implicit conversion between dimensions of the same unit is core to Dimensional
       // cppcheck-suppress noExplicitConstructor
-      constexpr amount(const base_dimension<Ts...>& base) : base_dimension<unit_exponent<Unit>>::base_dimension(get_dimension_as<unit_exponent<Unit>>(base)) {}
+      constexpr amount(const base_dimension_impl<Rep, Ts...>& base) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(get_dimension_as<unit_exponent<Unit>>(base)) {}
+   };
+
+   template<is_amount_unit Unit>
+   class amount<Unit, void> : public amount<double, Unit> {
+   public:
+      using amount<double, Unit>::amount;
    };
 
    /// @brief Deduction guide for amount constructor with base_dimension.
    /// @tparam amountUnit The unit type.
    template<is_amount Dim>
-   amount(Dim) -> amount<DimExtractor<amountType, Dim>>;
+   amount(Dim) -> amount<typename Dim::rep, DimExtractor<amountType, Dim>>;
 }
 
 #endif // STATIC_DIMENSION_amount_IMPL_H

@@ -1,10 +1,13 @@
 #ifndef DIMENSION_UNIT_SIMPLIFIER_H
 #define DIMENSION_UNIT_SIMPLIFIER_H
 
+#include <concepts>
+
 #include "TupleHandling.h"
 #include "Conversion.h"
 #include "FundamentalUnitExtractor.h"
 #include "UnitValidation.h"
+#include "base_dimension_signature.h"
 
 namespace dimension
 {
@@ -319,10 +322,6 @@ namespace dimension
                              IsUnitTuple<typename FundamentalUnitExtractor<NumTuple, DenTuple>::Den> &&
                              NoNonAbsoluteQuantitiesInCompoundDimension<NumTuple, DenTuple> &&
                              !has_matching_quantity<NumTuple, DenTuple>::value;
-
-   // Forward declarations
-   template<are_unit_exponents... Units>
-   class base_dimension;
 
 
 

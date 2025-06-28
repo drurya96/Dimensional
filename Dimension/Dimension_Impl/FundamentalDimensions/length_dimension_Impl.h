@@ -52,36 +52,42 @@ namespace dimension
       return get_dimension_as<unit_exponent<T>>(obj);
    }
 
-   template<is_length_unit Unit = Primarylength, bool isQuantity = false>
+   template<typename RepOrUnit = double, typename MaybeUnit = void>
    class length;
 
    /// @brief Represents a dimension type for length.
    /// @tparam Unit The primary unit type.
-   template<is_length_unit Unit>
-   class length<Unit, false> : public base_dimension<unit_exponent<Unit>>
+   template<rep_type Rep, is_length_unit Unit>
+   class length<Rep, Unit> : public base_dimension_impl<Rep, unit_exponent<Unit>>
    {
    public:
       /// @brief Default constructor initializing to zero.
-      constexpr length() : base_dimension<unit_exponent<Unit>>::base_dimension(0.0) {}
+      constexpr length() : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(0.0) {}
 
       /// @brief Constructs a length object with a specific value.
       /// @param val The value to initialize with.
-      explicit constexpr length(double val) : base_dimension<unit_exponent<Unit>>::base_dimension(val) {}
+      explicit constexpr length(double val) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(val) {}
 
       /// @brief Constructs a length object from another base_dimension.
       /// @tparam Ts The units of the base_dimension.
       /// @param base The base_dimension object to construct from.
       template<typename... Ts>
-      requires matching_dimensions<base_dimension<unit_exponent<Unit>>, base_dimension<Ts...>>
+      requires matching_dimensions<base_dimension_impl<Rep, unit_exponent<Unit>>, base_dimension_impl<Rep, Ts...>>
       // Implicit conversion between dimensions of the same unit is core to Dimensional
       // cppcheck-suppress noExplicitConstructor
-      constexpr length(const base_dimension<Ts...>& base) : base_dimension<unit_exponent<Unit>>::base_dimension(get_dimension_as<unit_exponent<Unit>>(base)) {}
+      constexpr length(const base_dimension_impl<Rep, Ts...>& base) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(get_dimension_as<unit_exponent<Unit>>(base)) {}
+   };
+
+   template<is_length_unit Unit>
+   class length<Unit, void> : public length<double, Unit> {
+   public:
+      using length<double, Unit>::length;
    };
 
    /// @brief Deduction guide for length constructor with base_dimension.
    /// @tparam lengthUnit The unit type.
    template<is_length Dim>
-   length(Dim) -> length<DimExtractor<lengthType, Dim>>;
+   length(Dim) -> length<typename Dim::rep, DimExtractor<lengthType, Dim>>;
 }
 
 #endif // STATIC_DIMENSION_length_IMPL_H

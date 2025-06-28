@@ -1,6 +1,8 @@
 #ifndef DIMENSION_UNIT_SIMPLIFIER_H
 #define DIMENSION_UNIT_SIMPLIFIER_H
 
+#include <concepts>
+
 #include "TupleHandling.h"
 #include "Conversion.h"
 #include "FundamentalUnitExtractor.h"
@@ -8,14 +10,10 @@
 #include "TemplateUtils/RatioUtils.h"
 #include "TemplateUtils/GenericUtils.h"
 #include "Conversion.h"
+#include "base_dimension_signature.h"
 
 namespace dimension
 {
-
-
-   template<are_unit_exponents... Units>
-   class base_dimension;
-
 
    // TODO: Maybe not needed? Keep until verified
    template<typename IncomingUnit, typename... Units>
@@ -474,6 +472,48 @@ namespace dimension
       return simplify_type::dimType(simplify_type::after_conversion::Convert(input.GetRaw()));
    }
 
+   // ============================================================
+   // ==================== Equivalent Units ======================
+   // ============================================================
+
+   template<typename A, typename B>
+   constexpr bool unit_exponent_equiv_v =
+      std::is_same_v<typename A::unit, typename B::unit> &&
+      std::ratio_equal_v<typename A::exponent, typename B::exponent>;
+
+   template<typename TargetUnit, typename Tuple>
+   struct contains_unit_exponent;
+
+   template<typename TargetUnit>
+   struct contains_unit_exponent<TargetUnit, std::tuple<>> : std::false_type {};
+
+   template<typename TargetUnit, typename Head, typename... Tail>
+   struct contains_unit_exponent<TargetUnit, std::tuple<Head, Tail...>> : std::conditional_t<
+      unit_exponent_equiv_v<TargetUnit, Head>,
+      std::true_type,
+      contains_unit_exponent<TargetUnit, std::tuple<Tail...>>
+   > {};
+
+   template<typename A, typename B>
+   struct all_in;
+
+   template<typename... As, typename B>
+   struct all_in<std::tuple<As...>, B> : std::conjunction<
+      contains_unit_exponent<As, B>...
+   > {};
+
+   template<typename A, typename B>
+   struct same_units_trait
+   : std::conjunction<
+         all_in<A, B>,
+         all_in<B, A>
+      > {};
+
+   template<typename T1, typename T2>
+   concept same_units = same_units_trait<
+      typename InitialSimplifier<T1>::units,
+      typename InitialSimplifier<T2>::units
+   >::value;
 
 
 
@@ -485,6 +525,14 @@ namespace dimension
 
 
 
+
+
+
+
+
+
+
+   
 
    // ============================================================
    // ============== Find Matching Unit by Dimension =============

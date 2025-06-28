@@ -1,7 +1,6 @@
 #ifndef STATIC_DIMENSION_MOLAR_MASSES_H
 #define STATIC_DIMENSION_MOLAR_MASSES_H
 
-//#include "molar_mass_dimension.h"
 #include "dimensions.h"
 
 namespace dimension::molar_mass_constants

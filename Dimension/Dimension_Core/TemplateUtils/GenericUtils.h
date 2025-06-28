@@ -5,6 +5,10 @@
 
 namespace dimension
 {
+
+   template<typename T>
+   using no_deduce = typename std::type_identity<T>::type;
+
    template<typename Tuple, typename State, template<typename, typename> class Func>
    struct fold_over_tuple_with_state;
    

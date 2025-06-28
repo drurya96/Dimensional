@@ -52,36 +52,42 @@ namespace dimension
       return get_dimension_as<unit_exponent<T>>(obj);
    }
 
-   template<is_charge_unit Unit = Primarycharge, bool isQuantity = false>
+   template<typename RepOrUnit = double, typename MaybeUnit = void>
    class charge;
 
    /// @brief Represents a dimension type for charge.
    /// @tparam Unit The primary unit type.
-   template<is_charge_unit Unit>
-   class charge<Unit, false> : public base_dimension<unit_exponent<Unit>>
+   template<rep_type Rep, is_charge_unit Unit>
+   class charge<Rep, Unit> : public base_dimension_impl<Rep, unit_exponent<Unit>>
    {
    public:
       /// @brief Default constructor initializing to zero.
-      constexpr charge() : base_dimension<unit_exponent<Unit>>::base_dimension(0.0) {}
+      constexpr charge() : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(0.0) {}
 
       /// @brief Constructs a charge object with a specific value.
       /// @param val The value to initialize with.
-      explicit constexpr charge(double val) : base_dimension<unit_exponent<Unit>>::base_dimension(val) {}
+      explicit constexpr charge(double val) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(val) {}
 
       /// @brief Constructs a charge object from another base_dimension.
       /// @tparam Ts The units of the base_dimension.
       /// @param base The base_dimension object to construct from.
       template<typename... Ts>
-      requires matching_dimensions<base_dimension<unit_exponent<Unit>>, base_dimension<Ts...>>
+      requires matching_dimensions<base_dimension_impl<Rep, unit_exponent<Unit>>, base_dimension_impl<Rep, Ts...>>
       // Implicit conversion between dimensions of the same unit is core to Dimensional
       // cppcheck-suppress noExplicitConstructor
-      constexpr charge(const base_dimension<Ts...>& base) : base_dimension<unit_exponent<Unit>>::base_dimension(get_dimension_as<unit_exponent<Unit>>(base)) {}
+      constexpr charge(const base_dimension_impl<Rep, Ts...>& base) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(get_dimension_as<unit_exponent<Unit>>(base)) {}
+   };
+
+   template<is_charge_unit Unit>
+   class charge<Unit, void> : public charge<double, Unit> {
+   public:
+      using charge<double, Unit>::charge;
    };
 
    /// @brief Deduction guide for charge constructor with base_dimension.
    /// @tparam chargeUnit The unit type.
    template<is_charge Dim>
-   charge(Dim) -> charge<DimExtractor<chargeType, Dim>>;
+   charge(Dim) -> charge<typename Dim::rep, DimExtractor<chargeType, Dim>>;
 }
 
 #endif // STATIC_DIMENSION_charge_IMPL_H

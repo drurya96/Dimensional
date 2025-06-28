@@ -52,36 +52,42 @@ namespace dimension
       return get_dimension_as<unit_exponent<T>>(obj);
    }
 
-   template<is_mass_unit Unit = Primarymass, bool isQuantity = false>
+   template<typename RepOrUnit = double, typename MaybeUnit = void>
    class mass;
 
    /// @brief Represents a dimension type for mass.
    /// @tparam Unit The primary unit type.
-   template<is_mass_unit Unit>
-   class mass<Unit, false> : public base_dimension<unit_exponent<Unit>>
+   template<rep_type Rep, is_mass_unit Unit>
+   class mass<Rep, Unit> : public base_dimension_impl<Rep, unit_exponent<Unit>>
    {
    public:
       /// @brief Default constructor initializing to zero.
-      constexpr mass() : base_dimension<unit_exponent<Unit>>::base_dimension(0.0) {}
+      constexpr mass() : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(0.0) {}
 
       /// @brief Constructs a mass object with a specific value.
       /// @param val The value to initialize with.
-      explicit constexpr mass(double val) : base_dimension<unit_exponent<Unit>>::base_dimension(val) {}
+      explicit constexpr mass(double val) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(val) {}
 
       /// @brief Constructs a mass object from another base_dimension.
       /// @tparam Ts The units of the base_dimension.
       /// @param base The base_dimension object to construct from.
       template<typename... Ts>
-      requires matching_dimensions<base_dimension<unit_exponent<Unit>>, base_dimension<Ts...>>
+      requires matching_dimensions<base_dimension_impl<Rep, unit_exponent<Unit>>, base_dimension_impl<Rep, Ts...>>
       // Implicit conversion between dimensions of the same unit is core to Dimensional
       // cppcheck-suppress noExplicitConstructor
-      constexpr mass(const base_dimension<Ts...>& base) : base_dimension<unit_exponent<Unit>>::base_dimension(get_dimension_as<unit_exponent<Unit>>(base)) {}
+      constexpr mass(const base_dimension_impl<Rep, Ts...>& base) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(get_dimension_as<unit_exponent<Unit>>(base)) {}
+   };
+
+   template<is_mass_unit Unit>
+   class mass<Unit, void> : public mass<double, Unit> {
+   public:
+      using mass<double, Unit>::mass;
    };
 
    /// @brief Deduction guide for mass constructor with base_dimension.
    /// @tparam massUnit The unit type.
    template<is_mass Dim>
-   mass(Dim) -> mass<DimExtractor<massType, Dim>>;
+   mass(Dim) -> mass<typename Dim::rep, DimExtractor<massType, Dim>>;
 }
 
 #endif // STATIC_DIMENSION_mass_IMPL_H

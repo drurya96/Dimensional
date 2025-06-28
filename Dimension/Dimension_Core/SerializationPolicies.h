@@ -2,17 +2,15 @@
 #define DIMENSION_SERIALIZATION_POLICIES_H
 
 #include <cstring>
+#include <concepts>
 
 #include "StringLiteral.h"
 #include "UnitSimplifier.h"
+#include "base_dimension_signature.h"
 #include <vector>
 
 namespace dimension
 {
-
-   // Forward declaration
-   template<are_unit_exponents... Units>
-   class base_dimension;
 
    /// @brief Validate that an input buffer's tag matches the hashed value corresponding to the type
    /// @tparam NumTuple Numerator tuple

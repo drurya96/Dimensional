@@ -2,7 +2,9 @@
 #define DIMENSION_STREAM_H
 
 #include "TupleHandling.h"
+#include "base_dimension_signature.h"
 
+#include <concepts>
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -13,9 +15,6 @@ namespace dimension
    // Forward declare dimension and unit
    template<typename Unit, StringLiteral Name, StringLiteral Abbreviation, StringLiteral DimName, int UnitID>
    struct BaseUnit;
-
-   template<are_unit_exponents... Units>
-   class base_dimension;
 
    /// @brief Type of string to print
    enum class UnitNameTypes{Name, Abbr, DimName};
