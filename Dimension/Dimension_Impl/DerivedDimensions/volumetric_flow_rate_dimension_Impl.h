@@ -5,8 +5,25 @@
 #include "../../dimensions/fundamental/length_dimension.h"
 #include "../../dimensions/fundamental/timespan_dimension.h"
 
+
 namespace dimension
 {
+
+   template<
+         typename T0,
+         typename T1
+   >
+   concept are_volumetric_flow_rate_units =
+         (
+               is_length_unit<T0> && 
+               is_timespan_unit<T1>
+         ) ||
+         (
+               is_timespan_unit<T0> && 
+               is_length_unit<T1>
+         )
+   ;
+
    /// @brief Concept to verify a type can serve as a named volumetric_flow_rate unit
    template<typename T>
    concept IsNamedvolumetric_flow_rateUnit = requires {
@@ -57,33 +74,81 @@ namespace dimension
    template<typename... Ts>
    class volumetric_flow_rate;
 
-   /// @brief Represents the default volumetric_flow_rate
-   template<>
-   class volumetric_flow_rate<> : public base_dimension<
-      unit_exponent<Primarylength, 3>,
-      unit_exponent<Primarytimespan, -1>>
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      is_coefficient... Cs
+   >
+   requires are_volumetric_flow_rate_units<
+      T0,
+      T1
+   >
+   class volumetric_flow_rate<T0, T1, Cs...> : public base_dimension<double,
+      unit_exponent<typename Extractor<lengthType, T0, T1>::type, 3>,
+      unit_exponent<typename Extractor<timespanType, T0, T1>::type, -1>,
+      Cs...
+   >
    {
    public:
-      using Base = base_dimension<
-         unit_exponent<Primarylength, 3>,
-         unit_exponent<Primarytimespan, -1>>;
+      using Base = base_dimension<double,
+         unit_exponent<typename Extractor<lengthType, T0, T1>::type, 3>,
+         unit_exponent<typename Extractor<timespanType, T0, T1>::type, -1>,
+         Cs...
+      >;
+   
       using Base::Base;
-
-      explicit constexpr volumetric_flow_rate(PrecisionType val) : Base(val) {}
-
-      template<typename Other>
-      requires Isvolumetric_flow_rate<Other>
-      constexpr volumetric_flow_rate(const Other& base)
-         : Base(call_unpack<typename Base::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
+   
+      template<typename T>
+      requires Isvolumetric_flow_rate<T>
+      constexpr volumetric_flow_rate(const T& base) : Base(base) {}
    };
+
+
+
+
+   template<
+      rep_type Rep,
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      is_coefficient... Cs
+   >
+   requires are_volumetric_flow_rate_units<
+      T0,
+      T1
+   >
+   class volumetric_flow_rate<Rep, T0, T1, Cs...> : public base_dimension<Rep,
+      unit_exponent<typename Extractor<lengthType, T0, T1>::type, 3>,
+      unit_exponent<typename Extractor<timespanType, T0, T1>::type, -1>,
+      Cs...
+   >
+   {
+   public:
+      using Base = base_dimension<Rep,
+         unit_exponent<typename Extractor<lengthType, T0, T1>::type, 3>,
+         unit_exponent<typename Extractor<timespanType, T0, T1>::type, -1>,
+         Cs...
+      >;
+   
+      using Base::Base;
+   
+      template<typename T>
+      requires Isvolumetric_flow_rate<T>
+      constexpr volumetric_flow_rate(const T& base) : Base(base) {}
+   };
+
+
+
 
    /// @brief Template specialization for named volumetric_flow_rate units
    /// @tparam Named The named unit this volumetric_flow_rate type is in terms of
-   template<IsNamedvolumetric_flow_rateUnit Named>
-   class volumetric_flow_rate<Named> : public base_dimensionFromTuple<typename Named::units>::dim
+   template<IsNamedvolumetric_flow_rateUnit Named, is_coefficient... Cs>
+   class volumetric_flow_rate<Named, Cs...> : public base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<typename Named::units>::dim;
+      using Base = typename base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
@@ -93,24 +158,92 @@ namespace dimension
    };
 
 
-   template<typename... Units>
-   class volumetric_flow_rate<Units...> : public base_dimension<
-      unit_exponent<typename Extractor<lengthType, Units...>::type, 3>,
-      unit_exponent<typename Extractor<timespanType, Units...>::type, -1>
-   >
+   /// @brief Template specialization for named volumetric_flow_rate units
+   /// @tparam Named The named unit this volumetric_flow_rate type is in terms of
+   template<rep_type Rep, IsNamedvolumetric_flow_rateUnit Named, is_coefficient... Cs>
+   class volumetric_flow_rate<Rep, Named, Cs...> : public base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = base_dimension<
-         unit_exponent<typename Extractor<lengthType, Units...>::type, 3>,
-         unit_exponent<typename Extractor<timespanType, Units...>::type, -1>
-      >;
-   
+      using Base = typename base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
-   
-      template<typename T>
-      requires Isvolumetric_flow_rate<T>
-      constexpr volumetric_flow_rate(const T& base) : Base(base) {}
+
+      template<typename Other>
+      requires Isvolumetric_flow_rate<Other>
+      constexpr volumetric_flow_rate(const Other& base)
+         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
+
+
+
+
+   
+
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      is_coefficient... Cs
+   >
+   requires are_volumetric_flow_rate_units<
+      T0,
+      T1
+   >
+   constexpr auto make_volumetric_flow_rate(Cs... coeffs)
+   {
+      return volumetric_flow_rate<double, T0, T1, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      rep_type Rep,
+      is_coefficient... Cs
+   >
+   requires are_volumetric_flow_rate_units<
+      T0,
+      T1
+   > && (!is_coefficient<Rep>)
+   constexpr auto make_volumetric_flow_rate(Rep value, Cs... coeffs)
+   {
+      return volumetric_flow_rate<Rep, T0, T1, Cs...>(value, coeffs...);
+   }
+
+
+
+
+   /// @brief Template specialization for named volumetric_flow_rate units
+   /// @tparam Named The named unit this volumetric_flow_rate type is in terms of
+   template<IsNamedvolumetric_flow_rateUnit Named, is_coefficient... Cs>
+   constexpr auto make_volumetric_flow_rate(Cs... coeffs)
+   {
+      return volumetric_flow_rate<double, Named, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+
+
+   /// @brief Template specialization for named volumetric_flow_rate units
+   /// @tparam Named The named unit this volumetric_flow_rate type is in terms of
+   template<IsNamedvolumetric_flow_rateUnit Named, rep_type Rep, is_coefficient... Cs>
+   constexpr auto make_volumetric_flow_rate(Rep value, Cs... coeffs)
+   {
+      return volumetric_flow_rate<Rep, Named, Cs...>(value, coeffs...);
+   }
+
+
+
+
+
+
+
+
 
    template<Isvolumetric_flow_rate Dim>
    volumetric_flow_rate(Dim) -> 

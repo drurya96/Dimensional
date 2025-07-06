@@ -5,8 +5,25 @@
 #include "../../dimensions/fundamental/mass_dimension.h"
 #include "../../dimensions/fundamental/amount_dimension.h"
 
+
 namespace dimension
 {
+
+   template<
+         typename T0,
+         typename T1
+   >
+   concept are_molar_mass_units =
+         (
+               is_mass_unit<T0> && 
+               is_amount_unit<T1>
+         ) ||
+         (
+               is_amount_unit<T0> && 
+               is_mass_unit<T1>
+         )
+   ;
+
    /// @brief Concept to verify a type can serve as a named molar_mass unit
    template<typename T>
    concept IsNamedmolar_massUnit = requires {
@@ -57,33 +74,81 @@ namespace dimension
    template<typename... Ts>
    class molar_mass;
 
-   /// @brief Represents the default molar_mass
-   template<>
-   class molar_mass<> : public base_dimension<
-      unit_exponent<Primarymass, 1>,
-      unit_exponent<Primaryamount, -1>>
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      is_coefficient... Cs
+   >
+   requires are_molar_mass_units<
+      T0,
+      T1
+   >
+   class molar_mass<T0, T1, Cs...> : public base_dimension<double,
+      unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
+      unit_exponent<typename Extractor<amountType, T0, T1>::type, -1>,
+      Cs...
+   >
    {
    public:
-      using Base = base_dimension<
-         unit_exponent<Primarymass, 1>,
-         unit_exponent<Primaryamount, -1>>;
+      using Base = base_dimension<double,
+         unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
+         unit_exponent<typename Extractor<amountType, T0, T1>::type, -1>,
+         Cs...
+      >;
+   
       using Base::Base;
-
-      explicit constexpr molar_mass(PrecisionType val) : Base(val) {}
-
-      template<typename Other>
-      requires Ismolar_mass<Other>
-      constexpr molar_mass(const Other& base)
-         : Base(call_unpack<typename Base::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
+   
+      template<typename T>
+      requires Ismolar_mass<T>
+      constexpr molar_mass(const T& base) : Base(base) {}
    };
+
+
+
+
+   template<
+      rep_type Rep,
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      is_coefficient... Cs
+   >
+   requires are_molar_mass_units<
+      T0,
+      T1
+   >
+   class molar_mass<Rep, T0, T1, Cs...> : public base_dimension<Rep,
+      unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
+      unit_exponent<typename Extractor<amountType, T0, T1>::type, -1>,
+      Cs...
+   >
+   {
+   public:
+      using Base = base_dimension<Rep,
+         unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
+         unit_exponent<typename Extractor<amountType, T0, T1>::type, -1>,
+         Cs...
+      >;
+   
+      using Base::Base;
+   
+      template<typename T>
+      requires Ismolar_mass<T>
+      constexpr molar_mass(const T& base) : Base(base) {}
+   };
+
+
+
 
    /// @brief Template specialization for named molar_mass units
    /// @tparam Named The named unit this molar_mass type is in terms of
-   template<IsNamedmolar_massUnit Named>
-   class molar_mass<Named> : public base_dimensionFromTuple<typename Named::units>::dim
+   template<IsNamedmolar_massUnit Named, is_coefficient... Cs>
+   class molar_mass<Named, Cs...> : public base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<typename Named::units>::dim;
+      using Base = typename base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
@@ -93,24 +158,92 @@ namespace dimension
    };
 
 
-   template<typename... Units>
-   class molar_mass<Units...> : public base_dimension<
-      unit_exponent<typename Extractor<massType, Units...>::type, 1>,
-      unit_exponent<typename Extractor<amountType, Units...>::type, -1>
-   >
+   /// @brief Template specialization for named molar_mass units
+   /// @tparam Named The named unit this molar_mass type is in terms of
+   template<rep_type Rep, IsNamedmolar_massUnit Named, is_coefficient... Cs>
+   class molar_mass<Rep, Named, Cs...> : public base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = base_dimension<
-         unit_exponent<typename Extractor<massType, Units...>::type, 1>,
-         unit_exponent<typename Extractor<amountType, Units...>::type, -1>
-      >;
-   
+      using Base = typename base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
-   
-      template<typename T>
-      requires Ismolar_mass<T>
-      constexpr molar_mass(const T& base) : Base(base) {}
+
+      template<typename Other>
+      requires Ismolar_mass<Other>
+      constexpr molar_mass(const Other& base)
+         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
+
+
+
+
+   
+
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      is_coefficient... Cs
+   >
+   requires are_molar_mass_units<
+      T0,
+      T1
+   >
+   constexpr auto make_molar_mass(Cs... coeffs)
+   {
+      return molar_mass<double, T0, T1, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      rep_type Rep,
+      is_coefficient... Cs
+   >
+   requires are_molar_mass_units<
+      T0,
+      T1
+   > && (!is_coefficient<Rep>)
+   constexpr auto make_molar_mass(Rep value, Cs... coeffs)
+   {
+      return molar_mass<Rep, T0, T1, Cs...>(value, coeffs...);
+   }
+
+
+
+
+   /// @brief Template specialization for named molar_mass units
+   /// @tparam Named The named unit this molar_mass type is in terms of
+   template<IsNamedmolar_massUnit Named, is_coefficient... Cs>
+   constexpr auto make_molar_mass(Cs... coeffs)
+   {
+      return molar_mass<double, Named, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+
+
+   /// @brief Template specialization for named molar_mass units
+   /// @tparam Named The named unit this molar_mass type is in terms of
+   template<IsNamedmolar_massUnit Named, rep_type Rep, is_coefficient... Cs>
+   constexpr auto make_molar_mass(Rep value, Cs... coeffs)
+   {
+      return molar_mass<Rep, Named, Cs...>(value, coeffs...);
+   }
+
+
+
+
+
+
+
+
 
    template<Ismolar_mass Dim>
    molar_mass(Dim) -> 

@@ -52,42 +52,73 @@ namespace dimension
       return get_dimension_as<unit_exponent<T>>(obj);
    }
 
-   template<typename RepOrUnit = double, typename MaybeUnit = void>
+   template<typename RepOrUnit = double, typename MaybeUnit = void, is_coefficient... Cs>
    class length;
 
    /// @brief Represents a dimension type for length.
    /// @tparam Unit The primary unit type.
-   template<rep_type Rep, is_length_unit Unit>
-   class length<Rep, Unit> : public base_dimension_impl<Rep, unit_exponent<Unit>>
+   template<rep_type Rep, is_length_unit Unit, is_coefficient... Cs>
+   class length<Rep, Unit, Cs...> : public base_dimension_impl<Rep, unit_exponent<Unit>, Cs...>
    {
+
+      using impl = base_dimension_impl<Rep, unit_exponent<Unit>, Cs...>;
+
    public:
       /// @brief Default constructor initializing to zero.
-      constexpr length() : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(0.0) {}
+      constexpr length() : impl(0.0) {}
 
       /// @brief Constructs a length object with a specific value.
       /// @param val The value to initialize with.
-      explicit constexpr length(double val) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(val) {}
+      explicit constexpr length(double val) : impl(val) {}
+
+      /* perfect-forward ctor so factory can pass symbols --------------------- */
+      template<typename V, is_coefficient... Ds>
+      requires std::is_constructible_v<Rep, V>
+      explicit constexpr length(V&& v, Ds... ds) : impl(static_cast<Rep>(std::forward<V>(v)), ds...) {}
+
+      template<is_coefficient... Ds>
+      requires std::same_as<std::tuple<Cs...>, std::tuple<Ds...>>
+      constexpr length(const base_dimension_impl<Rep, unit_exponent<Unit>, Ds...>& src) : impl(src) {}
 
       /// @brief Constructs a length object from another base_dimension.
       /// @tparam Ts The units of the base_dimension.
       /// @param base The base_dimension object to construct from.
       template<typename... Ts>
-      requires matching_dimensions<base_dimension_impl<Rep, unit_exponent<Unit>>, base_dimension_impl<Rep, Ts...>>
+      requires matching_dimensions<impl, base_dimension_impl<Rep, Ts...>>
       // Implicit conversion between dimensions of the same unit is core to Dimensional
       // cppcheck-suppress noExplicitConstructor
-      constexpr length(const base_dimension_impl<Rep, Ts...>& base) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(get_dimension_as<unit_exponent<Unit>>(base)) {}
+      constexpr length(const base_dimension_impl<Rep, Ts...>& base) : impl(get_dimension_as<unit_exponent<Unit>>(base)) {}
    };
 
-   template<is_length_unit Unit>
-   class length<Unit, void> : public length<double, Unit> {
+   template<is_length_unit U, typename Rep, is_coefficient... Cs>
+   requires (!is_coefficient<Rep>)
+   constexpr auto make_length(Rep value, Cs... coeffs)
+   {
+      return length<Rep, U, Cs...>(value, coeffs...);
+   }
+
+   template<is_length_unit U, is_coefficient... Cs>
+   constexpr auto make_length(Cs... coeffs)
+   {
+      return length<double, U, Cs...>(1.0, coeffs...);   // 1 × coeffs
+   }
+
+   template<is_length_unit Unit, is_coefficient... Cs>
+   class length<Unit, void, Cs...> : public length<double, Unit, Cs...> {
    public:
-      using length<double, Unit>::length;
+      using length<double, Unit, Cs...>::length;
    };
 
    /// @brief Deduction guide for length constructor with base_dimension.
    /// @tparam lengthUnit The unit type.
    template<is_length Dim>
    length(Dim) -> length<typename Dim::rep, DimExtractor<lengthType, Dim>>;
+
+   template<rep_type Rep, is_length_unit Unit, is_coefficient... Cs>
+   length(const length<Rep, Unit, Cs...>&) -> length<Rep, Unit, Cs...>;
+
+   template<rep_type R, is_length_unit U, is_coefficient... Cs>
+   length(base_dimension_impl<R, unit_exponent<U>, Cs...>) -> length<R, U, Cs...>;
 }
 
 #endif // STATIC_DIMENSION_length_IMPL_H

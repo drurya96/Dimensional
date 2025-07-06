@@ -4,8 +4,19 @@
 #include "../../base_dimension.h"
 #include "../../dimensions/fundamental/length_dimension.h"
 
+
 namespace dimension
 {
+
+   template<
+         typename T0
+   >
+   concept are_volume_units =
+         (
+               is_length_unit<T0>
+         )
+   ;
+
    /// @brief Concept to verify a type can serve as a named volume unit
    template<typename T>
    concept IsNamedvolumeUnit = requires {
@@ -51,31 +62,73 @@ namespace dimension
    template<typename... Ts>
    class volume;
 
-   /// @brief Represents the default volume
-   template<>
-   class volume<> : public base_dimension<
-      unit_exponent<Primarylength, 3>>
+
+
+
+   template<
+      IsBasicUnitType T0,
+      is_coefficient... Cs
+   >
+   requires are_volume_units<
+      T0
+   >
+   class volume<T0, Cs...> : public base_dimension<double,
+      unit_exponent<typename Extractor<lengthType, T0>::type, 3>,
+      Cs...
+   >
    {
    public:
-      using Base = base_dimension<
-         unit_exponent<Primarylength, 3>>;
+      using Base = base_dimension<double,
+         unit_exponent<typename Extractor<lengthType, T0>::type, 3>,
+         Cs...
+      >;
+   
       using Base::Base;
-
-      explicit constexpr volume(PrecisionType val) : Base(val) {}
-
-      template<typename Other>
-      requires Isvolume<Other>
-      constexpr volume(const Other& base)
-         : Base(call_unpack<typename Base::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
+   
+      template<typename T>
+      requires Isvolume<T>
+      constexpr volume(const T& base) : Base(base) {}
    };
+
+
+
+
+   template<
+      rep_type Rep,
+      IsBasicUnitType T0,
+      is_coefficient... Cs
+   >
+   requires are_volume_units<
+      T0
+   >
+   class volume<Rep, T0, Cs...> : public base_dimension<Rep,
+      unit_exponent<typename Extractor<lengthType, T0>::type, 3>,
+      Cs...
+   >
+   {
+   public:
+      using Base = base_dimension<Rep,
+         unit_exponent<typename Extractor<lengthType, T0>::type, 3>,
+         Cs...
+      >;
+   
+      using Base::Base;
+   
+      template<typename T>
+      requires Isvolume<T>
+      constexpr volume(const T& base) : Base(base) {}
+   };
+
+
+
 
    /// @brief Template specialization for named volume units
    /// @tparam Named The named unit this volume type is in terms of
-   template<IsNamedvolumeUnit Named>
-   class volume<Named> : public base_dimensionFromTuple<typename Named::units>::dim
+   template<IsNamedvolumeUnit Named, is_coefficient... Cs>
+   class volume<Named, Cs...> : public base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<typename Named::units>::dim;
+      using Base = typename base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
@@ -85,22 +138,88 @@ namespace dimension
    };
 
 
-   template<typename... Units>
-   class volume<Units...> : public base_dimension<
-      unit_exponent<typename Extractor<lengthType, Units...>::type, 3>
-   >
+   /// @brief Template specialization for named volume units
+   /// @tparam Named The named unit this volume type is in terms of
+   template<rep_type Rep, IsNamedvolumeUnit Named, is_coefficient... Cs>
+   class volume<Rep, Named, Cs...> : public base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = base_dimension<
-         unit_exponent<typename Extractor<lengthType, Units...>::type, 3>
-      >;
-   
+      using Base = typename base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
-   
-      template<typename T>
-      requires Isvolume<T>
-      constexpr volume(const T& base) : Base(base) {}
+
+      template<typename Other>
+      requires Isvolume<Other>
+      constexpr volume(const Other& base)
+         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
+
+
+
+
+   
+
+
+
+
+   template<
+      IsBasicUnitType T0,
+      is_coefficient... Cs
+   >
+   requires are_volume_units<
+      T0
+   >
+   constexpr auto make_volume(Cs... coeffs)
+   {
+      return volume<double, T0, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+   template<
+      IsBasicUnitType T0,
+      rep_type Rep,
+      is_coefficient... Cs
+   >
+   requires are_volume_units<
+      T0
+   > && (!is_coefficient<Rep>)
+   constexpr auto make_volume(Rep value, Cs... coeffs)
+   {
+      return volume<Rep, T0, Cs...>(value, coeffs...);
+   }
+
+
+
+
+   /// @brief Template specialization for named volume units
+   /// @tparam Named The named unit this volume type is in terms of
+   template<IsNamedvolumeUnit Named, is_coefficient... Cs>
+   constexpr auto make_volume(Cs... coeffs)
+   {
+      return volume<double, Named, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+
+
+   /// @brief Template specialization for named volume units
+   /// @tparam Named The named unit this volume type is in terms of
+   template<IsNamedvolumeUnit Named, rep_type Rep, is_coefficient... Cs>
+   constexpr auto make_volume(Rep value, Cs... coeffs)
+   {
+      return volume<Rep, Named, Cs...>(value, coeffs...);
+   }
+
+
+
+
+
+
+
+
 
    template<Isvolume Dim>
    volume(Dim) -> 

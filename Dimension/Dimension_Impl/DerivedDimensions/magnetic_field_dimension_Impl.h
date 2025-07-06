@@ -6,8 +6,48 @@
 #include "../../dimensions/fundamental/timespan_dimension.h"
 #include "../../dimensions/fundamental/charge_dimension.h"
 
+
 namespace dimension
 {
+
+   template<
+         typename T0,
+         typename T1,
+         typename T2
+   >
+   concept are_magnetic_field_units =
+         (
+               is_mass_unit<T0> && 
+               is_timespan_unit<T1> && 
+               is_charge_unit<T2>
+         ) ||
+         (
+               is_mass_unit<T0> && 
+               is_charge_unit<T1> && 
+               is_timespan_unit<T2>
+         ) ||
+         (
+               is_timespan_unit<T0> && 
+               is_mass_unit<T1> && 
+               is_charge_unit<T2>
+         ) ||
+         (
+               is_timespan_unit<T0> && 
+               is_charge_unit<T1> && 
+               is_mass_unit<T2>
+         ) ||
+         (
+               is_charge_unit<T0> && 
+               is_mass_unit<T1> && 
+               is_timespan_unit<T2>
+         ) ||
+         (
+               is_charge_unit<T0> && 
+               is_timespan_unit<T1> && 
+               is_mass_unit<T2>
+         )
+   ;
+
    /// @brief Concept to verify a type can serve as a named magnetic_field unit
    template<typename T>
    concept IsNamedmagnetic_fieldUnit = requires {
@@ -63,35 +103,89 @@ namespace dimension
    template<typename... Ts>
    class magnetic_field;
 
-   /// @brief Represents the default magnetic_field
-   template<>
-   class magnetic_field<> : public base_dimension<
-      unit_exponent<Primarymass, 1>,
-      unit_exponent<Primarytimespan, -1>,
-      unit_exponent<Primarycharge, -1>>
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      is_coefficient... Cs
+   >
+   requires are_magnetic_field_units<
+      T0,
+      T1,
+      T2
+   >
+   class magnetic_field<T0, T1, T2, Cs...> : public base_dimension<double,
+      unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
+      unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -1>,
+      unit_exponent<typename Extractor<chargeType, T0, T1, T2>::type, -1>,
+      Cs...
+   >
    {
    public:
-      using Base = base_dimension<
-         unit_exponent<Primarymass, 1>,
-         unit_exponent<Primarytimespan, -1>,
-         unit_exponent<Primarycharge, -1>>;
+      using Base = base_dimension<double,
+         unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
+         unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -1>,
+         unit_exponent<typename Extractor<chargeType, T0, T1, T2>::type, -1>,
+         Cs...
+      >;
+   
       using Base::Base;
-
-      explicit constexpr magnetic_field(PrecisionType val) : Base(val) {}
-
-      template<typename Other>
-      requires Ismagnetic_field<Other>
-      constexpr magnetic_field(const Other& base)
-         : Base(call_unpack<typename Base::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
+   
+      template<typename T>
+      requires Ismagnetic_field<T>
+      constexpr magnetic_field(const T& base) : Base(base) {}
    };
+
+
+
+
+   template<
+      rep_type Rep,
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      is_coefficient... Cs
+   >
+   requires are_magnetic_field_units<
+      T0,
+      T1,
+      T2
+   >
+   class magnetic_field<Rep, T0, T1, T2, Cs...> : public base_dimension<Rep,
+      unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
+      unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -1>,
+      unit_exponent<typename Extractor<chargeType, T0, T1, T2>::type, -1>,
+      Cs...
+   >
+   {
+   public:
+      using Base = base_dimension<Rep,
+         unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
+         unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -1>,
+         unit_exponent<typename Extractor<chargeType, T0, T1, T2>::type, -1>,
+         Cs...
+      >;
+   
+      using Base::Base;
+   
+      template<typename T>
+      requires Ismagnetic_field<T>
+      constexpr magnetic_field(const T& base) : Base(base) {}
+   };
+
+
+
 
    /// @brief Template specialization for named magnetic_field units
    /// @tparam Named The named unit this magnetic_field type is in terms of
-   template<IsNamedmagnetic_fieldUnit Named>
-   class magnetic_field<Named> : public base_dimensionFromTuple<typename Named::units>::dim
+   template<IsNamedmagnetic_fieldUnit Named, is_coefficient... Cs>
+   class magnetic_field<Named, Cs...> : public base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<typename Named::units>::dim;
+      using Base = typename base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
@@ -101,26 +195,96 @@ namespace dimension
    };
 
 
-   template<typename... Units>
-   class magnetic_field<Units...> : public base_dimension<
-      unit_exponent<typename Extractor<massType, Units...>::type, 1>,
-      unit_exponent<typename Extractor<timespanType, Units...>::type, -1>,
-      unit_exponent<typename Extractor<chargeType, Units...>::type, -1>
-   >
+   /// @brief Template specialization for named magnetic_field units
+   /// @tparam Named The named unit this magnetic_field type is in terms of
+   template<rep_type Rep, IsNamedmagnetic_fieldUnit Named, is_coefficient... Cs>
+   class magnetic_field<Rep, Named, Cs...> : public base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = base_dimension<
-         unit_exponent<typename Extractor<massType, Units...>::type, 1>,
-         unit_exponent<typename Extractor<timespanType, Units...>::type, -1>,
-         unit_exponent<typename Extractor<chargeType, Units...>::type, -1>
-      >;
-   
+      using Base = typename base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
-   
-      template<typename T>
-      requires Ismagnetic_field<T>
-      constexpr magnetic_field(const T& base) : Base(base) {}
+
+      template<typename Other>
+      requires Ismagnetic_field<Other>
+      constexpr magnetic_field(const Other& base)
+         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
+
+
+
+
+   
+
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      is_coefficient... Cs
+   >
+   requires are_magnetic_field_units<
+      T0,
+      T1,
+      T2
+   >
+   constexpr auto make_magnetic_field(Cs... coeffs)
+   {
+      return magnetic_field<double, T0, T1, T2, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      rep_type Rep,
+      is_coefficient... Cs
+   >
+   requires are_magnetic_field_units<
+      T0,
+      T1,
+      T2
+   > && (!is_coefficient<Rep>)
+   constexpr auto make_magnetic_field(Rep value, Cs... coeffs)
+   {
+      return magnetic_field<Rep, T0, T1, T2, Cs...>(value, coeffs...);
+   }
+
+
+
+
+   /// @brief Template specialization for named magnetic_field units
+   /// @tparam Named The named unit this magnetic_field type is in terms of
+   template<IsNamedmagnetic_fieldUnit Named, is_coefficient... Cs>
+   constexpr auto make_magnetic_field(Cs... coeffs)
+   {
+      return magnetic_field<double, Named, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+
+
+   /// @brief Template specialization for named magnetic_field units
+   /// @tparam Named The named unit this magnetic_field type is in terms of
+   template<IsNamedmagnetic_fieldUnit Named, rep_type Rep, is_coefficient... Cs>
+   constexpr auto make_magnetic_field(Rep value, Cs... coeffs)
+   {
+      return magnetic_field<Rep, Named, Cs...>(value, coeffs...);
+   }
+
+
+
+
+
+
+
+
 
    template<Ismagnetic_field Dim>
    magnetic_field(Dim) -> 

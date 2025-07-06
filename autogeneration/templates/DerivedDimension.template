@@ -6,8 +6,32 @@
 #include "../../dimensions/fundamental/{{ de.dim }}_dimension.h"
 {% endfor %}
 
+{% set dim_num = dim.definition | length %}
+{% set t_items = [] %}
+{% for i in range(dim_num) %}
+   {% set _ = t_items.append('T' ~ i) %}
+{% endfor %}
+{% set t_list = t_items | join(', ') %}
+{% set perms = constraint_permutations(dim.definition) %}
+
 namespace dimension
 {
+
+   template<
+      {% for t in t_items %}
+         typename {{ t }}{{ "," if not loop.last }}
+      {% endfor %}
+   >
+   concept are_{{ dim.name }}_units =
+      {% for perm in perms %}
+         (
+         {% for i in range(dim_num) %}
+               {{ perm[i] }}<{{ t_items[i] }}>{{ " && " if not loop.last }}
+         {% endfor %}
+         ){{ " ||" if not loop.last }}
+      {% endfor %}
+   ;
+
    /// @brief Concept to verify a type can serve as a named {{ dim.name }} unit
    template<typename T>
    concept IsNamed{{ dim.name }}Unit = requires {
@@ -63,35 +87,89 @@ namespace dimension
    template<typename... Ts>
    class {{ dim.name }};
 
-   /// @brief Represents the default {{ dim.name }}
-   template<>
-   class {{ dim.name }}<> : public base_dimension<
-      {% for de in dim.definition %}
-      unit_exponent<Primary{{ de.dim }}, {{ de.exponent_num }}>{{ "," if not loop.last else ">" }}
+
+
+
+   template<
+      {% for num in range(dim_num) %}
+      IsBasicUnitType T{{num}},
       {% endfor %}
+      is_coefficient... Cs
+   >
+   requires are_{{ dim.name }}_units<
+      {% for num in range(dim_num) %}
+      T{{num}}{{ "," if not loop.last }}
+      {% endfor %}
+   >
+   class {{ dim.name }}<{{t_list}}, Cs...> : public base_dimension<double,
+      {% for de in dim.definition %}
+      unit_exponent<typename Extractor<{{ de.dim }}Type, {{t_list}}>::type, {{ de.exponent_num }}>,
+      {% endfor %}
+      Cs...
+   >
    {
    public:
-      using Base = base_dimension<
+      using Base = base_dimension<double,
          {% for de in dim.definition %}
-         unit_exponent<Primary{{ de.dim }}, {{ de.exponent_num }}>{{ "," if not loop.last else ">;" }}
+         unit_exponent<typename Extractor<{{ de.dim }}Type, {{t_list}}>::type, {{ de.exponent_num }}>,
          {% endfor %}
+         Cs...
+      >;
+   
       using Base::Base;
-
-      explicit constexpr {{ dim.name }}(PrecisionType val) : Base(val) {}
-
-      template<typename Other>
-      requires Is{{ dim.name }}<Other>
-      constexpr {{ dim.name }}(const Other& base)
-         : Base(call_unpack<typename Base::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
+   
+      template<typename T>
+      requires Is{{ dim.name }}<T>
+      constexpr {{ dim.name }}(const T& base) : Base(base) {}
    };
+
+
+
+
+   template<
+      rep_type Rep,
+      {% for num in range(dim_num) %}
+      IsBasicUnitType T{{num}},
+      {% endfor %}
+      is_coefficient... Cs
+   >
+   requires are_{{ dim.name }}_units<
+      {% for num in range(dim_num) %}
+      T{{num}}{{ "," if not loop.last }}
+      {% endfor %}
+   >
+   class {{ dim.name }}<Rep, {{t_list}}, Cs...> : public base_dimension<Rep,
+      {% for de in dim.definition %}
+      unit_exponent<typename Extractor<{{ de.dim }}Type, {{t_list}}>::type, {{ de.exponent_num }}>,
+      {% endfor %}
+      Cs...
+   >
+   {
+   public:
+      using Base = base_dimension<Rep,
+         {% for de in dim.definition %}
+         unit_exponent<typename Extractor<{{ de.dim }}Type, {{t_list}}>::type, {{ de.exponent_num }}>,
+         {% endfor %}
+         Cs...
+      >;
+   
+      using Base::Base;
+   
+      template<typename T>
+      requires Is{{ dim.name }}<T>
+      constexpr {{ dim.name }}(const T& base) : Base(base) {}
+   };
+
+
+
 
    /// @brief Template specialization for named {{ dim.name }} units
    /// @tparam Named The named unit this {{ dim.name }} type is in terms of
-   template<IsNamed{{ dim.name }}Unit Named>
-   class {{ dim.name }}<Named> : public base_dimensionFromTuple<typename Named::units>::dim
+   template<IsNamed{{ dim.name }}Unit Named, is_coefficient... Cs>
+   class {{ dim.name }}<Named, Cs...> : public base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<typename Named::units>::dim;
+      using Base = typename base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
@@ -101,26 +179,96 @@ namespace dimension
    };
 
 
-   template<typename... Units>
-   class {{ dim.name }}<Units...> : public base_dimension<
-      {% for de in dim.definition %}
-      unit_exponent<typename Extractor<{{ de.dim }}Type, Units...>::type, {{ de.exponent_num }}>{{ "," if not loop.last }}
-      {% endfor %}
-   >
+   /// @brief Template specialization for named {{ dim.name }} units
+   /// @tparam Named The named unit this {{ dim.name }} type is in terms of
+   template<rep_type Rep, IsNamed{{ dim.name }}Unit Named, is_coefficient... Cs>
+   class {{ dim.name }}<Rep, Named, Cs...> : public base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = base_dimension<
-         {% for de in dim.definition %}
-         unit_exponent<typename Extractor<{{ de.dim }}Type, Units...>::type, {{ de.exponent_num }}>{{ "," if not loop.last }}
-         {% endfor %}
-      >;
-   
+      using Base = typename base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
-   
-      template<typename T>
-      requires Is{{ dim.name }}<T>
-      constexpr {{ dim.name }}(const T& base) : Base(base) {}
+
+      template<typename Other>
+      requires Is{{ dim.name }}<Other>
+      constexpr {{ dim.name }}(const Other& base)
+         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
+
+
+
+
+   
+
+
+
+
+   template<
+      {% for num in range(dim_num) %}
+      IsBasicUnitType T{{num}},
+      {% endfor %}
+      is_coefficient... Cs
+   >
+   requires are_{{ dim.name }}_units<
+      {% for num in range(dim_num) %}
+      T{{num}}{{ "," if not loop.last }}
+      {% endfor %}
+   >
+   constexpr auto make_{{ dim.name }}(Cs... coeffs)
+   {
+      return {{ dim.name }}<double, {{t_list}}, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+   template<
+      {% for num in range(dim_num) %}
+      IsBasicUnitType T{{num}},
+      {% endfor %}
+      rep_type Rep,
+      is_coefficient... Cs
+   >
+   requires are_{{ dim.name }}_units<
+      {% for num in range(dim_num) %}
+      T{{num}}{{ "," if not loop.last }}
+      {% endfor %}
+   > && (!is_coefficient<Rep>)
+   constexpr auto make_{{ dim.name }}(Rep value, Cs... coeffs)
+   {
+      return {{ dim.name }}<Rep, {{t_list}}, Cs...>(value, coeffs...);
+   }
+
+
+
+
+   /// @brief Template specialization for named {{ dim.name }} units
+   /// @tparam Named The named unit this {{ dim.name }} type is in terms of
+   template<IsNamed{{ dim.name }}Unit Named, is_coefficient... Cs>
+   constexpr auto make_{{ dim.name }}(Cs... coeffs)
+   {
+      return {{ dim.name }}<double, Named, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+
+
+   /// @brief Template specialization for named {{ dim.name }} units
+   /// @tparam Named The named unit this {{ dim.name }} type is in terms of
+   template<IsNamed{{ dim.name }}Unit Named, rep_type Rep, is_coefficient... Cs>
+   constexpr auto make_{{ dim.name }}(Rep value, Cs... coeffs)
+   {
+      return {{ dim.name }}<Rep, Named, Cs...>(value, coeffs...);
+   }
+
+
+
+
+
+
+
+
 
    template<Is{{ dim.name }} Dim>
    {{ dim.name }}(Dim) -> 

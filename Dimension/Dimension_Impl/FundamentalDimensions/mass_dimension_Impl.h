@@ -52,42 +52,73 @@ namespace dimension
       return get_dimension_as<unit_exponent<T>>(obj);
    }
 
-   template<typename RepOrUnit = double, typename MaybeUnit = void>
+   template<typename RepOrUnit = double, typename MaybeUnit = void, is_coefficient... Cs>
    class mass;
 
    /// @brief Represents a dimension type for mass.
    /// @tparam Unit The primary unit type.
-   template<rep_type Rep, is_mass_unit Unit>
-   class mass<Rep, Unit> : public base_dimension_impl<Rep, unit_exponent<Unit>>
+   template<rep_type Rep, is_mass_unit Unit, is_coefficient... Cs>
+   class mass<Rep, Unit, Cs...> : public base_dimension_impl<Rep, unit_exponent<Unit>, Cs...>
    {
+
+      using impl = base_dimension_impl<Rep, unit_exponent<Unit>, Cs...>;
+
    public:
       /// @brief Default constructor initializing to zero.
-      constexpr mass() : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(0.0) {}
+      constexpr mass() : impl(0.0) {}
 
       /// @brief Constructs a mass object with a specific value.
       /// @param val The value to initialize with.
-      explicit constexpr mass(double val) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(val) {}
+      explicit constexpr mass(double val) : impl(val) {}
+
+      /* perfect-forward ctor so factory can pass symbols --------------------- */
+      template<typename V, is_coefficient... Ds>
+      requires std::is_constructible_v<Rep, V>
+      explicit constexpr mass(V&& v, Ds... ds) : impl(static_cast<Rep>(std::forward<V>(v)), ds...) {}
+
+      template<is_coefficient... Ds>
+      requires std::same_as<std::tuple<Cs...>, std::tuple<Ds...>>
+      constexpr mass(const base_dimension_impl<Rep, unit_exponent<Unit>, Ds...>& src) : impl(src) {}
 
       /// @brief Constructs a mass object from another base_dimension.
       /// @tparam Ts The units of the base_dimension.
       /// @param base The base_dimension object to construct from.
       template<typename... Ts>
-      requires matching_dimensions<base_dimension_impl<Rep, unit_exponent<Unit>>, base_dimension_impl<Rep, Ts...>>
+      requires matching_dimensions<impl, base_dimension_impl<Rep, Ts...>>
       // Implicit conversion between dimensions of the same unit is core to Dimensional
       // cppcheck-suppress noExplicitConstructor
-      constexpr mass(const base_dimension_impl<Rep, Ts...>& base) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(get_dimension_as<unit_exponent<Unit>>(base)) {}
+      constexpr mass(const base_dimension_impl<Rep, Ts...>& base) : impl(get_dimension_as<unit_exponent<Unit>>(base)) {}
    };
 
-   template<is_mass_unit Unit>
-   class mass<Unit, void> : public mass<double, Unit> {
+   template<is_mass_unit U, typename Rep, is_coefficient... Cs>
+   requires (!is_coefficient<Rep>)
+   constexpr auto make_mass(Rep value, Cs... coeffs)
+   {
+      return mass<Rep, U, Cs...>(value, coeffs...);
+   }
+
+   template<is_mass_unit U, is_coefficient... Cs>
+   constexpr auto make_mass(Cs... coeffs)
+   {
+      return mass<double, U, Cs...>(1.0, coeffs...);   // 1 × coeffs
+   }
+
+   template<is_mass_unit Unit, is_coefficient... Cs>
+   class mass<Unit, void, Cs...> : public mass<double, Unit, Cs...> {
    public:
-      using mass<double, Unit>::mass;
+      using mass<double, Unit, Cs...>::mass;
    };
 
    /// @brief Deduction guide for mass constructor with base_dimension.
    /// @tparam massUnit The unit type.
    template<is_mass Dim>
    mass(Dim) -> mass<typename Dim::rep, DimExtractor<massType, Dim>>;
+
+   template<rep_type Rep, is_mass_unit Unit, is_coefficient... Cs>
+   mass(const mass<Rep, Unit, Cs...>&) -> mass<Rep, Unit, Cs...>;
+
+   template<rep_type R, is_mass_unit U, is_coefficient... Cs>
+   mass(base_dimension_impl<R, unit_exponent<U>, Cs...>) -> mass<R, U, Cs...>;
 }
 
 #endif // STATIC_DIMENSION_mass_IMPL_H

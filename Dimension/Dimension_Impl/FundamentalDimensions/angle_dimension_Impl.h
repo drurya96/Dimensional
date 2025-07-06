@@ -52,42 +52,73 @@ namespace dimension
       return get_dimension_as<unit_exponent<T>>(obj);
    }
 
-   template<typename RepOrUnit = double, typename MaybeUnit = void>
+   template<typename RepOrUnit = double, typename MaybeUnit = void, is_coefficient... Cs>
    class angle;
 
    /// @brief Represents a dimension type for angle.
    /// @tparam Unit The primary unit type.
-   template<rep_type Rep, is_angle_unit Unit>
-   class angle<Rep, Unit> : public base_dimension_impl<Rep, unit_exponent<Unit>>
+   template<rep_type Rep, is_angle_unit Unit, is_coefficient... Cs>
+   class angle<Rep, Unit, Cs...> : public base_dimension_impl<Rep, unit_exponent<Unit>, Cs...>
    {
+
+      using impl = base_dimension_impl<Rep, unit_exponent<Unit>, Cs...>;
+
    public:
       /// @brief Default constructor initializing to zero.
-      constexpr angle() : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(0.0) {}
+      constexpr angle() : impl(0.0) {}
 
       /// @brief Constructs a angle object with a specific value.
       /// @param val The value to initialize with.
-      explicit constexpr angle(double val) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(val) {}
+      explicit constexpr angle(double val) : impl(val) {}
+
+      /* perfect-forward ctor so factory can pass symbols --------------------- */
+      template<typename V, is_coefficient... Ds>
+      requires std::is_constructible_v<Rep, V>
+      explicit constexpr angle(V&& v, Ds... ds) : impl(static_cast<Rep>(std::forward<V>(v)), ds...) {}
+
+      template<is_coefficient... Ds>
+      requires std::same_as<std::tuple<Cs...>, std::tuple<Ds...>>
+      constexpr angle(const base_dimension_impl<Rep, unit_exponent<Unit>, Ds...>& src) : impl(src) {}
 
       /// @brief Constructs a angle object from another base_dimension.
       /// @tparam Ts The units of the base_dimension.
       /// @param base The base_dimension object to construct from.
       template<typename... Ts>
-      requires matching_dimensions<base_dimension_impl<Rep, unit_exponent<Unit>>, base_dimension_impl<Rep, Ts...>>
+      requires matching_dimensions<impl, base_dimension_impl<Rep, Ts...>>
       // Implicit conversion between dimensions of the same unit is core to Dimensional
       // cppcheck-suppress noExplicitConstructor
-      constexpr angle(const base_dimension_impl<Rep, Ts...>& base) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(get_dimension_as<unit_exponent<Unit>>(base)) {}
+      constexpr angle(const base_dimension_impl<Rep, Ts...>& base) : impl(get_dimension_as<unit_exponent<Unit>>(base)) {}
    };
 
-   template<is_angle_unit Unit>
-   class angle<Unit, void> : public angle<double, Unit> {
+   template<is_angle_unit U, typename Rep, is_coefficient... Cs>
+   requires (!is_coefficient<Rep>)
+   constexpr auto make_angle(Rep value, Cs... coeffs)
+   {
+      return angle<Rep, U, Cs...>(value, coeffs...);
+   }
+
+   template<is_angle_unit U, is_coefficient... Cs>
+   constexpr auto make_angle(Cs... coeffs)
+   {
+      return angle<double, U, Cs...>(1.0, coeffs...);   // 1 × coeffs
+   }
+
+   template<is_angle_unit Unit, is_coefficient... Cs>
+   class angle<Unit, void, Cs...> : public angle<double, Unit, Cs...> {
    public:
-      using angle<double, Unit>::angle;
+      using angle<double, Unit, Cs...>::angle;
    };
 
    /// @brief Deduction guide for angle constructor with base_dimension.
    /// @tparam angleUnit The unit type.
    template<is_angle Dim>
    angle(Dim) -> angle<typename Dim::rep, DimExtractor<angleType, Dim>>;
+
+   template<rep_type Rep, is_angle_unit Unit, is_coefficient... Cs>
+   angle(const angle<Rep, Unit, Cs...>&) -> angle<Rep, Unit, Cs...>;
+
+   template<rep_type R, is_angle_unit U, is_coefficient... Cs>
+   angle(base_dimension_impl<R, unit_exponent<U>, Cs...>) -> angle<R, U, Cs...>;
 }
 
 #endif // STATIC_DIMENSION_angle_IMPL_H

@@ -6,8 +6,48 @@
 #include "../../dimensions/fundamental/length_dimension.h"
 #include "../../dimensions/fundamental/timespan_dimension.h"
 
+
 namespace dimension
 {
+
+   template<
+         typename T0,
+         typename T1,
+         typename T2
+   >
+   concept are_energy_units =
+         (
+               is_mass_unit<T0> && 
+               is_length_unit<T1> && 
+               is_timespan_unit<T2>
+         ) ||
+         (
+               is_mass_unit<T0> && 
+               is_timespan_unit<T1> && 
+               is_length_unit<T2>
+         ) ||
+         (
+               is_length_unit<T0> && 
+               is_mass_unit<T1> && 
+               is_timespan_unit<T2>
+         ) ||
+         (
+               is_length_unit<T0> && 
+               is_timespan_unit<T1> && 
+               is_mass_unit<T2>
+         ) ||
+         (
+               is_timespan_unit<T0> && 
+               is_mass_unit<T1> && 
+               is_length_unit<T2>
+         ) ||
+         (
+               is_timespan_unit<T0> && 
+               is_length_unit<T1> && 
+               is_mass_unit<T2>
+         )
+   ;
+
    /// @brief Concept to verify a type can serve as a named energy unit
    template<typename T>
    concept IsNamedenergyUnit = requires {
@@ -63,35 +103,89 @@ namespace dimension
    template<typename... Ts>
    class energy;
 
-   /// @brief Represents the default energy
-   template<>
-   class energy<> : public base_dimension<
-      unit_exponent<Primarymass, 1>,
-      unit_exponent<Primarylength, 2>,
-      unit_exponent<Primarytimespan, -2>>
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      is_coefficient... Cs
+   >
+   requires are_energy_units<
+      T0,
+      T1,
+      T2
+   >
+   class energy<T0, T1, T2, Cs...> : public base_dimension<double,
+      unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
+      unit_exponent<typename Extractor<lengthType, T0, T1, T2>::type, 2>,
+      unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -2>,
+      Cs...
+   >
    {
    public:
-      using Base = base_dimension<
-         unit_exponent<Primarymass, 1>,
-         unit_exponent<Primarylength, 2>,
-         unit_exponent<Primarytimespan, -2>>;
+      using Base = base_dimension<double,
+         unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
+         unit_exponent<typename Extractor<lengthType, T0, T1, T2>::type, 2>,
+         unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -2>,
+         Cs...
+      >;
+   
       using Base::Base;
-
-      explicit constexpr energy(PrecisionType val) : Base(val) {}
-
-      template<typename Other>
-      requires Isenergy<Other>
-      constexpr energy(const Other& base)
-         : Base(call_unpack<typename Base::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
+   
+      template<typename T>
+      requires Isenergy<T>
+      constexpr energy(const T& base) : Base(base) {}
    };
+
+
+
+
+   template<
+      rep_type Rep,
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      is_coefficient... Cs
+   >
+   requires are_energy_units<
+      T0,
+      T1,
+      T2
+   >
+   class energy<Rep, T0, T1, T2, Cs...> : public base_dimension<Rep,
+      unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
+      unit_exponent<typename Extractor<lengthType, T0, T1, T2>::type, 2>,
+      unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -2>,
+      Cs...
+   >
+   {
+   public:
+      using Base = base_dimension<Rep,
+         unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
+         unit_exponent<typename Extractor<lengthType, T0, T1, T2>::type, 2>,
+         unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -2>,
+         Cs...
+      >;
+   
+      using Base::Base;
+   
+      template<typename T>
+      requires Isenergy<T>
+      constexpr energy(const T& base) : Base(base) {}
+   };
+
+
+
 
    /// @brief Template specialization for named energy units
    /// @tparam Named The named unit this energy type is in terms of
-   template<IsNamedenergyUnit Named>
-   class energy<Named> : public base_dimensionFromTuple<typename Named::units>::dim
+   template<IsNamedenergyUnit Named, is_coefficient... Cs>
+   class energy<Named, Cs...> : public base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<typename Named::units>::dim;
+      using Base = typename base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
@@ -101,26 +195,96 @@ namespace dimension
    };
 
 
-   template<typename... Units>
-   class energy<Units...> : public base_dimension<
-      unit_exponent<typename Extractor<massType, Units...>::type, 1>,
-      unit_exponent<typename Extractor<lengthType, Units...>::type, 2>,
-      unit_exponent<typename Extractor<timespanType, Units...>::type, -2>
-   >
+   /// @brief Template specialization for named energy units
+   /// @tparam Named The named unit this energy type is in terms of
+   template<rep_type Rep, IsNamedenergyUnit Named, is_coefficient... Cs>
+   class energy<Rep, Named, Cs...> : public base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = base_dimension<
-         unit_exponent<typename Extractor<massType, Units...>::type, 1>,
-         unit_exponent<typename Extractor<lengthType, Units...>::type, 2>,
-         unit_exponent<typename Extractor<timespanType, Units...>::type, -2>
-      >;
-   
+      using Base = typename base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
-   
-      template<typename T>
-      requires Isenergy<T>
-      constexpr energy(const T& base) : Base(base) {}
+
+      template<typename Other>
+      requires Isenergy<Other>
+      constexpr energy(const Other& base)
+         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
+
+
+
+
+   
+
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      is_coefficient... Cs
+   >
+   requires are_energy_units<
+      T0,
+      T1,
+      T2
+   >
+   constexpr auto make_energy(Cs... coeffs)
+   {
+      return energy<double, T0, T1, T2, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      rep_type Rep,
+      is_coefficient... Cs
+   >
+   requires are_energy_units<
+      T0,
+      T1,
+      T2
+   > && (!is_coefficient<Rep>)
+   constexpr auto make_energy(Rep value, Cs... coeffs)
+   {
+      return energy<Rep, T0, T1, T2, Cs...>(value, coeffs...);
+   }
+
+
+
+
+   /// @brief Template specialization for named energy units
+   /// @tparam Named The named unit this energy type is in terms of
+   template<IsNamedenergyUnit Named, is_coefficient... Cs>
+   constexpr auto make_energy(Cs... coeffs)
+   {
+      return energy<double, Named, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+
+
+   /// @brief Template specialization for named energy units
+   /// @tparam Named The named unit this energy type is in terms of
+   template<IsNamedenergyUnit Named, rep_type Rep, is_coefficient... Cs>
+   constexpr auto make_energy(Rep value, Cs... coeffs)
+   {
+      return energy<Rep, Named, Cs...>(value, coeffs...);
+   }
+
+
+
+
+
+
+
+
 
    template<Isenergy Dim>
    energy(Dim) -> 

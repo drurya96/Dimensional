@@ -5,8 +5,25 @@
 #include "../../dimensions/fundamental/length_dimension.h"
 #include "../../dimensions/fundamental/timespan_dimension.h"
 
+
 namespace dimension
 {
+
+   template<
+         typename T0,
+         typename T1
+   >
+   concept are_speed_units =
+         (
+               is_length_unit<T0> && 
+               is_timespan_unit<T1>
+         ) ||
+         (
+               is_timespan_unit<T0> && 
+               is_length_unit<T1>
+         )
+   ;
+
    /// @brief Concept to verify a type can serve as a named speed unit
    template<typename T>
    concept IsNamedspeedUnit = requires {
@@ -57,33 +74,81 @@ namespace dimension
    template<typename... Ts>
    class speed;
 
-   /// @brief Represents the default speed
-   template<>
-   class speed<> : public base_dimension<
-      unit_exponent<Primarylength, 1>,
-      unit_exponent<Primarytimespan, -1>>
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      is_coefficient... Cs
+   >
+   requires are_speed_units<
+      T0,
+      T1
+   >
+   class speed<T0, T1, Cs...> : public base_dimension<double,
+      unit_exponent<typename Extractor<lengthType, T0, T1>::type, 1>,
+      unit_exponent<typename Extractor<timespanType, T0, T1>::type, -1>,
+      Cs...
+   >
    {
    public:
-      using Base = base_dimension<
-         unit_exponent<Primarylength, 1>,
-         unit_exponent<Primarytimespan, -1>>;
+      using Base = base_dimension<double,
+         unit_exponent<typename Extractor<lengthType, T0, T1>::type, 1>,
+         unit_exponent<typename Extractor<timespanType, T0, T1>::type, -1>,
+         Cs...
+      >;
+   
       using Base::Base;
-
-      explicit constexpr speed(PrecisionType val) : Base(val) {}
-
-      template<typename Other>
-      requires Isspeed<Other>
-      constexpr speed(const Other& base)
-         : Base(call_unpack<typename Base::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
+   
+      template<typename T>
+      requires Isspeed<T>
+      constexpr speed(const T& base) : Base(base) {}
    };
+
+
+
+
+   template<
+      rep_type Rep,
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      is_coefficient... Cs
+   >
+   requires are_speed_units<
+      T0,
+      T1
+   >
+   class speed<Rep, T0, T1, Cs...> : public base_dimension<Rep,
+      unit_exponent<typename Extractor<lengthType, T0, T1>::type, 1>,
+      unit_exponent<typename Extractor<timespanType, T0, T1>::type, -1>,
+      Cs...
+   >
+   {
+   public:
+      using Base = base_dimension<Rep,
+         unit_exponent<typename Extractor<lengthType, T0, T1>::type, 1>,
+         unit_exponent<typename Extractor<timespanType, T0, T1>::type, -1>,
+         Cs...
+      >;
+   
+      using Base::Base;
+   
+      template<typename T>
+      requires Isspeed<T>
+      constexpr speed(const T& base) : Base(base) {}
+   };
+
+
+
 
    /// @brief Template specialization for named speed units
    /// @tparam Named The named unit this speed type is in terms of
-   template<IsNamedspeedUnit Named>
-   class speed<Named> : public base_dimensionFromTuple<typename Named::units>::dim
+   template<IsNamedspeedUnit Named, is_coefficient... Cs>
+   class speed<Named, Cs...> : public base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<typename Named::units>::dim;
+      using Base = typename base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
@@ -93,24 +158,92 @@ namespace dimension
    };
 
 
-   template<typename... Units>
-   class speed<Units...> : public base_dimension<
-      unit_exponent<typename Extractor<lengthType, Units...>::type, 1>,
-      unit_exponent<typename Extractor<timespanType, Units...>::type, -1>
-   >
+   /// @brief Template specialization for named speed units
+   /// @tparam Named The named unit this speed type is in terms of
+   template<rep_type Rep, IsNamedspeedUnit Named, is_coefficient... Cs>
+   class speed<Rep, Named, Cs...> : public base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = base_dimension<
-         unit_exponent<typename Extractor<lengthType, Units...>::type, 1>,
-         unit_exponent<typename Extractor<timespanType, Units...>::type, -1>
-      >;
-   
+      using Base = typename base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
-   
-      template<typename T>
-      requires Isspeed<T>
-      constexpr speed(const T& base) : Base(base) {}
+
+      template<typename Other>
+      requires Isspeed<Other>
+      constexpr speed(const Other& base)
+         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
+
+
+
+
+   
+
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      is_coefficient... Cs
+   >
+   requires are_speed_units<
+      T0,
+      T1
+   >
+   constexpr auto make_speed(Cs... coeffs)
+   {
+      return speed<double, T0, T1, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      rep_type Rep,
+      is_coefficient... Cs
+   >
+   requires are_speed_units<
+      T0,
+      T1
+   > && (!is_coefficient<Rep>)
+   constexpr auto make_speed(Rep value, Cs... coeffs)
+   {
+      return speed<Rep, T0, T1, Cs...>(value, coeffs...);
+   }
+
+
+
+
+   /// @brief Template specialization for named speed units
+   /// @tparam Named The named unit this speed type is in terms of
+   template<IsNamedspeedUnit Named, is_coefficient... Cs>
+   constexpr auto make_speed(Cs... coeffs)
+   {
+      return speed<double, Named, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+
+
+   /// @brief Template specialization for named speed units
+   /// @tparam Named The named unit this speed type is in terms of
+   template<IsNamedspeedUnit Named, rep_type Rep, is_coefficient... Cs>
+   constexpr auto make_speed(Rep value, Cs... coeffs)
+   {
+      return speed<Rep, Named, Cs...>(value, coeffs...);
+   }
+
+
+
+
+
+
+
+
 
    template<Isspeed Dim>
    speed(Dim) -> 

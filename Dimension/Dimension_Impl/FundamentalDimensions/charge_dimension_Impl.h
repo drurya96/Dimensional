@@ -52,42 +52,73 @@ namespace dimension
       return get_dimension_as<unit_exponent<T>>(obj);
    }
 
-   template<typename RepOrUnit = double, typename MaybeUnit = void>
+   template<typename RepOrUnit = double, typename MaybeUnit = void, is_coefficient... Cs>
    class charge;
 
    /// @brief Represents a dimension type for charge.
    /// @tparam Unit The primary unit type.
-   template<rep_type Rep, is_charge_unit Unit>
-   class charge<Rep, Unit> : public base_dimension_impl<Rep, unit_exponent<Unit>>
+   template<rep_type Rep, is_charge_unit Unit, is_coefficient... Cs>
+   class charge<Rep, Unit, Cs...> : public base_dimension_impl<Rep, unit_exponent<Unit>, Cs...>
    {
+
+      using impl = base_dimension_impl<Rep, unit_exponent<Unit>, Cs...>;
+
    public:
       /// @brief Default constructor initializing to zero.
-      constexpr charge() : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(0.0) {}
+      constexpr charge() : impl(0.0) {}
 
       /// @brief Constructs a charge object with a specific value.
       /// @param val The value to initialize with.
-      explicit constexpr charge(double val) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(val) {}
+      explicit constexpr charge(double val) : impl(val) {}
+
+      /* perfect-forward ctor so factory can pass symbols --------------------- */
+      template<typename V, is_coefficient... Ds>
+      requires std::is_constructible_v<Rep, V>
+      explicit constexpr charge(V&& v, Ds... ds) : impl(static_cast<Rep>(std::forward<V>(v)), ds...) {}
+
+      template<is_coefficient... Ds>
+      requires std::same_as<std::tuple<Cs...>, std::tuple<Ds...>>
+      constexpr charge(const base_dimension_impl<Rep, unit_exponent<Unit>, Ds...>& src) : impl(src) {}
 
       /// @brief Constructs a charge object from another base_dimension.
       /// @tparam Ts The units of the base_dimension.
       /// @param base The base_dimension object to construct from.
       template<typename... Ts>
-      requires matching_dimensions<base_dimension_impl<Rep, unit_exponent<Unit>>, base_dimension_impl<Rep, Ts...>>
+      requires matching_dimensions<impl, base_dimension_impl<Rep, Ts...>>
       // Implicit conversion between dimensions of the same unit is core to Dimensional
       // cppcheck-suppress noExplicitConstructor
-      constexpr charge(const base_dimension_impl<Rep, Ts...>& base) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(get_dimension_as<unit_exponent<Unit>>(base)) {}
+      constexpr charge(const base_dimension_impl<Rep, Ts...>& base) : impl(get_dimension_as<unit_exponent<Unit>>(base)) {}
    };
 
-   template<is_charge_unit Unit>
-   class charge<Unit, void> : public charge<double, Unit> {
+   template<is_charge_unit U, typename Rep, is_coefficient... Cs>
+   requires (!is_coefficient<Rep>)
+   constexpr auto make_charge(Rep value, Cs... coeffs)
+   {
+      return charge<Rep, U, Cs...>(value, coeffs...);
+   }
+
+   template<is_charge_unit U, is_coefficient... Cs>
+   constexpr auto make_charge(Cs... coeffs)
+   {
+      return charge<double, U, Cs...>(1.0, coeffs...);   // 1 × coeffs
+   }
+
+   template<is_charge_unit Unit, is_coefficient... Cs>
+   class charge<Unit, void, Cs...> : public charge<double, Unit, Cs...> {
    public:
-      using charge<double, Unit>::charge;
+      using charge<double, Unit, Cs...>::charge;
    };
 
    /// @brief Deduction guide for charge constructor with base_dimension.
    /// @tparam chargeUnit The unit type.
    template<is_charge Dim>
    charge(Dim) -> charge<typename Dim::rep, DimExtractor<chargeType, Dim>>;
+
+   template<rep_type Rep, is_charge_unit Unit, is_coefficient... Cs>
+   charge(const charge<Rep, Unit, Cs...>&) -> charge<Rep, Unit, Cs...>;
+
+   template<rep_type R, is_charge_unit U, is_coefficient... Cs>
+   charge(base_dimension_impl<R, unit_exponent<U>, Cs...>) -> charge<R, U, Cs...>;
 }
 
 #endif // STATIC_DIMENSION_charge_IMPL_H

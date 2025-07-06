@@ -52,42 +52,73 @@ namespace dimension
       return get_dimension_as<unit_exponent<T>>(obj);
    }
 
-   template<typename RepOrUnit = double, typename MaybeUnit = void>
+   template<typename RepOrUnit = double, typename MaybeUnit = void, is_coefficient... Cs>
    class {{dim.name}};
 
    /// @brief Represents a dimension type for {{ dim.name }}.
    /// @tparam Unit The primary unit type.
-   template<rep_type Rep, is_{{ dim.name }}_unit Unit>
-   class {{ dim.name }}<Rep, Unit> : public base_dimension_impl<Rep, unit_exponent<Unit>>
+   template<rep_type Rep, is_{{ dim.name }}_unit Unit, is_coefficient... Cs>
+   class {{ dim.name }}<Rep, Unit, Cs...> : public base_dimension_impl<Rep, unit_exponent<Unit>, Cs...>
    {
+
+      using impl = base_dimension_impl<Rep, unit_exponent<Unit>, Cs...>;
+
    public:
       /// @brief Default constructor initializing to zero.
-      constexpr {{ dim.name }}() : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(0.0) {}
+      constexpr {{ dim.name }}() : impl(0.0) {}
 
       /// @brief Constructs a {{ dim.name }} object with a specific value.
       /// @param val The value to initialize with.
-      explicit constexpr {{ dim.name }}(double val) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(val) {}
+      explicit constexpr {{ dim.name }}(double val) : impl(val) {}
+
+      /* perfect-forward ctor so factory can pass symbols --------------------- */
+      template<typename V, is_coefficient... Ds>
+      requires std::is_constructible_v<Rep, V>
+      explicit constexpr {{ dim.name }}(V&& v, Ds... ds) : impl(static_cast<Rep>(std::forward<V>(v)), ds...) {}
+
+      template<is_coefficient... Ds>
+      requires std::same_as<std::tuple<Cs...>, std::tuple<Ds...>>
+      constexpr {{ dim.name }}(const base_dimension_impl<Rep, unit_exponent<Unit>, Ds...>& src) : impl(src) {}
 
       /// @brief Constructs a {{ dim.name }} object from another base_dimension.
       /// @tparam Ts The units of the base_dimension.
       /// @param base The base_dimension object to construct from.
       template<typename... Ts>
-      requires matching_dimensions<base_dimension_impl<Rep, unit_exponent<Unit>>, base_dimension_impl<Rep, Ts...>>
+      requires matching_dimensions<impl, base_dimension_impl<Rep, Ts...>>
       // Implicit conversion between dimensions of the same unit is core to Dimensional
       // cppcheck-suppress noExplicitConstructor
-      constexpr {{ dim.name }}(const base_dimension_impl<Rep, Ts...>& base) : base_dimension_impl<Rep, unit_exponent<Unit>>::base_dimension_impl(get_dimension_as<unit_exponent<Unit>>(base)) {}
+      constexpr {{ dim.name }}(const base_dimension_impl<Rep, Ts...>& base) : impl(get_dimension_as<unit_exponent<Unit>>(base)) {}
    };
 
-   template<is_{{ dim.name }}_unit Unit>
-   class {{ dim.name }}<Unit, void> : public {{ dim.name }}<double, Unit> {
+   template<is_{{ dim.name }}_unit U, typename Rep, is_coefficient... Cs>
+   requires (!is_coefficient<Rep>)
+   constexpr auto make_{{ dim.name }}(Rep value, Cs... coeffs)
+   {
+      return {{ dim.name }}<Rep, U, Cs...>(value, coeffs...);
+   }
+
+   template<is_{{ dim.name }}_unit U, is_coefficient... Cs>
+   constexpr auto make_{{ dim.name }}(Cs... coeffs)
+   {
+      return {{ dim.name }}<double, U, Cs...>(1.0, coeffs...);   // 1 × coeffs
+   }
+
+   template<is_{{ dim.name }}_unit Unit, is_coefficient... Cs>
+   class {{ dim.name }}<Unit, void, Cs...> : public {{ dim.name }}<double, Unit, Cs...> {
    public:
-      using {{ dim.name }}<double, Unit>::{{ dim.name }};
+      using {{ dim.name }}<double, Unit, Cs...>::{{ dim.name }};
    };
 
    /// @brief Deduction guide for {{ dim.name }} constructor with base_dimension.
    /// @tparam {{ dim.name }}Unit The unit type.
    template<is_{{ dim.name }} Dim>
    {{ dim.name }}(Dim) -> {{ dim.name }}<typename Dim::rep, DimExtractor<{{ dim.name }}Type, Dim>>;
+
+   template<rep_type Rep, is_{{ dim.name }}_unit Unit, is_coefficient... Cs>
+   {{ dim.name }}(const {{ dim.name }}<Rep, Unit, Cs...>&) -> {{ dim.name }}<Rep, Unit, Cs...>;
+
+   template<rep_type R, is_{{ dim.name }}_unit U, is_coefficient... Cs>
+   {{ dim.name }}(base_dimension_impl<R, unit_exponent<U>, Cs...>) -> {{ dim.name }}<R, U, Cs...>;
 }
 
 #endif // STATIC_DIMENSION_{{ dim.name }}_IMPL_H

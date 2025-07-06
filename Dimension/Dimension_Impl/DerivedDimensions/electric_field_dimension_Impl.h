@@ -7,8 +7,163 @@
 #include "../../dimensions/fundamental/timespan_dimension.h"
 #include "../../dimensions/fundamental/charge_dimension.h"
 
+
 namespace dimension
 {
+
+   template<
+         typename T0,
+         typename T1,
+         typename T2,
+         typename T3
+   >
+   concept are_electric_field_units =
+         (
+               is_mass_unit<T0> && 
+               is_length_unit<T1> && 
+               is_timespan_unit<T2> && 
+               is_charge_unit<T3>
+         ) ||
+         (
+               is_mass_unit<T0> && 
+               is_length_unit<T1> && 
+               is_charge_unit<T2> && 
+               is_timespan_unit<T3>
+         ) ||
+         (
+               is_mass_unit<T0> && 
+               is_timespan_unit<T1> && 
+               is_length_unit<T2> && 
+               is_charge_unit<T3>
+         ) ||
+         (
+               is_mass_unit<T0> && 
+               is_timespan_unit<T1> && 
+               is_charge_unit<T2> && 
+               is_length_unit<T3>
+         ) ||
+         (
+               is_mass_unit<T0> && 
+               is_charge_unit<T1> && 
+               is_length_unit<T2> && 
+               is_timespan_unit<T3>
+         ) ||
+         (
+               is_mass_unit<T0> && 
+               is_charge_unit<T1> && 
+               is_timespan_unit<T2> && 
+               is_length_unit<T3>
+         ) ||
+         (
+               is_length_unit<T0> && 
+               is_mass_unit<T1> && 
+               is_timespan_unit<T2> && 
+               is_charge_unit<T3>
+         ) ||
+         (
+               is_length_unit<T0> && 
+               is_mass_unit<T1> && 
+               is_charge_unit<T2> && 
+               is_timespan_unit<T3>
+         ) ||
+         (
+               is_length_unit<T0> && 
+               is_timespan_unit<T1> && 
+               is_mass_unit<T2> && 
+               is_charge_unit<T3>
+         ) ||
+         (
+               is_length_unit<T0> && 
+               is_timespan_unit<T1> && 
+               is_charge_unit<T2> && 
+               is_mass_unit<T3>
+         ) ||
+         (
+               is_length_unit<T0> && 
+               is_charge_unit<T1> && 
+               is_mass_unit<T2> && 
+               is_timespan_unit<T3>
+         ) ||
+         (
+               is_length_unit<T0> && 
+               is_charge_unit<T1> && 
+               is_timespan_unit<T2> && 
+               is_mass_unit<T3>
+         ) ||
+         (
+               is_timespan_unit<T0> && 
+               is_mass_unit<T1> && 
+               is_length_unit<T2> && 
+               is_charge_unit<T3>
+         ) ||
+         (
+               is_timespan_unit<T0> && 
+               is_mass_unit<T1> && 
+               is_charge_unit<T2> && 
+               is_length_unit<T3>
+         ) ||
+         (
+               is_timespan_unit<T0> && 
+               is_length_unit<T1> && 
+               is_mass_unit<T2> && 
+               is_charge_unit<T3>
+         ) ||
+         (
+               is_timespan_unit<T0> && 
+               is_length_unit<T1> && 
+               is_charge_unit<T2> && 
+               is_mass_unit<T3>
+         ) ||
+         (
+               is_timespan_unit<T0> && 
+               is_charge_unit<T1> && 
+               is_mass_unit<T2> && 
+               is_length_unit<T3>
+         ) ||
+         (
+               is_timespan_unit<T0> && 
+               is_charge_unit<T1> && 
+               is_length_unit<T2> && 
+               is_mass_unit<T3>
+         ) ||
+         (
+               is_charge_unit<T0> && 
+               is_mass_unit<T1> && 
+               is_length_unit<T2> && 
+               is_timespan_unit<T3>
+         ) ||
+         (
+               is_charge_unit<T0> && 
+               is_mass_unit<T1> && 
+               is_timespan_unit<T2> && 
+               is_length_unit<T3>
+         ) ||
+         (
+               is_charge_unit<T0> && 
+               is_length_unit<T1> && 
+               is_mass_unit<T2> && 
+               is_timespan_unit<T3>
+         ) ||
+         (
+               is_charge_unit<T0> && 
+               is_length_unit<T1> && 
+               is_timespan_unit<T2> && 
+               is_mass_unit<T3>
+         ) ||
+         (
+               is_charge_unit<T0> && 
+               is_timespan_unit<T1> && 
+               is_mass_unit<T2> && 
+               is_length_unit<T3>
+         ) ||
+         (
+               is_charge_unit<T0> && 
+               is_timespan_unit<T1> && 
+               is_length_unit<T2> && 
+               is_mass_unit<T3>
+         )
+   ;
+
    /// @brief Concept to verify a type can serve as a named electric_field unit
    template<typename T>
    concept IsNamedelectric_fieldUnit = requires {
@@ -69,37 +224,97 @@ namespace dimension
    template<typename... Ts>
    class electric_field;
 
-   /// @brief Represents the default electric_field
-   template<>
-   class electric_field<> : public base_dimension<
-      unit_exponent<Primarymass, 1>,
-      unit_exponent<Primarylength, 1>,
-      unit_exponent<Primarytimespan, -2>,
-      unit_exponent<Primarycharge, -1>>
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      IsBasicUnitType T3,
+      is_coefficient... Cs
+   >
+   requires are_electric_field_units<
+      T0,
+      T1,
+      T2,
+      T3
+   >
+   class electric_field<T0, T1, T2, T3, Cs...> : public base_dimension<double,
+      unit_exponent<typename Extractor<massType, T0, T1, T2, T3>::type, 1>,
+      unit_exponent<typename Extractor<lengthType, T0, T1, T2, T3>::type, 1>,
+      unit_exponent<typename Extractor<timespanType, T0, T1, T2, T3>::type, -2>,
+      unit_exponent<typename Extractor<chargeType, T0, T1, T2, T3>::type, -1>,
+      Cs...
+   >
    {
    public:
-      using Base = base_dimension<
-         unit_exponent<Primarymass, 1>,
-         unit_exponent<Primarylength, 1>,
-         unit_exponent<Primarytimespan, -2>,
-         unit_exponent<Primarycharge, -1>>;
+      using Base = base_dimension<double,
+         unit_exponent<typename Extractor<massType, T0, T1, T2, T3>::type, 1>,
+         unit_exponent<typename Extractor<lengthType, T0, T1, T2, T3>::type, 1>,
+         unit_exponent<typename Extractor<timespanType, T0, T1, T2, T3>::type, -2>,
+         unit_exponent<typename Extractor<chargeType, T0, T1, T2, T3>::type, -1>,
+         Cs...
+      >;
+   
       using Base::Base;
-
-      explicit constexpr electric_field(PrecisionType val) : Base(val) {}
-
-      template<typename Other>
-      requires Iselectric_field<Other>
-      constexpr electric_field(const Other& base)
-         : Base(call_unpack<typename Base::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
+   
+      template<typename T>
+      requires Iselectric_field<T>
+      constexpr electric_field(const T& base) : Base(base) {}
    };
+
+
+
+
+   template<
+      rep_type Rep,
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      IsBasicUnitType T3,
+      is_coefficient... Cs
+   >
+   requires are_electric_field_units<
+      T0,
+      T1,
+      T2,
+      T3
+   >
+   class electric_field<Rep, T0, T1, T2, T3, Cs...> : public base_dimension<Rep,
+      unit_exponent<typename Extractor<massType, T0, T1, T2, T3>::type, 1>,
+      unit_exponent<typename Extractor<lengthType, T0, T1, T2, T3>::type, 1>,
+      unit_exponent<typename Extractor<timespanType, T0, T1, T2, T3>::type, -2>,
+      unit_exponent<typename Extractor<chargeType, T0, T1, T2, T3>::type, -1>,
+      Cs...
+   >
+   {
+   public:
+      using Base = base_dimension<Rep,
+         unit_exponent<typename Extractor<massType, T0, T1, T2, T3>::type, 1>,
+         unit_exponent<typename Extractor<lengthType, T0, T1, T2, T3>::type, 1>,
+         unit_exponent<typename Extractor<timespanType, T0, T1, T2, T3>::type, -2>,
+         unit_exponent<typename Extractor<chargeType, T0, T1, T2, T3>::type, -1>,
+         Cs...
+      >;
+   
+      using Base::Base;
+   
+      template<typename T>
+      requires Iselectric_field<T>
+      constexpr electric_field(const T& base) : Base(base) {}
+   };
+
+
+
 
    /// @brief Template specialization for named electric_field units
    /// @tparam Named The named unit this electric_field type is in terms of
-   template<IsNamedelectric_fieldUnit Named>
-   class electric_field<Named> : public base_dimensionFromTuple<typename Named::units>::dim
+   template<IsNamedelectric_fieldUnit Named, is_coefficient... Cs>
+   class electric_field<Named, Cs...> : public base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<typename Named::units>::dim;
+      using Base = typename base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
@@ -109,28 +324,100 @@ namespace dimension
    };
 
 
-   template<typename... Units>
-   class electric_field<Units...> : public base_dimension<
-      unit_exponent<typename Extractor<massType, Units...>::type, 1>,
-      unit_exponent<typename Extractor<lengthType, Units...>::type, 1>,
-      unit_exponent<typename Extractor<timespanType, Units...>::type, -2>,
-      unit_exponent<typename Extractor<chargeType, Units...>::type, -1>
-   >
+   /// @brief Template specialization for named electric_field units
+   /// @tparam Named The named unit this electric_field type is in terms of
+   template<rep_type Rep, IsNamedelectric_fieldUnit Named, is_coefficient... Cs>
+   class electric_field<Rep, Named, Cs...> : public base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = base_dimension<
-         unit_exponent<typename Extractor<massType, Units...>::type, 1>,
-         unit_exponent<typename Extractor<lengthType, Units...>::type, 1>,
-         unit_exponent<typename Extractor<timespanType, Units...>::type, -2>,
-         unit_exponent<typename Extractor<chargeType, Units...>::type, -1>
-      >;
-   
+      using Base = typename base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
-   
-      template<typename T>
-      requires Iselectric_field<T>
-      constexpr electric_field(const T& base) : Base(base) {}
+
+      template<typename Other>
+      requires Iselectric_field<Other>
+      constexpr electric_field(const Other& base)
+         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
+
+
+
+
+   
+
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      IsBasicUnitType T3,
+      is_coefficient... Cs
+   >
+   requires are_electric_field_units<
+      T0,
+      T1,
+      T2,
+      T3
+   >
+   constexpr auto make_electric_field(Cs... coeffs)
+   {
+      return electric_field<double, T0, T1, T2, T3, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      IsBasicUnitType T3,
+      rep_type Rep,
+      is_coefficient... Cs
+   >
+   requires are_electric_field_units<
+      T0,
+      T1,
+      T2,
+      T3
+   > && (!is_coefficient<Rep>)
+   constexpr auto make_electric_field(Rep value, Cs... coeffs)
+   {
+      return electric_field<Rep, T0, T1, T2, T3, Cs...>(value, coeffs...);
+   }
+
+
+
+
+   /// @brief Template specialization for named electric_field units
+   /// @tparam Named The named unit this electric_field type is in terms of
+   template<IsNamedelectric_fieldUnit Named, is_coefficient... Cs>
+   constexpr auto make_electric_field(Cs... coeffs)
+   {
+      return electric_field<double, Named, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+
+
+   /// @brief Template specialization for named electric_field units
+   /// @tparam Named The named unit this electric_field type is in terms of
+   template<IsNamedelectric_fieldUnit Named, rep_type Rep, is_coefficient... Cs>
+   constexpr auto make_electric_field(Rep value, Cs... coeffs)
+   {
+      return electric_field<Rep, Named, Cs...>(value, coeffs...);
+   }
+
+
+
+
+
+
+
+
 
    template<Iselectric_field Dim>
    electric_field(Dim) -> 

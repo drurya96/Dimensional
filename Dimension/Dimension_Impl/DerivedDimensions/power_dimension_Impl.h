@@ -6,8 +6,48 @@
 #include "../../dimensions/fundamental/length_dimension.h"
 #include "../../dimensions/fundamental/timespan_dimension.h"
 
+
 namespace dimension
 {
+
+   template<
+         typename T0,
+         typename T1,
+         typename T2
+   >
+   concept are_power_units =
+         (
+               is_mass_unit<T0> && 
+               is_length_unit<T1> && 
+               is_timespan_unit<T2>
+         ) ||
+         (
+               is_mass_unit<T0> && 
+               is_timespan_unit<T1> && 
+               is_length_unit<T2>
+         ) ||
+         (
+               is_length_unit<T0> && 
+               is_mass_unit<T1> && 
+               is_timespan_unit<T2>
+         ) ||
+         (
+               is_length_unit<T0> && 
+               is_timespan_unit<T1> && 
+               is_mass_unit<T2>
+         ) ||
+         (
+               is_timespan_unit<T0> && 
+               is_mass_unit<T1> && 
+               is_length_unit<T2>
+         ) ||
+         (
+               is_timespan_unit<T0> && 
+               is_length_unit<T1> && 
+               is_mass_unit<T2>
+         )
+   ;
+
    /// @brief Concept to verify a type can serve as a named power unit
    template<typename T>
    concept IsNamedpowerUnit = requires {
@@ -63,35 +103,89 @@ namespace dimension
    template<typename... Ts>
    class power;
 
-   /// @brief Represents the default power
-   template<>
-   class power<> : public base_dimension<
-      unit_exponent<Primarymass, 1>,
-      unit_exponent<Primarylength, 2>,
-      unit_exponent<Primarytimespan, -3>>
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      is_coefficient... Cs
+   >
+   requires are_power_units<
+      T0,
+      T1,
+      T2
+   >
+   class power<T0, T1, T2, Cs...> : public base_dimension<double,
+      unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
+      unit_exponent<typename Extractor<lengthType, T0, T1, T2>::type, 2>,
+      unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -3>,
+      Cs...
+   >
    {
    public:
-      using Base = base_dimension<
-         unit_exponent<Primarymass, 1>,
-         unit_exponent<Primarylength, 2>,
-         unit_exponent<Primarytimespan, -3>>;
+      using Base = base_dimension<double,
+         unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
+         unit_exponent<typename Extractor<lengthType, T0, T1, T2>::type, 2>,
+         unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -3>,
+         Cs...
+      >;
+   
       using Base::Base;
-
-      explicit constexpr power(PrecisionType val) : Base(val) {}
-
-      template<typename Other>
-      requires Ispower<Other>
-      constexpr power(const Other& base)
-         : Base(call_unpack<typename Base::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
+   
+      template<typename T>
+      requires Ispower<T>
+      constexpr power(const T& base) : Base(base) {}
    };
+
+
+
+
+   template<
+      rep_type Rep,
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      is_coefficient... Cs
+   >
+   requires are_power_units<
+      T0,
+      T1,
+      T2
+   >
+   class power<Rep, T0, T1, T2, Cs...> : public base_dimension<Rep,
+      unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
+      unit_exponent<typename Extractor<lengthType, T0, T1, T2>::type, 2>,
+      unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -3>,
+      Cs...
+   >
+   {
+   public:
+      using Base = base_dimension<Rep,
+         unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
+         unit_exponent<typename Extractor<lengthType, T0, T1, T2>::type, 2>,
+         unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -3>,
+         Cs...
+      >;
+   
+      using Base::Base;
+   
+      template<typename T>
+      requires Ispower<T>
+      constexpr power(const T& base) : Base(base) {}
+   };
+
+
+
 
    /// @brief Template specialization for named power units
    /// @tparam Named The named unit this power type is in terms of
-   template<IsNamedpowerUnit Named>
-   class power<Named> : public base_dimensionFromTuple<typename Named::units>::dim
+   template<IsNamedpowerUnit Named, is_coefficient... Cs>
+   class power<Named, Cs...> : public base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<typename Named::units>::dim;
+      using Base = typename base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
@@ -101,26 +195,96 @@ namespace dimension
    };
 
 
-   template<typename... Units>
-   class power<Units...> : public base_dimension<
-      unit_exponent<typename Extractor<massType, Units...>::type, 1>,
-      unit_exponent<typename Extractor<lengthType, Units...>::type, 2>,
-      unit_exponent<typename Extractor<timespanType, Units...>::type, -3>
-   >
+   /// @brief Template specialization for named power units
+   /// @tparam Named The named unit this power type is in terms of
+   template<rep_type Rep, IsNamedpowerUnit Named, is_coefficient... Cs>
+   class power<Rep, Named, Cs...> : public base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = base_dimension<
-         unit_exponent<typename Extractor<massType, Units...>::type, 1>,
-         unit_exponent<typename Extractor<lengthType, Units...>::type, 2>,
-         unit_exponent<typename Extractor<timespanType, Units...>::type, -3>
-      >;
-   
+      using Base = typename base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
-   
-      template<typename T>
-      requires Ispower<T>
-      constexpr power(const T& base) : Base(base) {}
+
+      template<typename Other>
+      requires Ispower<Other>
+      constexpr power(const Other& base)
+         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
+
+
+
+
+   
+
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      is_coefficient... Cs
+   >
+   requires are_power_units<
+      T0,
+      T1,
+      T2
+   >
+   constexpr auto make_power(Cs... coeffs)
+   {
+      return power<double, T0, T1, T2, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      rep_type Rep,
+      is_coefficient... Cs
+   >
+   requires are_power_units<
+      T0,
+      T1,
+      T2
+   > && (!is_coefficient<Rep>)
+   constexpr auto make_power(Rep value, Cs... coeffs)
+   {
+      return power<Rep, T0, T1, T2, Cs...>(value, coeffs...);
+   }
+
+
+
+
+   /// @brief Template specialization for named power units
+   /// @tparam Named The named unit this power type is in terms of
+   template<IsNamedpowerUnit Named, is_coefficient... Cs>
+   constexpr auto make_power(Cs... coeffs)
+   {
+      return power<double, Named, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+
+
+   /// @brief Template specialization for named power units
+   /// @tparam Named The named unit this power type is in terms of
+   template<IsNamedpowerUnit Named, rep_type Rep, is_coefficient... Cs>
+   constexpr auto make_power(Rep value, Cs... coeffs)
+   {
+      return power<Rep, Named, Cs...>(value, coeffs...);
+   }
+
+
+
+
+
+
+
+
 
    template<Ispower Dim>
    power(Dim) -> 

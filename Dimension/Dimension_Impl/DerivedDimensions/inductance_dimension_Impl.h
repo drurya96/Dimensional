@@ -6,8 +6,48 @@
 #include "../../dimensions/fundamental/length_dimension.h"
 #include "../../dimensions/fundamental/charge_dimension.h"
 
+
 namespace dimension
 {
+
+   template<
+         typename T0,
+         typename T1,
+         typename T2
+   >
+   concept are_inductance_units =
+         (
+               is_mass_unit<T0> && 
+               is_length_unit<T1> && 
+               is_charge_unit<T2>
+         ) ||
+         (
+               is_mass_unit<T0> && 
+               is_charge_unit<T1> && 
+               is_length_unit<T2>
+         ) ||
+         (
+               is_length_unit<T0> && 
+               is_mass_unit<T1> && 
+               is_charge_unit<T2>
+         ) ||
+         (
+               is_length_unit<T0> && 
+               is_charge_unit<T1> && 
+               is_mass_unit<T2>
+         ) ||
+         (
+               is_charge_unit<T0> && 
+               is_mass_unit<T1> && 
+               is_length_unit<T2>
+         ) ||
+         (
+               is_charge_unit<T0> && 
+               is_length_unit<T1> && 
+               is_mass_unit<T2>
+         )
+   ;
+
    /// @brief Concept to verify a type can serve as a named inductance unit
    template<typename T>
    concept IsNamedinductanceUnit = requires {
@@ -63,35 +103,89 @@ namespace dimension
    template<typename... Ts>
    class inductance;
 
-   /// @brief Represents the default inductance
-   template<>
-   class inductance<> : public base_dimension<
-      unit_exponent<Primarymass, 1>,
-      unit_exponent<Primarylength, 2>,
-      unit_exponent<Primarycharge, -2>>
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      is_coefficient... Cs
+   >
+   requires are_inductance_units<
+      T0,
+      T1,
+      T2
+   >
+   class inductance<T0, T1, T2, Cs...> : public base_dimension<double,
+      unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
+      unit_exponent<typename Extractor<lengthType, T0, T1, T2>::type, 2>,
+      unit_exponent<typename Extractor<chargeType, T0, T1, T2>::type, -2>,
+      Cs...
+   >
    {
    public:
-      using Base = base_dimension<
-         unit_exponent<Primarymass, 1>,
-         unit_exponent<Primarylength, 2>,
-         unit_exponent<Primarycharge, -2>>;
+      using Base = base_dimension<double,
+         unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
+         unit_exponent<typename Extractor<lengthType, T0, T1, T2>::type, 2>,
+         unit_exponent<typename Extractor<chargeType, T0, T1, T2>::type, -2>,
+         Cs...
+      >;
+   
       using Base::Base;
-
-      explicit constexpr inductance(PrecisionType val) : Base(val) {}
-
-      template<typename Other>
-      requires Isinductance<Other>
-      constexpr inductance(const Other& base)
-         : Base(call_unpack<typename Base::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
+   
+      template<typename T>
+      requires Isinductance<T>
+      constexpr inductance(const T& base) : Base(base) {}
    };
+
+
+
+
+   template<
+      rep_type Rep,
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      is_coefficient... Cs
+   >
+   requires are_inductance_units<
+      T0,
+      T1,
+      T2
+   >
+   class inductance<Rep, T0, T1, T2, Cs...> : public base_dimension<Rep,
+      unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
+      unit_exponent<typename Extractor<lengthType, T0, T1, T2>::type, 2>,
+      unit_exponent<typename Extractor<chargeType, T0, T1, T2>::type, -2>,
+      Cs...
+   >
+   {
+   public:
+      using Base = base_dimension<Rep,
+         unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
+         unit_exponent<typename Extractor<lengthType, T0, T1, T2>::type, 2>,
+         unit_exponent<typename Extractor<chargeType, T0, T1, T2>::type, -2>,
+         Cs...
+      >;
+   
+      using Base::Base;
+   
+      template<typename T>
+      requires Isinductance<T>
+      constexpr inductance(const T& base) : Base(base) {}
+   };
+
+
+
 
    /// @brief Template specialization for named inductance units
    /// @tparam Named The named unit this inductance type is in terms of
-   template<IsNamedinductanceUnit Named>
-   class inductance<Named> : public base_dimensionFromTuple<typename Named::units>::dim
+   template<IsNamedinductanceUnit Named, is_coefficient... Cs>
+   class inductance<Named, Cs...> : public base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<typename Named::units>::dim;
+      using Base = typename base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
@@ -101,26 +195,96 @@ namespace dimension
    };
 
 
-   template<typename... Units>
-   class inductance<Units...> : public base_dimension<
-      unit_exponent<typename Extractor<massType, Units...>::type, 1>,
-      unit_exponent<typename Extractor<lengthType, Units...>::type, 2>,
-      unit_exponent<typename Extractor<chargeType, Units...>::type, -2>
-   >
+   /// @brief Template specialization for named inductance units
+   /// @tparam Named The named unit this inductance type is in terms of
+   template<rep_type Rep, IsNamedinductanceUnit Named, is_coefficient... Cs>
+   class inductance<Rep, Named, Cs...> : public base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = base_dimension<
-         unit_exponent<typename Extractor<massType, Units...>::type, 1>,
-         unit_exponent<typename Extractor<lengthType, Units...>::type, 2>,
-         unit_exponent<typename Extractor<chargeType, Units...>::type, -2>
-      >;
-   
+      using Base = typename base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
-   
-      template<typename T>
-      requires Isinductance<T>
-      constexpr inductance(const T& base) : Base(base) {}
+
+      template<typename Other>
+      requires Isinductance<Other>
+      constexpr inductance(const Other& base)
+         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
+
+
+
+
+   
+
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      is_coefficient... Cs
+   >
+   requires are_inductance_units<
+      T0,
+      T1,
+      T2
+   >
+   constexpr auto make_inductance(Cs... coeffs)
+   {
+      return inductance<double, T0, T1, T2, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      rep_type Rep,
+      is_coefficient... Cs
+   >
+   requires are_inductance_units<
+      T0,
+      T1,
+      T2
+   > && (!is_coefficient<Rep>)
+   constexpr auto make_inductance(Rep value, Cs... coeffs)
+   {
+      return inductance<Rep, T0, T1, T2, Cs...>(value, coeffs...);
+   }
+
+
+
+
+   /// @brief Template specialization for named inductance units
+   /// @tparam Named The named unit this inductance type is in terms of
+   template<IsNamedinductanceUnit Named, is_coefficient... Cs>
+   constexpr auto make_inductance(Cs... coeffs)
+   {
+      return inductance<double, Named, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+
+
+   /// @brief Template specialization for named inductance units
+   /// @tparam Named The named unit this inductance type is in terms of
+   template<IsNamedinductanceUnit Named, rep_type Rep, is_coefficient... Cs>
+   constexpr auto make_inductance(Rep value, Cs... coeffs)
+   {
+      return inductance<Rep, Named, Cs...>(value, coeffs...);
+   }
+
+
+
+
+
+
+
+
 
    template<Isinductance Dim>
    inductance(Dim) -> 

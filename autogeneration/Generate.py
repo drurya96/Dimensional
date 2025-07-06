@@ -2,11 +2,18 @@ import json
 from pathlib import Path
 from metadata.python_utils.Dimension import AllDimension, FundamentalDimension
 from jinja2 import Environment
+from itertools import permutations
+
+def constraint_permutations(dim_def):
+    constraints = [f"is_{d.dim}_unit" for d in dim_def]
+    return list(permutations(constraints))
 
 env = Environment(
     trim_blocks=True,
     lstrip_blocks=True
 )
+
+env.globals["constraint_permutations"] = constraint_permutations
 
 def generate(obj, template_filepath, name_generator):
 

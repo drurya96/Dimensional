@@ -27,7 +27,7 @@ double TestFunction2(length<T> time)
    return get_length_as<meters>(time);
 }
 
-double TestFunctionGenericlength(dimension::force<> force)
+double TestFunctionGenericlength(dimension::force<dimension::newtons> force)
 {
    return get_force_as<newtons>(force);
 }

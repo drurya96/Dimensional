@@ -442,10 +442,22 @@ namespace dimension
    template<typename... T>
    struct base_dimensionFromTuple;
 
-   template<typename... T>
-   struct base_dimensionFromTuple<std::tuple<T...>>
+   template<typename Rep, typename Ratio, typename... Units, typename... Coeffs>
+   struct base_dimensionFromTuple<Rep, Ratio, std::tuple<Units...>, std::tuple<Coeffs...>>
    {
-      using dim = typename base_dimension<T...>;
+      using dim = typename base_dimension<Rep, Units..., Coeffs..., Ratio>;
+   };
+
+   template<typename Rep, typename... Units, typename... Coeffs>
+   struct base_dimensionFromTuple<Rep, std::tuple<Units...>, std::tuple<Coeffs...>>
+   {
+      using dim = typename base_dimension<Rep, Units..., Coeffs...>;
+   };
+
+   template<typename... Units>
+   struct base_dimensionFromTuple<std::tuple<Units...>>
+   {
+      using dim = typename base_dimension<Units...>;
    };
 
 

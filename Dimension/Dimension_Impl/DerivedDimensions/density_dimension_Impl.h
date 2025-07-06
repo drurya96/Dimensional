@@ -5,8 +5,25 @@
 #include "../../dimensions/fundamental/mass_dimension.h"
 #include "../../dimensions/fundamental/length_dimension.h"
 
+
 namespace dimension
 {
+
+   template<
+         typename T0,
+         typename T1
+   >
+   concept are_density_units =
+         (
+               is_mass_unit<T0> && 
+               is_length_unit<T1>
+         ) ||
+         (
+               is_length_unit<T0> && 
+               is_mass_unit<T1>
+         )
+   ;
+
    /// @brief Concept to verify a type can serve as a named density unit
    template<typename T>
    concept IsNameddensityUnit = requires {
@@ -57,33 +74,81 @@ namespace dimension
    template<typename... Ts>
    class density;
 
-   /// @brief Represents the default density
-   template<>
-   class density<> : public base_dimension<
-      unit_exponent<Primarymass, 1>,
-      unit_exponent<Primarylength, -3>>
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      is_coefficient... Cs
+   >
+   requires are_density_units<
+      T0,
+      T1
+   >
+   class density<T0, T1, Cs...> : public base_dimension<double,
+      unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
+      unit_exponent<typename Extractor<lengthType, T0, T1>::type, -3>,
+      Cs...
+   >
    {
    public:
-      using Base = base_dimension<
-         unit_exponent<Primarymass, 1>,
-         unit_exponent<Primarylength, -3>>;
+      using Base = base_dimension<double,
+         unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
+         unit_exponent<typename Extractor<lengthType, T0, T1>::type, -3>,
+         Cs...
+      >;
+   
       using Base::Base;
-
-      explicit constexpr density(PrecisionType val) : Base(val) {}
-
-      template<typename Other>
-      requires Isdensity<Other>
-      constexpr density(const Other& base)
-         : Base(call_unpack<typename Base::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
+   
+      template<typename T>
+      requires Isdensity<T>
+      constexpr density(const T& base) : Base(base) {}
    };
+
+
+
+
+   template<
+      rep_type Rep,
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      is_coefficient... Cs
+   >
+   requires are_density_units<
+      T0,
+      T1
+   >
+   class density<Rep, T0, T1, Cs...> : public base_dimension<Rep,
+      unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
+      unit_exponent<typename Extractor<lengthType, T0, T1>::type, -3>,
+      Cs...
+   >
+   {
+   public:
+      using Base = base_dimension<Rep,
+         unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
+         unit_exponent<typename Extractor<lengthType, T0, T1>::type, -3>,
+         Cs...
+      >;
+   
+      using Base::Base;
+   
+      template<typename T>
+      requires Isdensity<T>
+      constexpr density(const T& base) : Base(base) {}
+   };
+
+
+
 
    /// @brief Template specialization for named density units
    /// @tparam Named The named unit this density type is in terms of
-   template<IsNameddensityUnit Named>
-   class density<Named> : public base_dimensionFromTuple<typename Named::units>::dim
+   template<IsNameddensityUnit Named, is_coefficient... Cs>
+   class density<Named, Cs...> : public base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<typename Named::units>::dim;
+      using Base = typename base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
@@ -93,24 +158,92 @@ namespace dimension
    };
 
 
-   template<typename... Units>
-   class density<Units...> : public base_dimension<
-      unit_exponent<typename Extractor<massType, Units...>::type, 1>,
-      unit_exponent<typename Extractor<lengthType, Units...>::type, -3>
-   >
+   /// @brief Template specialization for named density units
+   /// @tparam Named The named unit this density type is in terms of
+   template<rep_type Rep, IsNameddensityUnit Named, is_coefficient... Cs>
+   class density<Rep, Named, Cs...> : public base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = base_dimension<
-         unit_exponent<typename Extractor<massType, Units...>::type, 1>,
-         unit_exponent<typename Extractor<lengthType, Units...>::type, -3>
-      >;
-   
+      using Base = typename base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
-   
-      template<typename T>
-      requires Isdensity<T>
-      constexpr density(const T& base) : Base(base) {}
+
+      template<typename Other>
+      requires Isdensity<Other>
+      constexpr density(const Other& base)
+         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
+
+
+
+
+   
+
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      is_coefficient... Cs
+   >
+   requires are_density_units<
+      T0,
+      T1
+   >
+   constexpr auto make_density(Cs... coeffs)
+   {
+      return density<double, T0, T1, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      rep_type Rep,
+      is_coefficient... Cs
+   >
+   requires are_density_units<
+      T0,
+      T1
+   > && (!is_coefficient<Rep>)
+   constexpr auto make_density(Rep value, Cs... coeffs)
+   {
+      return density<Rep, T0, T1, Cs...>(value, coeffs...);
+   }
+
+
+
+
+   /// @brief Template specialization for named density units
+   /// @tparam Named The named unit this density type is in terms of
+   template<IsNameddensityUnit Named, is_coefficient... Cs>
+   constexpr auto make_density(Cs... coeffs)
+   {
+      return density<double, Named, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+
+
+   /// @brief Template specialization for named density units
+   /// @tparam Named The named unit this density type is in terms of
+   template<IsNameddensityUnit Named, rep_type Rep, is_coefficient... Cs>
+   constexpr auto make_density(Rep value, Cs... coeffs)
+   {
+      return density<Rep, Named, Cs...>(value, coeffs...);
+   }
+
+
+
+
+
+
+
+
 
    template<Isdensity Dim>
    density(Dim) -> 

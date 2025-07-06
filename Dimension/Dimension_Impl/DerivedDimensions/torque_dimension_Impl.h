@@ -7,8 +7,163 @@
 #include "../../dimensions/fundamental/timespan_dimension.h"
 #include "../../dimensions/fundamental/angle_dimension.h"
 
+
 namespace dimension
 {
+
+   template<
+         typename T0,
+         typename T1,
+         typename T2,
+         typename T3
+   >
+   concept are_torque_units =
+         (
+               is_mass_unit<T0> && 
+               is_length_unit<T1> && 
+               is_timespan_unit<T2> && 
+               is_angle_unit<T3>
+         ) ||
+         (
+               is_mass_unit<T0> && 
+               is_length_unit<T1> && 
+               is_angle_unit<T2> && 
+               is_timespan_unit<T3>
+         ) ||
+         (
+               is_mass_unit<T0> && 
+               is_timespan_unit<T1> && 
+               is_length_unit<T2> && 
+               is_angle_unit<T3>
+         ) ||
+         (
+               is_mass_unit<T0> && 
+               is_timespan_unit<T1> && 
+               is_angle_unit<T2> && 
+               is_length_unit<T3>
+         ) ||
+         (
+               is_mass_unit<T0> && 
+               is_angle_unit<T1> && 
+               is_length_unit<T2> && 
+               is_timespan_unit<T3>
+         ) ||
+         (
+               is_mass_unit<T0> && 
+               is_angle_unit<T1> && 
+               is_timespan_unit<T2> && 
+               is_length_unit<T3>
+         ) ||
+         (
+               is_length_unit<T0> && 
+               is_mass_unit<T1> && 
+               is_timespan_unit<T2> && 
+               is_angle_unit<T3>
+         ) ||
+         (
+               is_length_unit<T0> && 
+               is_mass_unit<T1> && 
+               is_angle_unit<T2> && 
+               is_timespan_unit<T3>
+         ) ||
+         (
+               is_length_unit<T0> && 
+               is_timespan_unit<T1> && 
+               is_mass_unit<T2> && 
+               is_angle_unit<T3>
+         ) ||
+         (
+               is_length_unit<T0> && 
+               is_timespan_unit<T1> && 
+               is_angle_unit<T2> && 
+               is_mass_unit<T3>
+         ) ||
+         (
+               is_length_unit<T0> && 
+               is_angle_unit<T1> && 
+               is_mass_unit<T2> && 
+               is_timespan_unit<T3>
+         ) ||
+         (
+               is_length_unit<T0> && 
+               is_angle_unit<T1> && 
+               is_timespan_unit<T2> && 
+               is_mass_unit<T3>
+         ) ||
+         (
+               is_timespan_unit<T0> && 
+               is_mass_unit<T1> && 
+               is_length_unit<T2> && 
+               is_angle_unit<T3>
+         ) ||
+         (
+               is_timespan_unit<T0> && 
+               is_mass_unit<T1> && 
+               is_angle_unit<T2> && 
+               is_length_unit<T3>
+         ) ||
+         (
+               is_timespan_unit<T0> && 
+               is_length_unit<T1> && 
+               is_mass_unit<T2> && 
+               is_angle_unit<T3>
+         ) ||
+         (
+               is_timespan_unit<T0> && 
+               is_length_unit<T1> && 
+               is_angle_unit<T2> && 
+               is_mass_unit<T3>
+         ) ||
+         (
+               is_timespan_unit<T0> && 
+               is_angle_unit<T1> && 
+               is_mass_unit<T2> && 
+               is_length_unit<T3>
+         ) ||
+         (
+               is_timespan_unit<T0> && 
+               is_angle_unit<T1> && 
+               is_length_unit<T2> && 
+               is_mass_unit<T3>
+         ) ||
+         (
+               is_angle_unit<T0> && 
+               is_mass_unit<T1> && 
+               is_length_unit<T2> && 
+               is_timespan_unit<T3>
+         ) ||
+         (
+               is_angle_unit<T0> && 
+               is_mass_unit<T1> && 
+               is_timespan_unit<T2> && 
+               is_length_unit<T3>
+         ) ||
+         (
+               is_angle_unit<T0> && 
+               is_length_unit<T1> && 
+               is_mass_unit<T2> && 
+               is_timespan_unit<T3>
+         ) ||
+         (
+               is_angle_unit<T0> && 
+               is_length_unit<T1> && 
+               is_timespan_unit<T2> && 
+               is_mass_unit<T3>
+         ) ||
+         (
+               is_angle_unit<T0> && 
+               is_timespan_unit<T1> && 
+               is_mass_unit<T2> && 
+               is_length_unit<T3>
+         ) ||
+         (
+               is_angle_unit<T0> && 
+               is_timespan_unit<T1> && 
+               is_length_unit<T2> && 
+               is_mass_unit<T3>
+         )
+   ;
+
    /// @brief Concept to verify a type can serve as a named torque unit
    template<typename T>
    concept IsNamedtorqueUnit = requires {
@@ -69,37 +224,97 @@ namespace dimension
    template<typename... Ts>
    class torque;
 
-   /// @brief Represents the default torque
-   template<>
-   class torque<> : public base_dimension<
-      unit_exponent<Primarymass, 1>,
-      unit_exponent<Primarylength, 2>,
-      unit_exponent<Primarytimespan, -2>,
-      unit_exponent<Primaryangle, -1>>
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      IsBasicUnitType T3,
+      is_coefficient... Cs
+   >
+   requires are_torque_units<
+      T0,
+      T1,
+      T2,
+      T3
+   >
+   class torque<T0, T1, T2, T3, Cs...> : public base_dimension<double,
+      unit_exponent<typename Extractor<massType, T0, T1, T2, T3>::type, 1>,
+      unit_exponent<typename Extractor<lengthType, T0, T1, T2, T3>::type, 2>,
+      unit_exponent<typename Extractor<timespanType, T0, T1, T2, T3>::type, -2>,
+      unit_exponent<typename Extractor<angleType, T0, T1, T2, T3>::type, -1>,
+      Cs...
+   >
    {
    public:
-      using Base = base_dimension<
-         unit_exponent<Primarymass, 1>,
-         unit_exponent<Primarylength, 2>,
-         unit_exponent<Primarytimespan, -2>,
-         unit_exponent<Primaryangle, -1>>;
+      using Base = base_dimension<double,
+         unit_exponent<typename Extractor<massType, T0, T1, T2, T3>::type, 1>,
+         unit_exponent<typename Extractor<lengthType, T0, T1, T2, T3>::type, 2>,
+         unit_exponent<typename Extractor<timespanType, T0, T1, T2, T3>::type, -2>,
+         unit_exponent<typename Extractor<angleType, T0, T1, T2, T3>::type, -1>,
+         Cs...
+      >;
+   
       using Base::Base;
-
-      explicit constexpr torque(PrecisionType val) : Base(val) {}
-
-      template<typename Other>
-      requires Istorque<Other>
-      constexpr torque(const Other& base)
-         : Base(call_unpack<typename Base::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
+   
+      template<typename T>
+      requires Istorque<T>
+      constexpr torque(const T& base) : Base(base) {}
    };
+
+
+
+
+   template<
+      rep_type Rep,
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      IsBasicUnitType T3,
+      is_coefficient... Cs
+   >
+   requires are_torque_units<
+      T0,
+      T1,
+      T2,
+      T3
+   >
+   class torque<Rep, T0, T1, T2, T3, Cs...> : public base_dimension<Rep,
+      unit_exponent<typename Extractor<massType, T0, T1, T2, T3>::type, 1>,
+      unit_exponent<typename Extractor<lengthType, T0, T1, T2, T3>::type, 2>,
+      unit_exponent<typename Extractor<timespanType, T0, T1, T2, T3>::type, -2>,
+      unit_exponent<typename Extractor<angleType, T0, T1, T2, T3>::type, -1>,
+      Cs...
+   >
+   {
+   public:
+      using Base = base_dimension<Rep,
+         unit_exponent<typename Extractor<massType, T0, T1, T2, T3>::type, 1>,
+         unit_exponent<typename Extractor<lengthType, T0, T1, T2, T3>::type, 2>,
+         unit_exponent<typename Extractor<timespanType, T0, T1, T2, T3>::type, -2>,
+         unit_exponent<typename Extractor<angleType, T0, T1, T2, T3>::type, -1>,
+         Cs...
+      >;
+   
+      using Base::Base;
+   
+      template<typename T>
+      requires Istorque<T>
+      constexpr torque(const T& base) : Base(base) {}
+   };
+
+
+
 
    /// @brief Template specialization for named torque units
    /// @tparam Named The named unit this torque type is in terms of
-   template<IsNamedtorqueUnit Named>
-   class torque<Named> : public base_dimensionFromTuple<typename Named::units>::dim
+   template<IsNamedtorqueUnit Named, is_coefficient... Cs>
+   class torque<Named, Cs...> : public base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<typename Named::units>::dim;
+      using Base = typename base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
@@ -109,28 +324,100 @@ namespace dimension
    };
 
 
-   template<typename... Units>
-   class torque<Units...> : public base_dimension<
-      unit_exponent<typename Extractor<massType, Units...>::type, 1>,
-      unit_exponent<typename Extractor<lengthType, Units...>::type, 2>,
-      unit_exponent<typename Extractor<timespanType, Units...>::type, -2>,
-      unit_exponent<typename Extractor<angleType, Units...>::type, -1>
-   >
+   /// @brief Template specialization for named torque units
+   /// @tparam Named The named unit this torque type is in terms of
+   template<rep_type Rep, IsNamedtorqueUnit Named, is_coefficient... Cs>
+   class torque<Rep, Named, Cs...> : public base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = base_dimension<
-         unit_exponent<typename Extractor<massType, Units...>::type, 1>,
-         unit_exponent<typename Extractor<lengthType, Units...>::type, 2>,
-         unit_exponent<typename Extractor<timespanType, Units...>::type, -2>,
-         unit_exponent<typename Extractor<angleType, Units...>::type, -1>
-      >;
-   
+      using Base = typename base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
-   
-      template<typename T>
-      requires Istorque<T>
-      constexpr torque(const T& base) : Base(base) {}
+
+      template<typename Other>
+      requires Istorque<Other>
+      constexpr torque(const Other& base)
+         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
+
+
+
+
+   
+
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      IsBasicUnitType T3,
+      is_coefficient... Cs
+   >
+   requires are_torque_units<
+      T0,
+      T1,
+      T2,
+      T3
+   >
+   constexpr auto make_torque(Cs... coeffs)
+   {
+      return torque<double, T0, T1, T2, T3, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+   template<
+      IsBasicUnitType T0,
+      IsBasicUnitType T1,
+      IsBasicUnitType T2,
+      IsBasicUnitType T3,
+      rep_type Rep,
+      is_coefficient... Cs
+   >
+   requires are_torque_units<
+      T0,
+      T1,
+      T2,
+      T3
+   > && (!is_coefficient<Rep>)
+   constexpr auto make_torque(Rep value, Cs... coeffs)
+   {
+      return torque<Rep, T0, T1, T2, T3, Cs...>(value, coeffs...);
+   }
+
+
+
+
+   /// @brief Template specialization for named torque units
+   /// @tparam Named The named unit this torque type is in terms of
+   template<IsNamedtorqueUnit Named, is_coefficient... Cs>
+   constexpr auto make_torque(Cs... coeffs)
+   {
+      return torque<double, Named, Cs...>(1.0, coeffs...);
+   }
+
+
+
+
+
+
+   /// @brief Template specialization for named torque units
+   /// @tparam Named The named unit this torque type is in terms of
+   template<IsNamedtorqueUnit Named, rep_type Rep, is_coefficient... Cs>
+   constexpr auto make_torque(Rep value, Cs... coeffs)
+   {
+      return torque<Rep, Named, Cs...>(value, coeffs...);
+   }
+
+
+
+
+
+
+
+
 
    template<Istorque Dim>
    torque(Dim) -> 
