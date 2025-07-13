@@ -18,12 +18,13 @@ set(TEST_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/PhysicsProblemsExamples/Example1.cpp
 
 
-    #${CMAKE_CURRENT_LIST_DIR}/TestSerialization.cpp
-    #${CMAKE_CURRENT_LIST_DIR}/TestQuantityAdditionSubtraction.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/TestSerialization.cpp
     #${CMAKE_CURRENT_LIST_DIR}/TestNewDimension.cpp
+
+
+    #${CMAKE_CURRENT_LIST_DIR}/TestQuantityAdditionSubtraction.cpp
     #${CMAKE_CURRENT_LIST_DIR}/TestUtilities.cpp
-
-
+    
     ${CMAKE_CURRENT_LIST_DIR}/TestTemp.cpp
 )
 

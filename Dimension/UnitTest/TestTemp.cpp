@@ -71,6 +71,12 @@ TEST(TempTests, Test3) {
 
 
 
+   //auto z = base_dimension<unit_exponent<meters, 1, 2>, unit_exponent<seconds, -2>>(10.0);
+   force<newtons> z{10.0};
+
+   std::cout << "Value of z: " << z << std::endl;
+
+
 
 
    //using Raw = decltype(x / x3);

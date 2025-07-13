@@ -7,19 +7,19 @@
 
 using namespace dimension;
 
-template<typename NumTuple, typename DenTuple>
+template<typename... Units>
 void ValidateWrapperWithReturns()
 {
-    base_dimension<NumTuple, DenTuple> obj(25.0);
+    base_dimension<Units...> obj(25.0);
     auto buffer = serialize(obj);
 
-    EXPECT_EQ(buffer.size(), sizeof(uint32_t) + sizeof(PrecisionType));
+    EXPECT_EQ(buffer.size(), sizeof(uint32_t) + sizeof(double));
 
-    auto result = deserialize<NumTuple, DenTuple, decltype(buffer)>(buffer);
-    EXPECT_NEAR((result.template GetVal<NumTuple, DenTuple>()), 25.0, TOLERANCE);
+    auto result = deserialize<base_dimension<Units...>, decltype(buffer)>(buffer);
+    EXPECT_NEAR((get_dimension_as<Units...>(result)), 25.0, TOLERANCE);
 }
 
-template<typename NumTuple, typename DenTuple, typename BufferType>
+template<typename BufferType, typename... Units>
 void ValidateWrapperWithRefs()
 {
 
@@ -29,87 +29,74 @@ void ValidateWrapperWithRefs()
     BufferType buffer;
     buffer.resize(requiredSize);
 
-    base_dimension<NumTuple, DenTuple> obj(25.0);
+    base_dimension<Units...> obj(25.0);
     serialize(buffer, obj);
 
     EXPECT_EQ(buffer.size() * sizeof(elementType), sizeof(uint32_t) + sizeof(PrecisionType));
 
-    base_dimension<NumTuple, DenTuple> result;
-    deserialize<NumTuple, DenTuple>(buffer, result);
+    //base_dimension<Units...> result;
+    auto result = deserialize<base_dimension<Units...>>(buffer);
 
-    EXPECT_NEAR((result.template GetVal<NumTuple, DenTuple>()), 25.0, TOLERANCE);
+    std::cout << "Deserialized Value: " << result << std::endl;
+
+    EXPECT_NEAR((get_dimension_as<Units...>(result)), 25.0, TOLERANCE);
 
 }
 
-template<typename NumTuple, typename DenTuple>
+template<typename... Units>
 void ValidateNoHash()
 {
 
-    using TestSerializer = Serializer<NumTuple, DenTuple, DefaultSerializationPolicy<NoHash>>;
+    using TestSerializer = Serializer<base_dimension<Units...>, DefaultSerializationPolicy<NoHash>>;
 
-    base_dimension<NumTuple, DenTuple> obj(25.0);
+    base_dimension<Units...> obj(25.0);
     auto buffer = TestSerializer::serialize(obj);
 
     EXPECT_EQ(buffer.size(), sizeof(PrecisionType));
 
     auto result = TestSerializer::deserialize(buffer);
-    EXPECT_NEAR((result.template GetVal<NumTuple, DenTuple>()), 25.0, TOLERANCE);
+    EXPECT_NEAR((get_dimension_as<Units...>(result)), 25.0, TOLERANCE);
 }
 
 
 
-template<typename NumTuple, typename DenTuple>
+template<typename... Units>
 void ValidateAll()
 {
-    ValidateWrapperWithReturns<NumTuple, DenTuple>();
+    ValidateWrapperWithReturns<Units...>();
 
-    ValidateWrapperWithRefs<NumTuple, DenTuple, std::vector<uint8_t>>();
-    ValidateWrapperWithRefs<NumTuple, DenTuple, std::vector<uint16_t>>();
-    ValidateWrapperWithRefs<NumTuple, DenTuple, std::vector<uint32_t>>();
+    ValidateWrapperWithRefs<std::vector<uint8_t>, Units...>();
+    ValidateWrapperWithRefs<std::vector<uint16_t>, Units...>();
+    ValidateWrapperWithRefs<std::vector<uint32_t>, Units...>();
 
     // In the current state, buffer word size cannot exceed hashed-tag size.
     // Fix in future serializatio updates.
 
-    ValidateNoHash<NumTuple, DenTuple>();
+    ValidateNoHash<Units...>();
 }
 
 
 TEST(Serialization, TestSingleNum)
 {
-    using NumTuple = std::tuple<Feet>;
-    using DenTuple = std::tuple<>;
-
-    ValidateAll<NumTuple, DenTuple>();
+    ValidateAll<unit_exponent<feet>>();
 }
 
 TEST(Serialization, TestSingleInverse)
 {
-    using NumTuple = std::tuple<>;
-    using DenTuple = std::tuple<seconds>;
-
-    ValidateAll<NumTuple, DenTuple>();
+    ValidateAll<unit_exponent<seconds, -1>>();
 }
 
 TEST(Serialization, TestOneEach)
 {
-    using NumTuple = std::tuple<Grams>;
-    using DenTuple = std::tuple<radians>;
-
-    ValidateAll<NumTuple, DenTuple>();
+    ValidateAll<unit_exponent<grams>, unit_exponent<radians, -1>>();
 }
 
 TEST(Serialization, TestMultipleEach)
 {
-    using NumTuple = std::tuple<Grams, meters>;
-    using DenTuple = std::tuple<radians, seconds>;
-
-    ValidateAll<NumTuple, DenTuple>();
+    ValidateAll<unit_exponent<grams>, unit_exponent<meters>, unit_exponent<radians, -1>, unit_exponent<seconds, -1>>();
 }
 
 TEST(Serialization, TestShouldCancel)
 {
-    using NumTuple = std::tuple<meters>;
-    using DenTuple = std::tuple<meters>;
-
-    ValidateAll<NumTuple, DenTuple>();
+    ValidateAll<unit_exponent<meters>, unit_exponent<meters, -1>>();
 }

@@ -19,7 +19,7 @@ namespace dimension
    /// @tparam HashPolicy Hash policy implementation 
    /// @param in iterator to serialized buffer
    /// @return bool indicating if tag is valid for this type hash
-   template <typename NumTuple, typename DenTuple, typename InputIt, typename HashPolicy>
+   template <is_base_dimension Dim, typename InputIt, typename HashPolicy>
    bool validateTag(InputIt in)
    {
       if constexpr(!std::is_void_v<typename HashPolicy::tag_type::type>)
@@ -27,7 +27,7 @@ namespace dimension
          typename HashPolicy::tag_type::type tag;
          std::memcpy(&tag, &*in, HashPolicy::tag_size);
 
-         constexpr typename HashPolicy::tag_type expected_tag = TypeTagHelper<NumTuple, DenTuple, HashPolicy>::value();
+         constexpr typename HashPolicy::tag_type expected_tag = TypeTagHelper<Dim, HashPolicy>::value();
          return (tag == expected_tag.get());
       }
       else
@@ -42,25 +42,25 @@ namespace dimension
    struct DefaultSerializationPolicy
    {
    private:
-      template <typename NumTuple, typename DenTuple, typename OutputIt, typename BufferSizeType>
-      static void serialize_impl(OutputIt out, const base_dimension<NumTuple, DenTuple>& obj)
+      template <is_base_dimension Dim, typename OutputIt, typename BufferSizeType>
+      static void serialize_impl(OutputIt out, const Dim& obj)
       {
          if constexpr(!std::is_void_v<typename HashPolicy::tag_type::type>)
          {
-            constexpr auto tagData = TypeTagHelper<NumTuple, DenTuple, HashPolicy>::value().get();
+            constexpr auto tagData = TypeTagHelper<Dim, HashPolicy>::value().get();
             std::memcpy(&*out, &tagData, HashPolicy::tag_size);
             out += (HashPolicy::tag_size / sizeof(BufferSizeType));
          }
 
          // Write the double scalar
-         PrecisionType temp = obj.template GetVal<NumTuple, DenTuple>();
+         PrecisionType temp = get_dimension_tuple<typename Dim::units>(obj);
          std::memcpy(&*out, &temp, sizeof(PrecisionType));
       }
 
-      template <typename NumTuple, typename DenTuple, typename InputIt, typename BufferSizeType>
+      template <is_base_dimension Dim, typename InputIt, typename BufferSizeType>
       static PrecisionType deserialize_impl(InputIt in)
       {
-         if (!validateTag<NumTuple, DenTuple, InputIt, HashPolicy>(in))
+         if (!validateTag<Dim, InputIt, HashPolicy>(in))
          {
             throw std::invalid_argument("Type tag mismatch during deserialization");
          }
@@ -80,8 +80,8 @@ namespace dimension
       /// @tparam OutputBuf The buffer type
       /// @param out The buffer to serialize into
       /// @param obj The object to serialize
-      template <typename NumTuple, typename DenTuple, typename OutputBuf>
-      static void serialize(OutputBuf& out, const base_dimension<NumTuple, DenTuple>& obj)
+      template <is_base_dimension Dim, typename OutputBuf>
+      static void serialize(OutputBuf& out, const Dim& obj)
       {
          constexpr size_t required_size = HashPolicy::tag_size + sizeof(PrecisionType);
 
@@ -89,7 +89,7 @@ namespace dimension
          {
             throw std::invalid_argument("Buffer size is too small. Must be at least " + std::to_string(required_size) + " bytes with these parameters.");
          }
-         serialize_impl<NumTuple, DenTuple, decltype(out.begin()), typename OutputBuf::value_type>(out.begin(), obj);
+         serialize_impl<Dim, decltype(out.begin()), typename OutputBuf::value_type>(out.begin(), obj);
       }
 
       /// @brief serialize a base_dimension object and return the buffer
@@ -98,14 +98,14 @@ namespace dimension
       /// @tparam OutputBuf The buffer type
       /// @param obj The object to serialize
       /// @return A new buffer populated with data from serializing obj
-      template <typename NumTuple, typename DenTuple, typename OutputBuf = std::vector<uint8_t>>
-      static OutputBuf serialize(const base_dimension<NumTuple, DenTuple>& obj)
+      template <is_base_dimension Dim, typename OutputBuf = std::vector<uint8_t>>
+      static OutputBuf serialize(const Dim& obj)
       {
          // Generate the unique type tag based on `NumTuple` and `DenTuple`
          OutputBuf out;
          out.resize(HashPolicy::tag_size + sizeof(PrecisionType));
 
-         serialize_impl<NumTuple, DenTuple, decltype(out.begin()), typename OutputBuf::value_type>(out.begin(), obj);
+         serialize_impl<Dim, decltype(out.begin()), typename OutputBuf::value_type>(out.begin(), obj);
 
          return out;
       }
@@ -116,25 +116,27 @@ namespace dimension
       /// @tparam InputBuf The buffer type
       /// @param in The buffer to deserialize
       /// @return A new base_dimension object populated with data from deserializing input buffer
-      template <typename NumTuple, typename DenTuple, typename InputBuf>
-      static base_dimension<NumTuple, DenTuple> deserialize(const InputBuf& in)
+      template <is_base_dimension Dim, typename InputBuf>
+      static Dim deserialize(const InputBuf& in)
       {
-         PrecisionType val = deserialize_impl<NumTuple, DenTuple, decltype(in.begin()), typename InputBuf::value_type>(in.begin());
-         return base_dimension<NumTuple, DenTuple>(val);
+         PrecisionType val = deserialize_impl<Dim, decltype(in.begin()), typename InputBuf::value_type>(in.begin());
+         return Dim(val);
       }
 
+      /*
       /// @brief deserialize a buffer and update the input object
       /// @tparam NumTuple numerator tuple to template Serializer on
       /// @tparam DenTuple denominator tuple to template Serializer on
       /// @tparam InputBuf The buffer type
       /// @param in The buffer to deserialize
       /// @param obj The object to deserialize into
-      template <typename NumTuple, typename DenTuple, typename InputBuf>
-      static void deserialize(const InputBuf& in, base_dimension<NumTuple, DenTuple>& obj)
+      template <is_base_dimension Dim, typename InputBuf>
+      static void deserialize(const InputBuf& in, Dim& obj)
       {
-         PrecisionType val = deserialize_impl<NumTuple, DenTuple, decltype(in.begin()), typename InputBuf::value_type>(in.begin());
-         obj.template SetVal<NumTuple, DenTuple>(val);
+         PrecisionType val = deserialize_impl<Dim, decltype(in.begin()), typename InputBuf::value_type>(in.begin());
+         //obj.template SetVal<NumTuple, DenTuple>(val);
       }
+      */
 
    };
 
