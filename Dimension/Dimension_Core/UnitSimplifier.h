@@ -143,36 +143,6 @@ namespace dimension
        using units = typename RemoveZeros<combined>::units;
    };
 
-   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
    // ============================================================
    // =================== Conversion Stuff =======================
    // ============================================================
@@ -236,8 +206,6 @@ namespace dimension
          return value * value * value * value * value;
       }
 
-
-
       template<int Root>
       constexpr double RootInt(double value)
       {
@@ -271,13 +239,6 @@ namespace dimension
       }
 
    }
-
-
-
-
-
-
-
 
    template<typename StartingUnit, typename TargetUnit>
    constexpr double GetSlope()
@@ -318,40 +279,6 @@ namespace dimension
          return value * Math::RootInt<Unit::exponent::den>(Math::PowInt<Unit::exponent::num>(scale));
       }
    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
    // ============================================================
    // =================== Convert All Units ======================
@@ -444,22 +371,20 @@ namespace dimension
    template<typename Rep, typename Ratio, typename... Units, typename... Coeffs>
    struct base_dimensionFromTuple<Rep, Ratio, std::tuple<Units...>, std::tuple<Coeffs...>>
    {
-      using dim = typename base_dimension<Rep, Units..., Coeffs..., Ratio>;
+      using dim = base_dimension<Rep, Units..., Coeffs..., Ratio>;
    };
 
    template<typename Rep, typename... Units, typename... Coeffs>
    struct base_dimensionFromTuple<Rep, std::tuple<Units...>, std::tuple<Coeffs...>>
    {
-      using dim = typename base_dimension<Rep, Units..., Coeffs...>;
+      using dim = base_dimension<Rep, Units..., Coeffs...>;
    };
 
    template<typename... Units>
    struct base_dimensionFromTuple<std::tuple<Units...>>
    {
-      using dim = typename base_dimension<Units...>;
+      using dim = base_dimension<Units...>;
    };
-
-
 
    // ============================================================
    // ==================== Full Simplifier =======================
@@ -480,7 +405,9 @@ namespace dimension
    template<typename Dim>
    constexpr auto FullSimplify(Dim input) {
       using simplify_type = FullSimplifyType<typename Dim::units>;
-      return simplify_type::dimType(simplify_type::after_conversion::Convert(input.template get_tuple_scalar<typename Dim::units>()));
+      using result_type   = typename simplify_type::dimType;
+
+      return result_type{simplify_type::after_conversion::Convert(input.template get_tuple_scalar<typename Dim::units>())};
    }
 
    // ============================================================
@@ -526,25 +453,6 @@ namespace dimension
       typename InitialSimplifier<T2>::units
    >::value;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-   
-
    // ============================================================
    // ============== Find Matching Unit by Dimension =============
    // ============================================================
@@ -577,11 +485,6 @@ namespace dimension
       static constexpr bool found = is_match || find_unit_by_dimension<Target, std::tuple<Tail...>>::found;
       using type = std::conditional_t<is_match, Head, typename find_unit_by_dimension<Target, std::tuple<Tail...>>::type>;
    };
-
-
-
-
-
 
    // ============================================================
    // ==================== Subtract Tuples =======================
@@ -627,17 +530,6 @@ namespace dimension
       >;
    };
 
-
-
-
-
-
-
-
-
-
-
-
    template<typename From, typename ToTuple>
    struct MatchUnit;
    
@@ -661,40 +553,6 @@ namespace dimension
            typename MatchUnit<From, std::tuple<Tail...>>::type
        >;
    };
-
-
-
-
-
-
-
-
-
-/*
-   // Conversion assuming FromTuple and ToTuple are fully simplified
-   template<typename... Units>
-   struct ConvertSimplified;
-
-   template<>
-   struct ConvertSimplified<std::tuple<>, std::tuple<>>
-   {
-      static constexpr double scalar = 1.0;
-   };
-
-   template<typename FromUnit, typename ToUnit>
-   struct ConvertSimplified<std::tuple<FromUnit>, std::tuple<ToUnit>>
-   {
-      // Figure out how to make constexpr
-      static const inline double scalar = DoConversion<ToUnit::unit, FromUnit>(1.0);
-   };
-
-   template<typename FromUnit, typename... FromUnits, typename ToUnit, typename... ToUnits>
-   struct ConvertSimplified<std::tuple<FromUnit, FromUnits...>, std::tuple<ToUnit, ToUnits...>>
-   {
-      // Figure out how to make constexpr
-      static const inline double scalar = ConvertSimplified<std::tuple<FromUnit>, std::tuple<ToUnit>>::scalar * ConvertSimplified<std::tuple<FromUnits...>, std::tuple<ToUnits...>>::scalar;
-   };
-*/
 
    template<typename... Units>
    struct ConvertSimplified;
@@ -752,13 +610,6 @@ namespace dimension
          return fullSimplified.template get_tuple_scalar<typename FromFullySimplified::units>() * inverse_scalar * converter::scalar;
    }
    };
-   
-   
-
-
-
-
-
 
    template<typename... Units>
    struct FlipExponents;
@@ -775,33 +626,6 @@ namespace dimension
            typename FlipExponents<std::tuple<Rest...>>::units
        >;
    };
-
-
-
-
-
-
-
-   //template<typename T>
-   //concept base_dimension = requires {
-   //    typename T::units; // Must have a 'units' type
-   //};
-   /*
-   class base_dimension_marker;
-
-   template<typename T>
-   concept is_base_dimension = std::is_base_of_v<base_dimension_marker, T>;
-   */
-
-
-
-
-
-
-
-
-
-
 
    template<is_unit_exponent T, is_unit_exponent U>
    struct Convertibleunit_exponent
@@ -836,206 +660,12 @@ namespace dimension
            (sizeof...(Units1) == std::tuple_size_v<Tuple2>);
    };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
    template<typename T, typename U>
    concept matching_dimensions =
        AreUnitTuplesEquivalent<
            typename decltype(FullSimplify(T{}))::units,
            typename decltype(FullSimplify(U{}))::units
        >::value;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-
-
-   template<typename NumTuple, typename DenTuple, int Index = 0>
-   struct has_matching_quantity;
-
-   template<typename NumTuple, typename DenTuple, int Index>
-   requires (Index == std::tuple_size_v<NumTuple>)
-   struct has_matching_quantity<NumTuple, DenTuple, Index>
-   {
-      static constexpr bool value = false;
-   };
-
-   template<typename NumTuple, typename DenTuple, int Index>
-   requires (Index < std::tuple_size_v<NumTuple>)
-   struct has_matching_quantity<NumTuple, DenTuple, Index>
-   {
-      static constexpr bool value = has_same_quantity_dim<std::tuple_element_t<Index, NumTuple>, DenTuple>::value ||
-         has_matching_quantity<NumTuple, DenTuple, Index + 1>::value;
-   };
-
-   template<typename NumTuple, typename DenTuple>
-   concept NoNonAbsoluteQuantitiesInCompoundDimension = 
-                  (!has_non_absolute_quantity_v<NumTuple> && !has_non_absolute_quantity_v<DenTuple>) ||
-                  (std::tuple_size_v<NumTuple> == 1 && std::tuple_size_v<DenTuple> == 0);
-
-   template<typename NumTuple, typename DenTuple>
-   concept IsUnitTuplePair = IsUnitTuple<typename FundamentalUnitExtractor<NumTuple, DenTuple>::Num> &&
-                             IsUnitTuple<typename FundamentalUnitExtractor<NumTuple, DenTuple>::Den> &&
-                             NoNonAbsoluteQuantitiesInCompoundDimension<NumTuple, DenTuple> &&
-                             !has_matching_quantity<NumTuple, DenTuple>::value;
-
-   // Forward declarations
-   template<are_unit_exponents... Units>
-   class base_dimension;
-
-
-
-   /// @brief Struct to simplify units by cancelling out as necessary
-   template<typename NumTypes1, typename NumTypes2, typename DenTypes1, typename DenTypes2>
-   struct UnitSimplifier;
-
-   /// @brief Struct to simplify units by cancelling out as necessary
-   /// @tparam NumTypes1... The types in the first group of numerator types
-   /// @tparam NumTypes2... The types in the second group of numerator types
-   /// @tparam DenTypes1... The types in the first group of denominator types
-   /// @tparam DenTypes2... The types in the second group of denominator types
-   /// @typedef newNum The simplified numerator types
-   /// @typedef newDen The simplified denominator types
-   /// @typedef dimType A base_dimension templated on the simplified types
-   template<typename ... NumTypes1, typename ... NumTypes2, typename ... DenTypes1, typename ... DenTypes2>
-   struct UnitSimplifier<std::tuple<NumTypes1...>, std::tuple<NumTypes2...>, std::tuple<DenTypes1...>, std::tuple<DenTypes2...>>
-   {
-   private:
-      using num1AfterSimpleCancel = tuple_diff<std::is_same, std::tuple<NumTypes1...>, std::tuple<DenTypes2...>>;
-      using num2AfterSimpleCancel = tuple_diff<std::is_same, std::tuple<NumTypes2...>, std::tuple<DenTypes1...>>;
-
-      using den1AfterSimpleCancel = tuple_diff<std::is_same, std::tuple<DenTypes1...>, std::tuple<NumTypes2...>>;
-      using den2AfterSimpleCancel = tuple_diff<std::is_same, std::tuple<DenTypes2...>, std::tuple<NumTypes1...>>;
-
-      using remainingNum1 = tuple_diff<has_same_dim, typename num1AfterSimpleCancel::type, typename den2AfterSimpleCancel::type>;
-      using remainingNum2 = tuple_diff<has_same_dim, typename num2AfterSimpleCancel::type, typename den1AfterSimpleCancel::type>;
-
-      using remainingDen1 = tuple_diff<has_same_dim, typename den1AfterSimpleCancel::type, typename num2AfterSimpleCancel::type>;
-      using remainingDen2 = tuple_diff<has_same_dim, typename den2AfterSimpleCancel::type, typename num1AfterSimpleCancel::type>;
-      
-
-   public:
-      using newNum = tuple_cat_t<typename remainingNum1::type, typename remainingNum2::type>;
-      using newDen = tuple_cat_t<typename remainingDen1::type, typename remainingDen2::type>;
-
-      using numSimple = tuple_cat_t<typename num1AfterSimpleCancel::type, typename num2AfterSimpleCancel::type>;
-      using denSimple = tuple_cat_t<typename den1AfterSimpleCancel::type, typename den2AfterSimpleCancel::type>;
-
-      using dimType = base_dimension<newNum, newDen>;
-
-      constexpr static bool isDelta = !((std::tuple_size_v<newNum> == 1) && (std::tuple_size_v<newDen> == 0));
-      constexpr static bool isScalar = (std::tuple_size_v<newNum> == 0) && (std::tuple_size_v<newDen> == 0);
-   };
-
-   /// @brief Unit cancellation implementation
-   /// @details recursive base-case
-   template<bool inverse = false, int index = 0, typename RealTupType, typename IncomingTupType>
-   requires (index == std::tuple_size_v<IncomingTupType>)
-   constexpr PrecisionType CancelUnitsImpl(PrecisionType value)
-   {
-      return value;
-   }
-
-   /// @brief Unit cancellation implementation
-   /// @details Updates the given value when units are cancelled,
-   ///    and updates the given unit tuple when a unit is not cancelled.
-   /// @tparam inverse bool indicating whether the item is in numerator (false) or denominator (true)
-   /// @tparam index The tuple index to attempt cancelling
-   /// @tparam IncomingTupType The types to attempt cancelling
-   /// @tparam RealTupType The types to update as needed
-   /// @tparam isDelata Bool indicating whether this conversion is of a single unit in the normator (false)
-   ///    or not (true).
-   /// @param[in,out] value The value to update when cancelling units
-   template<bool inverse = false, int index = 0, typename RealTupType, typename IncomingTupType>
-   requires (index < std::tuple_size_v<IncomingTupType>)
-   constexpr PrecisionType CancelUnitsImpl(PrecisionType value)
-   {
-      using currentType = std::tuple_element_t<index, IncomingTupType>;
-      if constexpr (has_same_dim<currentType, RealTupType>::value)
-      {
-         const PrecisionType valueConverted = Convert<currentType, typename get_first_match<is_same_dim, currentType, RealTupType>::type, inverse>(value);
-         return CancelUnitsImpl<inverse, index + 1, typename RemoveOneInstance<is_same_dim, currentType, RealTupType>::type, IncomingTupType>(valueConverted);
-      }
-      else
-      {
-         using primary = type_from_quantity_or_delta_t<currentType>::Primary;
-         using realPrimary = std::conditional_t<is_quantity_v<currentType>, Quantity<primary>, primary>;
-
-         const PrecisionType valueConverted = Convert<currentType, realPrimary, inverse>(value);
-         return CancelUnitsImpl<inverse, index + 1, RealTupType, IncomingTupType>(valueConverted);
-      }
-   }
-
-   /// @brief Perform unit cancellation
-   /// @tparam NumTupType Incoming numerator types
-   /// @tparam DenTupType Incoming denominator types
-   /// @tparam RealNumTupType Numerator types to update
-   /// @tparam RealDenTupType Denominator types to udpate
-   /// @tparam isDelata Bool indicating whether this conversion is of a single unit in the normator (false)
-   ///    or not (true).
-   /// @param[in,out] value Value to update
-   template<typename NumTupType, typename DenTupType, typename RealNumTupType, typename RealDenTupType, bool isDelta = false>
-   constexpr PrecisionType CancelUnits(PrecisionType value)
-   {
-      const PrecisionType valueConverted1 = CancelUnitsImpl<false, 0, RealNumTupType, NumTupType>(value);
-      const PrecisionType valueConverted2 = CancelUnitsImpl<true, 0, RealDenTupType, DenTupType>(valueConverted1);
-
-      return valueConverted2;
-   }
-
-   template<typename Dim1, typename Dim2>
-   struct is_matching_dimension
-   {
-      using simplified = UnitSimplifier<typename Dim1::simplifiedNumTuple, typename Dim2::simplifiedDenTuple, typename Dim1::simplifiedDenTuple, typename Dim2::simplifiedNumTuple>;
-
-      static constexpr bool value = simplified::isScalar;
-   };
-
-   template<typename Dim1, typename Dim2>
-   concept MatchingDimensionsNew = is_matching_dimension<Dim1, Dim2>::value;
-
-*/
 
 } // end Dimension
 

@@ -122,21 +122,6 @@ namespace dimension
          return Dim(val);
       }
 
-      /*
-      /// @brief deserialize a buffer and update the input object
-      /// @tparam NumTuple numerator tuple to template Serializer on
-      /// @tparam DenTuple denominator tuple to template Serializer on
-      /// @tparam InputBuf The buffer type
-      /// @param in The buffer to deserialize
-      /// @param obj The object to deserialize into
-      template <is_base_dimension Dim, typename InputBuf>
-      static void deserialize(const InputBuf& in, Dim& obj)
-      {
-         PrecisionType val = deserialize_impl<Dim, decltype(in.begin()), typename InputBuf::value_type>(in.begin());
-         //obj.template SetVal<NumTuple, DenTuple>(val);
-      }
-      */
-
    };
 
 

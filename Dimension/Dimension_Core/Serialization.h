@@ -101,21 +101,6 @@ namespace dimension
       return Serializer<Dim, Policy>::deserialize(in);
    }
 
-   /*
-   /// @brief deserialize a buffer and update the input object
-   /// @tparam NumTuple numerator tuple to template Serializer on
-   /// @tparam DenTuple denominator tuple to template Serializer on
-   /// @tparam InputBuf The buffer type
-   /// @tparam Policy Serialization policy to template Serializer on
-   /// @param in The buffer to deserialize
-   /// @param obj The object to deserialize into
-   template <is_base_dimension Dim, typename InputBuf, typename Policy = DefaultSerializationPolicy<FNV_1a_32Bit>>
-   void deserialize(const InputBuf& in, Dim& obj)
-   {
-      Serializer<Dim, Policy>::deserialize(in, obj);
-   }
-   */
-
 } // end Dimension
 
 #endif // DIMENSION_SERIALIZATION_H

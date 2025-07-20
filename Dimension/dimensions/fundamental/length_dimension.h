@@ -1,7 +1,7 @@
 #ifndef STATIC_DIMENSION_LENGTH_H
 #define STATIC_DIMENSION_LENGTH_H
 
-#include "../Dimension_Impl/FundamentalDimensions/length_dimension_Impl.h"
+#include "Dimension_Impl/FundamentalDimensions/length_dimension_Impl.h"
 
 namespace dimension
 {

@@ -6,7 +6,7 @@ class TestPackageConan(ConanFile):
     generators = "cmake"
 
     requires = [
-        "Dimensional/1.0.0@myuser/testing",
+        "Dimensional/3.0.0.0@myuser/testing",
         "gtest/1.12.1"
     ]
 

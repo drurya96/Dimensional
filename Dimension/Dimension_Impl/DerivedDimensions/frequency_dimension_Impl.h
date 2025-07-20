@@ -41,6 +41,8 @@ namespace dimension
    template<
       is_timespan_unit timespanUnit,
       is_frequency DimType>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr PrecisionType get_frequency_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -54,6 +56,7 @@ namespace dimension
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
    template<IsNamedfrequencyUnit Named, is_frequency DimType>
+   // TODO: Unit test this and remove suppression
    constexpr PrecisionType get_frequency_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -87,6 +90,7 @@ namespace dimension
    
       template<typename T>
       requires is_frequency<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr frequency(const T& base) : Base(base) {}
    };
 
@@ -116,6 +120,7 @@ namespace dimension
    
       template<typename T>
       requires is_frequency<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr frequency(const T& base) : Base(base) {}
    };
 
@@ -133,6 +138,7 @@ namespace dimension
 
       template<typename Other>
       requires is_frequency<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr frequency(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -149,6 +155,7 @@ namespace dimension
 
       template<typename Other>
       requires is_frequency<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr frequency(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -168,13 +175,12 @@ namespace dimension
    requires are_frequency_units<
       T0
    >
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_frequency(Cs... coeffs)
    {
       return frequency<double, T0, Cs...>(1.0, coeffs...);
    }
-
-
-
 
    template<
       IsBasicUnitType T0,
@@ -184,42 +190,32 @@ namespace dimension
    requires are_frequency_units<
       T0
    > && (!is_coefficient<Rep>)
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_frequency(Rep value, Cs... coeffs)
    {
       return frequency<Rep, T0, Cs...>(value, coeffs...);
    }
 
-
-
-
    /// @brief Template specialization for named frequency units
    /// @tparam Named The named unit this frequency type is in terms of
    template<IsNamedfrequencyUnit Named, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_frequency(Cs... coeffs)
    {
       return frequency<double, Named, Cs...>(1.0, coeffs...);
    }
 
-
-
-
-
-
    /// @brief Template specialization for named frequency units
    /// @tparam Named The named unit this frequency type is in terms of
    template<IsNamedfrequencyUnit Named, rep_type Rep, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_frequency(Rep value, Cs... coeffs)
    {
       return frequency<Rep, Named, Cs...>(value, coeffs...);
    }
-
-
-
-
-
-
-
-
 
    template<is_frequency Dim>
    frequency(Dim) -> 

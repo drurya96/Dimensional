@@ -200,6 +200,8 @@ namespace dimension
       is_mass_unit massUnit,
       is_length_unit lengthUnit,
       is_conductance DimType>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr PrecisionType get_conductance_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -216,6 +218,7 @@ namespace dimension
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
    template<IsNamedconductanceUnit Named, is_conductance DimType>
+   // TODO: Unit test this and remove suppression
    constexpr PrecisionType get_conductance_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -261,6 +264,7 @@ namespace dimension
    
       template<typename T>
       requires is_conductance<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr conductance(const T& base) : Base(base) {}
    };
 
@@ -302,6 +306,7 @@ namespace dimension
    
       template<typename T>
       requires is_conductance<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr conductance(const T& base) : Base(base) {}
    };
 
@@ -319,6 +324,7 @@ namespace dimension
 
       template<typename Other>
       requires is_conductance<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr conductance(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -335,6 +341,7 @@ namespace dimension
 
       template<typename Other>
       requires is_conductance<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr conductance(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -360,13 +367,12 @@ namespace dimension
       T2,
       T3
    >
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_conductance(Cs... coeffs)
    {
       return conductance<double, T0, T1, T2, T3, Cs...>(1.0, coeffs...);
    }
-
-
-
 
    template<
       IsBasicUnitType T0,
@@ -382,42 +388,32 @@ namespace dimension
       T2,
       T3
    > && (!is_coefficient<Rep>)
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_conductance(Rep value, Cs... coeffs)
    {
       return conductance<Rep, T0, T1, T2, T3, Cs...>(value, coeffs...);
    }
 
-
-
-
    /// @brief Template specialization for named conductance units
    /// @tparam Named The named unit this conductance type is in terms of
    template<IsNamedconductanceUnit Named, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_conductance(Cs... coeffs)
    {
       return conductance<double, Named, Cs...>(1.0, coeffs...);
    }
 
-
-
-
-
-
    /// @brief Template specialization for named conductance units
    /// @tparam Named The named unit this conductance type is in terms of
    template<IsNamedconductanceUnit Named, rep_type Rep, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_conductance(Rep value, Cs... coeffs)
    {
       return conductance<Rep, Named, Cs...>(value, coeffs...);
    }
-
-
-
-
-
-
-
-
 
    template<is_conductance Dim>
    conductance(Dim) -> 

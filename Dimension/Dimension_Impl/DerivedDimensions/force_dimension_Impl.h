@@ -80,6 +80,8 @@ namespace dimension
       is_length_unit lengthUnit,
       is_timespan_unit timespanUnit,
       is_force DimType>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr PrecisionType get_force_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -95,6 +97,7 @@ namespace dimension
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
    template<IsNamedforceUnit Named, is_force DimType>
+   // TODO: Unit test this and remove suppression
    constexpr PrecisionType get_force_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -136,6 +139,7 @@ namespace dimension
    
       template<typename T>
       requires is_force<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr force(const T& base) : Base(base) {}
    };
 
@@ -173,6 +177,7 @@ namespace dimension
    
       template<typename T>
       requires is_force<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr force(const T& base) : Base(base) {}
    };
 
@@ -190,6 +195,7 @@ namespace dimension
 
       template<typename Other>
       requires is_force<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr force(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -206,6 +212,7 @@ namespace dimension
 
       template<typename Other>
       requires is_force<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr force(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -229,13 +236,12 @@ namespace dimension
       T1,
       T2
    >
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_force(Cs... coeffs)
    {
       return force<double, T0, T1, T2, Cs...>(1.0, coeffs...);
    }
-
-
-
 
    template<
       IsBasicUnitType T0,
@@ -249,42 +255,32 @@ namespace dimension
       T1,
       T2
    > && (!is_coefficient<Rep>)
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_force(Rep value, Cs... coeffs)
    {
       return force<Rep, T0, T1, T2, Cs...>(value, coeffs...);
    }
 
-
-
-
    /// @brief Template specialization for named force units
    /// @tparam Named The named unit this force type is in terms of
    template<IsNamedforceUnit Named, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_force(Cs... coeffs)
    {
       return force<double, Named, Cs...>(1.0, coeffs...);
    }
 
-
-
-
-
-
    /// @brief Template specialization for named force units
    /// @tparam Named The named unit this force type is in terms of
    template<IsNamedforceUnit Named, rep_type Rep, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_force(Rep value, Cs... coeffs)
    {
       return force<Rep, Named, Cs...>(value, coeffs...);
    }
-
-
-
-
-
-
-
-
 
    template<is_force Dim>
    force(Dim) -> 

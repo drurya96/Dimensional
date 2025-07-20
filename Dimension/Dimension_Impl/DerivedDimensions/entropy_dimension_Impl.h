@@ -200,6 +200,8 @@ namespace dimension
       is_timespan_unit timespanUnit,
       is_temperature_unit temperatureUnit,
       is_entropy DimType>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr PrecisionType get_entropy_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -216,6 +218,7 @@ namespace dimension
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
    template<IsNamedentropyUnit Named, is_entropy DimType>
+   // TODO: Unit test this and remove suppression
    constexpr PrecisionType get_entropy_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -261,6 +264,7 @@ namespace dimension
    
       template<typename T>
       requires is_entropy<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr entropy(const T& base) : Base(base) {}
    };
 
@@ -302,6 +306,7 @@ namespace dimension
    
       template<typename T>
       requires is_entropy<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr entropy(const T& base) : Base(base) {}
    };
 
@@ -319,6 +324,7 @@ namespace dimension
 
       template<typename Other>
       requires is_entropy<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr entropy(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -335,6 +341,7 @@ namespace dimension
 
       template<typename Other>
       requires is_entropy<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr entropy(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -360,13 +367,12 @@ namespace dimension
       T2,
       T3
    >
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_entropy(Cs... coeffs)
    {
       return entropy<double, T0, T1, T2, T3, Cs...>(1.0, coeffs...);
    }
-
-
-
 
    template<
       IsBasicUnitType T0,
@@ -382,42 +388,32 @@ namespace dimension
       T2,
       T3
    > && (!is_coefficient<Rep>)
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_entropy(Rep value, Cs... coeffs)
    {
       return entropy<Rep, T0, T1, T2, T3, Cs...>(value, coeffs...);
    }
 
-
-
-
    /// @brief Template specialization for named entropy units
    /// @tparam Named The named unit this entropy type is in terms of
    template<IsNamedentropyUnit Named, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_entropy(Cs... coeffs)
    {
       return entropy<double, Named, Cs...>(1.0, coeffs...);
    }
 
-
-
-
-
-
    /// @brief Template specialization for named entropy units
    /// @tparam Named The named unit this entropy type is in terms of
    template<IsNamedentropyUnit Named, rep_type Rep, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_entropy(Rep value, Cs... coeffs)
    {
       return entropy<Rep, Named, Cs...>(value, coeffs...);
    }
-
-
-
-
-
-
-
-
 
    template<is_entropy Dim>
    entropy(Dim) -> 

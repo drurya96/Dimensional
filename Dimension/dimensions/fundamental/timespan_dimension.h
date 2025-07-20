@@ -1,7 +1,7 @@
 #ifndef STATIC_DIMENSION_TIMESPAN_H
 #define STATIC_DIMENSION_TIMESPAN_H
 
-#include "../Dimension_Impl/FundamentalDimensions/timespan_dimension_Impl.h"
+#include "Dimension_Impl/FundamentalDimensions/timespan_dimension_Impl.h"
 
 namespace dimension
 {

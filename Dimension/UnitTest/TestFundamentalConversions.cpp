@@ -426,3 +426,20 @@ TEST(FundamentalConversions, TestchargeConversions)
    EXPECT_NEAR(get_charge_as<elementary_charges>(chargeInElementarycharges), 100.0, TOLERANCE);
 
 }
+
+TEST(FundamentalConversions, TestamountConversions)
+{
+
+   // Test from moles to other units
+   amount<moles> amountInmoles{100.0};
+
+   EXPECT_NEAR(get_amount_as<moles>(amountInmoles), 100.0, TOLERANCE);
+   EXPECT_NEAR(get_amount_as<pound_moles>(amountInmoles), 0.2204622622, TOLERANCE);
+
+   // Test from pound_moles to other units
+   amount<pound_moles> amountInpoundMoles{100.0};
+
+   EXPECT_NEAR(get_amount_as<moles>(amountInpoundMoles), 45359.237, TOLERANCE);
+   EXPECT_NEAR(get_amount_as<pound_moles>(amountInpoundMoles), 100.0, TOLERANCE);
+
+}

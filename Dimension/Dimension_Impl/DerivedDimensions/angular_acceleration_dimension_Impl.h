@@ -52,6 +52,8 @@ namespace dimension
       is_angle_unit angleUnit,
       is_timespan_unit timespanUnit,
       is_angular_acceleration DimType>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr PrecisionType get_angular_acceleration_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -66,6 +68,7 @@ namespace dimension
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
    template<IsNamedangular_accelerationUnit Named, is_angular_acceleration DimType>
+   // TODO: Unit test this and remove suppression
    constexpr PrecisionType get_angular_acceleration_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -103,6 +106,7 @@ namespace dimension
    
       template<typename T>
       requires is_angular_acceleration<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr angular_acceleration(const T& base) : Base(base) {}
    };
 
@@ -136,6 +140,7 @@ namespace dimension
    
       template<typename T>
       requires is_angular_acceleration<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr angular_acceleration(const T& base) : Base(base) {}
    };
 
@@ -153,6 +158,7 @@ namespace dimension
 
       template<typename Other>
       requires is_angular_acceleration<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr angular_acceleration(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -169,6 +175,7 @@ namespace dimension
 
       template<typename Other>
       requires is_angular_acceleration<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr angular_acceleration(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -190,13 +197,12 @@ namespace dimension
       T0,
       T1
    >
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_angular_acceleration(Cs... coeffs)
    {
       return angular_acceleration<double, T0, T1, Cs...>(1.0, coeffs...);
    }
-
-
-
 
    template<
       IsBasicUnitType T0,
@@ -208,42 +214,32 @@ namespace dimension
       T0,
       T1
    > && (!is_coefficient<Rep>)
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_angular_acceleration(Rep value, Cs... coeffs)
    {
       return angular_acceleration<Rep, T0, T1, Cs...>(value, coeffs...);
    }
 
-
-
-
    /// @brief Template specialization for named angular_acceleration units
    /// @tparam Named The named unit this angular_acceleration type is in terms of
    template<IsNamedangular_accelerationUnit Named, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_angular_acceleration(Cs... coeffs)
    {
       return angular_acceleration<double, Named, Cs...>(1.0, coeffs...);
    }
 
-
-
-
-
-
    /// @brief Template specialization for named angular_acceleration units
    /// @tparam Named The named unit this angular_acceleration type is in terms of
    template<IsNamedangular_accelerationUnit Named, rep_type Rep, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_angular_acceleration(Rep value, Cs... coeffs)
    {
       return angular_acceleration<Rep, Named, Cs...>(value, coeffs...);
    }
-
-
-
-
-
-
-
-
 
    template<is_angular_acceleration Dim>
    angular_acceleration(Dim) -> 

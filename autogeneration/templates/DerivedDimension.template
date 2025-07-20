@@ -64,6 +64,8 @@ namespace dimension
       is_{{ de.dim }}_unit {{ de.dim }}Unit,
       {% endfor %}
       is_{{ dim.name }} DimType>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr PrecisionType get_{{ dim.name.lower() }}_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -79,6 +81,7 @@ namespace dimension
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
    template<IsNamed{{ dim.name }}Unit Named, is_{{ dim.name }} DimType>
+   // TODO: Unit test this and remove suppression
    constexpr PrecisionType get_{{ dim.name.lower() }}_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -120,6 +123,7 @@ namespace dimension
    
       template<typename T>
       requires is_{{ dim.name }}<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr {{ dim.name }}(const T& base) : Base(base) {}
    };
 
@@ -157,6 +161,7 @@ namespace dimension
    
       template<typename T>
       requires is_{{ dim.name }}<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr {{ dim.name }}(const T& base) : Base(base) {}
    };
 
@@ -174,6 +179,7 @@ namespace dimension
 
       template<typename Other>
       requires is_{{ dim.name }}<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr {{ dim.name }}(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -190,6 +196,7 @@ namespace dimension
 
       template<typename Other>
       requires is_{{ dim.name }}<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr {{ dim.name }}(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -213,13 +220,12 @@ namespace dimension
       T{{num}}{{ "," if not loop.last }}
       {% endfor %}
    >
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_{{ dim.name }}(Cs... coeffs)
    {
       return {{ dim.name }}<double, {{t_list}}, Cs...>(1.0, coeffs...);
    }
-
-
-
 
    template<
       {% for num in range(dim_num) %}
@@ -233,42 +239,32 @@ namespace dimension
       T{{num}}{{ "," if not loop.last }}
       {% endfor %}
    > && (!is_coefficient<Rep>)
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_{{ dim.name }}(Rep value, Cs... coeffs)
    {
       return {{ dim.name }}<Rep, {{t_list}}, Cs...>(value, coeffs...);
    }
 
-
-
-
    /// @brief Template specialization for named {{ dim.name }} units
    /// @tparam Named The named unit this {{ dim.name }} type is in terms of
    template<IsNamed{{ dim.name }}Unit Named, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_{{ dim.name }}(Cs... coeffs)
    {
       return {{ dim.name }}<double, Named, Cs...>(1.0, coeffs...);
    }
 
-
-
-
-
-
    /// @brief Template specialization for named {{ dim.name }} units
    /// @tparam Named The named unit this {{ dim.name }} type is in terms of
    template<IsNamed{{ dim.name }}Unit Named, rep_type Rep, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_{{ dim.name }}(Rep value, Cs... coeffs)
    {
       return {{ dim.name }}<Rep, Named, Cs...>(value, coeffs...);
    }
-
-
-
-
-
-
-
-
 
    template<is_{{ dim.name }} Dim>
    {{ dim.name }}(Dim) -> 

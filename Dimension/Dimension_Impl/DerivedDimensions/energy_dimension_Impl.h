@@ -80,6 +80,8 @@ namespace dimension
       is_length_unit lengthUnit,
       is_timespan_unit timespanUnit,
       is_energy DimType>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr PrecisionType get_energy_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -95,6 +97,7 @@ namespace dimension
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
    template<IsNamedenergyUnit Named, is_energy DimType>
+   // TODO: Unit test this and remove suppression
    constexpr PrecisionType get_energy_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -136,6 +139,7 @@ namespace dimension
    
       template<typename T>
       requires is_energy<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr energy(const T& base) : Base(base) {}
    };
 
@@ -173,6 +177,7 @@ namespace dimension
    
       template<typename T>
       requires is_energy<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr energy(const T& base) : Base(base) {}
    };
 
@@ -190,6 +195,7 @@ namespace dimension
 
       template<typename Other>
       requires is_energy<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr energy(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -206,6 +212,7 @@ namespace dimension
 
       template<typename Other>
       requires is_energy<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr energy(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -229,13 +236,12 @@ namespace dimension
       T1,
       T2
    >
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_energy(Cs... coeffs)
    {
       return energy<double, T0, T1, T2, Cs...>(1.0, coeffs...);
    }
-
-
-
 
    template<
       IsBasicUnitType T0,
@@ -249,42 +255,32 @@ namespace dimension
       T1,
       T2
    > && (!is_coefficient<Rep>)
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_energy(Rep value, Cs... coeffs)
    {
       return energy<Rep, T0, T1, T2, Cs...>(value, coeffs...);
    }
 
-
-
-
    /// @brief Template specialization for named energy units
    /// @tparam Named The named unit this energy type is in terms of
    template<IsNamedenergyUnit Named, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_energy(Cs... coeffs)
    {
       return energy<double, Named, Cs...>(1.0, coeffs...);
    }
 
-
-
-
-
-
    /// @brief Template specialization for named energy units
    /// @tparam Named The named unit this energy type is in terms of
    template<IsNamedenergyUnit Named, rep_type Rep, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_energy(Rep value, Cs... coeffs)
    {
       return energy<Rep, Named, Cs...>(value, coeffs...);
    }
-
-
-
-
-
-
-
-
 
    template<is_energy Dim>
    energy(Dim) -> 

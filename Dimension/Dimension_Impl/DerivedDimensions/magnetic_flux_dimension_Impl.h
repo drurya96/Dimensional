@@ -200,6 +200,8 @@ namespace dimension
       is_timespan_unit timespanUnit,
       is_charge_unit chargeUnit,
       is_magnetic_flux DimType>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr PrecisionType get_magnetic_flux_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -216,6 +218,7 @@ namespace dimension
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
    template<IsNamedmagnetic_fluxUnit Named, is_magnetic_flux DimType>
+   // TODO: Unit test this and remove suppression
    constexpr PrecisionType get_magnetic_flux_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -261,6 +264,7 @@ namespace dimension
    
       template<typename T>
       requires is_magnetic_flux<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr magnetic_flux(const T& base) : Base(base) {}
    };
 
@@ -302,6 +306,7 @@ namespace dimension
    
       template<typename T>
       requires is_magnetic_flux<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr magnetic_flux(const T& base) : Base(base) {}
    };
 
@@ -319,6 +324,7 @@ namespace dimension
 
       template<typename Other>
       requires is_magnetic_flux<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr magnetic_flux(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -335,6 +341,7 @@ namespace dimension
 
       template<typename Other>
       requires is_magnetic_flux<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr magnetic_flux(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -360,13 +367,12 @@ namespace dimension
       T2,
       T3
    >
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_magnetic_flux(Cs... coeffs)
    {
       return magnetic_flux<double, T0, T1, T2, T3, Cs...>(1.0, coeffs...);
    }
-
-
-
 
    template<
       IsBasicUnitType T0,
@@ -382,42 +388,32 @@ namespace dimension
       T2,
       T3
    > && (!is_coefficient<Rep>)
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_magnetic_flux(Rep value, Cs... coeffs)
    {
       return magnetic_flux<Rep, T0, T1, T2, T3, Cs...>(value, coeffs...);
    }
 
-
-
-
    /// @brief Template specialization for named magnetic_flux units
    /// @tparam Named The named unit this magnetic_flux type is in terms of
    template<IsNamedmagnetic_fluxUnit Named, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_magnetic_flux(Cs... coeffs)
    {
       return magnetic_flux<double, Named, Cs...>(1.0, coeffs...);
    }
 
-
-
-
-
-
    /// @brief Template specialization for named magnetic_flux units
    /// @tparam Named The named unit this magnetic_flux type is in terms of
    template<IsNamedmagnetic_fluxUnit Named, rep_type Rep, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_magnetic_flux(Rep value, Cs... coeffs)
    {
       return magnetic_flux<Rep, Named, Cs...>(value, coeffs...);
    }
-
-
-
-
-
-
-
-
 
    template<is_magnetic_flux Dim>
    magnetic_flux(Dim) -> 

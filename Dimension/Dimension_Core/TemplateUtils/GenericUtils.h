@@ -33,7 +33,7 @@ namespace dimension
       >;
    };
 
-
+   /*
    template<typename Tuple, typename Func>
    constexpr double fold_tuple(double value, Func func)
    {
@@ -44,17 +44,7 @@ namespace dimension
          Tuple{}
       );
    }
-
-/*
-   template<typename Tuple>
-   struct expand_tuple;
-   
-   template<typename... Ts>
-   struct expand_tuple<std::tuple<Ts...>> {
-       template<template<typename...> typename F>
-       using into = F<Ts...>;
-   };
-*/
+   */
 
    template<typename Tuple, typename F>
    constexpr auto call_unpack(F&& f) {
@@ -88,17 +78,6 @@ namespace dimension
          });
    }
 
-
-
-
-
-
-
-
-
-
-
-
    // Primary template – never used directly
    template<typename Tuple>
    struct apply;
@@ -121,10 +100,6 @@ namespace dimension
                   .template operator()<Ts...>(std::forward<Args>(args)...);
       }
    };
-
-
-
-
 
 }
 

@@ -52,6 +52,8 @@ namespace dimension
       is_length_unit lengthUnit,
       is_timespan_unit timespanUnit,
       is_diffusion_coefficient DimType>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr PrecisionType get_diffusion_coefficient_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -66,6 +68,7 @@ namespace dimension
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
    template<IsNameddiffusion_coefficientUnit Named, is_diffusion_coefficient DimType>
+   // TODO: Unit test this and remove suppression
    constexpr PrecisionType get_diffusion_coefficient_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -103,6 +106,7 @@ namespace dimension
    
       template<typename T>
       requires is_diffusion_coefficient<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr diffusion_coefficient(const T& base) : Base(base) {}
    };
 
@@ -136,6 +140,7 @@ namespace dimension
    
       template<typename T>
       requires is_diffusion_coefficient<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr diffusion_coefficient(const T& base) : Base(base) {}
    };
 
@@ -153,6 +158,7 @@ namespace dimension
 
       template<typename Other>
       requires is_diffusion_coefficient<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr diffusion_coefficient(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -169,6 +175,7 @@ namespace dimension
 
       template<typename Other>
       requires is_diffusion_coefficient<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr diffusion_coefficient(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -190,13 +197,12 @@ namespace dimension
       T0,
       T1
    >
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_diffusion_coefficient(Cs... coeffs)
    {
       return diffusion_coefficient<double, T0, T1, Cs...>(1.0, coeffs...);
    }
-
-
-
 
    template<
       IsBasicUnitType T0,
@@ -208,42 +214,32 @@ namespace dimension
       T0,
       T1
    > && (!is_coefficient<Rep>)
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_diffusion_coefficient(Rep value, Cs... coeffs)
    {
       return diffusion_coefficient<Rep, T0, T1, Cs...>(value, coeffs...);
    }
 
-
-
-
    /// @brief Template specialization for named diffusion_coefficient units
    /// @tparam Named The named unit this diffusion_coefficient type is in terms of
    template<IsNameddiffusion_coefficientUnit Named, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_diffusion_coefficient(Cs... coeffs)
    {
       return diffusion_coefficient<double, Named, Cs...>(1.0, coeffs...);
    }
 
-
-
-
-
-
    /// @brief Template specialization for named diffusion_coefficient units
    /// @tparam Named The named unit this diffusion_coefficient type is in terms of
    template<IsNameddiffusion_coefficientUnit Named, rep_type Rep, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_diffusion_coefficient(Rep value, Cs... coeffs)
    {
       return diffusion_coefficient<Rep, Named, Cs...>(value, coeffs...);
    }
-
-
-
-
-
-
-
-
 
    template<is_diffusion_coefficient Dim>
    diffusion_coefficient(Dim) -> 

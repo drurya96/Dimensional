@@ -73,7 +73,7 @@ namespace dimension
    /// @tparam DenTuple tuple of Unit types to convert denominator to
    /// @return A PrecisionType representing the value in terms of the given units
    template<are_unit_exponents... Units, typename Dim>
-   requires matching_dimensions<base_dimension_impl<double, Units...>, Dim> && !same_units<std::tuple<Units...>, typename Dim::units>
+   requires (matching_dimensions<base_dimension_impl<double, Units...>, Dim> && !same_units<std::tuple<Units...>, typename Dim::units>)
    constexpr Dim::rep get_dimension_as(Dim obj)
    {
       return ConvertDim<typename Dim::units, std::tuple<Units...>>::Convert(
@@ -95,7 +95,7 @@ namespace dimension
    }
 
    template<are_unit_exponents... Units, typename Dim>
-   requires matching_dimensions<base_dimension_impl<double, Units...>, Dim> && !same_units<std::tuple<Units...>, typename Dim::units>
+   requires (matching_dimensions<base_dimension_impl<double, Units...>, Dim> && !same_units<std::tuple<Units...>, typename Dim::units>)
    constexpr Dim::rep get_scalar_as(Dim obj)
    {
       return ConvertDim<typename Dim::units, std::tuple<Units...>>::Convert(
@@ -140,8 +140,8 @@ namespace dimension
    private:
       using ts_split = partition_coeffs<Ts...>;
 
-      template<typename... Ts>
-      static constexpr void ignore_unused(Ts&&...) noexcept {}
+      template<typename... Us>
+      static constexpr void ignore_unused(Us&&...) noexcept {}
 
    public:
 
@@ -157,13 +157,13 @@ namespace dimension
       // 1. default / “coefficients-only” constructor
       //------------------------------------------------------------------
       template<is_coefficient... Cs>
-      constexpr base_dimension_impl(Cs... coeffs) noexcept
+      constexpr base_dimension_impl(Cs... incoming_coeffs) noexcept
          : scalar(Rep{0})
       {
          static_assert(sizeof...(Cs) == 0 ||               // plain default
                         (std::is_empty_v<Cs> && ...),        // all tags are EBO
                         "Run-time coefficient arguments must be empty types");
-         ignore_unused(coeffs...);                          // discard at run time
+         ignore_unused(incoming_coeffs...);                          // discard at run time
       }
 
       //------------------------------------------------------------------
@@ -171,12 +171,12 @@ namespace dimension
       //------------------------------------------------------------------
       template<is_coefficient... Cs>
       explicit constexpr base_dimension_impl(Rep v,
-                                             Cs... coeffs) noexcept
+                                             Cs... incoming_coeffs) noexcept
          : scalar(v)
       {
          static_assert((std::is_empty_v<Cs> && ...),
                         "Run-time coefficient arguments must be empty types");
-         ignore_unused(coeffs...);
+         ignore_unused(incoming_coeffs...);
       }
       
       template<typename... OtherUnits>
@@ -290,7 +290,7 @@ namespace dimension
       }
 
       template<typename... Units2>
-      [[nodiscard]] constexpr Rep get()
+      [[nodiscard]] constexpr Rep get() const
       {
          static_assert(same_units<units, std::tuple<Units2...>>,
             "get is an implementation detail of Dimensional and is not meant to be called externally! Prefer get_dimension_as. When using get directly, template parameter units must exactly match units of the object."
@@ -302,7 +302,7 @@ namespace dimension
       }
 
       template<typename... Units2>
-      [[nodiscard]] constexpr Rep get_scalar()
+      [[nodiscard]] constexpr Rep get_scalar() const
       {
          static_assert(same_units<units, std::tuple<Units2...>>,
             "get_scalar is an implementation detail of Dimensional and is not meant to be called externally! Prefer get_dimension_as. When using get directly, template parameter units must exactly match units of the object."
@@ -312,7 +312,7 @@ namespace dimension
       }
 
       template<typename Tuple>
-      [[nodiscard]] constexpr Rep get_tuple_scalar()
+      [[nodiscard]] constexpr Rep get_tuple_scalar() const
       {
          static_assert(same_units<units, Tuple>,
             "get_tuple_scalar is an implementation detail of Dimensional and is not meant to be called externally! Prefer get_dimension_as. When using get directly, template parameter units must exactly match units of the object."
@@ -387,6 +387,8 @@ namespace dimension
    template<are_unit_exponents U,
             typename Rep,                          // deduced
             is_coefficient... Cs>                  // deduced
+   // TODO: Unit test this and remove suppression
+   // cppcheck-suppress unusedFunction
    constexpr auto make_dimension(Rep value, Cs... coeffs)
    {
       // compile-time guard: Rep must work with base_dimension’s ctor
@@ -415,7 +417,7 @@ namespace dimension
       using units_combined = tuple_cat_t<typename Lhs::units, typename FlipExponents<typename Rhs::units>::units>;
       using units = typename InitialSimplifier<units_combined>::units;
 
-      return base_dimensionFromTuple<Rep, ratio, units, symbols>::dim(
+      return typename base_dimensionFromTuple<Rep, ratio, units, symbols>::dim(
          get_scalar_tuple<typename Lhs::units>(lhs) /
          get_scalar_tuple<typename Rhs::units>(rhs)
       );
@@ -439,7 +441,7 @@ namespace dimension
       using units_combined = tuple_cat_t<typename Lhs::units, typename Rhs::units>;
       using units = typename InitialSimplifier<units_combined>::units;
       
-      return base_dimensionFromTuple<Rep, ratio, units, symbols>::dim(
+      return typename base_dimensionFromTuple<Rep, ratio, units, symbols>::dim(
          get_scalar_tuple<typename Lhs::units>(lhs) *
          get_scalar_tuple<typename Rhs::units>(rhs)
       );
@@ -452,7 +454,7 @@ namespace dimension
    template<typename Lhs>
    constexpr auto operator*(const Lhs& lhs, double scalar)
    {
-      return base_dimensionFromTuple<typename Lhs::units>::dim(
+      return typename base_dimensionFromTuple<typename Lhs::units>::dim(
          call_unpack<typename Lhs::units>([&]<typename... Units> { return get_dimension_as<Units...>(lhs); }) * scalar
       );
    }
@@ -468,7 +470,7 @@ namespace dimension
    template<typename Lhs>
    constexpr auto operator/(const Lhs& lhs, double scalar)
    {
-      return base_dimensionFromTuple<typename Lhs::units>::dim(
+      return typename base_dimensionFromTuple<typename Lhs::units>::dim(
          call_unpack<typename Lhs::units>([&]<typename... Units> { return get_dimension_as<Units...>(lhs); }) / scalar
       );
    }
@@ -477,7 +479,7 @@ namespace dimension
    template<typename Rhs>
    constexpr auto operator/(double scalar, const Rhs& rhs)
    {
-      return base_dimensionFromTuple<typename FlipExponents<typename Rhs::units>::units>::dim(
+      return typename base_dimensionFromTuple<typename FlipExponents<typename Rhs::units>::units>::dim(
          scalar / call_unpack<typename Rhs::units>([&]<typename... Units> { return get_dimension_as<Units...>(rhs); })
       );
    }
@@ -489,7 +491,7 @@ namespace dimension
    template<is_base_dimension Lhs, is_base_dimension Rhs>
    constexpr auto operator+(const Lhs& lhs, const Rhs& rhs)
    {
-      return base_dimensionFromTuple<typename Lhs::units>::dim(
+      return typename base_dimensionFromTuple<typename Lhs::units>::dim(
          call_unpack<typename Lhs::units>([&]<typename... Units> { return get_dimension_as<Units...>(lhs); }) +
          call_unpack<typename Lhs::units>([&]<typename... Units> { return get_dimension_as<Units...>(rhs); })
       );
@@ -501,7 +503,7 @@ namespace dimension
    template<is_base_dimension Lhs, is_base_dimension Rhs>
    constexpr auto operator-(const Lhs& lhs, const Rhs& rhs)
    {
-      return base_dimensionFromTuple<typename Lhs::units>::dim(
+      return typename base_dimensionFromTuple<typename Lhs::units>::dim(
          call_unpack<typename Lhs::units>([&]<typename... Units> { return get_dimension_as<Units...>(lhs); }) -
          call_unpack<typename Lhs::units>([&]<typename... Units> { return get_dimension_as<Units...>(rhs); })
       );
@@ -522,7 +524,7 @@ namespace dimension
       if constexpr (exponent == 0)
       {
          // 0th power: returns dimensionless with value 1.0
-         return base_dimension_impl<>{1.0};
+         return base_dimension<>{1.0};
       }
       else if constexpr (exponent == 1)
       {
@@ -639,7 +641,7 @@ namespace dimension
       const auto num = get_dimension_tuple<typename T::units>(dividend);
       const auto denom = get_dimension_tuple<typename T::units>(divisor);
       return T(denom == 0 ? throw std::invalid_argument("Divisor cannot be zero.")
-                          : num - static_cast<long long>(num / denom) * denom);
+                          : num - static_cast<PrecisionType>(static_cast<long long>(num / denom)) * denom);
    }
    
 }

@@ -12,8 +12,6 @@ namespace dimension
    static constexpr bool delta = false;
    static constexpr bool quantity = true;
 
-
-
    // TODO: No idea where this should live...
    struct qname_builder
    {
@@ -40,6 +38,7 @@ namespace dimension
    //  1.  Variadic pack interface
    //      make_units_qname<UE1, UE2, …>()
    // ──────────────────────────────────────────────────────────────
+   /*
    template<typename... UEs>
    constexpr auto make_units_qname()
    {
@@ -47,6 +46,7 @@ namespace dimension
                      "make_units_qname requires at least one unit_exponent");
       return qname_builder::build<UEs...>();
    }
+   */
 
 
    // ──────────────────────────────────────────────────────────────
@@ -69,23 +69,6 @@ namespace dimension
       return make_units_qname_impl<Tuple>(
                   std::make_index_sequence<std::tuple_size_v<Tuple>>{});
    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
    // TODO: This should probably live inside StringLiteral...
    //––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
@@ -145,16 +128,6 @@ namespace dimension
                      int_literal<Den>());
    }
 
-
-
-
-
-
-
-
-
-
-
    struct FundamentalUnitTag;
 
    // TODO: MOVE THIS
@@ -181,13 +154,6 @@ namespace dimension
 
       static constexpr bool quantity = isQuantity;
    };
-
-
-
-
-
-
-
 
    template <typename> struct is_tuple: std::false_type {};
 

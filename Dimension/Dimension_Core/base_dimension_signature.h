@@ -31,7 +31,6 @@ namespace dimension
       { a >= b } -> std::convertible_to<bool>;
    };
 
-
    struct symbol{};
 
    template<typename T>

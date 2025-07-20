@@ -200,6 +200,8 @@ namespace dimension
       is_timespan_unit timespanUnit,
       is_charge_unit chargeUnit,
       is_resistance DimType>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr PrecisionType get_resistance_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -216,6 +218,7 @@ namespace dimension
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
    template<IsNamedresistanceUnit Named, is_resistance DimType>
+   // TODO: Unit test this and remove suppression
    constexpr PrecisionType get_resistance_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -261,6 +264,7 @@ namespace dimension
    
       template<typename T>
       requires is_resistance<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr resistance(const T& base) : Base(base) {}
    };
 
@@ -302,6 +306,7 @@ namespace dimension
    
       template<typename T>
       requires is_resistance<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr resistance(const T& base) : Base(base) {}
    };
 
@@ -319,6 +324,7 @@ namespace dimension
 
       template<typename Other>
       requires is_resistance<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr resistance(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -335,6 +341,7 @@ namespace dimension
 
       template<typename Other>
       requires is_resistance<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr resistance(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -360,13 +367,12 @@ namespace dimension
       T2,
       T3
    >
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_resistance(Cs... coeffs)
    {
       return resistance<double, T0, T1, T2, T3, Cs...>(1.0, coeffs...);
    }
-
-
-
 
    template<
       IsBasicUnitType T0,
@@ -382,42 +388,32 @@ namespace dimension
       T2,
       T3
    > && (!is_coefficient<Rep>)
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_resistance(Rep value, Cs... coeffs)
    {
       return resistance<Rep, T0, T1, T2, T3, Cs...>(value, coeffs...);
    }
 
-
-
-
    /// @brief Template specialization for named resistance units
    /// @tparam Named The named unit this resistance type is in terms of
    template<IsNamedresistanceUnit Named, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_resistance(Cs... coeffs)
    {
       return resistance<double, Named, Cs...>(1.0, coeffs...);
    }
 
-
-
-
-
-
    /// @brief Template specialization for named resistance units
    /// @tparam Named The named unit this resistance type is in terms of
    template<IsNamedresistanceUnit Named, rep_type Rep, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_resistance(Rep value, Cs... coeffs)
    {
       return resistance<Rep, Named, Cs...>(value, coeffs...);
    }
-
-
-
-
-
-
-
-
 
    template<is_resistance Dim>
    resistance(Dim) -> 

@@ -29,56 +29,6 @@ namespace dimension
    struct combine_ratios<>
    {   using type = std::ratio<1>; };
 
-   // ───────────────────────────────────────────────────────────────
-   // 4.  Symbol-exponent merging
-   //     add_symbol<tuple<Existing...>, Sym, Exp>  → new tuple
-   // ───────────────────────────────────────────────────────────────
-   
-   /*
-   template<typename Tuple, typename Sym, typename Exp> struct add_symbol;
-
-   template<typename Sym, typename Exp>
-   struct add_symbol<std::tuple<>, Sym, Exp>
-   {
-      using type = std::tuple< symbol_exponent<Sym, Exp::num, Exp::den> >;
-   };
-
-   template<typename Head, typename... Tail, typename Sym, typename Exp>
-   struct add_symbol<std::tuple<Head, Tail...>, Sym, Exp>
-   {
-   private:
-      static constexpr bool same =
-         std::same_as<typename Head::symbol, Sym>;
-
-      using updated_exp  = std::ratio_add<typename Head::exponent, Exp>;
-      using replaced     = std::conditional_t<
-                              std::ratio_equal_v<updated_exp, std::ratio<0>>,
-                              std::tuple<>,                               // drop if zero
-                              std::tuple< symbol_exponent<Sym,
-                                          updated_exp::num, updated_exp::den> >>;
-
-      using rest = typename add_symbol<std::tuple<Tail...>, Sym, Exp>::type;
-
-   public:
-      using type = std::conditional_t<
-                     same,
-                     decltype(std::tuple_cat(std::declval<replaced>(),
-                                             std::declval<std::tuple<Tail...>>())),
-                     decltype(std::tuple_cat(std::declval<std::tuple<Head>>(),
-                                             std::declval<rest>()))>;
-   };
-
-   // base-case when no change needed
-   template<typename... Ts, typename Sym, typename Exp>
-   struct add_symbol<std::tuple<symbol_exponent<Sym, Exp::num, Exp::den>, Ts...>,
-                     Sym, Exp>
-   {
-      using type = typename add_symbol<
-                     std::tuple<symbol_exponent<Sym, Exp::num, Exp::den>, Ts...>,
-                     Sym, Exp>::type;
-   };
-   */
-
    // ── primary template: default “prepend new symbol” ───────────────
    template<typename Tuple, typename Sym, typename Exp>
    struct add_symbol;
@@ -141,22 +91,9 @@ namespace dimension
                std::declval<typename add_symbol<std::tuple<Tail...>, Sym, Exp>::type>() ) );
    };
 
-
-
-
-
-
-
-
-
-
    // ───────────────────────────────────────────────────────────────
    // 5.  Build the final tuple<symbol_exponent<…>...>
    // ───────────────────────────────────────────────────────────────
-   
-
-
-
    // primary: default “do nothing”
    template<typename Tuple, typename Coeff, typename = void>
    struct merge_symbol
@@ -187,13 +124,6 @@ namespace dimension
                      typename std::remove_cvref_t<SE>::exponent
                   >::type;
    };
-
-
-
-
-
-
-
    
    template<typename Tuple, typename... Cs>
    struct build_symbols;                       // primary
@@ -241,16 +171,6 @@ namespace dimension
       : handle_coefficients<Ts...> { };
 
 
-
-
-
-
-
-
-
-
-
-
    template<typename... Ts> struct partition_coeffs;
 
    template<>
@@ -276,9 +196,6 @@ namespace dimension
    };
 
 
-
-
-
    // ─────────────── eval-one trait  (specialisable) ───────────────
    template<typename T> struct eval_one_trait;               // primary (never used)
 
@@ -297,10 +214,7 @@ namespace dimension
    private:
       static constexpr long double base =
          static_cast<long double>(Sym::value);
-      //static constexpr long double exp  =
-         //static_cast<long double>(Num) / static_cast<long double>(Den);
    public:
-      //static constexpr long double value = std::pow(base, exp);
       static constexpr long double value = pow_impl(base, Num, Den);
    };
 
@@ -324,18 +238,6 @@ namespace dimension
    {
       return eval_symbol_tuple_impl<std::remove_cvref_t<Tuple>>::value;
    }
-
-
-
-
-
-
-
-
-
-
-
-
 
    // ============================================================================
    //  helper: negate a coefficient (for division)
@@ -383,22 +285,6 @@ namespace dimension
    public:
       using type = typename multiply_symbol_tuples<std::tuple<T1s...>, negated_pack>::type;
    };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
 

@@ -1,7 +1,7 @@
 #ifndef STATIC_DIMENSION_{{ dim.name.upper() }}_H
 #define STATIC_DIMENSION_{{ dim.name.upper() }}_H
 
-#include "../Dimension_Impl/FundamentalDimensions/{{ dim.name }}_dimension_Impl.h"
+#include "Dimension_Impl/FundamentalDimensions/{{ dim.name }}_dimension_Impl.h"
 
 namespace dimension
 {

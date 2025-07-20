@@ -1,7 +1,7 @@
 #ifndef STATIC_DIMENSION_AMOUNT_H
 #define STATIC_DIMENSION_AMOUNT_H
 
-#include "../Dimension_Impl/FundamentalDimensions/amount_dimension_Impl.h"
+#include "Dimension_Impl/FundamentalDimensions/amount_dimension_Impl.h"
 
 namespace dimension
 {

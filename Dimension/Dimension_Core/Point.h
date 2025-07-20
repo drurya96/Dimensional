@@ -9,10 +9,6 @@
 #include "Conversion.h"
 #include "base_dimension_signature.h"
 
-
-
-//#include "temperatureDimension.h" // Just for testing
-
 namespace dimension {
 
    struct FundamentalUnitTag;
@@ -22,8 +18,6 @@ namespace dimension {
    {
       using unit = T;
    };
-
-
 
    template<typename Target, typename Source>
    struct get_point_as_impl;
@@ -40,21 +34,13 @@ namespace dimension {
    public:
       using frame_type = Frame;
       using dimension = Dim;
-      //using unit = typename Frame::unit;
 
       constexpr explicit point(double val) : value_(val) {}
 
       template<typename T>
       //requires true; // Add a real constraint
+      // cppcheck-suppress noExplicitConstructor
       constexpr point(point<T, Dim> obj) : value_(get_point_as<Frame>(obj)) {}
-
-      //constexpr double value() const { return value_; }
-
-      // Convert to raw quantity in base dimension
-      //constexpr operator base_dimension<unit_exponent<unit>> () const {
-         // Apply affine transform from Frame
-      //   return base_dimension<unit_exponent<unit>>(Frame::slope * value_ + Frame::offset);
-      //}
 
    private:
       double value_;
@@ -62,22 +48,7 @@ namespace dimension {
       friend struct get_point_as_impl<Frame, Frame>;
    };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
    // ===================== Conversions =====================
-
 
    template<typename T>
    concept HasDoubleOffset = requires {
@@ -176,23 +147,10 @@ namespace dimension {
    };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
    // ===================== Addition/Subtraction =====================
 
    // unit - point -> INVALID
    // point + point -> INVALID
-
 
    // point + unit -> point
    template<typename T, typename U, typename Dim>
@@ -226,19 +184,6 @@ namespace dimension {
       return base_dimension_impl<double, unit_exponent<typename T::unit>>(get_point_as<typename T::unit>(lhs) - get_point_as<typename T::unit>(rhs));
    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
    // Need to figure out the return type, probably using auto
    // ===================== Multiplication/Division =====================
    template<typename T, is_base_dimension Rhs, typename Dim>
@@ -268,9 +213,6 @@ namespace dimension {
    {
       return lhs / base_dimension_impl<double, unit_exponent<typename T::unit>>(get_point_as<typename T::unit>(rhs));
    }
-
-
-
 
 }
 

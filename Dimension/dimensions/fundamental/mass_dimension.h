@@ -1,7 +1,7 @@
 #ifndef STATIC_DIMENSION_MASS_H
 #define STATIC_DIMENSION_MASS_H
 
-#include "../Dimension_Impl/FundamentalDimensions/mass_dimension_Impl.h"
+#include "Dimension_Impl/FundamentalDimensions/mass_dimension_Impl.h"
 
 namespace dimension
 {

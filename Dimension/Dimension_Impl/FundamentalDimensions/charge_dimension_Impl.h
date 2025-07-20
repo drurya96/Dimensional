@@ -55,7 +55,7 @@ namespace dimension
       return get_dimension_as<unit_exponent<T>>(obj);
    }
 
-   template<typename RepOrUnit = double, typename MaybeUnit = void, is_coefficient... Cs>
+   template<typename... Ts>
    class charge;
 
    /// @brief Represents a dimension type for charge.
@@ -81,6 +81,7 @@ namespace dimension
 
       template<is_coefficient... Ds>
       requires std::same_as<std::tuple<Cs...>, std::tuple<Ds...>>
+      // cppcheck-suppress noExplicitConstructor
       constexpr charge(const base_dimension_impl<Rep, unit_exponent<Unit>, Ds...>& src) : impl(src) {}
 
       /// @brief Constructs a charge object from another base_dimension.
@@ -95,19 +96,23 @@ namespace dimension
 
    template<is_charge_unit U, typename Rep, is_coefficient... Cs>
    requires (!is_coefficient<Rep>)
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_charge(Rep value, Cs... coeffs)
    {
       return charge<Rep, U, Cs...>(value, coeffs...);
    }
 
    template<is_charge_unit U, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_charge(Cs... coeffs)
    {
       return charge<double, U, Cs...>(1.0, coeffs...);   // 1 × coeffs
    }
 
    template<is_charge_unit Unit, is_coefficient... Cs>
-   class charge<Unit, void, Cs...> : public charge<double, Unit, Cs...> {
+   class charge<Unit, Cs...> : public charge<double, Unit, Cs...> {
    public:
       using charge<double, Unit, Cs...>::charge;
    };

@@ -1,23 +1,6 @@
 #ifndef STATIC_DIMENSION_CONSTANTS_H
 #define STATIC_DIMENSION_CONSTANTS_H
 
-/*
-// Fundamental Dimensions
-#include "amount_dimension.h"
-#include "angle_dimension.h"
-#include "charge_dimension.h"
-#include "length_dimension.h"
-#include "mass_dimension.h"
-#include "temperature_dimension.h"
-#include "timespan_dimension.h"
-
-// Derived Dimensions
-#include "acceleration_dimension.h"
-#include "pressure_dimension.h"
-#include "speed_dimension.h"
-#include "energy_dimension.h"
-*/
-
 #include "dimensions.h"
 
 namespace dimension::constants

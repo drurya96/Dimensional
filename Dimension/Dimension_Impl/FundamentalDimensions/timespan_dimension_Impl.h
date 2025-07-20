@@ -55,7 +55,7 @@ namespace dimension
       return get_dimension_as<unit_exponent<T>>(obj);
    }
 
-   template<typename RepOrUnit = double, typename MaybeUnit = void, is_coefficient... Cs>
+   template<typename... Ts>
    class timespan;
 
    /// @brief Represents a dimension type for timespan.
@@ -81,6 +81,7 @@ namespace dimension
 
       template<is_coefficient... Ds>
       requires std::same_as<std::tuple<Cs...>, std::tuple<Ds...>>
+      // cppcheck-suppress noExplicitConstructor
       constexpr timespan(const base_dimension_impl<Rep, unit_exponent<Unit>, Ds...>& src) : impl(src) {}
 
       /// @brief Constructs a timespan object from another base_dimension.
@@ -95,19 +96,23 @@ namespace dimension
 
    template<is_timespan_unit U, typename Rep, is_coefficient... Cs>
    requires (!is_coefficient<Rep>)
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_timespan(Rep value, Cs... coeffs)
    {
       return timespan<Rep, U, Cs...>(value, coeffs...);
    }
 
    template<is_timespan_unit U, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_timespan(Cs... coeffs)
    {
       return timespan<double, U, Cs...>(1.0, coeffs...);   // 1 × coeffs
    }
 
    template<is_timespan_unit Unit, is_coefficient... Cs>
-   class timespan<Unit, void, Cs...> : public timespan<double, Unit, Cs...> {
+   class timespan<Unit, Cs...> : public timespan<double, Unit, Cs...> {
    public:
       using timespan<double, Unit, Cs...>::timespan;
    };

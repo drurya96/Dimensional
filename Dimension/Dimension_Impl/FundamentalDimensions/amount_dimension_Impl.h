@@ -55,7 +55,7 @@ namespace dimension
       return get_dimension_as<unit_exponent<T>>(obj);
    }
 
-   template<typename RepOrUnit = double, typename MaybeUnit = void, is_coefficient... Cs>
+   template<typename... Ts>
    class amount;
 
    /// @brief Represents a dimension type for amount.
@@ -81,6 +81,7 @@ namespace dimension
 
       template<is_coefficient... Ds>
       requires std::same_as<std::tuple<Cs...>, std::tuple<Ds...>>
+      // cppcheck-suppress noExplicitConstructor
       constexpr amount(const base_dimension_impl<Rep, unit_exponent<Unit>, Ds...>& src) : impl(src) {}
 
       /// @brief Constructs a amount object from another base_dimension.
@@ -95,19 +96,23 @@ namespace dimension
 
    template<is_amount_unit U, typename Rep, is_coefficient... Cs>
    requires (!is_coefficient<Rep>)
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_amount(Rep value, Cs... coeffs)
    {
       return amount<Rep, U, Cs...>(value, coeffs...);
    }
 
    template<is_amount_unit U, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_amount(Cs... coeffs)
    {
       return amount<double, U, Cs...>(1.0, coeffs...);   // 1 × coeffs
    }
 
    template<is_amount_unit Unit, is_coefficient... Cs>
-   class amount<Unit, void, Cs...> : public amount<double, Unit, Cs...> {
+   class amount<Unit, Cs...> : public amount<double, Unit, Cs...> {
    public:
       using amount<double, Unit, Cs...>::amount;
    };

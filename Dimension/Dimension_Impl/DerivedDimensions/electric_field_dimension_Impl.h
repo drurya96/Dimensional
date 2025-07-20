@@ -200,6 +200,8 @@ namespace dimension
       is_timespan_unit timespanUnit,
       is_charge_unit chargeUnit,
       is_electric_field DimType>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr PrecisionType get_electric_field_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -216,6 +218,7 @@ namespace dimension
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
    template<IsNamedelectric_fieldUnit Named, is_electric_field DimType>
+   // TODO: Unit test this and remove suppression
    constexpr PrecisionType get_electric_field_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -261,6 +264,7 @@ namespace dimension
    
       template<typename T>
       requires is_electric_field<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr electric_field(const T& base) : Base(base) {}
    };
 
@@ -302,6 +306,7 @@ namespace dimension
    
       template<typename T>
       requires is_electric_field<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr electric_field(const T& base) : Base(base) {}
    };
 
@@ -319,6 +324,7 @@ namespace dimension
 
       template<typename Other>
       requires is_electric_field<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr electric_field(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -335,6 +341,7 @@ namespace dimension
 
       template<typename Other>
       requires is_electric_field<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr electric_field(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -360,13 +367,12 @@ namespace dimension
       T2,
       T3
    >
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_electric_field(Cs... coeffs)
    {
       return electric_field<double, T0, T1, T2, T3, Cs...>(1.0, coeffs...);
    }
-
-
-
 
    template<
       IsBasicUnitType T0,
@@ -382,42 +388,32 @@ namespace dimension
       T2,
       T3
    > && (!is_coefficient<Rep>)
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_electric_field(Rep value, Cs... coeffs)
    {
       return electric_field<Rep, T0, T1, T2, T3, Cs...>(value, coeffs...);
    }
 
-
-
-
    /// @brief Template specialization for named electric_field units
    /// @tparam Named The named unit this electric_field type is in terms of
    template<IsNamedelectric_fieldUnit Named, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_electric_field(Cs... coeffs)
    {
       return electric_field<double, Named, Cs...>(1.0, coeffs...);
    }
 
-
-
-
-
-
    /// @brief Template specialization for named electric_field units
    /// @tparam Named The named unit this electric_field type is in terms of
    template<IsNamedelectric_fieldUnit Named, rep_type Rep, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_electric_field(Rep value, Cs... coeffs)
    {
       return electric_field<Rep, Named, Cs...>(value, coeffs...);
    }
-
-
-
-
-
-
-
-
 
    template<is_electric_field Dim>
    electric_field(Dim) -> 

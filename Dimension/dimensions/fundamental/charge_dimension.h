@@ -1,7 +1,7 @@
 #ifndef STATIC_DIMENSION_CHARGE_H
 #define STATIC_DIMENSION_CHARGE_H
 
-#include "../Dimension_Impl/FundamentalDimensions/charge_dimension_Impl.h"
+#include "Dimension_Impl/FundamentalDimensions/charge_dimension_Impl.h"
 
 namespace dimension
 {

@@ -96,17 +96,6 @@ namespace dimension
        //static_assert(sizeof(ExpectedTag) == 0, "No matching unit found for this dimension.");
    };
 
-
-
-
-
-
-
-
-
-
-
-
    template<typename TargetTag, typename BaseDim>
    struct DimExtractorHelper;
    
@@ -115,20 +104,8 @@ namespace dimension
        using type = typename Extractor<TargetTag, typename UEs::unit...>::type;
    };
    
-   //template<typename TargetTag, typename BaseDim>
-   //using DimExtractor = typename DimExtractorHelper<TargetTag, typename BaseDim::units>::type;
-   
    template<typename TargetTag, typename BaseDim>
    using DimExtractor = typename DimExtractorHelper<TargetTag, typename decltype(FullSimplify(BaseDim{}))::units>::type;
-   
-
-
-
-
-
-
-
-
 
 } // end Dimension
 

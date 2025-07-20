@@ -55,7 +55,7 @@ namespace dimension
       return get_dimension_as<unit_exponent<T>>(obj);
    }
 
-   template<typename RepOrUnit = double, typename MaybeUnit = void, is_coefficient... Cs>
+   template<typename... Ts>
    class temperature;
 
    /// @brief Represents a dimension type for temperature.
@@ -81,6 +81,7 @@ namespace dimension
 
       template<is_coefficient... Ds>
       requires std::same_as<std::tuple<Cs...>, std::tuple<Ds...>>
+      // cppcheck-suppress noExplicitConstructor
       constexpr temperature(const base_dimension_impl<Rep, unit_exponent<Unit>, Ds...>& src) : impl(src) {}
 
       /// @brief Constructs a temperature object from another base_dimension.
@@ -95,19 +96,23 @@ namespace dimension
 
    template<is_temperature_unit U, typename Rep, is_coefficient... Cs>
    requires (!is_coefficient<Rep>)
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_temperature(Rep value, Cs... coeffs)
    {
       return temperature<Rep, U, Cs...>(value, coeffs...);
    }
 
    template<is_temperature_unit U, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_temperature(Cs... coeffs)
    {
       return temperature<double, U, Cs...>(1.0, coeffs...);   // 1 × coeffs
    }
 
    template<is_temperature_unit Unit, is_coefficient... Cs>
-   class temperature<Unit, void, Cs...> : public temperature<double, Unit, Cs...> {
+   class temperature<Unit, Cs...> : public temperature<double, Unit, Cs...> {
    public:
       using temperature<double, Unit, Cs...>::temperature;
    };

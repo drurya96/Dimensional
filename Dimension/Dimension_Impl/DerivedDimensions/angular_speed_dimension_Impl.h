@@ -52,6 +52,8 @@ namespace dimension
       is_angle_unit angleUnit,
       is_timespan_unit timespanUnit,
       is_angular_speed DimType>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr PrecisionType get_angular_speed_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -66,6 +68,7 @@ namespace dimension
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
    template<IsNamedangular_speedUnit Named, is_angular_speed DimType>
+   // TODO: Unit test this and remove suppression
    constexpr PrecisionType get_angular_speed_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -103,6 +106,7 @@ namespace dimension
    
       template<typename T>
       requires is_angular_speed<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr angular_speed(const T& base) : Base(base) {}
    };
 
@@ -136,6 +140,7 @@ namespace dimension
    
       template<typename T>
       requires is_angular_speed<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr angular_speed(const T& base) : Base(base) {}
    };
 
@@ -153,6 +158,7 @@ namespace dimension
 
       template<typename Other>
       requires is_angular_speed<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr angular_speed(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -169,6 +175,7 @@ namespace dimension
 
       template<typename Other>
       requires is_angular_speed<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr angular_speed(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -190,13 +197,12 @@ namespace dimension
       T0,
       T1
    >
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_angular_speed(Cs... coeffs)
    {
       return angular_speed<double, T0, T1, Cs...>(1.0, coeffs...);
    }
-
-
-
 
    template<
       IsBasicUnitType T0,
@@ -208,42 +214,32 @@ namespace dimension
       T0,
       T1
    > && (!is_coefficient<Rep>)
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_angular_speed(Rep value, Cs... coeffs)
    {
       return angular_speed<Rep, T0, T1, Cs...>(value, coeffs...);
    }
 
-
-
-
    /// @brief Template specialization for named angular_speed units
    /// @tparam Named The named unit this angular_speed type is in terms of
    template<IsNamedangular_speedUnit Named, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_angular_speed(Cs... coeffs)
    {
       return angular_speed<double, Named, Cs...>(1.0, coeffs...);
    }
 
-
-
-
-
-
    /// @brief Template specialization for named angular_speed units
    /// @tparam Named The named unit this angular_speed type is in terms of
    template<IsNamedangular_speedUnit Named, rep_type Rep, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_angular_speed(Rep value, Cs... coeffs)
    {
       return angular_speed<Rep, Named, Cs...>(value, coeffs...);
    }
-
-
-
-
-
-
-
-
 
    template<is_angular_speed Dim>
    angular_speed(Dim) -> 

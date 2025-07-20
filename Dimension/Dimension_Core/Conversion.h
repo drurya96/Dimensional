@@ -66,28 +66,6 @@ namespace dimension
          typename get_first_match<Compare, T, std::tuple<Tail...>>::type>;
    };
 
-   template <typename Dim, typename Tuple>
-   struct delta_tuple;
-
-   template <typename Dim, typename Tuple>
-   requires (has_dim<Dim, Tuple>::value)
-   struct delta_tuple<Dim, Tuple>
-   {
-   private:
-      using firstType = get_first_match<is_dim, Dim, Tuple>::type;
-      using T = std::tuple<firstType>;
-
-   public:
-      using type = tuple_cat_t<T, typename delta_tuple<Dim, typename RemoveOneInstance<is_dim, Dim, Tuple>::type>::type>;
-   };
-
-   template <typename Dim, typename Tuple>
-   requires (!has_dim<Dim, Tuple>::value)
-   struct delta_tuple<Dim, Tuple>
-   {
-      using type = std::tuple<>;
-   };
-
    // Specialization when RhsType is Delta
    template <typename LhsType, typename RhsUnit>
    struct transform_rhs_element
@@ -97,7 +75,6 @@ namespace dimension
 
    // Metafunction to transform the entire rhs tuple based on lhs tuple
    template <typename LhsTuple, typename RhsTuple, size_t... Is>
-   // cppcheck-suppress unusedFunction // Only used for type deduction
    auto transform_rhs_impl(std::index_sequence<Is...>) 
       -> std::tuple< typename transform_rhs_element<
                      std::tuple_element_t<Is, LhsTuple>, 
@@ -235,37 +212,6 @@ namespace dimension
             Convert<FromT, typename FromT::Primary, Inverse>(input)
          );
       }
-   }
-
-   /// @brief Convert the given value when units are cancelled out
-   /// @details Recursive base-case
-   template <size_t I = 0, bool inverse = false, typename toTuple, typename fromTup, bool isDelta = false>
-   requires (I == std::tuple_size_v<fromTup>)
-   constexpr PrecisionType ConvertDimension(PrecisionType value)
-   {
-      return value;
-   }
-
-   /// @brief Convert the given value when units are cancelled out
-   /// @tparam I The current index of both tuples
-   /// @tparam inverse Whether the conversion is inverted (i.e. in the denominator)
-   /// @tparam toTuple The tuple type to convert to
-   /// @tparam fromTuple The tuple type to convert from
-   /// @tparam isDelata Bool indicating whether this conversion is of a single unit in the normator (false)
-   ///    or not (true).
-   /// @param value[in,out] Reference of a value to update
-   template <size_t I = 0, bool inverse = false, typename toTuple, typename fromTup, bool isDelta = false>
-   requires (I < std::tuple_size_v<fromTup>)
-   constexpr PrecisionType ConvertDimension(PrecisionType value)
-   {
-      // cppcheck-suppress templateRecursion // cppcheck isn't aware of the requires clause preventing infinite recursion
-      using fromType = std::tuple_element_t<I, fromTup>;
-      using toType = typename get_first_match<is_same_dim, fromType, toTuple>::type;
-
-      using remainingToTuple = typename RemoveOneInstance<is_same_dim, fromType, toTuple>::type;
-
-      const PrecisionType convertedValue = Convert<fromType, toType, inverse>(value);
-      return ConvertDimension<I + 1, inverse, remainingToTuple, fromTup, isDelta>(convertedValue);
    }
 
    template <bool B>

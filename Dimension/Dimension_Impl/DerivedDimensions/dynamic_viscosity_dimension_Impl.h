@@ -80,6 +80,8 @@ namespace dimension
       is_timespan_unit timespanUnit,
       is_length_unit lengthUnit,
       is_dynamic_viscosity DimType>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr PrecisionType get_dynamic_viscosity_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -95,6 +97,7 @@ namespace dimension
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
    template<IsNameddynamic_viscosityUnit Named, is_dynamic_viscosity DimType>
+   // TODO: Unit test this and remove suppression
    constexpr PrecisionType get_dynamic_viscosity_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -136,6 +139,7 @@ namespace dimension
    
       template<typename T>
       requires is_dynamic_viscosity<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr dynamic_viscosity(const T& base) : Base(base) {}
    };
 
@@ -173,6 +177,7 @@ namespace dimension
    
       template<typename T>
       requires is_dynamic_viscosity<T>
+      // cppcheck-suppress noExplicitConstructor
       constexpr dynamic_viscosity(const T& base) : Base(base) {}
    };
 
@@ -190,6 +195,7 @@ namespace dimension
 
       template<typename Other>
       requires is_dynamic_viscosity<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr dynamic_viscosity(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -206,6 +212,7 @@ namespace dimension
 
       template<typename Other>
       requires is_dynamic_viscosity<Other>
+      // cppcheck-suppress noExplicitConstructor
       constexpr dynamic_viscosity(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -229,13 +236,12 @@ namespace dimension
       T1,
       T2
    >
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_dynamic_viscosity(Cs... coeffs)
    {
       return dynamic_viscosity<double, T0, T1, T2, Cs...>(1.0, coeffs...);
    }
-
-
-
 
    template<
       IsBasicUnitType T0,
@@ -249,42 +255,32 @@ namespace dimension
       T1,
       T2
    > && (!is_coefficient<Rep>)
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_dynamic_viscosity(Rep value, Cs... coeffs)
    {
       return dynamic_viscosity<Rep, T0, T1, T2, Cs...>(value, coeffs...);
    }
 
-
-
-
    /// @brief Template specialization for named dynamic_viscosity units
    /// @tparam Named The named unit this dynamic_viscosity type is in terms of
    template<IsNameddynamic_viscosityUnit Named, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_dynamic_viscosity(Cs... coeffs)
    {
       return dynamic_viscosity<double, Named, Cs...>(1.0, coeffs...);
    }
 
-
-
-
-
-
    /// @brief Template specialization for named dynamic_viscosity units
    /// @tparam Named The named unit this dynamic_viscosity type is in terms of
    template<IsNameddynamic_viscosityUnit Named, rep_type Rep, is_coefficient... Cs>
+   // TODO: Unit test this and remove suppression
+   [[maybe_unused]]
    constexpr auto make_dynamic_viscosity(Rep value, Cs... coeffs)
    {
       return dynamic_viscosity<Rep, Named, Cs...>(value, coeffs...);
    }
-
-
-
-
-
-
-
-
 
    template<is_dynamic_viscosity Dim>
    dynamic_viscosity(Dim) -> 

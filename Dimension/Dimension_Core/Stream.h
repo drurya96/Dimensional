@@ -48,6 +48,9 @@ namespace dimension
       bool first = true;
 
       ((
+         // This condition is NOT always known, its updated inside the fold expression.
+         // cppcheck can't detect that.
+         // cppcheck-suppress knownConditionTrueFalse
          first ? static_cast<void>(first = false)          // first element
                : static_cast<void>(os << " * "),           // later elements
          stream_one_unit<Stream, Units>(os)                // print the unit

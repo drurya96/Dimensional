@@ -4,30 +4,30 @@
 
 using namespace dimension;
 
-length<meters> TestFunction1(timespan<seconds> time)
+static length<meters> TestFunction1(timespan<seconds> time)
 {
    return length<meters>(get_timespan_as<seconds>(time));
 }
 
-length<meters> TestFunction1(length<meters> time)
+static length<meters> TestFunction1(length<meters> time)
 {
    return length<meters>(get_length_as<meters>(time));
 }
 
 
 template<typename T>
-double TestFunction2(timespan<T> time)
+static double TestFunction2(timespan<T> time)
 {
    return get_timespan_as<seconds>(time);
 }
 
 template<typename T>
-double TestFunction2(length<T> time)
+static double TestFunction2(length<T> time)
 {
    return get_length_as<meters>(time);
 }
 
-double TestFunctionGenericlength(dimension::force<dimension::newtons> force)
+static double TestFunctionGenericlength(dimension::force<dimension::newtons> force)
 {
    return get_force_as<newtons>(force);
 }
@@ -58,7 +58,7 @@ TEST(Functions, TestFunctionParameters) {
    length<meters> ret2 = TestFunction1(timespan<minutes>(1.0));
    ASSERT_NEAR((get_length_as<meters>(ret2)), 60.0, TOLERANCE);
   
-   length<kilo_meters> ret3 = TestFunction1(timespan<seconds>(5.0));
+   length<kilo_meters> ret3 = TestFunction1(length<meters>(5.0));
    ASSERT_NEAR((get_length_as<meters>(ret3)), 5.0, TOLERANCE);
 
    length<NonBaseUnit> X(1.0);
