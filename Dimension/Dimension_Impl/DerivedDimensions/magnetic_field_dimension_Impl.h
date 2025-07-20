@@ -62,10 +62,10 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a magnetic_field type
    template<typename T>
-   concept Ismagnetic_field = std::is_convertible_v<T, base_dimension<
-      unit_exponent<Primarymass, 1>, 
-      unit_exponent<Primarytimespan, -1>, 
-      unit_exponent<Primarycharge, -1>
+   concept is_magnetic_field = std::is_convertible_v<T, base_dimension<
+      unit_exponent<primary_mass, 1>, 
+      unit_exponent<primary_timespan, -1>, 
+      unit_exponent<primary_charge, -1>
    >>;
 
    /// @brief Retrieves the value of a magnetic_field object with specific units
@@ -79,7 +79,7 @@ namespace dimension
       is_mass_unit massUnit,
       is_timespan_unit timespanUnit,
       is_charge_unit chargeUnit,
-      Ismagnetic_field DimType>
+      is_magnetic_field DimType>
    constexpr PrecisionType get_magnetic_field_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -94,7 +94,7 @@ namespace dimension
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
-   template<IsNamedmagnetic_fieldUnit Named, Ismagnetic_field DimType>
+   template<IsNamedmagnetic_fieldUnit Named, is_magnetic_field DimType>
    constexpr PrecisionType get_magnetic_field_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -135,7 +135,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Ismagnetic_field<T>
+      requires is_magnetic_field<T>
       constexpr magnetic_field(const T& base) : Base(base) {}
    };
 
@@ -172,7 +172,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Ismagnetic_field<T>
+      requires is_magnetic_field<T>
       constexpr magnetic_field(const T& base) : Base(base) {}
    };
 
@@ -189,7 +189,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Ismagnetic_field<Other>
+      requires is_magnetic_field<Other>
       constexpr magnetic_field(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -205,7 +205,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Ismagnetic_field<Other>
+      requires is_magnetic_field<Other>
       constexpr magnetic_field(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -286,7 +286,7 @@ namespace dimension
 
 
 
-   template<Ismagnetic_field Dim>
+   template<is_magnetic_field Dim>
    magnetic_field(Dim) -> 
    magnetic_field<
       DimExtractor<massType, Dim>,

@@ -37,9 +37,9 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a current type
    template<typename T>
-   concept Iscurrent = std::is_convertible_v<T, base_dimension<
-      unit_exponent<Primarycharge, 1>, 
-      unit_exponent<Primarytimespan, -1>
+   concept is_current = std::is_convertible_v<T, base_dimension<
+      unit_exponent<primary_charge, 1>, 
+      unit_exponent<primary_timespan, -1>
    >>;
 
    /// @brief Retrieves the value of a current object with specific units
@@ -51,7 +51,7 @@ namespace dimension
    template<
       is_charge_unit chargeUnit,
       is_timespan_unit timespanUnit,
-      Iscurrent DimType>
+      is_current DimType>
    constexpr PrecisionType get_current_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -65,7 +65,7 @@ namespace dimension
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
-   template<IsNamedcurrentUnit Named, Iscurrent DimType>
+   template<IsNamedcurrentUnit Named, is_current DimType>
    constexpr PrecisionType get_current_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -102,7 +102,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Iscurrent<T>
+      requires is_current<T>
       constexpr current(const T& base) : Base(base) {}
    };
 
@@ -135,7 +135,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Iscurrent<T>
+      requires is_current<T>
       constexpr current(const T& base) : Base(base) {}
    };
 
@@ -152,7 +152,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Iscurrent<Other>
+      requires is_current<Other>
       constexpr current(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -168,7 +168,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Iscurrent<Other>
+      requires is_current<Other>
       constexpr current(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -245,7 +245,7 @@ namespace dimension
 
 
 
-   template<Iscurrent Dim>
+   template<is_current Dim>
    current(Dim) -> 
    current<
       DimExtractor<chargeType, Dim>,

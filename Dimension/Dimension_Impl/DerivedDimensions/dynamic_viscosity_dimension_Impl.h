@@ -62,10 +62,10 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a dynamic_viscosity type
    template<typename T>
-   concept Isdynamic_viscosity = std::is_convertible_v<T, base_dimension<
-      unit_exponent<Primarymass, 1>, 
-      unit_exponent<Primarytimespan, -1>, 
-      unit_exponent<Primarylength, -1>
+   concept is_dynamic_viscosity = std::is_convertible_v<T, base_dimension<
+      unit_exponent<primary_mass, 1>, 
+      unit_exponent<primary_timespan, -1>, 
+      unit_exponent<primary_length, -1>
    >>;
 
    /// @brief Retrieves the value of a dynamic_viscosity object with specific units
@@ -79,7 +79,7 @@ namespace dimension
       is_mass_unit massUnit,
       is_timespan_unit timespanUnit,
       is_length_unit lengthUnit,
-      Isdynamic_viscosity DimType>
+      is_dynamic_viscosity DimType>
    constexpr PrecisionType get_dynamic_viscosity_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -94,7 +94,7 @@ namespace dimension
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
-   template<IsNameddynamic_viscosityUnit Named, Isdynamic_viscosity DimType>
+   template<IsNameddynamic_viscosityUnit Named, is_dynamic_viscosity DimType>
    constexpr PrecisionType get_dynamic_viscosity_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -135,7 +135,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isdynamic_viscosity<T>
+      requires is_dynamic_viscosity<T>
       constexpr dynamic_viscosity(const T& base) : Base(base) {}
    };
 
@@ -172,7 +172,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isdynamic_viscosity<T>
+      requires is_dynamic_viscosity<T>
       constexpr dynamic_viscosity(const T& base) : Base(base) {}
    };
 
@@ -189,7 +189,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isdynamic_viscosity<Other>
+      requires is_dynamic_viscosity<Other>
       constexpr dynamic_viscosity(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -205,7 +205,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isdynamic_viscosity<Other>
+      requires is_dynamic_viscosity<Other>
       constexpr dynamic_viscosity(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -286,7 +286,7 @@ namespace dimension
 
 
 
-   template<Isdynamic_viscosity Dim>
+   template<is_dynamic_viscosity Dim>
    dynamic_viscosity(Dim) -> 
    dynamic_viscosity<
       DimExtractor<massType, Dim>,

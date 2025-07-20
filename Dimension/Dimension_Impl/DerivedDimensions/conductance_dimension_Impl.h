@@ -179,11 +179,11 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a conductance type
    template<typename T>
-   concept Isconductance = std::is_convertible_v<T, base_dimension<
-      unit_exponent<Primarytimespan, 1>, 
-      unit_exponent<Primarycharge, 2>, 
-      unit_exponent<Primarymass, -1>, 
-      unit_exponent<Primarylength, -2>
+   concept is_conductance = std::is_convertible_v<T, base_dimension<
+      unit_exponent<primary_timespan, 1>, 
+      unit_exponent<primary_charge, 2>, 
+      unit_exponent<primary_mass, -1>, 
+      unit_exponent<primary_length, -2>
    >>;
 
    /// @brief Retrieves the value of a conductance object with specific units
@@ -199,7 +199,7 @@ namespace dimension
       is_charge_unit chargeUnit,
       is_mass_unit massUnit,
       is_length_unit lengthUnit,
-      Isconductance DimType>
+      is_conductance DimType>
    constexpr PrecisionType get_conductance_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -215,7 +215,7 @@ namespace dimension
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
-   template<IsNamedconductanceUnit Named, Isconductance DimType>
+   template<IsNamedconductanceUnit Named, is_conductance DimType>
    constexpr PrecisionType get_conductance_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -260,7 +260,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isconductance<T>
+      requires is_conductance<T>
       constexpr conductance(const T& base) : Base(base) {}
    };
 
@@ -301,7 +301,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isconductance<T>
+      requires is_conductance<T>
       constexpr conductance(const T& base) : Base(base) {}
    };
 
@@ -318,7 +318,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isconductance<Other>
+      requires is_conductance<Other>
       constexpr conductance(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -334,7 +334,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isconductance<Other>
+      requires is_conductance<Other>
       constexpr conductance(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -419,7 +419,7 @@ namespace dimension
 
 
 
-   template<Isconductance Dim>
+   template<is_conductance Dim>
    conductance(Dim) -> 
    conductance<
       DimExtractor<timespanType, Dim>,

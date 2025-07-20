@@ -1,5 +1,8 @@
-#ifndef STATIC_DIMENSION_length_IMPL_H
-#define STATIC_DIMENSION_length_IMPL_H
+#ifndef STATIC_DIMENSION_LENGTH_IMPL_H
+#define STATIC_DIMENSION_LENGTH_IMPL_H
+
+#include <type_traits>
+#include <tuple>
 
 #include "../../base_dimension.h"
 
@@ -11,7 +14,7 @@ namespace dimension
    /// @brief Represents the primary unit for length.
    struct meters;
 
-   using Primarylength = meters;
+   using primary_length = meters;
 
    /// @brief Concept to check if a type is a valid length unit.
    /// @tparam T The type to check.
@@ -30,7 +33,7 @@ namespace dimension
       using Dim = lengthType;
 
       /// @brief The primary unit type for this dimension.
-      using Primary = Primarylength;
+      using Primary = primary_length;
    };
 
    /// @brief Concept to check if a type is a length dimension.
@@ -121,4 +124,4 @@ namespace dimension
    length(base_dimension_impl<R, unit_exponent<U>, Cs...>) -> length<R, U, Cs...>;
 }
 
-#endif // STATIC_DIMENSION_length_IMPL_H
+#endif // STATIC_DIMENSION_LENGTH_IMPL_H

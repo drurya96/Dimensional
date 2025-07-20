@@ -29,8 +29,8 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a frequency type
    template<typename T>
-   concept Isfrequency = std::is_convertible_v<T, base_dimension<
-      unit_exponent<Primarytimespan, -1>
+   concept is_frequency = std::is_convertible_v<T, base_dimension<
+      unit_exponent<primary_timespan, -1>
    >>;
 
    /// @brief Retrieves the value of a frequency object with specific units
@@ -40,7 +40,7 @@ namespace dimension
    /// @return The raw value in terms of template units as a PrecisionType
    template<
       is_timespan_unit timespanUnit,
-      Isfrequency DimType>
+      is_frequency DimType>
    constexpr PrecisionType get_frequency_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -53,7 +53,7 @@ namespace dimension
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
-   template<IsNamedfrequencyUnit Named, Isfrequency DimType>
+   template<IsNamedfrequencyUnit Named, is_frequency DimType>
    constexpr PrecisionType get_frequency_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -86,7 +86,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isfrequency<T>
+      requires is_frequency<T>
       constexpr frequency(const T& base) : Base(base) {}
    };
 
@@ -115,7 +115,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isfrequency<T>
+      requires is_frequency<T>
       constexpr frequency(const T& base) : Base(base) {}
    };
 
@@ -132,7 +132,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isfrequency<Other>
+      requires is_frequency<Other>
       constexpr frequency(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -148,7 +148,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isfrequency<Other>
+      requires is_frequency<Other>
       constexpr frequency(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -221,7 +221,7 @@ namespace dimension
 
 
 
-   template<Isfrequency Dim>
+   template<is_frequency Dim>
    frequency(Dim) -> 
    frequency<
       DimExtractor<timespanType, Dim>

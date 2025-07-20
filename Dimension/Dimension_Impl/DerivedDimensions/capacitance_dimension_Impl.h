@@ -179,11 +179,11 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a capacitance type
    template<typename T>
-   concept Iscapacitance = std::is_convertible_v<T, base_dimension<
-      unit_exponent<Primarycharge, 2>, 
-      unit_exponent<Primarytimespan, 2>, 
-      unit_exponent<Primarymass, -1>, 
-      unit_exponent<Primarylength, -2>
+   concept is_capacitance = std::is_convertible_v<T, base_dimension<
+      unit_exponent<primary_charge, 2>, 
+      unit_exponent<primary_timespan, 2>, 
+      unit_exponent<primary_mass, -1>, 
+      unit_exponent<primary_length, -2>
    >>;
 
    /// @brief Retrieves the value of a capacitance object with specific units
@@ -199,7 +199,7 @@ namespace dimension
       is_timespan_unit timespanUnit,
       is_mass_unit massUnit,
       is_length_unit lengthUnit,
-      Iscapacitance DimType>
+      is_capacitance DimType>
    constexpr PrecisionType get_capacitance_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -215,7 +215,7 @@ namespace dimension
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
-   template<IsNamedcapacitanceUnit Named, Iscapacitance DimType>
+   template<IsNamedcapacitanceUnit Named, is_capacitance DimType>
    constexpr PrecisionType get_capacitance_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -260,7 +260,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Iscapacitance<T>
+      requires is_capacitance<T>
       constexpr capacitance(const T& base) : Base(base) {}
    };
 
@@ -301,7 +301,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Iscapacitance<T>
+      requires is_capacitance<T>
       constexpr capacitance(const T& base) : Base(base) {}
    };
 
@@ -318,7 +318,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Iscapacitance<Other>
+      requires is_capacitance<Other>
       constexpr capacitance(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -334,7 +334,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Iscapacitance<Other>
+      requires is_capacitance<Other>
       constexpr capacitance(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -419,7 +419,7 @@ namespace dimension
 
 
 
-   template<Iscapacitance Dim>
+   template<is_capacitance Dim>
    capacitance(Dim) -> 
    capacitance<
       DimExtractor<chargeType, Dim>,

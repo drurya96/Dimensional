@@ -37,9 +37,9 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a speed type
    template<typename T>
-   concept Isspeed = std::is_convertible_v<T, base_dimension<
-      unit_exponent<Primarylength, 1>, 
-      unit_exponent<Primarytimespan, -1>
+   concept is_speed = std::is_convertible_v<T, base_dimension<
+      unit_exponent<primary_length, 1>, 
+      unit_exponent<primary_timespan, -1>
    >>;
 
    /// @brief Retrieves the value of a speed object with specific units
@@ -51,7 +51,7 @@ namespace dimension
    template<
       is_length_unit lengthUnit,
       is_timespan_unit timespanUnit,
-      Isspeed DimType>
+      is_speed DimType>
    constexpr PrecisionType get_speed_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -65,7 +65,7 @@ namespace dimension
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
-   template<IsNamedspeedUnit Named, Isspeed DimType>
+   template<IsNamedspeedUnit Named, is_speed DimType>
    constexpr PrecisionType get_speed_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -102,7 +102,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isspeed<T>
+      requires is_speed<T>
       constexpr speed(const T& base) : Base(base) {}
    };
 
@@ -135,7 +135,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isspeed<T>
+      requires is_speed<T>
       constexpr speed(const T& base) : Base(base) {}
    };
 
@@ -152,7 +152,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isspeed<Other>
+      requires is_speed<Other>
       constexpr speed(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -168,7 +168,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isspeed<Other>
+      requires is_speed<Other>
       constexpr speed(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -245,7 +245,7 @@ namespace dimension
 
 
 
-   template<Isspeed Dim>
+   template<is_speed Dim>
    speed(Dim) -> 
    speed<
       DimExtractor<lengthType, Dim>,

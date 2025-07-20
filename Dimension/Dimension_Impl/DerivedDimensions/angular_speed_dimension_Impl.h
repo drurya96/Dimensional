@@ -37,9 +37,9 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a angular_speed type
    template<typename T>
-   concept Isangular_speed = std::is_convertible_v<T, base_dimension<
-      unit_exponent<Primaryangle, 1>, 
-      unit_exponent<Primarytimespan, -1>
+   concept is_angular_speed = std::is_convertible_v<T, base_dimension<
+      unit_exponent<primary_angle, 1>, 
+      unit_exponent<primary_timespan, -1>
    >>;
 
    /// @brief Retrieves the value of a angular_speed object with specific units
@@ -51,7 +51,7 @@ namespace dimension
    template<
       is_angle_unit angleUnit,
       is_timespan_unit timespanUnit,
-      Isangular_speed DimType>
+      is_angular_speed DimType>
    constexpr PrecisionType get_angular_speed_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -65,7 +65,7 @@ namespace dimension
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
-   template<IsNamedangular_speedUnit Named, Isangular_speed DimType>
+   template<IsNamedangular_speedUnit Named, is_angular_speed DimType>
    constexpr PrecisionType get_angular_speed_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -102,7 +102,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isangular_speed<T>
+      requires is_angular_speed<T>
       constexpr angular_speed(const T& base) : Base(base) {}
    };
 
@@ -135,7 +135,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isangular_speed<T>
+      requires is_angular_speed<T>
       constexpr angular_speed(const T& base) : Base(base) {}
    };
 
@@ -152,7 +152,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isangular_speed<Other>
+      requires is_angular_speed<Other>
       constexpr angular_speed(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -168,7 +168,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isangular_speed<Other>
+      requires is_angular_speed<Other>
       constexpr angular_speed(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -245,7 +245,7 @@ namespace dimension
 
 
 
-   template<Isangular_speed Dim>
+   template<is_angular_speed Dim>
    angular_speed(Dim) -> 
    angular_speed<
       DimExtractor<angleType, Dim>,

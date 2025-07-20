@@ -62,10 +62,10 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a inductance type
    template<typename T>
-   concept Isinductance = std::is_convertible_v<T, base_dimension<
-      unit_exponent<Primarymass, 1>, 
-      unit_exponent<Primarylength, 2>, 
-      unit_exponent<Primarycharge, -2>
+   concept is_inductance = std::is_convertible_v<T, base_dimension<
+      unit_exponent<primary_mass, 1>, 
+      unit_exponent<primary_length, 2>, 
+      unit_exponent<primary_charge, -2>
    >>;
 
    /// @brief Retrieves the value of a inductance object with specific units
@@ -79,7 +79,7 @@ namespace dimension
       is_mass_unit massUnit,
       is_length_unit lengthUnit,
       is_charge_unit chargeUnit,
-      Isinductance DimType>
+      is_inductance DimType>
    constexpr PrecisionType get_inductance_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -94,7 +94,7 @@ namespace dimension
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
-   template<IsNamedinductanceUnit Named, Isinductance DimType>
+   template<IsNamedinductanceUnit Named, is_inductance DimType>
    constexpr PrecisionType get_inductance_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -135,7 +135,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isinductance<T>
+      requires is_inductance<T>
       constexpr inductance(const T& base) : Base(base) {}
    };
 
@@ -172,7 +172,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isinductance<T>
+      requires is_inductance<T>
       constexpr inductance(const T& base) : Base(base) {}
    };
 
@@ -189,7 +189,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isinductance<Other>
+      requires is_inductance<Other>
       constexpr inductance(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -205,7 +205,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isinductance<Other>
+      requires is_inductance<Other>
       constexpr inductance(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -286,7 +286,7 @@ namespace dimension
 
 
 
-   template<Isinductance Dim>
+   template<is_inductance Dim>
    inductance(Dim) -> 
    inductance<
       DimExtractor<massType, Dim>,

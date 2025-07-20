@@ -1,5 +1,8 @@
-#ifndef STATIC_DIMENSION_timespan_IMPL_H
-#define STATIC_DIMENSION_timespan_IMPL_H
+#ifndef STATIC_DIMENSION_TIMESPAN_IMPL_H
+#define STATIC_DIMENSION_TIMESPAN_IMPL_H
+
+#include <type_traits>
+#include <tuple>
 
 #include "../../base_dimension.h"
 
@@ -11,7 +14,7 @@ namespace dimension
    /// @brief Represents the primary unit for timespan.
    struct seconds;
 
-   using Primarytimespan = seconds;
+   using primary_timespan = seconds;
 
    /// @brief Concept to check if a type is a valid timespan unit.
    /// @tparam T The type to check.
@@ -30,7 +33,7 @@ namespace dimension
       using Dim = timespanType;
 
       /// @brief The primary unit type for this dimension.
-      using Primary = Primarytimespan;
+      using Primary = primary_timespan;
    };
 
    /// @brief Concept to check if a type is a timespan dimension.
@@ -121,4 +124,4 @@ namespace dimension
    timespan(base_dimension_impl<R, unit_exponent<U>, Cs...>) -> timespan<R, U, Cs...>;
 }
 
-#endif // STATIC_DIMENSION_timespan_IMPL_H
+#endif // STATIC_DIMENSION_TIMESPAN_IMPL_H

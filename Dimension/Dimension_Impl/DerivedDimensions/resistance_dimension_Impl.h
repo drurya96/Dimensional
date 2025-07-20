@@ -179,11 +179,11 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a resistance type
    template<typename T>
-   concept Isresistance = std::is_convertible_v<T, base_dimension<
-      unit_exponent<Primarymass, 1>, 
-      unit_exponent<Primarylength, 2>, 
-      unit_exponent<Primarytimespan, -1>, 
-      unit_exponent<Primarycharge, -2>
+   concept is_resistance = std::is_convertible_v<T, base_dimension<
+      unit_exponent<primary_mass, 1>, 
+      unit_exponent<primary_length, 2>, 
+      unit_exponent<primary_timespan, -1>, 
+      unit_exponent<primary_charge, -2>
    >>;
 
    /// @brief Retrieves the value of a resistance object with specific units
@@ -199,7 +199,7 @@ namespace dimension
       is_length_unit lengthUnit,
       is_timespan_unit timespanUnit,
       is_charge_unit chargeUnit,
-      Isresistance DimType>
+      is_resistance DimType>
    constexpr PrecisionType get_resistance_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -215,7 +215,7 @@ namespace dimension
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
-   template<IsNamedresistanceUnit Named, Isresistance DimType>
+   template<IsNamedresistanceUnit Named, is_resistance DimType>
    constexpr PrecisionType get_resistance_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -260,7 +260,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isresistance<T>
+      requires is_resistance<T>
       constexpr resistance(const T& base) : Base(base) {}
    };
 
@@ -301,7 +301,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isresistance<T>
+      requires is_resistance<T>
       constexpr resistance(const T& base) : Base(base) {}
    };
 
@@ -318,7 +318,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isresistance<Other>
+      requires is_resistance<Other>
       constexpr resistance(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -334,7 +334,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isresistance<Other>
+      requires is_resistance<Other>
       constexpr resistance(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -419,7 +419,7 @@ namespace dimension
 
 
 
-   template<Isresistance Dim>
+   template<is_resistance Dim>
    resistance(Dim) -> 
    resistance<
       DimExtractor<massType, Dim>,

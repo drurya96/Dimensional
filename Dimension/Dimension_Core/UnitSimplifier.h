@@ -3,14 +3,13 @@
 
 #include <concepts>
 
-#include "TupleHandling.h"
-#include "Conversion.h"
-#include "FundamentalUnitExtractor.h"
-#include "UnitValidation.h"
 #include "TemplateUtils/RatioUtils.h"
 #include "TemplateUtils/GenericUtils.h"
-#include "Conversion.h"
+
 #include "base_dimension_signature.h"
+#include "TupleHandling.h"
+
+#include "FundamentalUnitExtractor.h"
 
 namespace dimension
 {
@@ -121,7 +120,7 @@ namespace dimension
    struct InitialSimplifier<std::tuple<Units...>>
    {
    private:
-       using flattened = typename FundamentalUnitExtractor<std::tuple<Units...>>::units;
+      using flattened = typename FundamentalUnitExtractor<std::tuple<Units...>>::units;
       
       template<typename FullTuple>
       struct CombineUniqueFrom {
@@ -481,7 +480,7 @@ namespace dimension
    template<typename Dim>
    constexpr auto FullSimplify(Dim input) {
       using simplify_type = FullSimplifyType<typename Dim::units>;
-      return simplify_type::dimType(simplify_type::after_conversion::Convert(input.GetRaw()));
+      return simplify_type::dimType(simplify_type::after_conversion::Convert(input.template get_tuple_scalar<typename Dim::units>()));
    }
 
    // ============================================================
@@ -727,6 +726,9 @@ namespace dimension
    struct ConvertDim
    {
 
+       using RawFrom = typename base_dimensionFromTuple<FromTuple>::dim;
+       using RawTo = typename base_dimensionFromTuple<ToTuple>::dim;
+
        using SimplifiedFrom = typename InitialSimplifier<FromTuple>::units;
        using SimplifiedTo = typename InitialSimplifier<ToTuple>::units;
    
@@ -739,15 +741,15 @@ namespace dimension
       static constexpr double Convert(double value) 
       {
 
-         using FromFullySimplified = decltype(FullSimplify(typename base_dimensionFromTuple<FromTuple>::dim(1.0)));
-         using ToFullySimplified = decltype(FullSimplify(typename base_dimensionFromTuple<ToTuple>::dim(1.0)));
+         using FromFullySimplified = decltype(FullSimplify(RawFrom(1.0)));
+         using ToFullySimplified = decltype(FullSimplify(RawTo(1.0)));
 
-         FromFullySimplified fullSimplified = FullSimplify(typename base_dimensionFromTuple<FromTuple>::dim(value));
-         double inverse_scalar = 1.0 / (FullSimplify(typename base_dimensionFromTuple<ToTuple>::dim(1.0)).GetRaw());
+         FromFullySimplified fullSimplified = FullSimplify(RawFrom(value));
+         constexpr double inverse_scalar = 1.0 / (FullSimplify(RawTo(1.0)).template get_tuple_scalar<typename ToFullySimplified::units>());
 
          using converter = ConvertSimplified<typename FromFullySimplified::units, typename ToFullySimplified::units>;
 
-       return fullSimplified.GetRaw() * inverse_scalar * converter::scalar;
+         return fullSimplified.template get_tuple_scalar<typename FromFullySimplified::units>() * inverse_scalar * converter::scalar;
    }
    };
    
@@ -784,11 +786,12 @@ namespace dimension
    //concept base_dimension = requires {
    //    typename T::units; // Must have a 'units' type
    //};
+   /*
    class base_dimension_marker;
 
    template<typename T>
    concept is_base_dimension = std::is_base_of_v<base_dimension_marker, T>;
-
+   */
 
 
 

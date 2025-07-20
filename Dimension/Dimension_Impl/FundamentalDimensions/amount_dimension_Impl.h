@@ -1,5 +1,8 @@
-#ifndef STATIC_DIMENSION_amount_IMPL_H
-#define STATIC_DIMENSION_amount_IMPL_H
+#ifndef STATIC_DIMENSION_AMOUNT_IMPL_H
+#define STATIC_DIMENSION_AMOUNT_IMPL_H
+
+#include <type_traits>
+#include <tuple>
 
 #include "../../base_dimension.h"
 
@@ -11,7 +14,7 @@ namespace dimension
    /// @brief Represents the primary unit for amount.
    struct moles;
 
-   using Primaryamount = moles;
+   using primary_amount = moles;
 
    /// @brief Concept to check if a type is a valid amount unit.
    /// @tparam T The type to check.
@@ -30,7 +33,7 @@ namespace dimension
       using Dim = amountType;
 
       /// @brief The primary unit type for this dimension.
-      using Primary = Primaryamount;
+      using Primary = primary_amount;
    };
 
    /// @brief Concept to check if a type is a amount dimension.
@@ -121,4 +124,4 @@ namespace dimension
    amount(base_dimension_impl<R, unit_exponent<U>, Cs...>) -> amount<R, U, Cs...>;
 }
 
-#endif // STATIC_DIMENSION_amount_IMPL_H
+#endif // STATIC_DIMENSION_AMOUNT_IMPL_H

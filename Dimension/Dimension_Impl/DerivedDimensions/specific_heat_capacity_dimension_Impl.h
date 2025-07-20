@@ -62,10 +62,10 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a specific_heat_capacity type
    template<typename T>
-   concept Isspecific_heat_capacity = std::is_convertible_v<T, base_dimension<
-      unit_exponent<Primarylength, 2>, 
-      unit_exponent<Primarytimespan, -2>, 
-      unit_exponent<Primarytemperature, -1>
+   concept is_specific_heat_capacity = std::is_convertible_v<T, base_dimension<
+      unit_exponent<primary_length, 2>, 
+      unit_exponent<primary_timespan, -2>, 
+      unit_exponent<primary_temperature, -1>
    >>;
 
    /// @brief Retrieves the value of a specific_heat_capacity object with specific units
@@ -79,7 +79,7 @@ namespace dimension
       is_length_unit lengthUnit,
       is_timespan_unit timespanUnit,
       is_temperature_unit temperatureUnit,
-      Isspecific_heat_capacity DimType>
+      is_specific_heat_capacity DimType>
    constexpr PrecisionType get_specific_heat_capacity_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -94,7 +94,7 @@ namespace dimension
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
-   template<IsNamedspecific_heat_capacityUnit Named, Isspecific_heat_capacity DimType>
+   template<IsNamedspecific_heat_capacityUnit Named, is_specific_heat_capacity DimType>
    constexpr PrecisionType get_specific_heat_capacity_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -135,7 +135,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isspecific_heat_capacity<T>
+      requires is_specific_heat_capacity<T>
       constexpr specific_heat_capacity(const T& base) : Base(base) {}
    };
 
@@ -172,7 +172,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isspecific_heat_capacity<T>
+      requires is_specific_heat_capacity<T>
       constexpr specific_heat_capacity(const T& base) : Base(base) {}
    };
 
@@ -189,7 +189,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isspecific_heat_capacity<Other>
+      requires is_specific_heat_capacity<Other>
       constexpr specific_heat_capacity(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -205,7 +205,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isspecific_heat_capacity<Other>
+      requires is_specific_heat_capacity<Other>
       constexpr specific_heat_capacity(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -286,7 +286,7 @@ namespace dimension
 
 
 
-   template<Isspecific_heat_capacity Dim>
+   template<is_specific_heat_capacity Dim>
    specific_heat_capacity(Dim) -> 
    specific_heat_capacity<
       DimExtractor<lengthType, Dim>,

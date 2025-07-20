@@ -46,9 +46,9 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a {{ dim.name }} type
    template<typename T>
-   concept Is{{ dim.name }} = std::is_convertible_v<T, base_dimension<
+   concept is_{{ dim.name }} = std::is_convertible_v<T, base_dimension<
       {% for de in dim.definition %}
-      unit_exponent<Primary{{ de.dim }}, {{ de.exponent_num }}>{{ ", " if not loop.last }}
+      unit_exponent<primary_{{ de.dim }}, {{ de.exponent_num }}>{{ ", " if not loop.last }}
       {% endfor %}
    >>;
 
@@ -63,7 +63,7 @@ namespace dimension
       {% for de in dim.definition %}
       is_{{ de.dim }}_unit {{ de.dim }}Unit,
       {% endfor %}
-      Is{{ dim.name }} DimType>
+      is_{{ dim.name }} DimType>
    constexpr PrecisionType get_{{ dim.name.lower() }}_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -78,7 +78,7 @@ namespace dimension
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
-   template<IsNamed{{ dim.name }}Unit Named, Is{{ dim.name }} DimType>
+   template<IsNamed{{ dim.name }}Unit Named, is_{{ dim.name }} DimType>
    constexpr PrecisionType get_{{ dim.name.lower() }}_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -119,7 +119,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Is{{ dim.name }}<T>
+      requires is_{{ dim.name }}<T>
       constexpr {{ dim.name }}(const T& base) : Base(base) {}
    };
 
@@ -156,7 +156,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Is{{ dim.name }}<T>
+      requires is_{{ dim.name }}<T>
       constexpr {{ dim.name }}(const T& base) : Base(base) {}
    };
 
@@ -173,7 +173,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Is{{ dim.name }}<Other>
+      requires is_{{ dim.name }}<Other>
       constexpr {{ dim.name }}(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -189,7 +189,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Is{{ dim.name }}<Other>
+      requires is_{{ dim.name }}<Other>
       constexpr {{ dim.name }}(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -270,7 +270,7 @@ namespace dimension
 
 
 
-   template<Is{{ dim.name }} Dim>
+   template<is_{{ dim.name }} Dim>
    {{ dim.name }}(Dim) -> 
    {{ dim.name }}<
       {% for de in dim.definition %}

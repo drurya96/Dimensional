@@ -179,11 +179,11 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a electric_potential type
    template<typename T>
-   concept Iselectric_potential = std::is_convertible_v<T, base_dimension<
-      unit_exponent<Primarymass, 1>, 
-      unit_exponent<Primarylength, 2>, 
-      unit_exponent<Primarytimespan, -2>, 
-      unit_exponent<Primarycharge, -1>
+   concept is_electric_potential = std::is_convertible_v<T, base_dimension<
+      unit_exponent<primary_mass, 1>, 
+      unit_exponent<primary_length, 2>, 
+      unit_exponent<primary_timespan, -2>, 
+      unit_exponent<primary_charge, -1>
    >>;
 
    /// @brief Retrieves the value of a electric_potential object with specific units
@@ -199,7 +199,7 @@ namespace dimension
       is_length_unit lengthUnit,
       is_timespan_unit timespanUnit,
       is_charge_unit chargeUnit,
-      Iselectric_potential DimType>
+      is_electric_potential DimType>
    constexpr PrecisionType get_electric_potential_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -215,7 +215,7 @@ namespace dimension
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
-   template<IsNamedelectric_potentialUnit Named, Iselectric_potential DimType>
+   template<IsNamedelectric_potentialUnit Named, is_electric_potential DimType>
    constexpr PrecisionType get_electric_potential_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -260,7 +260,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Iselectric_potential<T>
+      requires is_electric_potential<T>
       constexpr electric_potential(const T& base) : Base(base) {}
    };
 
@@ -301,7 +301,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Iselectric_potential<T>
+      requires is_electric_potential<T>
       constexpr electric_potential(const T& base) : Base(base) {}
    };
 
@@ -318,7 +318,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Iselectric_potential<Other>
+      requires is_electric_potential<Other>
       constexpr electric_potential(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -334,7 +334,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Iselectric_potential<Other>
+      requires is_electric_potential<Other>
       constexpr electric_potential(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -419,7 +419,7 @@ namespace dimension
 
 
 
-   template<Iselectric_potential Dim>
+   template<is_electric_potential Dim>
    electric_potential(Dim) -> 
    electric_potential<
       DimExtractor<massType, Dim>,

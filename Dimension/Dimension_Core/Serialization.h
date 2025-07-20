@@ -2,11 +2,11 @@
 #define DIMENSION_SERIALIZATION_H
 
 #include <cstring>
+#include <vector>
 
 #include "StringLiteral.h"
-#include "UnitSimplifier.h"
 #include "SerializationPolicies.h"
-#include <vector>
+
 
 namespace dimension
 {

@@ -1,5 +1,8 @@
-#ifndef STATIC_DIMENSION_angle_IMPL_H
-#define STATIC_DIMENSION_angle_IMPL_H
+#ifndef STATIC_DIMENSION_ANGLE_IMPL_H
+#define STATIC_DIMENSION_ANGLE_IMPL_H
+
+#include <type_traits>
+#include <tuple>
 
 #include "../../base_dimension.h"
 
@@ -11,7 +14,7 @@ namespace dimension
    /// @brief Represents the primary unit for angle.
    struct radians;
 
-   using Primaryangle = radians;
+   using primary_angle = radians;
 
    /// @brief Concept to check if a type is a valid angle unit.
    /// @tparam T The type to check.
@@ -30,7 +33,7 @@ namespace dimension
       using Dim = angleType;
 
       /// @brief The primary unit type for this dimension.
-      using Primary = Primaryangle;
+      using Primary = primary_angle;
    };
 
    /// @brief Concept to check if a type is a angle dimension.
@@ -121,4 +124,4 @@ namespace dimension
    angle(base_dimension_impl<R, unit_exponent<U>, Cs...>) -> angle<R, U, Cs...>;
 }
 
-#endif // STATIC_DIMENSION_angle_IMPL_H
+#endif // STATIC_DIMENSION_ANGLE_IMPL_H

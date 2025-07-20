@@ -1,5 +1,8 @@
-#ifndef STATIC_DIMENSION_charge_IMPL_H
-#define STATIC_DIMENSION_charge_IMPL_H
+#ifndef STATIC_DIMENSION_CHARGE_IMPL_H
+#define STATIC_DIMENSION_CHARGE_IMPL_H
+
+#include <type_traits>
+#include <tuple>
 
 #include "../../base_dimension.h"
 
@@ -11,7 +14,7 @@ namespace dimension
    /// @brief Represents the primary unit for charge.
    struct coulombs;
 
-   using Primarycharge = coulombs;
+   using primary_charge = coulombs;
 
    /// @brief Concept to check if a type is a valid charge unit.
    /// @tparam T The type to check.
@@ -30,7 +33,7 @@ namespace dimension
       using Dim = chargeType;
 
       /// @brief The primary unit type for this dimension.
-      using Primary = Primarycharge;
+      using Primary = primary_charge;
    };
 
    /// @brief Concept to check if a type is a charge dimension.
@@ -121,4 +124,4 @@ namespace dimension
    charge(base_dimension_impl<R, unit_exponent<U>, Cs...>) -> charge<R, U, Cs...>;
 }
 
-#endif // STATIC_DIMENSION_charge_IMPL_H
+#endif // STATIC_DIMENSION_CHARGE_IMPL_H

@@ -37,9 +37,9 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a diffusion_coefficient type
    template<typename T>
-   concept Isdiffusion_coefficient = std::is_convertible_v<T, base_dimension<
-      unit_exponent<Primarylength, 2>, 
-      unit_exponent<Primarytimespan, -1>
+   concept is_diffusion_coefficient = std::is_convertible_v<T, base_dimension<
+      unit_exponent<primary_length, 2>, 
+      unit_exponent<primary_timespan, -1>
    >>;
 
    /// @brief Retrieves the value of a diffusion_coefficient object with specific units
@@ -51,7 +51,7 @@ namespace dimension
    template<
       is_length_unit lengthUnit,
       is_timespan_unit timespanUnit,
-      Isdiffusion_coefficient DimType>
+      is_diffusion_coefficient DimType>
    constexpr PrecisionType get_diffusion_coefficient_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -65,7 +65,7 @@ namespace dimension
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
-   template<IsNameddiffusion_coefficientUnit Named, Isdiffusion_coefficient DimType>
+   template<IsNameddiffusion_coefficientUnit Named, is_diffusion_coefficient DimType>
    constexpr PrecisionType get_diffusion_coefficient_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -102,7 +102,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isdiffusion_coefficient<T>
+      requires is_diffusion_coefficient<T>
       constexpr diffusion_coefficient(const T& base) : Base(base) {}
    };
 
@@ -135,7 +135,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isdiffusion_coefficient<T>
+      requires is_diffusion_coefficient<T>
       constexpr diffusion_coefficient(const T& base) : Base(base) {}
    };
 
@@ -152,7 +152,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isdiffusion_coefficient<Other>
+      requires is_diffusion_coefficient<Other>
       constexpr diffusion_coefficient(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -168,7 +168,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isdiffusion_coefficient<Other>
+      requires is_diffusion_coefficient<Other>
       constexpr diffusion_coefficient(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -245,7 +245,7 @@ namespace dimension
 
 
 
-   template<Isdiffusion_coefficient Dim>
+   template<is_diffusion_coefficient Dim>
    diffusion_coefficient(Dim) -> 
    diffusion_coefficient<
       DimExtractor<lengthType, Dim>,

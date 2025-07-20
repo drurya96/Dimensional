@@ -1,5 +1,8 @@
-#ifndef STATIC_DIMENSION_temperature_IMPL_H
-#define STATIC_DIMENSION_temperature_IMPL_H
+#ifndef STATIC_DIMENSION_TEMPERATURE_IMPL_H
+#define STATIC_DIMENSION_TEMPERATURE_IMPL_H
+
+#include <type_traits>
+#include <tuple>
 
 #include "../../base_dimension.h"
 
@@ -11,7 +14,7 @@ namespace dimension
    /// @brief Represents the primary unit for temperature.
    struct kelvin;
 
-   using Primarytemperature = kelvin;
+   using primary_temperature = kelvin;
 
    /// @brief Concept to check if a type is a valid temperature unit.
    /// @tparam T The type to check.
@@ -30,7 +33,7 @@ namespace dimension
       using Dim = temperatureType;
 
       /// @brief The primary unit type for this dimension.
-      using Primary = Primarytemperature;
+      using Primary = primary_temperature;
    };
 
    /// @brief Concept to check if a type is a temperature dimension.
@@ -121,4 +124,4 @@ namespace dimension
    temperature(base_dimension_impl<R, unit_exponent<U>, Cs...>) -> temperature<R, U, Cs...>;
 }
 
-#endif // STATIC_DIMENSION_temperature_IMPL_H
+#endif // STATIC_DIMENSION_TEMPERATURE_IMPL_H

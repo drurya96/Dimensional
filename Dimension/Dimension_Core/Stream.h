@@ -1,13 +1,13 @@
 #ifndef DIMENSION_STREAM_H
 #define DIMENSION_STREAM_H
 
-#include "TupleHandling.h"
-#include "base_dimension_signature.h"
-
 #include <concepts>
 #include <iostream>
 #include <string>
 #include <sstream>
+
+#include "TupleHandling.h"
+#include "base_dimension_signature.h"
 
 namespace dimension
 {

@@ -1,5 +1,8 @@
-#ifndef STATIC_DIMENSION_mass_IMPL_H
-#define STATIC_DIMENSION_mass_IMPL_H
+#ifndef STATIC_DIMENSION_MASS_IMPL_H
+#define STATIC_DIMENSION_MASS_IMPL_H
+
+#include <type_traits>
+#include <tuple>
 
 #include "../../base_dimension.h"
 
@@ -11,7 +14,7 @@ namespace dimension
    /// @brief Represents the primary unit for mass.
    struct grams;
 
-   using Primarymass = grams;
+   using primary_mass = grams;
 
    /// @brief Concept to check if a type is a valid mass unit.
    /// @tparam T The type to check.
@@ -30,7 +33,7 @@ namespace dimension
       using Dim = massType;
 
       /// @brief The primary unit type for this dimension.
-      using Primary = Primarymass;
+      using Primary = primary_mass;
    };
 
    /// @brief Concept to check if a type is a mass dimension.
@@ -121,4 +124,4 @@ namespace dimension
    mass(base_dimension_impl<R, unit_exponent<U>, Cs...>) -> mass<R, U, Cs...>;
 }
 
-#endif // STATIC_DIMENSION_mass_IMPL_H
+#endif // STATIC_DIMENSION_MASS_IMPL_H

@@ -29,8 +29,8 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a area type
    template<typename T>
-   concept Isarea = std::is_convertible_v<T, base_dimension<
-      unit_exponent<Primarylength, 2>
+   concept is_area = std::is_convertible_v<T, base_dimension<
+      unit_exponent<primary_length, 2>
    >>;
 
    /// @brief Retrieves the value of a area object with specific units
@@ -40,7 +40,7 @@ namespace dimension
    /// @return The raw value in terms of template units as a PrecisionType
    template<
       is_length_unit lengthUnit,
-      Isarea DimType>
+      is_area DimType>
    constexpr PrecisionType get_area_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -53,7 +53,7 @@ namespace dimension
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
-   template<IsNamedareaUnit Named, Isarea DimType>
+   template<IsNamedareaUnit Named, is_area DimType>
    constexpr PrecisionType get_area_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -86,7 +86,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isarea<T>
+      requires is_area<T>
       constexpr area(const T& base) : Base(base) {}
    };
 
@@ -115,7 +115,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isarea<T>
+      requires is_area<T>
       constexpr area(const T& base) : Base(base) {}
    };
 
@@ -132,7 +132,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isarea<Other>
+      requires is_area<Other>
       constexpr area(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -148,7 +148,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isarea<Other>
+      requires is_area<Other>
       constexpr area(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -221,7 +221,7 @@ namespace dimension
 
 
 
-   template<Isarea Dim>
+   template<is_area Dim>
    area(Dim) -> 
    area<
       DimExtractor<lengthType, Dim>

@@ -37,9 +37,9 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a molar_mass type
    template<typename T>
-   concept Ismolar_mass = std::is_convertible_v<T, base_dimension<
-      unit_exponent<Primarymass, 1>, 
-      unit_exponent<Primaryamount, -1>
+   concept is_molar_mass = std::is_convertible_v<T, base_dimension<
+      unit_exponent<primary_mass, 1>, 
+      unit_exponent<primary_amount, -1>
    >>;
 
    /// @brief Retrieves the value of a molar_mass object with specific units
@@ -51,7 +51,7 @@ namespace dimension
    template<
       is_mass_unit massUnit,
       is_amount_unit amountUnit,
-      Ismolar_mass DimType>
+      is_molar_mass DimType>
    constexpr PrecisionType get_molar_mass_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -65,7 +65,7 @@ namespace dimension
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
-   template<IsNamedmolar_massUnit Named, Ismolar_mass DimType>
+   template<IsNamedmolar_massUnit Named, is_molar_mass DimType>
    constexpr PrecisionType get_molar_mass_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -102,7 +102,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Ismolar_mass<T>
+      requires is_molar_mass<T>
       constexpr molar_mass(const T& base) : Base(base) {}
    };
 
@@ -135,7 +135,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Ismolar_mass<T>
+      requires is_molar_mass<T>
       constexpr molar_mass(const T& base) : Base(base) {}
    };
 
@@ -152,7 +152,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Ismolar_mass<Other>
+      requires is_molar_mass<Other>
       constexpr molar_mass(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -168,7 +168,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Ismolar_mass<Other>
+      requires is_molar_mass<Other>
       constexpr molar_mass(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -245,7 +245,7 @@ namespace dimension
 
 
 
-   template<Ismolar_mass Dim>
+   template<is_molar_mass Dim>
    molar_mass(Dim) -> 
    molar_mass<
       DimExtractor<massType, Dim>,

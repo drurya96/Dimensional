@@ -37,9 +37,9 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a moment_of_inertia type
    template<typename T>
-   concept Ismoment_of_inertia = std::is_convertible_v<T, base_dimension<
-      unit_exponent<Primarymass, 1>, 
-      unit_exponent<Primarylength, 2>
+   concept is_moment_of_inertia = std::is_convertible_v<T, base_dimension<
+      unit_exponent<primary_mass, 1>, 
+      unit_exponent<primary_length, 2>
    >>;
 
    /// @brief Retrieves the value of a moment_of_inertia object with specific units
@@ -51,7 +51,7 @@ namespace dimension
    template<
       is_mass_unit massUnit,
       is_length_unit lengthUnit,
-      Ismoment_of_inertia DimType>
+      is_moment_of_inertia DimType>
    constexpr PrecisionType get_moment_of_inertia_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -65,7 +65,7 @@ namespace dimension
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
-   template<IsNamedmoment_of_inertiaUnit Named, Ismoment_of_inertia DimType>
+   template<IsNamedmoment_of_inertiaUnit Named, is_moment_of_inertia DimType>
    constexpr PrecisionType get_moment_of_inertia_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -102,7 +102,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Ismoment_of_inertia<T>
+      requires is_moment_of_inertia<T>
       constexpr moment_of_inertia(const T& base) : Base(base) {}
    };
 
@@ -135,7 +135,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Ismoment_of_inertia<T>
+      requires is_moment_of_inertia<T>
       constexpr moment_of_inertia(const T& base) : Base(base) {}
    };
 
@@ -152,7 +152,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Ismoment_of_inertia<Other>
+      requires is_moment_of_inertia<Other>
       constexpr moment_of_inertia(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -168,7 +168,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Ismoment_of_inertia<Other>
+      requires is_moment_of_inertia<Other>
       constexpr moment_of_inertia(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -245,7 +245,7 @@ namespace dimension
 
 
 
-   template<Ismoment_of_inertia Dim>
+   template<is_moment_of_inertia Dim>
    moment_of_inertia(Dim) -> 
    moment_of_inertia<
       DimExtractor<massType, Dim>,

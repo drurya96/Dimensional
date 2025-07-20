@@ -37,9 +37,9 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a heat_flux type
    template<typename T>
-   concept Isheat_flux = std::is_convertible_v<T, base_dimension<
-      unit_exponent<Primarymass, 1>, 
-      unit_exponent<Primarytimespan, -3>
+   concept is_heat_flux = std::is_convertible_v<T, base_dimension<
+      unit_exponent<primary_mass, 1>, 
+      unit_exponent<primary_timespan, -3>
    >>;
 
    /// @brief Retrieves the value of a heat_flux object with specific units
@@ -51,7 +51,7 @@ namespace dimension
    template<
       is_mass_unit massUnit,
       is_timespan_unit timespanUnit,
-      Isheat_flux DimType>
+      is_heat_flux DimType>
    constexpr PrecisionType get_heat_flux_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -65,7 +65,7 @@ namespace dimension
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
-   template<IsNamedheat_fluxUnit Named, Isheat_flux DimType>
+   template<IsNamedheat_fluxUnit Named, is_heat_flux DimType>
    constexpr PrecisionType get_heat_flux_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -102,7 +102,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isheat_flux<T>
+      requires is_heat_flux<T>
       constexpr heat_flux(const T& base) : Base(base) {}
    };
 
@@ -135,7 +135,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isheat_flux<T>
+      requires is_heat_flux<T>
       constexpr heat_flux(const T& base) : Base(base) {}
    };
 
@@ -152,7 +152,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isheat_flux<Other>
+      requires is_heat_flux<Other>
       constexpr heat_flux(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -168,7 +168,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isheat_flux<Other>
+      requires is_heat_flux<Other>
       constexpr heat_flux(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -245,7 +245,7 @@ namespace dimension
 
 
 
-   template<Isheat_flux Dim>
+   template<is_heat_flux Dim>
    heat_flux(Dim) -> 
    heat_flux<
       DimExtractor<massType, Dim>,

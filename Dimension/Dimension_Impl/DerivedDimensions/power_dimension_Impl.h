@@ -62,10 +62,10 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a power type
    template<typename T>
-   concept Ispower = std::is_convertible_v<T, base_dimension<
-      unit_exponent<Primarymass, 1>, 
-      unit_exponent<Primarylength, 2>, 
-      unit_exponent<Primarytimespan, -3>
+   concept is_power = std::is_convertible_v<T, base_dimension<
+      unit_exponent<primary_mass, 1>, 
+      unit_exponent<primary_length, 2>, 
+      unit_exponent<primary_timespan, -3>
    >>;
 
    /// @brief Retrieves the value of a power object with specific units
@@ -79,7 +79,7 @@ namespace dimension
       is_mass_unit massUnit,
       is_length_unit lengthUnit,
       is_timespan_unit timespanUnit,
-      Ispower DimType>
+      is_power DimType>
    constexpr PrecisionType get_power_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -94,7 +94,7 @@ namespace dimension
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
-   template<IsNamedpowerUnit Named, Ispower DimType>
+   template<IsNamedpowerUnit Named, is_power DimType>
    constexpr PrecisionType get_power_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -135,7 +135,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Ispower<T>
+      requires is_power<T>
       constexpr power(const T& base) : Base(base) {}
    };
 
@@ -172,7 +172,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Ispower<T>
+      requires is_power<T>
       constexpr power(const T& base) : Base(base) {}
    };
 
@@ -189,7 +189,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Ispower<Other>
+      requires is_power<Other>
       constexpr power(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -205,7 +205,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Ispower<Other>
+      requires is_power<Other>
       constexpr power(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -286,7 +286,7 @@ namespace dimension
 
 
 
-   template<Ispower Dim>
+   template<is_power Dim>
    power(Dim) -> 
    power<
       DimExtractor<massType, Dim>,

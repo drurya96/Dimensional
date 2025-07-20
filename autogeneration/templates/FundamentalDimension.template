@@ -1,5 +1,8 @@
-#ifndef STATIC_DIMENSION_{{ dim.name }}_IMPL_H
-#define STATIC_DIMENSION_{{ dim.name }}_IMPL_H
+#ifndef STATIC_DIMENSION_{{ dim.name.upper() }}_IMPL_H
+#define STATIC_DIMENSION_{{ dim.name.upper() }}_IMPL_H
+
+#include <type_traits>
+#include <tuple>
 
 #include "../../base_dimension.h"
 
@@ -11,7 +14,7 @@ namespace dimension
    /// @brief Represents the primary unit for {{ dim.name }}.
    struct {{ dim.base_unit }};
 
-   using Primary{{ dim.name }} = {{ dim.base_unit }};
+   using primary_{{ dim.name }} = {{ dim.base_unit }};
 
    /// @brief Concept to check if a type is a valid {{ dim.name }} unit.
    /// @tparam T The type to check.
@@ -30,7 +33,7 @@ namespace dimension
       using Dim = {{ dim.name }}Type;
 
       /// @brief The primary unit type for this dimension.
-      using Primary = Primary{{ dim.name }};
+      using Primary = primary_{{ dim.name }};
    };
 
    /// @brief Concept to check if a type is a {{ dim.name }} dimension.
@@ -121,4 +124,4 @@ namespace dimension
    {{ dim.name }}(base_dimension_impl<R, unit_exponent<U>, Cs...>) -> {{ dim.name }}<R, U, Cs...>;
 }
 
-#endif // STATIC_DIMENSION_{{ dim.name }}_IMPL_H
+#endif // STATIC_DIMENSION_{{ dim.name.upper() }}_IMPL_H

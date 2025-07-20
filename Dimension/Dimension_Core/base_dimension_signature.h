@@ -5,8 +5,6 @@
 #include <ratio>
 #include <type_traits>
 
-#include "UnitValidation.h"
-
 namespace dimension
 {
 
@@ -91,21 +89,6 @@ namespace dimension
          static constexpr double value = 3.1415;
       };
    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
    template<is_ratio T>
    constexpr double ratio_value()

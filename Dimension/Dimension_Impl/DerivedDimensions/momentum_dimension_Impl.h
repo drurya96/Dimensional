@@ -62,10 +62,10 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a momentum type
    template<typename T>
-   concept Ismomentum = std::is_convertible_v<T, base_dimension<
-      unit_exponent<Primarymass, 1>, 
-      unit_exponent<Primarylength, 1>, 
-      unit_exponent<Primarytimespan, -1>
+   concept is_momentum = std::is_convertible_v<T, base_dimension<
+      unit_exponent<primary_mass, 1>, 
+      unit_exponent<primary_length, 1>, 
+      unit_exponent<primary_timespan, -1>
    >>;
 
    /// @brief Retrieves the value of a momentum object with specific units
@@ -79,7 +79,7 @@ namespace dimension
       is_mass_unit massUnit,
       is_length_unit lengthUnit,
       is_timespan_unit timespanUnit,
-      Ismomentum DimType>
+      is_momentum DimType>
    constexpr PrecisionType get_momentum_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -94,7 +94,7 @@ namespace dimension
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
-   template<IsNamedmomentumUnit Named, Ismomentum DimType>
+   template<IsNamedmomentumUnit Named, is_momentum DimType>
    constexpr PrecisionType get_momentum_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -135,7 +135,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Ismomentum<T>
+      requires is_momentum<T>
       constexpr momentum(const T& base) : Base(base) {}
    };
 
@@ -172,7 +172,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Ismomentum<T>
+      requires is_momentum<T>
       constexpr momentum(const T& base) : Base(base) {}
    };
 
@@ -189,7 +189,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Ismomentum<Other>
+      requires is_momentum<Other>
       constexpr momentum(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -205,7 +205,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Ismomentum<Other>
+      requires is_momentum<Other>
       constexpr momentum(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -286,7 +286,7 @@ namespace dimension
 
 
 
-   template<Ismomentum Dim>
+   template<is_momentum Dim>
    momentum(Dim) -> 
    momentum<
       DimExtractor<massType, Dim>,

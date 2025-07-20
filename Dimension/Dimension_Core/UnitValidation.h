@@ -4,7 +4,7 @@
 #include <tuple> // For std::tuple and related functions
 #include <type_traits> // For std::is_same, std::remove_cv, std::disjunction
 
-#include "Conversion.h"
+#include "Conversion.h" // TODO: Remove this by moving PrimaryConvertible and friends to a separate header
 
 namespace dimension
 {
@@ -208,16 +208,11 @@ namespace dimension
       requires is_absolute<typename T::Primary>::value;
    };
 
-   template<typename T>
-   concept IsUnitType = 
-      (is_quantity_v<T> && IsBasicUnitType<typename T::unit>) || 
-      IsBasicUnitType<T>;
-
    template<typename Tuple, std::size_t... Is>
    // cppcheck-suppress unusedFunction // Only used within concept
    constexpr bool all_satisfy_unit_constraints(std::index_sequence<Is...>)
    {
-      return (IsUnitType<std::tuple_element_t<Is, Tuple>> && ...);
+      return (IsBasicUnitType<std::tuple_element_t<Is, Tuple>> && ...);
    }
 
    // The IsUnitTuple concept that ensures all types in a tuple satisfy Has_Dim
@@ -236,27 +231,6 @@ namespace dimension
 
    template<typename... Ts>
    concept are_unit_exponents = (is_unit_exponent<Ts> && ...);
-
- 
-   template<typename T, typename UnitType>
-   concept IsNonQuantityUnitDimension = 
-      !is_quantity_v<T> &&
-      requires
-      {
-         typename T::Dim; // Ensure T has a Dim member
-      } &&
-      std::is_same_v<typename T::Dim, UnitType>;
-
-   // Helper concept for quantity temperature units
-   template<typename T, typename UnitType>
-   concept IsQuantityUnitDimension = 
-      is_quantity_v<T> &&
-      requires
-      {
-         typename T::unit::Dim; // Ensure T::unit has a Dim member
-      } &&
-      std::is_same_v<typename T::unit::Dim, UnitType>;
-
 }
 
 #endif // DIMENSION_UNIT_VALIDATION_H

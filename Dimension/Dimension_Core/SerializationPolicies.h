@@ -3,11 +3,10 @@
 
 #include <cstring>
 #include <concepts>
+#include <vector>
 
 #include "StringLiteral.h"
-#include "UnitSimplifier.h"
 #include "base_dimension_signature.h"
-#include <vector>
 
 namespace dimension
 {

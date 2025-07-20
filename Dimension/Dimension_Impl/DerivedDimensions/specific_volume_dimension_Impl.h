@@ -37,9 +37,9 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a specific_volume type
    template<typename T>
-   concept Isspecific_volume = std::is_convertible_v<T, base_dimension<
-      unit_exponent<Primarylength, 3>, 
-      unit_exponent<Primarymass, -1>
+   concept is_specific_volume = std::is_convertible_v<T, base_dimension<
+      unit_exponent<primary_length, 3>, 
+      unit_exponent<primary_mass, -1>
    >>;
 
    /// @brief Retrieves the value of a specific_volume object with specific units
@@ -51,7 +51,7 @@ namespace dimension
    template<
       is_length_unit lengthUnit,
       is_mass_unit massUnit,
-      Isspecific_volume DimType>
+      is_specific_volume DimType>
    constexpr PrecisionType get_specific_volume_as(const DimType& obj)
    {
       return get_dimension_as<
@@ -65,7 +65,7 @@ namespace dimension
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as a PrecisionType
-   template<IsNamedspecific_volumeUnit Named, Isspecific_volume DimType>
+   template<IsNamedspecific_volumeUnit Named, is_specific_volume DimType>
    constexpr PrecisionType get_specific_volume_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
@@ -102,7 +102,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isspecific_volume<T>
+      requires is_specific_volume<T>
       constexpr specific_volume(const T& base) : Base(base) {}
    };
 
@@ -135,7 +135,7 @@ namespace dimension
       using Base::Base;
    
       template<typename T>
-      requires Isspecific_volume<T>
+      requires is_specific_volume<T>
       constexpr specific_volume(const T& base) : Base(base) {}
    };
 
@@ -152,7 +152,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isspecific_volume<Other>
+      requires is_specific_volume<Other>
       constexpr specific_volume(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -168,7 +168,7 @@ namespace dimension
       using Base::Base;
 
       template<typename Other>
-      requires Isspecific_volume<Other>
+      requires is_specific_volume<Other>
       constexpr specific_volume(const Other& base)
          : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
@@ -245,7 +245,7 @@ namespace dimension
 
 
 
-   template<Isspecific_volume Dim>
+   template<is_specific_volume Dim>
    specific_volume(Dim) -> 
    specific_volume<
       DimExtractor<lengthType, Dim>,
