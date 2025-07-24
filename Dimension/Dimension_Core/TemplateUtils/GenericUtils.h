@@ -33,19 +33,6 @@ namespace dimension
       >;
    };
 
-   /*
-   template<typename Tuple, typename Func>
-   constexpr double fold_tuple(double value, Func func)
-   {
-      return std::apply(
-         [&](auto... units) {
-               return (func.template operator()<decltype(units)>(value), ...);
-         },
-         Tuple{}
-      );
-   }
-   */
-
    template<typename Tuple, typename F>
    constexpr auto call_unpack(F&& f) {
       return [&f]<typename... Units>(std::tuple<Units...>*) {

@@ -35,21 +35,6 @@ namespace dimension
    };
 
    // ──────────────────────────────────────────────────────────────
-   //  1.  Variadic pack interface
-   //      make_units_qname<UE1, UE2, …>()
-   // ──────────────────────────────────────────────────────────────
-   /*
-   template<typename... UEs>
-   constexpr auto make_units_qname()
-   {
-      static_assert(sizeof...(UEs) > 0,
-                     "make_units_qname requires at least one unit_exponent");
-      return qname_builder::build<UEs...>();
-   }
-   */
-
-
-   // ──────────────────────────────────────────────────────────────
    //  2.  Tuple interface
    //      make_units_qname<Tuple>()
    //      where Tuple = std::tuple<unit_exponent<…>, …>
