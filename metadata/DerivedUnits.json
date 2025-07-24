@@ -1,233 +1,645 @@
 [
    {
-      "Dimension": "Acceleration",
+      "Dimension": "acceleration",
       "Fundamental": false,
-      "Numerator": ["Length"],
-      "Denominator": ["Time", "Time"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "length", "Exponent": 1 },
+         { "Dimension": "timespan", "Exponent": -2 }
+      ],
+      "Units": {},
+      "HelperUnits": {}
    },
    {
-      "Dimension": "Energy",
+      "Dimension": "energy",
       "Fundamental": false,
-      "Numerator": ["Mass", "Length", "Length"],
-      "Denominator": ["Time", "Time"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "mass", "Exponent": 1 },
+         { "Dimension": "length", "Exponent": 2 },
+         { "Dimension": "timespan", "Exponent": -2 }
+      ],
+      "Units": {
+            "joules": [
+               { "Unit": "kilo_grams", "Exponent": 1 },
+               { "Unit": "meters", "Exponent": 2 },
+               { "Unit": "seconds", "Exponent": -2 }
+            ],
+            "foot_pounds": [
+               { "Unit": "slugs", "Exponent": 1 },
+               { "Unit": "feet", "Exponent": 2 },
+               { "Unit": "seconds", "Exponent": -2 }
+            ],
+            "btus": [
+               { "Unit": "slugs", "Exponent": 1 },
+               { "Unit": "feet", "Exponent": 2 },
+               { "Unit": "seconds", "Exponent": -2 }
+            ],
+            "calories": [
+               { "Unit": "calorie_mass", "Exponent": 1 },
+               { "Unit": "meters", "Exponent": 2 },
+               { "Unit": "seconds", "Exponent": -2 }
+            ]
+      },
+      "HelperUnits": {
+         "calorie_mass": { "Dimension": "mass", "Name": "Caloriemass", "Abbreviation": "Caloriemass", 
+            "Conversions": {
+               "From": {},
+               "To": {
+                  "grams": 4184.0
+               }
+            }
+         }
+      }
    },
    {
-      "Dimension": "Force",
-      "Fundamental": false,
-      "Numerator": ["Mass", "Length"],
-      "Denominator": ["Time", "Time"],
-      "Units": {}
+     "Dimension": "force",
+     "Fundamental": false,
+     "HasExtras": false,
+     "Definition": [
+         { "Dimension": "mass", "Exponent": 1 },
+         { "Dimension": "length", "Exponent": 1 },
+         { "Dimension": "timespan", "Exponent": -2 }
+     ],
+     "Units": {
+         "newtons": [
+            { "Unit": "kilo_grams", "Exponent": 1 },
+            { "Unit": "meters", "Exponent": 1 },
+            { "Unit": "seconds", "Exponent": -2 }
+         ],
+         "pound_force": [
+            { "Unit": "slugs", "Exponent": 1 },
+            { "Unit": "feet", "Exponent": 1 },
+            { "Unit": "seconds", "Exponent": -2 }
+         ]
+      },
+      "HelperUnits": {}
    },
    {
-      "Dimension": "MolarMass",
+      "Dimension": "molar_mass",
       "Fundamental": false,
-      "Numerator": ["Mass"],
-      "Denominator": ["Amount"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "mass", "Exponent": 1 },
+         { "Dimension": "amount", "Exponent": -1 }
+      ],
+      "Units": {},
+      "HelperUnits": {}
    },
    {
-      "Dimension": "Pressure",
+      "Dimension": "pressure",
       "Fundamental": false,
-      "Numerator": ["Mass"],
-      "Denominator": ["Length", "Time", "Time"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "mass", "Exponent": 1 },
+         { "Dimension": "length", "Exponent": -1 },
+         { "Dimension": "timespan", "Exponent": -2 }
+      ],
+      "Units": {
+         "pascals": [
+            { "Unit": "kilo_grams", "Exponent": 1 },
+            { "Unit": "meters", "Exponent": -1 },
+            { "Unit": "seconds", "Exponent": -2 }
+         ],
+         "atmospheres": [
+            { "Unit": "atmosphere_mass", "Exponent": 1 },
+            { "Unit": "meters", "Exponent": -1 },
+            { "Unit": "seconds", "Exponent": -2 }
+         ],
+         "bar": [
+            { "Unit": "bar_mass", "Exponent": 1 },
+            { "Unit": "meters", "Exponent": -1 },
+            { "Unit": "seconds", "Exponent": -2 }
+         ],
+         "torr": [
+            { "Unit": "torr_mass", "Exponent": 1 },
+            { "Unit": "meters", "Exponent": -1 },
+            { "Unit": "seconds", "Exponent": -2 }
+         ],
+         "in_hg": [
+            { "Unit": "in_hg_mass", "Exponent": 1 },
+            { "Unit": "meters", "Exponent": -1 },
+            { "Unit": "seconds", "Exponent": -2 }
+         ],
+         "mm_hg": [
+            { "Unit": "torr_mass", "Exponent": 1 },
+            { "Unit": "meters", "Exponent": -1 },
+            { "Unit": "seconds", "Exponent": -2 }
+         ]
+      },
+      "HelperUnits": {
+         "atmosphere_mass": { "Dimension": "mass", "Name": "Atmospheremass", "Abbreviation": "Atmospheremass",
+            "Conversions": {
+               "From": {},
+               "To": {
+                  "grams": 1.01325e8
+               }
+            }
+         },
+         "bar_mass": { "Dimension": "mass", "Name": "Barmass", "Abbreviation": "Barmass",
+            "Conversions": {
+               "From": {},
+               "To": {
+                  "grams": 1e8
+               }
+            }
+         },
+         "torr_mass": { "Dimension": "mass", "Name": "Torrmass", "Abbreviation": "Torrmass",
+            "Conversions": {
+               "From": {},
+               "To": {
+                  "grams": 1.3332231202220616e5
+               }
+            }
+         },
+         "in_hg_mass": { "Dimension": "mass", "Name": "inHgmass", "Abbreviation": "inHgmass",
+            "Conversions": {
+               "From": {},
+               "To": {
+                  "grams": 3.386386725364e6
+               }
+            }
+         }
+      }
    },
    {
-      "Dimension": "Speed",
+      "Dimension": "speed",
       "Fundamental": false,
-      "Numerator": ["Length"],
-      "Denominator": ["Time"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "length", "Exponent": 1 },
+         { "Dimension": "timespan", "Exponent": -1 }
+      ],
+      "Units": {
+         "knots": [
+            { "Unit": "nautical_miles", "Exponent": 1 },
+            { "Unit": "hours", "Exponent": -1 }
+         ]
+      },
+      "HelperUnits": {}
    },
    {
-      "Dimension": "Volume",
+      "Dimension": "volume",
       "Fundamental": false,
-      "Numerator": ["Length", "Length", "Length"],
-      "Denominator": [],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "length", "Exponent": 3 }
+      ],
+      "Units": {
+         "liters": [
+            { "Unit": "deci_meters", "Exponent": 3 }
+         ],
+         "milli_liters": [
+            { "Unit": "centi_meters", "Exponent": 3 }
+         ],
+         "fluid_ounces": [
+            { "Unit": "fluid_ounce_length", "Exponent": 3 }
+         ],
+         "cups": [
+            { "Unit": "cup_length", "Exponent": 3 }
+         ],
+         "pints": [
+            { "Unit": "pint_length", "Exponent": 3 }
+         ],
+         "quarts": [
+            { "Unit": "quart_length", "Exponent": 3 }
+         ],
+         "gallons": [
+            { "Unit": "gallon_length", "Exponent": 3 }
+         ],
+         "teaspoons": [
+            { "Unit": "teaspoon_length", "Exponent": 3 }
+         ],
+         "tablespoons": [
+            { "Unit": "tablespoon_length", "Exponent": 3 }
+         ]
+      },
+      "HelperUnits": {
+         "fluid_ounce_length": { "Dimension": "length", "Name": "FluidOuncelength", "Abbreviation": "FluidOuncelength",
+            "Conversions": {
+               "From": {},
+               "To": {
+                  "meters": 0.03092440948
+               }
+            }
+         },
+         "cup_length": { "Dimension": "length", "Name": "Cuplength", "Abbreviation": "Cuplength",
+            "Conversions": {
+               "From": {},
+               "To": {
+                  "meters": 0.061848767433875
+               }
+            }
+         },
+         "pint_length": { "Dimension": "length", "Name": "Pintlength", "Abbreviation": "Pintlength",
+            "Conversions": {
+               "From": {},
+               "To": {
+                  "meters": 0.077924564
+               }
+            }
+         },
+         "quart_length": { "Dimension": "length", "Name": "Quartlength", "Abbreviation": "Quartlength",
+            "Conversions": {
+               "From": {},
+               "To": {
+                  "meters": 0.09817886355045987
+               }
+            }
+         },
+         "gallon_length": { "Dimension": "length", "Name": "Gallonlength", "Abbreviation": "Gallonlength",
+            "Conversions": {
+               "From": {},
+               "To": {
+                  "meters": 0.155849128
+               }
+            }
+         },
+         "teaspoon_length": { "Dimension": "length", "Name": "Teaspoonlength", "Abbreviation": "Teaspoonlength",
+            "Conversions": {
+               "From": {},
+               "To": {
+                  "meters": 0.01701834420916624526055025475059
+               }
+            }
+         },
+         "tablespoon_length": { "Dimension": "length", "Name": "Tablespoonlength", "Abbreviation": "Tablespoonlength",
+            "Conversions": {
+               "From": {},
+               "To": {
+                  "meters": 0.02454469962137835
+               }
+            }
+         }
+      }
    },
    {
-      "Dimension": "Area",
+      "Dimension": "area",
       "Fundamental": false,
-      "Numerator": ["Length", "Length"],
-      "Denominator": [],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "length", "Exponent": 2 }
+      ],
+      "Units": {},
+      "HelperUnits": {}
    },
    {
-      "Dimension": "Frequency",
+      "Dimension": "frequency",
       "Fundamental": false,
-      "Numerator": [],
-      "Denominator": ["Time"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "timespan", "Exponent": -1 }
+      ],
+      "Units": {
+         "hertz": [
+            { "Unit": "seconds", "Exponent": -1 }
+         ]
+      },
+      "HelperUnits": {}
    },
    {
-      "Dimension": "Momentum",
+      "Dimension": "momentum",
       "Fundamental": false,
-      "Numerator": ["Mass", "Length"],
-      "Denominator": ["Time"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "mass", "Exponent": 1 },
+         { "Dimension": "length", "Exponent": 1 },
+         { "Dimension": "timespan", "Exponent": -1 }
+      ],
+      "Units": {},
+      "HelperUnits": {}
    },
    {
-      "Dimension": "Power",
+      "Dimension": "power",
       "Fundamental": false,
-      "Numerator": ["Mass", "Length", "Length"],
-      "Denominator": ["Time", "Time", "Time"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "mass", "Exponent": 1 },
+         { "Dimension": "length", "Exponent": 2 },
+         { "Dimension": "timespan", "Exponent": -3 }
+      ],
+      "Units": {
+         "Watts": [
+            { "Unit": "kilo_grams", "Exponent": 1 },
+            { "Unit": "meters", "Exponent": 2 },
+            { "Unit": "seconds", "Exponent": -3 }
+         ]
+      },
+      "HelperUnits": {}
    },
    {
-      "Dimension": "Current",
+      "Dimension": "current",
       "Fundamental": false,
-      "Numerator": ["Charge"],
-      "Denominator": ["Time"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "charge", "Exponent": 1 },
+         { "Dimension": "timespan", "Exponent": -1 }
+      ],
+      "Units": {
+         "amperes": [
+            { "Unit": "coulombs", "Exponent": 1 },
+            { "Unit": "seconds", "Exponent": -1 }
+         ]
+      },
+      "HelperUnits": {}
    },
    {
-      "Dimension": "ElectricPotential",
+      "Dimension": "electric_potential",
       "Fundamental": false,
-      "Numerator": ["Mass", "Length", "Length"],
-      "Denominator": ["Time", "Time", "Charge"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "mass", "Exponent": 1 },
+         { "Dimension": "length", "Exponent": 2 },
+         { "Dimension": "timespan", "Exponent": -2 },
+         { "Dimension": "charge", "Exponent": -1 }
+      ],
+      "Units": {
+         "volts": [
+            { "Unit": "kilo_grams", "Exponent": 1 },
+            { "Unit": "meters", "Exponent": 2 },
+            { "Unit": "seconds", "Exponent": -2 },
+            { "Unit": "coulombs", "Exponent": -1 }
+         ]
+      },
+      "HelperUnits": {}
    },
    {
-      "Dimension": "Resistance",
+      "Dimension": "resistance",
       "Fundamental": false,
-      "Numerator": ["Mass", "Length", "Length"],
-      "Denominator": ["Time", "Charge", "Charge"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "mass", "Exponent": 1 },
+         { "Dimension": "length", "Exponent": 2 },
+         { "Dimension": "timespan", "Exponent": -1 },
+         { "Dimension": "charge", "Exponent": -2 }
+      ],
+      "Units": {
+         "ohms": [
+            { "Unit": "kilo_grams", "Exponent": 1 },
+            { "Unit": "meters", "Exponent": 2 },
+            { "Unit": "seconds", "Exponent": -1 },
+            { "Unit": "coulombs", "Exponent": -2 }
+         ]
+      },
+      "HelperUnits": {}
    },
    {
-      "Dimension": "Capacitance",
+      "Dimension": "capacitance",
       "Fundamental": false,
-      "Numerator": ["Charge", "Charge", "Time", "Time"],
-      "Denominator": ["Mass", "Length", "Length"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "charge", "Exponent": 2 },
+         { "Dimension": "timespan", "Exponent": 2 },
+         { "Dimension": "mass", "Exponent": -1 },
+         { "Dimension": "length", "Exponent": -2 }
+      ],
+      "Units": {
+         "farads": [
+            { "Unit": "coulombs", "Exponent": 2 },
+            { "Unit": "seconds", "Exponent": 2 },
+            { "Unit": "kilo_grams", "Exponent": -1 },
+            { "Unit": "meters", "Exponent": -2 }
+         ]
+      },
+      "HelperUnits": {}
    },
    {
-      "Dimension": "Inductance",
+      "Dimension": "inductance",
       "Fundamental": false,
-      "Numerator": ["Mass", "Length", "Length"],
-      "Denominator": ["Charge", "Charge"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "mass", "Exponent": 1 },
+         { "Dimension": "length", "Exponent": 2 },
+         { "Dimension": "charge", "Exponent": -2 }
+      ],
+      "Units": {
+         "henrys": [
+            { "Unit": "kilo_grams", "Exponent": 1 },
+            { "Unit": "meters", "Exponent": 2 },
+            { "Unit": "coulombs", "Exponent": -2 }
+         ]
+      },
+      "HelperUnits": {}
    },
    {
-      "Dimension": "MagneticFlux",
+      "Dimension": "magnetic_flux",
       "Fundamental": false,
-      "Numerator": ["Mass", "Length", "Length"],
-      "Denominator": ["Time", "Charge"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "mass", "Exponent": 1 },
+         { "Dimension": "length", "Exponent": 2 },
+         { "Dimension": "timespan", "Exponent": -1 },
+         { "Dimension": "charge", "Exponent": -1 }
+      ],
+      "Units": {
+         "webers": [
+            { "Unit": "kilo_grams", "Exponent": 1 },
+            { "Unit": "meters", "Exponent": 2 },
+            { "Unit": "seconds", "Exponent": -1 },
+            { "Unit": "coulombs", "Exponent": -1 }
+         ]
+      },
+      "HelperUnits": {}
    },
    {
-      "Dimension": "MagneticField",
+      "Dimension": "magnetic_field",
       "Fundamental": false,
-      "Numerator": ["Mass"],
-      "Denominator": ["Time", "Charge"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "mass", "Exponent": 1 },
+         { "Dimension": "timespan", "Exponent": -1 },
+         { "Dimension": "charge", "Exponent": -1 }
+      ],
+      "Units": {
+         "teslas": [
+            { "Unit": "kilo_grams", "Exponent": 1 },
+            { "Unit": "seconds", "Exponent": -1 },
+            { "Unit": "coulombs", "Exponent": -1 }
+         ]
+      },
+      "HelperUnits": {}
    },
    {
-      "Dimension": "ElectricField",
+      "Dimension": "electric_field",
       "Fundamental": false,
-      "Numerator": ["Mass", "Length"],
-      "Denominator": ["Time", "Time", "Charge"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "mass", "Exponent": 1 },
+         { "Dimension": "length", "Exponent": 1 },
+         { "Dimension": "timespan", "Exponent": -2 },
+         { "Dimension": "charge", "Exponent": -1 }
+      ],
+      "Units": {},
+      "HelperUnits": {}
    },
    {
-      "Dimension": "Conductance",
+      "Dimension": "conductance",
       "Fundamental": false,
-      "Numerator": ["Time", "Charge", "Charge"],
-      "Denominator": ["Mass", "Length", "Length"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "timespan", "Exponent": 1 },
+         { "Dimension": "charge", "Exponent": 2 },
+         { "Dimension": "mass", "Exponent": -1 },
+         { "Dimension": "length", "Exponent": -2 }
+      ],
+      "Units": {
+         "siemens": [
+            { "Unit": "seconds", "Exponent": 1 },
+            { "Unit": "coulombs", "Exponent": 2 },
+            { "Unit": "kilo_grams", "Exponent": -1 },
+            { "Unit": "meters", "Exponent": -2 }
+         ]
+      },
+      "HelperUnits": {}
    },
    {
-      "Dimension": "Entropy",
+      "Dimension": "entropy",
       "Fundamental": false,
-      "Numerator": ["Mass", "Length", "Length"],
-      "Denominator": ["Time", "Time", "Temperature"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "mass", "Exponent": 1 },
+         { "Dimension": "length", "Exponent": 2 },
+         { "Dimension": "timespan", "Exponent": -2 },
+         { "Dimension": "temperature", "Exponent": -1 }
+      ],
+      "Units": {},
+      "HelperUnits": {}
    },
    {
-      "Dimension": "HeatFlux",
+      "Dimension": "heat_flux",
       "Fundamental": false,
-      "Numerator": ["Mass"],
-      "Denominator": ["Time", "Time", "Time"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "mass", "Exponent": 1 },
+         { "Dimension": "timespan", "Exponent": -3 }
+      ],
+      "Units": {},
+      "HelperUnits": {}
    },
    {
-      "Dimension": "SpecificHeatCapacity",
+      "Dimension": "specific_heat_capacity",
       "Fundamental": false,
-      "Numerator": ["Length", "Length"],
-      "Denominator": ["Time", "Time", "Temperature"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "length", "Exponent": 2 },
+         { "Dimension": "timespan", "Exponent": -2 },
+         { "Dimension": "temperature", "Exponent": -1 }
+      ],
+      "Units": {},
+      "HelperUnits": {}
    },
    {
-      "Dimension": "DiffusionCoefficient",
+      "Dimension": "diffusion_coefficient",
       "Fundamental": false,
-      "Numerator": ["Length", "Length"],
-      "Denominator": ["Time"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "length", "Exponent": 2 },
+         { "Dimension": "timespan", "Exponent": -1 }
+      ],
+      "Units": {},
+      "HelperUnits": {}
    },
    {
-      "Dimension": "DynamicViscosity",
+      "Dimension": "dynamic_viscosity",
       "Fundamental": false,
-      "Numerator": ["Mass"],
-      "Denominator": ["Time", "Length"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "mass", "Exponent": 1 },
+         { "Dimension": "timespan", "Exponent": -1 },
+         { "Dimension": "length", "Exponent": -1 }
+      ],
+      "Units": {},
+      "HelperUnits": {}
    },
    {
-      "Dimension": "Density",
+      "Dimension": "density",
       "Fundamental": false,
-      "Numerator": ["Mass"],
-      "Denominator": ["Length", "Length", "Length"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "mass", "Exponent": 1 },
+         { "Dimension": "length", "Exponent": -3 }
+      ],
+      "Units": {},
+      "HelperUnits": {}
    },
    {
-      "Dimension": "VolumetricFlowRate",
+      "Dimension": "volumetric_flow_rate",
       "Fundamental": false,
-      "Numerator": ["Length", "Length", "Length"],
-      "Denominator": ["Time"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "length", "Exponent": 3 },
+         { "Dimension": "timespan", "Exponent": -1 }
+      ],
+      "Units": {},
+      "HelperUnits": {}
    },
    {
-      "Dimension": "MassFlowRate",
+      "Dimension": "mass_flow_rate",
       "Fundamental": false,
-      "Numerator": ["Mass"],
-      "Denominator": ["Time"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "mass", "Exponent": 1 },
+         { "Dimension": "timespan", "Exponent": -1 }
+      ],
+      "Units": {},
+      "HelperUnits": {}
    },
    {
-      "Dimension": "SpecificVolume",
+      "Dimension": "specific_volume",
       "Fundamental": false,
-      "Numerator": ["Length", "Length", "Length"],
-      "Denominator": ["Mass"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "length", "Exponent": 3 },
+         { "Dimension": "mass", "Exponent": -1 }
+      ],
+      "Units": {},
+      "HelperUnits": {}
    },
    {
-      "Dimension": "MomentOfInertia",
+      "Dimension": "moment_of_inertia",
       "Fundamental": false,
-      "Numerator": ["Mass", "Length", "Length"],
-      "Denominator": [],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "mass", "Exponent": 1 },
+         { "Dimension": "length", "Exponent": 2 }
+      ],
+      "Units": {},
+      "HelperUnits": {}
    },
    {
-      "Dimension": "AngularSpeed",
+      "Dimension": "angular_speed",
       "Fundamental": false,
-      "Numerator": ["Angle"],
-      "Denominator": ["Time"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "angle", "Exponent": 1 },
+         { "Dimension": "timespan", "Exponent": -1 }
+      ],
+      "Units": {},
+      "HelperUnits": {}
    },
    {
-      "Dimension": "AngularAcceleration",
+      "Dimension": "angular_acceleration",
       "Fundamental": false,
-      "Numerator": ["Angle"],
-      "Denominator": ["Time", "Time"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "angle", "Exponent": 1 },
+         { "Dimension": "timespan", "Exponent": -2 }
+      ],
+      "Units": {},
+      "HelperUnits": {}
    },
    {
-      "Dimension": "Torque",
+      "Dimension": "torque",
       "Fundamental": false,
-      "Numerator": ["Mass", "Length", "Length"],
-      "Denominator": ["Time", "Time", "Angle"],
-      "Units": {}
+      "HasExtras": false,
+      "Definition": [
+         { "Dimension": "mass", "Exponent": 1 },
+         { "Dimension": "length", "Exponent": 2 },
+         { "Dimension": "timespan", "Exponent": -2 },
+         { "Dimension": "angle", "Exponent": -1 }
+      ],
+      "Units": {},
+      "HelperUnits": {}
    }
-]
+ ]
+ 

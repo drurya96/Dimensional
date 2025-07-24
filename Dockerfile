@@ -16,8 +16,16 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     python3.12-venv \
     clang-tidy \
-    cppcheck \
+    git \
     && apt-get clean
+
+RUN curl -sSLo /opt/cppcheck.tar.gz 'https://github.com/danmar/cppcheck/archive/refs/tags/2.18.0.tar.gz' && \
+    tar -xzf /opt/cppcheck.tar.gz -C /opt && \
+    mkdir /opt/cppcheck-2.18.0/build && \
+    cd /opt/cppcheck-2.18.0/build && \
+    cmake .. && \
+    make -j$(nproc) && \
+    make install
 
 # Set GCC 12 as default
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 12 \

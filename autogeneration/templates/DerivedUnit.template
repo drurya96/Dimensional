@@ -1,0 +1,38 @@
+#ifndef STATIC_DIMENSION_{{ dim.name.upper() }}_H
+#define STATIC_DIMENSION_{{ dim.name.upper() }}_H
+
+#include "Dimension_Impl/DerivedDimensions/{{ dim.name }}_dimension_Impl.h"
+
+namespace dimension
+{
+   {% if dim.helper_units %}
+   // Helper fundamental units that exist only to compose derived units
+   //   These don't map to typical physical units, but are necessary to
+   //   produce some derived units
+   {% endif %}
+   {% for name, unit in dim.helper_units.items() %}
+   struct {{ name }} : public {{ unit.dim }}Unit<{{ name }}, "{{ unit.name }}", "{{ unit.abbreviation }}"> {};
+   {% for to_name, value in unit.conversions.To.items() %}
+   template<> struct Conversion<{{ name }}, {{ to_name }}> { static constexpr PrecisionType slope = {{ value }}; };
+   {% endfor %}
+
+   {% endfor %}
+
+   {% for unit_name, unit in dim.units.items() %}
+   struct {{ unit_name }}
+   {
+      using units = std::tuple<
+         {% for ue in unit %}
+         unit_exponent<{{ ue.unit }}, {{ ue.exponent_num }}, {{ ue.exponent_den }}>{{ "," if not loop.last }}
+         {% endfor %}
+      >;
+   };
+
+   {% endfor %}
+}
+
+{% if dim.has_extras %}
+#include "{{dim.name}}Extras.h"
+{% endif %}
+
+#endif // STATIC_DIMENSION_{{ dim.name.upper() }}_H

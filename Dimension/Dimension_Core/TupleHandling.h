@@ -4,15 +4,15 @@
 #include <tuple> // For std::tuple and related functions
 #include <type_traits> // For std::is_same, std::remove_cv, std::disjunction, std::conditional
 #include <utility> // For std::declval
-#include "Quantity.h"
 
 #include "StringLiteral.h"
 
-namespace Dimension
+namespace dimension
 {
-   /// @brief Check if two units are of the same dimension
-   template<typename T, typename U>
-   struct is_same_dim;
+   class base_dimension_marker;
+
+   template<typename T>
+   concept is_base_dimension = std::is_base_of_v<base_dimension_marker, T>;
 
    /// @brief Check if two units are of the same dimension
    /// @tparam T First unit to compare
@@ -20,192 +20,28 @@ namespace Dimension
    /// @typedef value const cool indicating whether the units are the same dimension
    /// @todo When upgrading to C++20 use/replace with concept/require
    template<typename T, typename U>
-   requires OneIsQuantity<T, U>
-   struct is_same_dim<T, U> : std::integral_constant<
-      bool,
-      false
-   > {};
-
-   template<typename T, typename U>
-   requires BothAreQuantity<T, U>
-   struct is_same_dim<T, U> : std::integral_constant<
-      bool,
-      std::is_same<typename std::remove_cv<typename T::unit::Dim>::type, typename std::remove_cv<typename U::unit::Dim>::type>::value &&
-      (T::unit::ID == U::unit::ID)
-   > {};
-
-   /// @brief Check if two units are of the same dimension
-   /// @tparam T First unit to compare
-   /// @tparam U Second unit to compare
-   /// @typedef value const cool indicating whether the units are the same dimension
-   /// @todo When upgrading to C++20 use/replace with concept/require
-   template<typename T, typename U>
-   requires NeitherIsQuantity<T, U>
-   struct is_same_dim<T, U> : std::integral_constant<
+   // TODO: Consider a requirement that T and U are dimensions
+   struct is_same_dim : std::integral_constant<
       bool,
       std::is_same<typename std::remove_cv<typename T::Dim>::type, typename std::remove_cv<typename U::Dim>::type>::value &&
       (T::ID == U::ID)
    > {};
 
    /// @brief Check if two units are of the same dimension
-   template<typename Dim, typename U>
-   struct is_dim;
-
-   template<typename Dim, typename U>
-   requires (is_quantity_v<U>)
-   struct is_dim<Dim, U> : std::integral_constant<
-      bool,
-      std::is_same<typename std::remove_cv<Dim>::type, typename std::remove_cv<typename U::unit::Dim>::type>::value
-   > {};
-
-
-   /// @brief Check if two units are of the same dimension
    /// @tparam T First unit to compare
    /// @tparam U Second unit to compare
    /// @typedef value const cool indicating whether the units are the same dimension
    /// @todo When upgrading to C++20 use/replace with concept/require
    template<typename Dim, typename U>
-   requires (!is_quantity_v<U>)
-   struct is_dim<Dim, U> : std::integral_constant<
+   struct is_dim : std::integral_constant<
       bool,
       std::is_same<typename std::remove_cv<Dim>::type, typename std::remove_cv<typename U::Dim>::type>::value
-   > {};
-
-   // TODO: add a requirement that this only works for `Quantity` types
-   /// @brief Check if two units are of the same dimension
-   template<typename T, typename U>
-   struct is_same_quantity_dim_diff_unit;
-
-   /// @brief Check if two units are of the same dimension
-   /// @tparam T First unit to compare
-   /// @tparam U Second unit to compare
-   /// @typedef value const cool indicating whether the units are the same dimension
-   /// @todo When upgrading to C++20 use/replace with concept/require
-   template<typename T, typename U>
-   requires (!(is_quantity_v<T> && is_quantity_v<U>))
-   struct is_same_quantity_dim_diff_unit<T, U> : std::false_type {};
-
-   template<typename T, typename U>
-   requires (is_quantity_v<T> && is_quantity_v<U>)
-   struct is_same_quantity_dim_diff_unit<T, U> : std::integral_constant<
-      bool,
-      //is_quantity_v<T> && is_quantity_v<U> &&
-      !std::is_same<typename std::remove_cv<T>::type, typename std::remove_cv<U>::type>::value &&
-      std::is_same<typename std::remove_cv<typename T::unit::Dim>::type, typename std::remove_cv<typename U::unit::Dim>::type>::value &&
-      (T::ID == U::ID)
    > {};
 
    /// @brief Convenience alias for retrieving the type of a tuple of types
    /// @tparam Ts Parameter pack to types to concatenate
    template<typename...Ts>
    using tuple_cat_t = decltype(std::tuple_cat(std::declval<Ts>()...));
-
-   /// @brief Struct to remove one instance of a type from a tuple of types
-   template<template<typename, typename> typename Compare, typename T, typename Tuple>
-   requires Comparable<Compare>
-   struct RemoveOneInstance;
-
-   /// @brief Struct to remove one instance of a type from a tuple of types
-   /// @details Specialization for an empty tuple
-   /// @typedef type An empty tuple
-   template<template<typename, typename> typename Compare, typename T>
-   requires Comparable<Compare>
-   struct RemoveOneInstance<Compare, T, std::tuple<>>
-   {
-      using type = std::tuple<>;
-   };
-
-   /// @brief Struct to remove one instance of a type from a tuple of types
-   /// @details Main specialization
-   /// @tparam T The type to remove
-   /// @tparam Head the first item of the tuple
-   /// @tparam Tail the remaining items in the tuple
-   /// @typedef type A tuple type matching the input tuple type, except the first instance of T is removed
-   template<template<typename, typename> typename Compare, typename T, typename Head, typename... Tail>
-   requires Comparable<Compare>
-   struct RemoveOneInstance<Compare, T, std::tuple<Head, Tail...>>
-   {
-      using type = std::conditional_t < Compare<T, Head>::value,
-         std::tuple<Tail...>,
-         tuple_cat_t<std::tuple<Head>, typename RemoveOneInstance<Compare, T, std::tuple<Tail...>>::type>
-      >;
-   };
-
-   /// @brief Find the difference between two type-tuples
-   /// @details Computes the multiset difference between two tuples, where the multiset
-   ///    difference of the minuend and subtrahend contains all elements from the
-   ///    minuend except those that also appear in the subtrahend.The multiplicity 
-   ///    of elements is taken into account.
-   template<template<typename, typename> typename Compare, typename T, typename U, typename Enable = void>
-   struct tuple_diff;
-
-   /// @brief Find the difference between two type-tuples
-   /// @details Specialization for an empty minuend tuple
-   /// @typedef type Empty tuple
-   template<template<typename, typename> typename Compare>
-   struct tuple_diff<Compare, std::tuple<>, std::tuple<>>
-   {
-      using type = std::tuple<>;
-   };
-
-   /// @brief Find the difference between two type-tuples
-   /// @details Specialization for an empty minuend tuple
-   /// @typedef type Empty tuple
-   template<template<typename, typename> typename Compare, typename ... subtrahendTypes>
-   struct tuple_diff<Compare, std::tuple<>, std::tuple<subtrahendTypes...>>
-   {
-      using type = std::tuple<>;
-   };
-
-   /// @brief Find the difference between two type-tuples
-   /// @details Specialization for an empty subtrahend tuple
-   /// @typedef type The entire minuend tuple
-   template<template<typename, typename> typename Compare, typename... restMinuendTypes>
-   struct tuple_diff<Compare, std::tuple<restMinuendTypes...>, std::tuple<>>
-   {
-      using type = std::tuple<restMinuendTypes...>;
-   };
-
-   /// @brief Find the difference between two type-tuples
-   /// @details Diff when subtrahend is non-empty and Compare resolves to True
-   ///   Removes one instance of T from subtrahendTypes
-   /// @tparam Compare A comparison type-trait used to determine if T is comparable to a tuple of subtrahendTypes
-   /// @tparam T The first type in the minuend tuple
-   /// @tparam restMinuendTypes The remaining types in the minuend tuple
-   /// @tparam subtrahendTypes The types in the subtrahend tuple
-   /// @typedef type A tuple of types contain the multiset different between the minuend and subtrahend
-   template<template<typename, typename> typename Compare, typename T, typename... restMinuendTypes, typename... subtrahendTypes>
-   requires (
-      sizeof...(subtrahendTypes) > 0 &&
-      Compare<T, std::tuple<subtrahendTypes...>>::value
-   )
-   struct tuple_diff<Compare, std::tuple<T, restMinuendTypes...>, std::tuple<subtrahendTypes...>>
-   {
-      using type = typename tuple_diff
-      <
-         Compare, 
-         std::tuple<restMinuendTypes...>, 
-         typename RemoveOneInstance<is_same_dim, T, std::tuple<subtrahendTypes...>>::type
-      >::type;
-   };
-
-   /// @brief Find the difference between two type-tuples
-   /// @details Diff when subtrahend is non-empty and Compare resolves to False
-   ///   Continues comparison with the next type in the restMinuendTypes set
-   /// @tparam Compare A comparison type-trait used to determine if T is comparable to a tuple of subtrahendTypes
-   /// @tparam T The first type in the minuend tuple
-   /// @tparam restMinuendTypes The remaining types in the minuend tuple
-   /// @tparam subtrahendTypes The types in the subtrahend tuple
-   /// @typedef type A tuple of types contain the multiset different between the minuend and subtrahend
-   template<template<typename, typename> typename Compare, typename T, typename... restMinuendTypes, typename... subtrahendTypes>
-   requires (
-      sizeof...(subtrahendTypes) > 0 &&
-      !Compare<T, std::tuple<subtrahendTypes...>>::value
-   )
-   struct tuple_diff<Compare, std::tuple<T, restMinuendTypes...>, std::tuple<subtrahendTypes...>>
-   {
-      using type = tuple_cat_t<std::tuple<T>, typename tuple_diff<Compare, std::tuple<restMinuendTypes...>, std::tuple<subtrahendTypes...>>::type>;
-   };
 
    /// @brief Swap two indecies of a tuple type
    /// @tparam Tuple Tuple type to swap
@@ -355,12 +191,23 @@ namespace Dimension
    // From this point, reconsider which pieces are actually necessary
    // =====================================================
 
+   // TODO: Important: Get rid of this, this is just to more easily find/replace some things.
+   template<typename T>
+   struct extract_type
+   {
+      using type = T::unit;
+   };
+
+   template <typename T>
+   using extract_type_t = typename extract_type<T>::type;
+
+
    template <typename Tuple>
    struct map_dim_tuple;
 
    template <typename... Ts>
    struct map_dim_tuple<std::tuple<Ts...>> {
-      using type = std::tuple<typename type_from_quantity_or_delta<Ts>::type::Dim...>;
+      using type = std::tuple<typename extract_type<Ts>::type::Dim...>;
    };
 
    // Helper to check if a type is in a tuple
@@ -415,72 +262,6 @@ namespace Dimension
 
    template<typename T>
    struct is_absolute : std::integral_constant<bool, true> {};
-
-   template<typename Tuple>
-   struct is_single_quantity;
-
-   template<typename Tuple>
-   requires (std::tuple_size_v<Tuple> != 1)
-   struct is_single_quantity<Tuple> : std::integral_constant<
-      bool,
-      false
-   > {};
-
-   template<typename Tuple>
-   requires (std::tuple_size_v<Tuple> == 1)
-   struct is_single_quantity<Tuple> : std::integral_constant<
-      bool,
-      is_quantity_v<std::tuple_element_t<0, Tuple>>
-   > {};
-
-   template<typename Tuple>
-   struct is_single_non_absolute_quantity;
-
-   template<typename Tuple>
-   requires (is_single_quantity<Tuple>::value)
-   struct is_single_non_absolute_quantity<Tuple> : std::integral_constant<
-      bool,
-      !is_absolute<type_from_quantity_or_delta_t<std::tuple_element_t<0, Tuple>>>::value
-   > {};
-
-   template<typename Tuple>
-   requires (!is_single_quantity<Tuple>::value)
-   struct is_single_non_absolute_quantity<Tuple> : std::integral_constant<
-      bool,
-      false
-   > {};
-
-   template<typename Tuple>
-   struct make_tuple_of_single_absolute_quantity;
-
-   template<typename Tuple>
-   requires (is_single_non_absolute_quantity<Tuple>::value)
-   struct make_tuple_of_single_absolute_quantity<Tuple>
-   {
-      using primary = type_from_quantity_or_delta_t<std::tuple_element_t<0, Tuple>>::Primary;
-      using type = std::tuple<Quantity<primary>>;
-      static constexpr bool value = true;
-   };
-
-   template<typename Tuple>
-   requires (!is_single_non_absolute_quantity<Tuple>::value)
-   struct make_tuple_of_single_absolute_quantity<Tuple>
-   {
-      using type = void;
-      static constexpr bool value = false;
-   };
-
-   template<typename Tuple>
-   struct has_non_absolute_quantity : std::false_type {};
-
-   // Partial specialization for std::tuple
-   template<typename... Ts>
-   struct has_non_absolute_quantity<std::tuple<Ts...>> 
-      : std::bool_constant<( (is_quantity_v<Ts> && !is_absolute<type_from_quantity_or_delta_t<Ts>>::value ) || ... )> {};
-
-   // Helper variable template for easier usage
-   template<typename Tuple>
-   inline constexpr bool has_non_absolute_quantity_v = has_non_absolute_quantity<Tuple>::value;
 
 } // end Dimension
 

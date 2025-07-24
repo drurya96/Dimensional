@@ -1,18 +1,16 @@
-#include "LengthDimension.h"
-#include "TimeDimension.h"
-#include "SpeedDimension.h"
+#include "dimensional.h"
 
 #include <iostream>
 
 int main()
 {
 
-   using namespace Dimension;
+   using namespace dimension;
 
-   Length<Meters> length(5.0);
-   Time<Seconds> time(10.0);
+   length<meters> length(5.0);
+   timespan<seconds> time(10.0);
 
-   Speed speed = length / time;
+   speed speed = length / time;
 
    std::cout << speed << std::endl;
 

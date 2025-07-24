@@ -1,74 +1,73 @@
 #include "DimensionTest.h"
 
-#include "TimeDimension.h"
-#include "LengthDimension.h"
-#include "SpeedDimension.h"
-#include "EnergyDimension.h"
-
-using namespace Dimension;
+using namespace dimension;
 using namespace std;
 
 TEST(Simplification, SimplificationWithMath) {
 
-   Length<Meters> length1(10.0);
-   Length<Feet> length2(20.0);
+   length<meters> length1(10.0);
+   length<feet> length2(20.0);
 
-   Time<Seconds> time1(5.0);
-   Time<Minutes> time2(12.0);
+   timespan<seconds> time1(5.0);
+   timespan<minutes> time2(12.0);
 
-   // This is 1.0416666667 Meters-Seconds-Seconds/Feet-Minutes
-   // Simplification occurs during division, so this resolves to just Seconds.
-   // However, Seconds in the numerator cancels Minutes in the denominator and Meters in the numerator cancels Feet in the denominator
-   // So the value should be 0.056959025955088914139 Seconds
+   // This is 1.0416666667 meters-seconds-seconds/feet-minutes
+   // Simplification occurs during division, so this resolves to just seconds.
+   // However, seconds in the numerator cancels minutes in the denominator and meters in the numerator cancels feet in the denominator
+   // So the value should be 0.056959025955088914139 seconds
    auto test = ((length1 * time1) / (length2 * time2)) * time1;
-   ASSERT_TRUE((is_same_v<decltype(test), BaseDimension<tuple<Seconds>, tuple<>>>));
+   //timespan t = ((length1 * time1) / (length2 * time2)) * time1;
+   ASSERT_TRUE((is_same_v<decltype(FullSimplify(test)), base_dimension<unit_exponent<seconds>>>));
    
-   ASSERT_NEAR((test.GetVal<std::tuple<Seconds>, std::tuple<>>()), 0.056959027777777775, TOLERANCE); // TODO: Double check precision
-   ASSERT_NEAR((getTime<Seconds>(test)), 0.056959027777777775, TOLERANCE); // TODO: Double check precision
+   ASSERT_NEAR((get_dimension_as<unit_exponent<seconds>>(test)), 0.056959027777777775, TOLERANCE); // TODO: Double check precision
+   ASSERT_NEAR((get_timespan_as<seconds>(test)), 0.056959027777777775, TOLERANCE); // TODO: Double check precision
 }
 
 TEST(Simplification, Simplification) {
 
-   // This is 10.0 (Meters-Mintues / Feet-Seconds-Minutes-Minutes)
-   auto test_before = BaseDimension<std::tuple<Meters, Minutes>, std::tuple<Seconds, Feet, Minutes>>(10.0);
-   ASSERT_TRUE((is_same_v<decltype(test_before), BaseDimension<tuple<Meters, Minutes>, tuple<Seconds, Feet, Minutes>>>));
+   // This is 10.0 (meters-Mintues / feet-seconds-minutes-minutes)
+   auto test_before = base_dimension<unit_exponent<meters>, unit_exponent<minutes>, unit_exponent<seconds, -1>, unit_exponent<feet, -1>, unit_exponent<minutes, -1>>(10.0);
+   ASSERT_TRUE((is_same_v<decltype(test_before), base_dimension<unit_exponent<meters>, unit_exponent<minutes>, unit_exponent<seconds, -1>, unit_exponent<feet, -1>, unit_exponent<minutes, -1>>>));
 
 
-   // After simplifying, Meters/Feet cancel and Minutes/Seconds cancel
-   // Note, simplification currently works left-to-right, so Minutes won't cancel with Minutes in this example
+   // After simplifying, meters/feet cancel and minutes/seconds cancel
+   // Note, simplification currently works left-to-right, so minutes won't cancel with minutes in this example
 
    // This means the final type will be a per-minutes
-   auto test_after = test_before.Simplify();
+   auto test_after = FullSimplify(test_before);
 
-   ASSERT_TRUE((is_same_v<decltype(test_after), BaseDimension<tuple<>, tuple<Minutes>>>));
-   ASSERT_NEAR((test_after.GetVal<std::tuple<>, std::tuple<Minutes>>()), 1968.504, TOLERANCE);
+   ASSERT_TRUE((is_same_v<decltype(test_after), base_dimension<unit_exponent<seconds, -1>>>));
+   ASSERT_NEAR((get_dimension_as<unit_exponent<minutes, -1>>(test_after)), 1968.504, TOLERANCE);
 }
 
-TEST(Simplification, SimplificationSpeedTypes)
+
+TEST(Simplification, SimplificationspeedTypes)
 {
-   Speed<Meters, Seconds> speed(1);
-   Time<Minutes> time(1);
+   speed<meters, seconds> s(1);
+   timespan<minutes> t(1);
 
-   Length length = speed * time;
+   length l = s * t;
 
-   ASSERT_NEAR(getLength<Meters>(length), 60.0, TOLERANCE);
+   ASSERT_NEAR(get_length_as<meters>(l), 60.0, TOLERANCE);
+
 }
+
 
 // TODO: Validate simplification resulting in unitless
 // TODO: How to handle unitless?
 
 TEST(Simplification, Validate_constexpr_behavior) {
 
-    using namespace Dimension;
+    using namespace dimension;
     using std::tuple;
     using std::cout;
     using std::endl;
 
-    constexpr BaseDimension<tuple<Meters>, tuple<>> obj1(10.0);
-    constexpr BaseDimension<tuple<Feet>, tuple<>> obj2(5.0);
+    constexpr base_dimension<unit_exponent<meters>> obj1(10.0);
+    constexpr base_dimension<unit_exponent<feet>> obj2(5.0);
 
-    static_assert(obj1.GetVal<tuple<Meters>, tuple<>>() == 10.0, "Fail");
-    static_assert(getLength<Meters>(obj1) == 10.0, "Fail");
+    static_assert(get_dimension_as<unit_exponent<meters>>(obj1) == 10.0, "Fail");
+    static_assert(get_length_as<meters>(obj1) == 10.0, "Fail");
     static_assert(obj1 > obj2, "Fail");
     static_assert(obj2 < obj1, "Fail");
 
@@ -80,23 +79,24 @@ TEST(Simplification, Validate_constexpr_behavior) {
 
     static_assert(obj3 > obj1, "Fail");
     static_assert(obj1 > obj4, "Fail");
-
-    static_assert(obj5.GetVal<tuple<Meters, Meters>, tuple<>>() > 10.0, "Fail");
-    static_assert(obj6.GetVal<tuple<>, tuple<>>() > 0.0, "Fail");
+    
+    static_assert(get_dimension_as<unit_exponent<meters, 2>>(obj5) > 10.0, "Fail");
+    static_assert(get_dimension_as<>(obj6) > 0.0, "Fail");
     static_assert(obj6 > 0.0, "Fail");
 
-    constexpr Length<Meters> obj7(15.0);
+    constexpr length<meters> obj7(15.0);
     static_assert(obj7 > obj1, "Fail");
 
-    constexpr Length obj8 = obj1;
+    constexpr length obj8 = obj1;
     static_assert(obj8 == obj1, "Fail");
 
-    constexpr Speed<Meters, Seconds> speed1(10.0);
-    static_assert(speed1.GetVal<tuple<Meters>, tuple<Seconds>>() == 10.0, "Fail");
+    constexpr speed<meters, seconds> speed1(10.0);
+    static_assert(get_dimension_as<unit_exponent<meters>, unit_exponent<seconds, -1>>(speed1) == 10.0, "Fail");
 
-    constexpr Energy<Joules> energy1(5.0);
-    constexpr Energy<KiloGrams, Meters, Meters, Seconds, Seconds> energy2(5.0);
+    constexpr energy<joules> energy1(5.0);
+    constexpr energy<kilo_grams, meters, seconds> energy2(5.0);
 
     static_assert(energy1 == energy2, "Fail");
-
+   
 }
+

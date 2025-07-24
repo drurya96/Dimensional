@@ -76,7 +76,7 @@ build:clang:
   script:
     - conan create . ${CONAN_USER_CHANNEL} --build=missing --profile clang_debug
     - cmake --workflow --preset build_and_test_linux
-    - cppcheck --enable=all,style,warning --inconclusive --suppressions-list=suppressions.txt --inline-suppr -ibuild/_deps/ --project=build/compile_commands.json --error-exitcode=1 $(find . -type d -exec printf '-I%s ' {} \;) 2> cppcheck-report.xml
+    - cppcheck --max-template-recursion=200 --enable=all,style,warning --inconclusive --suppressions-list=suppressions.txt --inline-suppr -ibuild/_deps/ --project=build/compile_commands.json --error-exitcode=1 $(find . -type d -exec printf '-I%s ' {} \;) 2> cppcheck-report.xml
   artifacts:
     paths:
       - cppcheck-report.xml

@@ -8,7 +8,7 @@
 
 #include <sstream>
 
-namespace Dimension
+namespace dimension
 {
    
    /// @brief Struct allowing strings as template parameters

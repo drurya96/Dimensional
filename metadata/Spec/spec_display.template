@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dimensional Specification</title>
+  <style>
+    body { font-family: sans-serif; margin: 2em; line-height: 1.5; }
+    summary { font-size: 1.3em; font-weight: bold; margin-top: 1em; cursor: pointer; }
+    h2 { margin-top: 2em; }
+    h3 { margin-bottom: 0.2em; }
+    .context { margin-left: 1.5em; }
+    .rule { margin-left: 2.5em; margin-bottom: 1.2em; border-left: 2px solid #ccc; padding-left: 1em; }
+    .positive { color: forestgreen; font-weight: bold; }
+    .negative { color: firebrick; font-weight: bold; }
+    .neutral  { color: gray; font-weight: bold; }
+    code { background: #f0f0f0; padding: 2px 4px; border-radius: 4px; font-family: monospace; }
+    .notes { font-size: 0.9em; color: #666; margin-top: 0.5em; }
+  </style>
+</head>
+<body>
+  <h1>Dimensional Specification</h1>
+
+  {% for domain in spec.domains %}
+  <details>
+    <summary>{{ domain.name }}</summary>
+    <div class="domain">
+      <div class="context-list">
+        {% for context in domain.contexts %}
+          <div class="context">
+            <h3>{{ context.name }}</h3>
+            <p><em>{{ context.description }}</em></p>
+
+            {% for rule in context.rules %}
+              <div class="rule">
+                <strong>{{ rule.name }}</strong>
+                {% set kind_class = 'neutral' %}
+                {% if rule.kind == 'positive_compile_time' %}
+                  {% set kind_class = 'positive' %}
+                {% elif rule.kind == 'negative_compile_time' %}
+                  {% set kind_class = 'negative' %}
+                {% endif %}
+                <div class="{{ kind_class }}">[{{ rule.kind }}]</div>
+                {% for behavior in rule.behaviors %}
+                  <p>{{ behavior }}</p>
+                {% endfor %}
+                {% if rule.notes %}
+                  <div class="notes">Note: {{ rule.notes }}</div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </details>
+  {% endfor %}
+</body>
+</html>

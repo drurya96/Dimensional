@@ -1,0 +1,37 @@
+#ifndef STATIC_DIMENSION_{{ dim.name.upper() }}_H
+#define STATIC_DIMENSION_{{ dim.name.upper() }}_H
+
+#include "Dimension_Impl/FundamentalDimensions/{{ dim.name }}_dimension_Impl.h"
+
+namespace dimension
+{
+   {% for name, unit in dim.units.items() %}
+   struct {{ name }} : public {{ dim.name }}Unit<{{ name }}, "{{ unit.name }}", "{{ unit.abbreviation }}"> {};
+   {% endfor %}
+
+   {% for name, unit in dim.units.items() %}
+   {% if name != dim.base_unit %}
+   {% set conversion = dim.base.conversions.To[name] %}
+   {% if conversion.__class__.__name__ == 'list' %}
+   template<> struct Conversion<{{ dim.base_unit }}, {{ name }}> { static constexpr PrecisionType slope = ({{ conversion[0] }}{%if 'e' not in conversion[0]|string %}.0{%endif%} / {{ conversion[1] }}{%if 'e' not in conversion[1]|string %}.0{%endif%}); };
+   {% else %}
+   template<> struct Conversion<{{ dim.base_unit }}, {{ name }}> { static constexpr PrecisionType slope = {{ conversion }}; };
+   {% endif %}
+   {% endif %}
+   {% endfor %}
+
+   {% for name, unit in dim.units.items() %}
+   {% if unit.si_prefixes %}
+   ALL_SI_PREFIXES({{ name }}, "{{ unit.abbreviation }}", {{ dim.name }}Unit);
+   {% endif %}
+   {% endfor %}
+
+}
+
+
+
+{% if dim.has_extras %}
+#include "extensions/{{ dim.name }}Extras.h"
+{% endif %}
+
+#endif //STATIC_DIMENSION_{{ dim.name.upper() }}_H

@@ -1,0 +1,48 @@
+#ifndef DIMENSIONS_H
+#define DIMENSIONS_H
+
+// Fundamental Dimensions
+#include "dimensions/fundamental/length_dimension.h"
+#include "dimensions/fundamental/mass_dimension.h"
+#include "dimensions/fundamental/amount_dimension.h"
+#include "dimensions/fundamental/angle_dimension.h"
+#include "dimensions/fundamental/charge_dimension.h"
+#include "dimensions/fundamental/timespan_dimension.h"
+#include "dimensions/fundamental/temperature_dimension.h"
+
+// Derived Dimensions
+#include "dimensions/derived/acceleration_dimension.h"
+#include "dimensions/derived/energy_dimension.h"
+#include "dimensions/derived/force_dimension.h"
+#include "dimensions/derived/molar_mass_dimension.h"
+#include "dimensions/derived/pressure_dimension.h"
+#include "dimensions/derived/speed_dimension.h"
+#include "dimensions/derived/volume_dimension.h"
+#include "dimensions/derived/area_dimension.h"
+#include "dimensions/derived/frequency_dimension.h"
+#include "dimensions/derived/momentum_dimension.h"
+#include "dimensions/derived/power_dimension.h"
+#include "dimensions/derived/current_dimension.h"
+#include "dimensions/derived/electric_potential_dimension.h"
+#include "dimensions/derived/resistance_dimension.h"
+#include "dimensions/derived/capacitance_dimension.h"
+#include "dimensions/derived/inductance_dimension.h"
+#include "dimensions/derived/magnetic_flux_dimension.h"
+#include "dimensions/derived/magnetic_field_dimension.h"
+#include "dimensions/derived/electric_field_dimension.h"
+#include "dimensions/derived/conductance_dimension.h"
+#include "dimensions/derived/entropy_dimension.h"
+#include "dimensions/derived/heat_flux_dimension.h"
+#include "dimensions/derived/specific_heat_capacity_dimension.h"
+#include "dimensions/derived/diffusion_coefficient_dimension.h"
+#include "dimensions/derived/dynamic_viscosity_dimension.h"
+#include "dimensions/derived/density_dimension.h"
+#include "dimensions/derived/volumetric_flow_rate_dimension.h"
+#include "dimensions/derived/mass_flow_rate_dimension.h"
+#include "dimensions/derived/specific_volume_dimension.h"
+#include "dimensions/derived/moment_of_inertia_dimension.h"
+#include "dimensions/derived/angular_speed_dimension.h"
+#include "dimensions/derived/angular_acceleration_dimension.h"
+#include "dimensions/derived/torque_dimension.h"
+
+#endif // DIMENSIONS_H

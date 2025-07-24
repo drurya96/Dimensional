@@ -1,117 +1,112 @@
 #include "DimensionTest.h"
 
-#include "TimeDimension.h"
-#include "LengthDimension.h"
-#include "SpeedDimension.h"
-#include "AngleDimension.h"
-
 #include <algorithm>
 
-using namespace Dimension;
-using Dimension::cos;
-using Dimension::sin;
-using Dimension::tan;
+using namespace dimension;
+using dimension::cos;
+using dimension::sin;
+using dimension::tan;
 using std::numbers::pi;
 
 // @todo Still need to verify angles outside range [0,2pi]
 
 TEST(TrigFunctions, CosTest) {
 
-   ASSERT_NEAR(cos(Angle<Radians>(pi * 2.0)), 1.0, TOLERANCE);
-   ASSERT_NEAR(cos(Angle<Radians>(pi * 1.0)), -1.0, TOLERANCE);
-   ASSERT_NEAR(cos(Angle<Radians>(pi / 2.0)), 0.0, TOLERANCE);
-   ASSERT_NEAR(cos(Angle<Radians>((3.0 * pi) / 2.0)), 0.0, TOLERANCE);
+   ASSERT_NEAR(cos(angle<radians>(pi * 2.0)), 1.0, TOLERANCE);
+   ASSERT_NEAR(cos(angle<radians>(pi * 1.0)), -1.0, TOLERANCE);
+   ASSERT_NEAR(cos(angle<radians>(pi / 2.0)), 0.0, TOLERANCE);
+   ASSERT_NEAR(cos(angle<radians>((3.0 * pi) / 2.0)), 0.0, TOLERANCE);
 
-   ASSERT_NEAR(cos(Angle<Radians>( pi / 6.0)), (std::sqrt(3.0) / 2.0), TOLERANCE);
+   ASSERT_NEAR(cos(angle<radians>( pi / 6.0)), (std::sqrt(3.0) / 2.0), TOLERANCE);
 }
 
 TEST(TrigFunctions, SinTest) {
 
-   ASSERT_NEAR(sin(Angle<Radians>(pi * 2.0)), 0.0, TOLERANCE);
-   ASSERT_NEAR(sin(Angle<Radians>(pi * 1.0)), 0.0, TOLERANCE);
-   ASSERT_NEAR(sin(Angle<Radians>(pi / 2.0)), 1.0, TOLERANCE);
-   ASSERT_NEAR(sin(Angle<Radians>((3.0 * pi) / 2.0)), -1.0, TOLERANCE);
+   ASSERT_NEAR(sin(angle<radians>(pi * 2.0)), 0.0, TOLERANCE);
+   ASSERT_NEAR(sin(angle<radians>(pi * 1.0)), 0.0, TOLERANCE);
+   ASSERT_NEAR(sin(angle<radians>(pi / 2.0)), 1.0, TOLERANCE);
+   ASSERT_NEAR(sin(angle<radians>((3.0 * pi) / 2.0)), -1.0, TOLERANCE);
 
-   ASSERT_NEAR(sin(Angle<Radians>( pi / 6.0)), 0.5, TOLERANCE);
+   ASSERT_NEAR(sin(angle<radians>( pi / 6.0)), 0.5, TOLERANCE);
 }
 
 TEST(TrigFunctions, TanTest) {
 
-   ASSERT_NEAR(tan(Angle<Radians>(pi * 0.0)), 0.0, TOLERANCE);
-   ASSERT_NEAR(tan(Angle<Radians>(pi / 4.0)), 1.0, TOLERANCE);
-   ASSERT_NEAR(tan(Angle<Radians>(3.0 * pi / 4.0)), -1.0, TOLERANCE);
+   ASSERT_NEAR(tan(angle<radians>(pi * 0.0)), 0.0, TOLERANCE);
+   ASSERT_NEAR(tan(angle<radians>(pi / 4.0)), 1.0, TOLERANCE);
+   ASSERT_NEAR(tan(angle<radians>(3.0 * pi / 4.0)), -1.0, TOLERANCE);
 
-   ASSERT_NEAR(tan(Angle<Radians>(pi / 6.0)), std::sqrt(3.0) / 3.0, TOLERANCE);
-   ASSERT_NEAR(tan(Angle<Radians>(pi / 3.0)), std::sqrt(3.0), TOLERANCE);
+   ASSERT_NEAR(tan(angle<radians>(pi / 6.0)), std::sqrt(3.0) / 3.0, TOLERANCE);
+   ASSERT_NEAR(tan(angle<radians>(pi / 3.0)), std::sqrt(3.0), TOLERANCE);
 }
 
 TEST(TrigFunctions, AcosTest) {
    
-   ASSERT_NEAR(getAngle<Radians>(Dimension::acos(1.0)), 0.0, TOLERANCE);
-   ASSERT_NEAR(getAngle<Radians>(Dimension::acos(0.0)), pi / 2.0, TOLERANCE);
-   ASSERT_NEAR(getAngle<Radians>(Dimension::acos(-1.0)), pi, TOLERANCE);
+   ASSERT_NEAR(get_angle_as<radians>(dimension::acos(1.0)), 0.0, TOLERANCE);
+   ASSERT_NEAR(get_angle_as<radians>(dimension::acos(0.0)), pi / 2.0, TOLERANCE);
+   ASSERT_NEAR(get_angle_as<radians>(dimension::acos(-1.0)), pi, TOLERANCE);
 
-   ASSERT_NEAR(getAngle<Radians>(Dimension::acos(std::sqrt(3.0) / 2.0)), pi / 6.0, TOLERANCE);
-   ASSERT_NEAR(getAngle<Radians>(Dimension::acos(0.5)), pi / 3.0, TOLERANCE);
+   ASSERT_NEAR(get_angle_as<radians>(dimension::acos(std::sqrt(3.0) / 2.0)), pi / 6.0, TOLERANCE);
+   ASSERT_NEAR(get_angle_as<radians>(dimension::acos(0.5)), pi / 3.0, TOLERANCE);
 }
 
 TEST(TrigFunctions, AsinTest) {
 
-   ASSERT_NEAR(getAngle<Radians>(Dimension::asin(0.0)), 0.0, TOLERANCE);
-   ASSERT_NEAR(getAngle<Radians>(Dimension::asin(1.0)), pi / 2.0, TOLERANCE);
-   ASSERT_NEAR(getAngle<Radians>(Dimension::asin(-1.0)), -pi / 2.0, TOLERANCE);
+   ASSERT_NEAR(get_angle_as<radians>(dimension::asin(0.0)), 0.0, TOLERANCE);
+   ASSERT_NEAR(get_angle_as<radians>(dimension::asin(1.0)), pi / 2.0, TOLERANCE);
+   ASSERT_NEAR(get_angle_as<radians>(dimension::asin(-1.0)), -pi / 2.0, TOLERANCE);
 
-   ASSERT_NEAR(getAngle<Radians>(Dimension::asin(0.5)), pi / 6.0, TOLERANCE);
-   ASSERT_NEAR(getAngle<Radians>(Dimension::asin(std::sqrt(3.0) / 2.0)), pi / 3.0, TOLERANCE);
+   ASSERT_NEAR(get_angle_as<radians>(dimension::asin(0.5)), pi / 6.0, TOLERANCE);
+   ASSERT_NEAR(get_angle_as<radians>(dimension::asin(std::sqrt(3.0) / 2.0)), pi / 3.0, TOLERANCE);
 }
 
 TEST(TrigFunctions, AtanTest) {
 
-   ASSERT_NEAR(getAngle<Radians>(Dimension::atan(0.0)), 0.0, TOLERANCE);
-   ASSERT_NEAR(getAngle<Radians>(Dimension::atan(1.0)), pi / 4.0, TOLERANCE);
-   ASSERT_NEAR(getAngle<Radians>(Dimension::atan(-1.0)), -pi / 4.0, TOLERANCE);
+   ASSERT_NEAR(get_angle_as<radians>(dimension::atan(0.0)), 0.0, TOLERANCE);
+   ASSERT_NEAR(get_angle_as<radians>(dimension::atan(1.0)), pi / 4.0, TOLERANCE);
+   ASSERT_NEAR(get_angle_as<radians>(dimension::atan(-1.0)), -pi / 4.0, TOLERANCE);
 
-   ASSERT_NEAR(getAngle<Radians>(Dimension::atan(std::sqrt(3.0))), pi / 3.0, TOLERANCE);
-   ASSERT_NEAR(getAngle<Radians>(Dimension::atan(1.0 / std::sqrt(3.0))), pi / 6.0, TOLERANCE);
+   ASSERT_NEAR(get_angle_as<radians>(dimension::atan(std::sqrt(3.0))), pi / 3.0, TOLERANCE);
+   ASSERT_NEAR(get_angle_as<radians>(dimension::atan(1.0 / std::sqrt(3.0))), pi / 6.0, TOLERANCE);
 }
 
 TEST(TrigFunctions, Atan2Test) {
 
-   ASSERT_NEAR(getAngle<Radians>(Dimension::atan2(Length<Meters>(0.0), Length<Meters>(1.0))), 0.0, TOLERANCE);
-   ASSERT_NEAR(getAngle<Radians>(Dimension::atan2(Length<Meters>(1.0), Length<Meters>(0.0))), pi / 2.0, TOLERANCE);
-   ASSERT_NEAR(getAngle<Radians>(Dimension::atan2(Length<Meters>(-1.0), Length<Meters>(0.0))), -pi / 2.0, TOLERANCE);
-   ASSERT_NEAR(getAngle<Radians>(Dimension::atan2(Length<Meters>(0.0), Length<Meters>(-1.0))), pi, TOLERANCE);
-   ASSERT_NEAR(getAngle<Radians>(Dimension::atan2(Length<Meters>(1.0), Length<Meters>(1.0))), pi / 4.0, TOLERANCE);
-   ASSERT_NEAR(getAngle<Radians>(Dimension::atan2(Length<Meters>(-1.0), Length<Meters>(-1.0))), -3.0 * pi / 4.0, TOLERANCE);
+   ASSERT_NEAR(get_angle_as<radians>(dimension::atan2(length<meters>(0.0), length<meters>(1.0))), 0.0, TOLERANCE);
+   ASSERT_NEAR(get_angle_as<radians>(dimension::atan2(length<meters>(1.0), length<meters>(0.0))), pi / 2.0, TOLERANCE);
+   ASSERT_NEAR(get_angle_as<radians>(dimension::atan2(length<meters>(-1.0), length<meters>(0.0))), -pi / 2.0, TOLERANCE);
+   ASSERT_NEAR(get_angle_as<radians>(dimension::atan2(length<meters>(0.0), length<meters>(-1.0))), pi, TOLERANCE);
+   ASSERT_NEAR(get_angle_as<radians>(dimension::atan2(length<meters>(1.0), length<meters>(1.0))), pi / 4.0, TOLERANCE);
+   ASSERT_NEAR(get_angle_as<radians>(dimension::atan2(length<meters>(-1.0), length<meters>(-1.0))), -3.0 * pi / 4.0, TOLERANCE);
 
-   // Ensure resolution of BaseDimension to named dimensions work
-   ASSERT_NEAR(getAngle<Radians>(Dimension::atan2(Length<Meters>(0.0), BaseDimension<std::tuple<Meters>, std::tuple<>>(1.0))), 0.0, TOLERANCE);
+   // Ensure resolution of base_dimension to named dimensions work
+   ASSERT_NEAR(get_angle_as<radians>(dimension::atan2(length<meters>(0.0), base_dimension_impl<double, unit_exponent<meters>>(1.0))), 0.0, TOLERANCE);
 }
 
 TEST(TrigFunctions, HypotTest) {
 
    // Simple cases
-   ASSERT_NEAR(getLength<Meters>((hypot(Length<Meters>(3.0), Length<Meters>(4.0)))), 5.0, TOLERANCE);
-   ASSERT_NEAR(getLength<Meters>((hypot(Length<Meters>(5.0), Length<Meters>(12.0)))), 13.0, TOLERANCE);
+   ASSERT_NEAR(get_length_as<meters>((hypot(length<meters>(3.0), length<meters>(4.0)))), 5.0, TOLERANCE);
+   ASSERT_NEAR(get_length_as<meters>((hypot(length<meters>(5.0), length<meters>(12.0)))), 13.0, TOLERANCE);
    
    // Test when one side is zero
-   ASSERT_NEAR(getLength<Meters>((hypot(Length<Meters>(0.0), Length<Meters>(5.0)))), 5.0, TOLERANCE);
-   ASSERT_NEAR(getLength<Meters>((hypot(Length<Meters>(7.0), Length<Meters>(0.0)))), 7.0, TOLERANCE);
+   ASSERT_NEAR(get_length_as<meters>((hypot(length<meters>(0.0), length<meters>(5.0)))), 5.0, TOLERANCE);
+   ASSERT_NEAR(get_length_as<meters>((hypot(length<meters>(7.0), length<meters>(0.0)))), 7.0, TOLERANCE);
 
    // Testing small floating-point values
-   ASSERT_NEAR(getLength<Meters>((hypot(Length<Meters>(1e-10), Length<Meters>(1e-10)))), std::sqrt(2) * 1e-10, TOLERANCE);
+   ASSERT_NEAR(get_length_as<meters>((hypot(length<meters>(1e-10), length<meters>(1e-10)))), std::sqrt(2) * 1e-10, TOLERANCE);
 
    // Testing larger values to verify stability
-   ASSERT_NEAR(getLength<Meters>((hypot(Length<Meters>(1e10), Length<Meters>(1e10)))), std::sqrt(2.0) * 1e10, TOLERANCE);
+   ASSERT_NEAR(get_length_as<meters>((hypot(length<meters>(1e10), length<meters>(1e10)))), std::sqrt(2.0) * 1e10, TOLERANCE);
 
    // Diagonal distance in a unit square (1-1 sqrt(2) triangle)
-   ASSERT_NEAR(getLength<Meters>((hypot(Length<Meters>(1.0), Length<Meters>(1.0)))), std::sqrt(2.0), TOLERANCE);
+   ASSERT_NEAR(get_length_as<meters>((hypot(length<meters>(1.0), length<meters>(1.0)))), std::sqrt(2.0), TOLERANCE);
 
    // Test negative values (hypot treats negative values as positive)
-   ASSERT_NEAR(getLength<Meters>((hypot(Length<Meters>(-3.0), Length<Meters>(4.0)))), 5.0, TOLERANCE);
-   ASSERT_NEAR(getLength<Meters>((hypot(Length<Meters>(5.0), Length<Meters>(-12.0)))), 13.0, TOLERANCE); 
+   ASSERT_NEAR(get_length_as<meters>((hypot(length<meters>(-3.0), length<meters>(4.0)))), 5.0, TOLERANCE);
+   ASSERT_NEAR(get_length_as<meters>((hypot(length<meters>(5.0), length<meters>(-12.0)))), 13.0, TOLERANCE); 
 
    // Test for very large differences in magnitude
-   ASSERT_NEAR(getLength<Meters>((hypot(Length<Meters>(1e10), Length<Meters>(1.0)))), 1e10, TOLERANCE);
+   ASSERT_NEAR(get_length_as<meters>((hypot(length<meters>(1e10), length<meters>(1.0)))), 1e10, TOLERANCE);
    
 }

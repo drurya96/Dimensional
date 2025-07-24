@@ -1,46 +1,83 @@
 #ifndef DIMENSION_STREAM_H
 #define DIMENSION_STREAM_H
 
-#include "TupleHandling.h"
-
+#include <concepts>
 #include <iostream>
 #include <string>
 #include <sstream>
 
-namespace Dimension
+#include "TupleHandling.h"
+#include "base_dimension_signature.h"
+
+namespace dimension
 {
-
-   // Forward declare dimension and unit
-   template<typename Unit, StringLiteral Name, StringLiteral Abbreviation, StringLiteral DimName, int UnitID>
-   struct BaseUnit;
-
-   template<typename NumTupleT, typename DenTupleT>
-   requires IsUnitTuplePair<NumTupleT, DenTupleT>
-   class BaseDimension;
-
-   /// @brief Type of string to print
-   enum class UnitNameTypes{Name, Abbr, DimName};
-
-   /// @brief Update stream using a string associated with each type in a tuple
-   /// @tparam StreamType Type of stream
-   /// @tparam TupleType Tuple to stream
-   /// @tparam Member Type of string to stream
-   /// @tparam ...Indices Indecies in the tuple
-   /// @param [out] stream Stream to update
-   /// @param [in] delim Delimiter to use between strings
-   template <typename StreamType, typename TupleType, UnitNameTypes Member, std::size_t... Indices>
-   void streamMember(StreamType& stream, std::index_sequence<Indices...>, const std::string& delim) {
-      ((stream << (Indices == 0 ? "" : delim), 
-         [&]() {
-            if constexpr (Member == UnitNameTypes::Name) {
-               stream << type_from_quantity_or_delta<std::tuple_element_t<Indices, TupleType>>::type::name;
-            } else if constexpr (Member == UnitNameTypes::Abbr) {
-               stream << type_from_quantity_or_delta<std::tuple_element_t<Indices, TupleType>>::type::abbr;
-            } else if constexpr (Member == UnitNameTypes::DimName) {
-               stream << type_from_quantity_or_delta<std::tuple_element_t<Indices, TupleType>>::type::dimName;
-            }
-         }()), ...);
+   // pretty-print one std::ratio
+   template<typename Stream, typename R>
+   constexpr void stream_ratio(Stream& os)
+   {
+      if constexpr (R::den == 1)
+         os << R::num;                         //  n
+      else
+         os << '(' << R::num << '/' << R::den << ')';   // (n/d)
    }
+
+   // write one unit_exponent<U,Num,Den>
+   template<typename Stream, typename UE>
+   constexpr void stream_one_unit(Stream& os)
+   {
+      using Unit     = typename UE::unit;
+      using Exponent = typename UE::exponent;   // std::ratio<Num,Den>
+
+      os << Unit::abbr;                         // "m", "s", …
+
+      // omit "^1"
+      if constexpr (!(Exponent::num == 1 && Exponent::den == 1))
+      {
+         os << '^';
+         stream_ratio<Stream, Exponent>(os);
+      }
+   }
+
+   //--------------------------------------------------------------------------
+   //  main entry – variadic pack
+   //--------------------------------------------------------------------------
+
+   template<typename Stream, typename... Units>
+   constexpr void stream_units(Stream& os)
+   {
+      bool first = true;
+
+      ((
+         // This condition is NOT always known, its updated inside the fold expression.
+         // cppcheck can't detect that.
+         // cppcheck-suppress knownConditionTrueFalse
+         first ? static_cast<void>(first = false)          // first element
+               : static_cast<void>(os << " * "),           // later elements
+         stream_one_unit<Stream, Units>(os)                // print the unit
+      ), ...);                                              // fold over pack
+   }
+
+
+   template<typename Stream, typename Tuple>
+   struct _stream_units_tuple_impl;                          // primary
+
+   template<typename Stream, typename... Units>
+   struct _stream_units_tuple_impl<Stream, std::tuple<Units...>>
+   {
+      static constexpr void apply(Stream& os)
+      {
+         stream_units<Stream, Units...>(os);        // reuse the pack fn
+      }
+   };
+
+   // convenience helper -----------------------------------------------
+   template<typename Stream, typename Tuple>
+   constexpr void stream_units_tuple(Stream& os)
+   {
+      _stream_units_tuple_impl<Stream, Tuple>::apply(os);
+   }
+
+
 
    /// @brief Write dimension object to stream
    /// @tparam NumTuple Numerator unit tuple
@@ -48,35 +85,16 @@ namespace Dimension
    /// @param os stream to write to
    /// @param obj object to write
    /// @return reference to stream written
-   template<typename NumTupleT, typename DenTupleT>
-   std::ostream& to_stream(std::ostream& os, const BaseDimension<NumTupleT, DenTupleT>& obj)
+   template<is_base_dimension Dim>
+   std::ostream& to_stream(std::ostream& os, const Dim& obj)
    {
-      using NumTuple = BaseDimension<NumTupleT, DenTupleT>::NumTuple;
-      using DenTuple = BaseDimension<NumTupleT, DenTupleT>::DenTuple;
+      //using NumTuple = base_dimension<NumTupleT, DenTupleT>::NumTuple;
+      //using DenTuple = base_dimension<NumTupleT, DenTupleT>::DenTuple;
+      using units = typename Dim::units;
 
-      os << obj.template GetVal<NumTuple, DenTuple>() << " [";
+      os << get_dimension_tuple<units>(obj) << " [";
 
-      if constexpr(std::tuple_size_v<NumTuple> == 1)
-      {
-         os << type_from_quantity_or_delta<std::tuple_element_t<0, NumTuple>>::type::abbr;
-      }
-      else if constexpr(std::tuple_size_v<NumTuple> > 1)
-      {
-         os << "(";
-         streamMember<std::ostream, NumTuple, UnitNameTypes::Abbr>(os, std::make_index_sequence<std::tuple_size_v<NumTuple>>{}, "*");
-         os << ")";
-      }
-
-      if constexpr(std::tuple_size_v<DenTuple> == 1)
-      {
-         os << " / " << type_from_quantity_or_delta<std::tuple_element_t<0, DenTuple>>::type::abbr;
-      }
-      else if constexpr(std::tuple_size_v<DenTuple> > 1)
-      {
-         os << " / (";
-         streamMember<std::ostream, DenTuple, UnitNameTypes::Abbr>(os, std::make_index_sequence<std::tuple_size_v<DenTuple>>{}, "*");
-         os << ")";
-      }
+      stream_units_tuple<std::ostream, units>(os);
 
       os << "]";
 
@@ -88,22 +106,22 @@ namespace Dimension
    /// @tparam DenTuple Denominator unit tuple
    /// @param obj Dimension object to write
    /// @return string representation of object
-   template<typename NumTuple, typename DenTuple>
-   std::string to_string(const BaseDimension<NumTuple, DenTuple>& obj)
+   template<is_base_dimension Dim>
+   std::string to_string(const Dim& obj)
    {
       std::ostringstream os;
       to_stream(os, obj);
       return os.str();
    }
 
-   /// @brief Stream operator from BaseDimension to ostream
+   /// @brief Stream operator from base_dimension to ostream
    /// @tparam NumTuple Numerator tuple
    /// @tparam DenTuple Denominator tuple
    /// @param os stream object
    /// @param obj dimension object
    /// @return reference to stream object
-   template<typename NumTuple, typename DenTuple>
-   std::ostream& operator<<(std::ostream& os, const BaseDimension<NumTuple, DenTuple>& obj)
+   template<is_base_dimension Dim>
+   std::ostream& operator<<(std::ostream& os, const Dim& obj)
    {
       return to_stream(os, obj);
    }

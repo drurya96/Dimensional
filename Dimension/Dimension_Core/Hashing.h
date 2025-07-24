@@ -5,7 +5,7 @@
 
 #include "StringLiteral.h"
 
-namespace Dimension
+namespace dimension
 {
 
    /// @brief Wrapper for tags to allow return of void types
@@ -76,20 +76,15 @@ namespace Dimension
    /// @tparam NumTuple Numerator tuple
    /// @tparam DenTuple Denominator tuple
    /// @tparam HashPolicy Policy providing a hash_string_literal method for hashing
-   template <typename NumTuple, typename DenTuple, typename HashPolicy>
+   template <is_base_dimension Dim, typename HashPolicy>
    struct TypeTagHelper 
    {
-      using SortedNumTuple = tuple_bubble_sort<NumTuple>::type;
-      using SortedDenTuple = tuple_bubble_sort<DenTuple>::type;
-
-      static constexpr auto NumTupleString = TupleStringConcat<SortedNumTuple>::value();
-      static constexpr auto DenTupleString = TupleStringConcat<SortedDenTuple>::value();
-
-      static constexpr auto FullString = concat(NumTupleString, DenTupleString);
+      using SortedTuple = tuple_bubble_sort<typename InitialSimplifier<typename Dim::units>::units>::type;
+      static constexpr auto TupleString = TupleStringConcat<SortedTuple>::value();
 
       static constexpr HashPolicy::tag_type value()
       {
-         return HashPolicy::template hash_string_literal(FullString);
+         return HashPolicy::template hash_string_literal(TupleString);
       }
    };
 
