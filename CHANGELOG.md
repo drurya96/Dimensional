@@ -17,7 +17,7 @@ All notable changes to this project will be documented in this file. Semantic ve
 - 
 
 ### Fixed
-- Fixed `operator<` for `StringLiteral` to specify `size_t` as the type for `std::min`
+- Fixed `operator<` for `string_literal` to specify `size_t` as the type for `std::min`
 
 ## [2.6.1] - 2025-2-3
 
@@ -117,7 +117,7 @@ All notable changes to this project will be documented in this file. Semantic ve
 - Streaming operator to `ostream`
 - Serialization/Deserialization
 - Documentation for Contributing, Usage, Extension, and Serialization
-- `StringLiteral` type and methods for handling string-like types at compile-time
+- `string_literal` type and methods for handling string-like types at compile-time
 
 ### Deprecated
 - 

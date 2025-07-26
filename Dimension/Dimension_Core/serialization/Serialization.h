@@ -4,7 +4,10 @@
 #include <cstring>
 #include <vector>
 
-#include "StringLiteral.h"
+#include "../internal_temp/strings/string_literal.h"
+#include "../internal_temp/strings/string_concat.h"
+#include "../internal_temp/strings/string_numeric.h"
+
 #include "SerializationPolicies.h"
 
 

@@ -5,8 +5,11 @@
 #include <concepts>
 #include <vector>
 
-#include "StringLiteral.h"
-#include "base_dimension_signature.h"
+#include "../internal_temp/strings/string_literal.h"
+#include "../internal_temp/strings/string_concat.h"
+#include "../internal_temp/strings/string_numeric.h"
+
+#include "../internal_temp/base_dimension_signature.h"
 
 namespace dimension
 {

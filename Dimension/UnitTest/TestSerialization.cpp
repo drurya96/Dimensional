@@ -1,6 +1,6 @@
 #include "DimensionTest.h"
 
-#include "Dimension_Core/Stream.h"
+#include "Dimension_Core/streaming/Stream.h"
 
 #include <iostream>
 #include <sstream>

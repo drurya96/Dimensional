@@ -25,7 +25,7 @@ namespace dimension
    /// @tparam Unit The unit type.
    /// @tparam Name The name of the unit.
    /// @tparam Abbreviation The abbreviation of the unit.
-   template<typename Unit, StringLiteral Name, StringLiteral Abbreviation, int ID = 0>
+   template<typename Unit, string_literal Name, string_literal Abbreviation, int ID = 0>
    struct chargeUnit : public BaseUnit<Unit, Name, Abbreviation, "charge", ID>
    {
    public:

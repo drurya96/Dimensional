@@ -11,32 +11,34 @@
 #include <limits>
 #include <utility>
 
-#include "Dimension_Core/PrecisionType.h"
-#include "Dimension_Core/UnitValidation.h"
-#include "Dimension_Core/UnitSimplifier.h"
-#include "Dimension_Core/FundamentalUnitExtractor.h"
-#include "Dimension_Core/Conversion.h"
-#include "Dimension_Core/SI_Macro.h"
-#include "Dimension_Core/Hashing.h"
-#include "Dimension_Core/StringLiteral.h"
-#include "Dimension_Core/Stream.h"
-#include "Dimension_Core/Serialization.h"
-#include "Dimension_Core/base_dimension_signature.h"
-#include "Dimension_Core/Coefficient.h"
+#include "Dimension_Core/internal_temp/PrecisionType.h"
+#include "Dimension_Core/internal_temp/UnitValidation.h"
+#include "Dimension_Core/internal_temp/UnitSimplifier.h"
+#include "Dimension_Core/internal_temp/FundamentalUnitExtractor.h"
+#include "Dimension_Core/internal_temp/Conversion.h"
+#include "Dimension_Core/internal_temp/SI_Macro.h"
+#include "Dimension_Core/serialization/Hashing.h"
+#include "Dimension_Core/internal_temp/strings/string_literal.h"
+#include "Dimension_Core/internal_temp/strings/string_concat.h"
+#include "Dimension_Core/internal_temp/strings/string_numeric.h"
+#include "Dimension_Core/streaming/Stream.h"
+#include "Dimension_Core/serialization/Serialization.h"
+#include "Dimension_Core/internal_temp/base_dimension_signature.h"
+#include "Dimension_Core/internal_temp/Coefficient.h"
 
-#include "Dimension_Core/Point.h"
+#include "Dimension_Core/internal_temp/point.h"
 
 namespace dimension
 {
 
-   static constexpr StringLiteral<3> delim = "::"; // Size three due to null terminator
+   static constexpr string_literal<3> delim = "::"; // Size three due to null terminator
 
    struct FundamentalUnitTag {};
 
    /// @brief A base class representing a unit
    /// @details This abstract class represents a Unit,
    ///    such as meters, seconds, Grams, etc.
-   template<typename Unit, StringLiteral Name, StringLiteral Abbreviation, StringLiteral DimName, int UnitID = 0>
+   template<typename Unit, string_literal Name, string_literal Abbreviation, string_literal DimName, int UnitID = 0>
    struct BaseUnit : FundamentalUnitTag
    {
    public:
@@ -56,12 +58,12 @@ namespace dimension
       ///    into one dimension will prevent them from canelling out.
       constexpr static int ID = UnitID;
 
-      static constexpr StringLiteral<Name.size> name = Name;
-      static constexpr StringLiteral<Abbreviation.size> abbr = Abbreviation;
-      static constexpr StringLiteral<DimName.size> dimName = DimName;
+      static constexpr string_literal<Name.size> name = Name;
+      static constexpr string_literal<Abbreviation.size> abbr = Abbreviation;
+      static constexpr string_literal<DimName.size> dimName = DimName;
 
-      static constexpr StringLiteral<DimName.size + delim.size - 1> intermediate = concat(dimName, delim); // size - 1 to account for removed null terminator from first param
-      static constexpr StringLiteral<intermediate.size + name.size - 1> qualifiedName = concat(intermediate, name); // size - 1 to account for removed null terminator from first param
+      static constexpr string_literal<DimName.size + delim.size - 1> intermediate = concat(dimName, delim); // size - 1 to account for removed null terminator from first param
+      static constexpr string_literal<intermediate.size + name.size - 1> qualifiedName = concat(intermediate, name); // size - 1 to account for removed null terminator from first param
 
       using name_type = decltype(Name);
       using abbr_type = decltype(Abbreviation);

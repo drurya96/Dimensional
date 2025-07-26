@@ -6,8 +6,8 @@
 #include <string>
 #include <sstream>
 
-#include "TupleHandling.h"
-#include "base_dimension_signature.h"
+#include "../internal_temp/TupleHandling.h"
+#include "../internal_temp/base_dimension_signature.h"
 
 namespace dimension
 {

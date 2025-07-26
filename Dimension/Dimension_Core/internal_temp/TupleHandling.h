@@ -5,7 +5,9 @@
 #include <type_traits> // For std::is_same, std::remove_cv, std::disjunction, std::conditional
 #include <utility> // For std::declval
 
-#include "StringLiteral.h"
+#include "strings/string_literal.h"
+#include "strings/string_concat.h"
+#include "strings/string_numeric.h"
 
 namespace dimension
 {

@@ -41,7 +41,7 @@ namespace dimension
 
       using units = std::tuple<unit_exponent<NonBaseUnit>>;
 
-      static constexpr StringLiteral<12> qualifiedName = "NonBaseUnit"; // Size three due to null terminator
+      static constexpr string_literal<12> qualifiedName = "NonBaseUnit"; // Size three due to null terminator
 
       // cppcheck-suppress unusedStructMember
       constexpr static int ID = 0;

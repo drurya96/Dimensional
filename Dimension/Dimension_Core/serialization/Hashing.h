@@ -3,7 +3,9 @@
 
 #include <cstdint> // for std::uint#_t
 
-#include "StringLiteral.h"
+#include "../internal_temp/strings/string_literal.h"
+#include "../internal_temp/strings/string_concat.h"
+#include "../internal_temp/strings/string_numeric.h"
 
 namespace dimension
 {
@@ -42,9 +44,9 @@ namespace dimension
 
       static constexpr size_t tag_size = tag_type::size;
 
-      // FNV-1a hash function for `StringLiteral`
+      // FNV-1a hash function for `string_literal`
       template <std::size_t N>
-      static constexpr tag_type hash_string_literal(const StringLiteral<N>&) { return tag_type(); } // unused parameter for no-op signature consistency
+      static constexpr tag_type hash_string_literal(const string_literal<N>&) { return tag_type(); } // unused parameter for no-op signature consistency
    };
 
    /// @brief Hashing policy using FNV-1a algorithm resulting in 32-bit tag
@@ -56,9 +58,9 @@ namespace dimension
 
       static constexpr size_t tag_size = tag_type::size;
 
-      // FNV-1a hash function for `StringLiteral`
+      // FNV-1a hash function for `string_literal`
       template <std::size_t N>
-      static constexpr tag_type hash_string_literal(const StringLiteral<N>& str)
+      static constexpr tag_type hash_string_literal(const string_literal<N>& str)
       {
          std::uint32_t hash = 0x811C9DC5;
          for (char c : str.value)
