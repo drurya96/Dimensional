@@ -11,18 +11,20 @@
 #include <limits>
 #include <utility>
 
+#include "Dimension_Core/internal_temp/uuid.h"
 #include "Dimension_Core/internal_temp/PrecisionType.h"
 #include "Dimension_Core/internal_temp/UnitValidation.h"
 #include "Dimension_Core/internal_temp/UnitSimplifier.h"
 #include "Dimension_Core/internal_temp/FundamentalUnitExtractor.h"
 #include "Dimension_Core/internal_temp/Conversion.h"
 #include "Dimension_Core/internal_temp/SI_Macro.h"
-#include "Dimension_Core/serialization/Hashing.h"
 #include "Dimension_Core/internal_temp/strings/string_literal.h"
 #include "Dimension_Core/internal_temp/strings/string_concat.h"
 #include "Dimension_Core/internal_temp/strings/string_numeric.h"
 #include "Dimension_Core/streaming/Stream.h"
 #include "Dimension_Core/serialization/Serialization.h"
+#include "Dimension_Core/serialization/exact_tag_policy.h"
+#include "Dimension_Core/serialization/raw_value_policy.h"
 #include "Dimension_Core/internal_temp/base_dimension_signature.h"
 #include "Dimension_Core/internal_temp/Coefficient.h"
 
@@ -57,6 +59,8 @@ namespace dimension
       ///    This means, creating units with different IDs and combining them
       ///    into one dimension will prevent them from canelling out.
       constexpr static int ID = UnitID;
+
+      constexpr static auto uuid = detail::uuid128_of(DimName);
 
       static constexpr string_literal<Name.size> name = Name;
       static constexpr string_literal<Abbreviation.size> abbr = Abbreviation;
