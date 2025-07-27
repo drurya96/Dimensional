@@ -58,7 +58,7 @@ namespace dimension
    struct FundamentalUnitTag;
 
    // TODO: MOVE THIS
-   template<typename Unit, int Num = 1, int Den = 1, bool isQuantity = delta>
+   template<typename Unit, int Num = 1, int Den = 1>
    struct unit_exponent
    {
       using unit = Unit;
@@ -81,9 +81,34 @@ namespace dimension
       //static constexpr string_literal<test.size + exponentString.size - 1> qualifiedName = concat(test, exponentString); // size - 1 to account for removed null terminator from first param
 
       static constexpr auto qualifiedName = concat(unit_qname, delim, exponentString);
-
-      static constexpr bool quantity = isQuantity;
    };
+
+   // ───────────────────────────── helper: map one unit_exponent ─────────────────────────────
+   template<typename UE> struct to_primary_ue;                 // primary template
+
+   template<typename U, int Num, int Den>                     // specialization
+   struct to_primary_ue<unit_exponent<U, Num, Den>>
+   {
+      using type = unit_exponent<typename U::Primary, Num, Den>;
+   };
+
+   template<typename UE>
+   using to_primary_ue_t = typename to_primary_ue<UE>::type;
+
+   // ───────────────────────────── helper: map a whole std::tuple ────────────────────────────
+   template<typename Tuple> struct to_primary_tuple;           // primary template
+
+   template<typename... UE>
+   struct to_primary_tuple<std::tuple<UE...>>
+   {
+      using type = std::tuple<to_primary_ue_t<UE>...>;
+   };
+
+   template<typename Tuple>
+   using to_primary_tuple_t = typename to_primary_tuple<Tuple>::type;
+
+
+
 
    template <typename> struct is_tuple: std::false_type {};
 

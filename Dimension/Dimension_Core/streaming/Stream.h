@@ -107,6 +107,7 @@ namespace dimension
    /// @param obj Dimension object to write
    /// @return string representation of object
    template<is_base_dimension Dim>
+   [[maybe_unused]]
    std::string to_string(const Dim& obj)
    {
       std::ostringstream os;
