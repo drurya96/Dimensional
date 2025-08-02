@@ -4,13 +4,13 @@
 namespace dimension
 {
    template<typename angleUnit>
-   PrecisionType cos(angle<angleUnit> angle) { return std::cos(get_angle_as<radians>(angle)); }
+   double cos(angle<angleUnit> angle) { return std::cos(get_angle_as<radians>(angle)); }
 
    template<typename angleUnit>
-   PrecisionType sin(angle<angleUnit> angle) { return std::sin(get_angle_as<radians>(angle)); }
+   double sin(angle<angleUnit> angle) { return std::sin(get_angle_as<radians>(angle)); }
 
    template<typename angleUnit>
-   PrecisionType tan(angle<angleUnit> angle) { return std::tan(get_angle_as<radians>(angle)); }
+   double tan(angle<angleUnit> angle) { return std::tan(get_angle_as<radians>(angle)); }
 
    static_assert( is_angle_unit<radians>, "radians must satisfy is_angle_unit" ); // Passes
    using __force_instantiation = angle<radians>;

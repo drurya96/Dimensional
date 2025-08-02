@@ -15,14 +15,14 @@ namespace dimension
    struct long_ton : public massUnit<long_ton, "Long Ton", "LT"> {};
    struct tonne : public massUnit<tonne, "Tonne", "t"> {};
 
-   template<> struct Conversion<grams, pound_mass> { static constexpr PrecisionType slope = (100000.0 / 45359237.0); };
-   template<> struct Conversion<grams, ounces> { static constexpr PrecisionType slope = (1600000.0 / 45359237.0); };
-   template<> struct Conversion<grams, slugs> { static constexpr PrecisionType slope = (609600000.0 / 8896443230521.0); };
-   template<> struct Conversion<grams, grains> { static constexpr PrecisionType slope = (100000000.0 / 6479891.0); };
-   template<> struct Conversion<grams, stone> { static constexpr PrecisionType slope = (50000.0 / 317514659.0); };
-   template<> struct Conversion<grams, short_ton> { static constexpr PrecisionType slope = (50.0 / 45359237.0); };
-   template<> struct Conversion<grams, long_ton> { static constexpr PrecisionType slope = (625.0 / 635029318.0); };
-   template<> struct Conversion<grams, tonne> { static constexpr PrecisionType slope = 1e-06; };
+   template<> struct Conversion<grams, pound_mass> { static constexpr double slope = (100000.0 / 45359237.0); };
+   template<> struct Conversion<grams, ounces> { static constexpr double slope = (1600000.0 / 45359237.0); };
+   template<> struct Conversion<grams, slugs> { static constexpr double slope = (609600000.0 / 8896443230521.0); };
+   template<> struct Conversion<grams, grains> { static constexpr double slope = (100000000.0 / 6479891.0); };
+   template<> struct Conversion<grams, stone> { static constexpr double slope = (50000.0 / 317514659.0); };
+   template<> struct Conversion<grams, short_ton> { static constexpr double slope = (50.0 / 45359237.0); };
+   template<> struct Conversion<grams, long_ton> { static constexpr double slope = (625.0 / 635029318.0); };
+   template<> struct Conversion<grams, tonne> { static constexpr double slope = 1e-06; };
 
    ALL_SI_PREFIXES(grams, "g", massUnit);
 

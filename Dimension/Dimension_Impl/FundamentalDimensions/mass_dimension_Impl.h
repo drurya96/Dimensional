@@ -4,7 +4,8 @@
 #include <type_traits>
 #include <tuple>
 
-#include "../../base_dimension.h"
+#include "../../base_unit.h"
+#include "../../base_dimension_impl.h"
 
 namespace dimension
 {
@@ -49,8 +50,8 @@ namespace dimension
    /// @tparam T The unit type.
    /// @param obj The mass object.
    /// @return The value in the specified unit.
-   template<is_mass_unit T>
-   constexpr PrecisionType get_mass_as(/*mass_type*/ auto obj)
+   template<is_mass_unit T, is_mass DimType>
+   constexpr DimType::rep get_mass_as(DimType obj)
    {
       return get_dimension_as<unit_exponent<T>>(obj);
    }

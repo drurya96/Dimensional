@@ -8,7 +8,7 @@ namespace dimension
    struct radians : public angleUnit<radians, "radians", "rad"> {};
    struct degrees : public angleUnit<degrees, "Degrees", "deg"> {};
 
-   template<> struct Conversion<radians, degrees> { static constexpr PrecisionType slope = 57.2958; };
+   template<> struct Conversion<radians, degrees> { static constexpr double slope = 57.2958; };
 
 
 }

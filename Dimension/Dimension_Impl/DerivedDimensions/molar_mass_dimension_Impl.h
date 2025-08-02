@@ -1,9 +1,12 @@
 #ifndef STATIC_DIMENSION_MOLAR_MASS_IMPL_H
 #define STATIC_DIMENSION_MOLAR_MASS_IMPL_H
 
-#include "../../base_dimension.h"
+#include "../../base_unit.h"
+#include "../../base_dimension_impl.h"
 #include "../../dimensions/fundamental/mass_dimension.h"
 #include "../../dimensions/fundamental/amount_dimension.h"
+
+#include "../../Dimension_Core/internal_temp/utils.h"
 
 
 namespace dimension
@@ -36,25 +39,28 @@ namespace dimension
    };
 
    /// @brief Concept to verify a dimension can be treated as a molar_mass type
-   template<typename T>
-   concept is_molar_mass = std::is_convertible_v<T, base_dimension<
+   template<typename T, typename Rep>
+   concept is_molar_mass_as = matching_dimension<T, Rep,
       unit_exponent<primary_mass, 1>, 
       unit_exponent<primary_amount, -1>
-   >>;
+   >;
+
+   template<typename T>
+   concept is_molar_mass = is_molar_mass_as<T, double>;
 
    /// @brief Retrieves the value of a molar_mass object with specific units
    /// @tparam massUnit The mass unit used for all mass components of molar_mass
    /// @tparam amountUnit The amount unit used for all amount components of molar_mass
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
-   /// @return The raw value in terms of template units as a PrecisionType
+   /// @return The raw value in terms of template units as the representative type of DimType
    template<
       is_mass_unit massUnit,
       is_amount_unit amountUnit,
       is_molar_mass DimType>
    // TODO: Unit test this and remove suppression
    [[maybe_unused]]
-   constexpr PrecisionType get_molar_mass_as(const DimType& obj)
+   constexpr DimType::rep get_molar_mass_as(const DimType& obj)
    {
       return get_dimension_as<
          unit_exponent<massUnit, 1>,
@@ -66,10 +72,10 @@ namespace dimension
    /// @tparam Named The named unit to extract in terms of
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
-   /// @return The raw value in terms of template units as a PrecisionType
+   /// @return The raw value in terms of template units as the representative type of DimType
    template<IsNamedmolar_massUnit Named, is_molar_mass DimType>
    // TODO: Unit test this and remove suppression
-   constexpr PrecisionType get_molar_mass_as(const DimType& obj)
+   constexpr DimType::rep get_molar_mass_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
@@ -89,14 +95,14 @@ namespace dimension
       T0,
       T1
    >
-   class molar_mass<T0, T1, Cs...> : public base_dimension<double,
+   class molar_mass<T0, T1, Cs...> : public base_dimension_impl<double,
       unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
       unit_exponent<typename Extractor<amountType, T0, T1>::type, -1>,
       Cs...
    >
    {
    public:
-      using Base = base_dimension<double,
+      using Base = base_dimension_impl<double,
          unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
          unit_exponent<typename Extractor<amountType, T0, T1>::type, -1>,
          Cs...
@@ -123,14 +129,14 @@ namespace dimension
       T0,
       T1
    >
-   class molar_mass<Rep, T0, T1, Cs...> : public base_dimension<Rep,
+   class molar_mass<Rep, T0, T1, Cs...> : public base_dimension_impl<Rep,
       unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
       unit_exponent<typename Extractor<amountType, T0, T1>::type, -1>,
       Cs...
    >
    {
    public:
-      using Base = base_dimension<Rep,
+      using Base = base_dimension_impl<Rep,
          unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
          unit_exponent<typename Extractor<amountType, T0, T1>::type, -1>,
          Cs...

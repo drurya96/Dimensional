@@ -57,8 +57,8 @@ namespace dimension
 
     #define SI_PREFIX(baseName, baseAbbr, UnitType, Prefix, Abbr) \
     struct CONCAT3(Prefix, _, baseName) : public UnitType<CONCAT3(Prefix, _, baseName), CONCAT_AND_STRINGIFY(Prefix, baseName), Abbr baseAbbr> { public: using UnitType::UnitType; }; \
-    template<> struct Conversion<baseName, CONCAT3(Prefix, _, baseName)> { static constexpr PrecisionType slope = 1.0 / SIFactor<Prefix>::value; }; \
-    template<> struct Conversion<CONCAT3(Prefix, _, baseName), baseName> { static constexpr PrecisionType slope = SIFactor<Prefix>::value; };
+    template<> struct Conversion<baseName, CONCAT3(Prefix, _, baseName)> { static constexpr double slope = 1.0 / SIFactor<Prefix>::value; }; \
+    template<> struct Conversion<CONCAT3(Prefix, _, baseName), baseName> { static constexpr double slope = SIFactor<Prefix>::value; };
 
 
     #define ALL_SI_PREFIXES(baseName, baseAbbr, UnitType) \

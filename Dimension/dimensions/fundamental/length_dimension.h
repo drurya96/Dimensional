@@ -17,16 +17,16 @@ namespace dimension
    struct yards : public lengthUnit<yards, "Yards", "yd"> {};
    struct us_survey_feet : public lengthUnit<us_survey_feet, "US Survey Feet", "ftUS"> {};
 
-   template<> struct Conversion<meters, feet> { static constexpr PrecisionType slope = (1250.0 / 381.0); };
-   template<> struct Conversion<meters, inches> { static constexpr PrecisionType slope = (15000.0 / 381.0); };
-   template<> struct Conversion<meters, astronomical_units> { static constexpr PrecisionType slope = (1.0 / 149597870700.0); };
-   template<> struct Conversion<meters, data_miles> { static constexpr PrecisionType slope = (5.0 / 9144.0); };
-   template<> struct Conversion<meters, nautical_miles> { static constexpr PrecisionType slope = (1.0 / 1852.0); };
-   template<> struct Conversion<meters, miles> { static constexpr PrecisionType slope = (125.0 / 201168.0); };
-   template<> struct Conversion<meters, fathoms> { static constexpr PrecisionType slope = (3937.0 / 7200.0); };
-   template<> struct Conversion<meters, furlong> { static constexpr PrecisionType slope = (3937.0 / 792000.0); };
-   template<> struct Conversion<meters, yards> { static constexpr PrecisionType slope = (1250.0 / 1143.0); };
-   template<> struct Conversion<meters, us_survey_feet> { static constexpr PrecisionType slope = (3937.0 / 1200.0); };
+   template<> struct Conversion<meters, feet> { static constexpr double slope = (1250.0 / 381.0); };
+   template<> struct Conversion<meters, inches> { static constexpr double slope = (15000.0 / 381.0); };
+   template<> struct Conversion<meters, astronomical_units> { static constexpr double slope = (1.0 / 149597870700.0); };
+   template<> struct Conversion<meters, data_miles> { static constexpr double slope = (5.0 / 9144.0); };
+   template<> struct Conversion<meters, nautical_miles> { static constexpr double slope = (1.0 / 1852.0); };
+   template<> struct Conversion<meters, miles> { static constexpr double slope = (125.0 / 201168.0); };
+   template<> struct Conversion<meters, fathoms> { static constexpr double slope = (3937.0 / 7200.0); };
+   template<> struct Conversion<meters, furlong> { static constexpr double slope = (3937.0 / 792000.0); };
+   template<> struct Conversion<meters, yards> { static constexpr double slope = (1250.0 / 1143.0); };
+   template<> struct Conversion<meters, us_survey_feet> { static constexpr double slope = (3937.0 / 1200.0); };
 
    ALL_SI_PREFIXES(meters, "m", lengthUnit);
 

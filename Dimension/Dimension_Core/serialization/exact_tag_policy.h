@@ -13,7 +13,7 @@
 #include <utility> // std::index_sequence, std::make_index_sequence
 
 #include "../internal_temp/uuid.h"
-#include "../internal_temp/UnitValidation.h" // Need unit exponent
+#include "../internal_temp/unit_exponent.h"
 
 namespace dimension
 {

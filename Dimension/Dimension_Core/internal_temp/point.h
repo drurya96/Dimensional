@@ -7,7 +7,6 @@
 #include <concepts>
 
 #include "Conversion.h"
-#include "base_dimension_signature.h"
 
 namespace dimension {
 

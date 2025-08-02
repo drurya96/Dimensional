@@ -13,7 +13,7 @@ namespace dimension
    {% for name, unit in dim.helper_units.items() %}
    struct {{ name }} : public {{ unit.dim }}Unit<{{ name }}, "{{ unit.name }}", "{{ unit.abbreviation }}"> {};
    {% for to_name, value in unit.conversions.To.items() %}
-   template<> struct Conversion<{{ name }}, {{ to_name }}> { static constexpr PrecisionType slope = {{ value }}; };
+   template<> struct Conversion<{{ name }}, {{ to_name }}> { static constexpr double slope = {{ value }}; };
    {% endfor %}
 
    {% endfor %}

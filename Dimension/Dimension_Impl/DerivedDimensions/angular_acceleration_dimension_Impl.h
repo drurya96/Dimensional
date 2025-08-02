@@ -1,9 +1,12 @@
 #ifndef STATIC_DIMENSION_ANGULAR_ACCELERATION_IMPL_H
 #define STATIC_DIMENSION_ANGULAR_ACCELERATION_IMPL_H
 
-#include "../../base_dimension.h"
+#include "../../base_unit.h"
+#include "../../base_dimension_impl.h"
 #include "../../dimensions/fundamental/angle_dimension.h"
 #include "../../dimensions/fundamental/timespan_dimension.h"
+
+#include "../../Dimension_Core/internal_temp/utils.h"
 
 
 namespace dimension
@@ -36,25 +39,28 @@ namespace dimension
    };
 
    /// @brief Concept to verify a dimension can be treated as a angular_acceleration type
-   template<typename T>
-   concept is_angular_acceleration = std::is_convertible_v<T, base_dimension<
+   template<typename T, typename Rep>
+   concept is_angular_acceleration_as = matching_dimension<T, Rep,
       unit_exponent<primary_angle, 1>, 
       unit_exponent<primary_timespan, -2>
-   >>;
+   >;
+
+   template<typename T>
+   concept is_angular_acceleration = is_angular_acceleration_as<T, double>;
 
    /// @brief Retrieves the value of a angular_acceleration object with specific units
    /// @tparam angleUnit The angle unit used for all angle components of angular_acceleration
    /// @tparam timespanUnit The timespan unit used for all timespan components of angular_acceleration
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
-   /// @return The raw value in terms of template units as a PrecisionType
+   /// @return The raw value in terms of template units as the representative type of DimType
    template<
       is_angle_unit angleUnit,
       is_timespan_unit timespanUnit,
       is_angular_acceleration DimType>
    // TODO: Unit test this and remove suppression
    [[maybe_unused]]
-   constexpr PrecisionType get_angular_acceleration_as(const DimType& obj)
+   constexpr DimType::rep get_angular_acceleration_as(const DimType& obj)
    {
       return get_dimension_as<
          unit_exponent<angleUnit, 1>,
@@ -66,10 +72,10 @@ namespace dimension
    /// @tparam Named The named unit to extract in terms of
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
-   /// @return The raw value in terms of template units as a PrecisionType
+   /// @return The raw value in terms of template units as the representative type of DimType
    template<IsNamedangular_accelerationUnit Named, is_angular_acceleration DimType>
    // TODO: Unit test this and remove suppression
-   constexpr PrecisionType get_angular_acceleration_as(const DimType& obj)
+   constexpr DimType::rep get_angular_acceleration_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
@@ -89,14 +95,14 @@ namespace dimension
       T0,
       T1
    >
-   class angular_acceleration<T0, T1, Cs...> : public base_dimension<double,
+   class angular_acceleration<T0, T1, Cs...> : public base_dimension_impl<double,
       unit_exponent<typename Extractor<angleType, T0, T1>::type, 1>,
       unit_exponent<typename Extractor<timespanType, T0, T1>::type, -2>,
       Cs...
    >
    {
    public:
-      using Base = base_dimension<double,
+      using Base = base_dimension_impl<double,
          unit_exponent<typename Extractor<angleType, T0, T1>::type, 1>,
          unit_exponent<typename Extractor<timespanType, T0, T1>::type, -2>,
          Cs...
@@ -123,14 +129,14 @@ namespace dimension
       T0,
       T1
    >
-   class angular_acceleration<Rep, T0, T1, Cs...> : public base_dimension<Rep,
+   class angular_acceleration<Rep, T0, T1, Cs...> : public base_dimension_impl<Rep,
       unit_exponent<typename Extractor<angleType, T0, T1>::type, 1>,
       unit_exponent<typename Extractor<timespanType, T0, T1>::type, -2>,
       Cs...
    >
    {
    public:
-      using Base = base_dimension<Rep,
+      using Base = base_dimension_impl<Rep,
          unit_exponent<typename Extractor<angleType, T0, T1>::type, 1>,
          unit_exponent<typename Extractor<timespanType, T0, T1>::type, -2>,
          Cs...

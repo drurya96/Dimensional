@@ -38,27 +38,6 @@ namespace dimension
       return ConcatHelper<Strings...>::value(strs...);
    }
 
-   /// @brief Concatenate a tuple of various string_literals
-   /// @tparam Tuple tuple of string_literals
-   /// @tparam Index Current index for recussive calls
-   template <typename Tuple, std::size_t Index = 0>
-   struct TupleStringConcat
-   {
-      static constexpr auto value() {
-         if constexpr (std::tuple_size_v<Tuple> == 0)
-         {
-            return string_literal<1>("");
-         }
-         else if constexpr (Index < std::tuple_size_v<Tuple> - 1)
-         {
-            return concat(concat(std::tuple_element_t<Index, Tuple>::qualifiedName, string_literal<2>("|")), TupleStringConcat<Tuple, Index + 1>::value());
-         } else 
-         {
-            return std::tuple_element_t<Index, Tuple>::qualifiedName; // Base case for when Index == std::tuple_size_v<Tuple>
-         }
-      }
-   };
-
 }
 
 #endif // DIMENSIONAL_STRING_CONCAT_H

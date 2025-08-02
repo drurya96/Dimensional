@@ -4,7 +4,8 @@
 #include <type_traits>
 #include <tuple>
 
-#include "../../base_dimension.h"
+#include "../../base_unit.h"
+#include "../../base_dimension_impl.h"
 
 namespace dimension
 {
@@ -49,8 +50,8 @@ namespace dimension
    /// @tparam T The unit type.
    /// @param obj The charge object.
    /// @return The value in the specified unit.
-   template<is_charge_unit T>
-   constexpr PrecisionType get_charge_as(/*charge_type*/ auto obj)
+   template<is_charge_unit T, is_charge DimType>
+   constexpr DimType::rep get_charge_as(DimType obj)
    {
       return get_dimension_as<unit_exponent<T>>(obj);
    }

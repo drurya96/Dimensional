@@ -1,8 +1,11 @@
 #ifndef STATIC_DIMENSION_FREQUENCY_IMPL_H
 #define STATIC_DIMENSION_FREQUENCY_IMPL_H
 
-#include "../../base_dimension.h"
+#include "../../base_unit.h"
+#include "../../base_dimension_impl.h"
 #include "../../dimensions/fundamental/timespan_dimension.h"
+
+#include "../../Dimension_Core/internal_temp/utils.h"
 
 
 namespace dimension
@@ -28,22 +31,25 @@ namespace dimension
    };
 
    /// @brief Concept to verify a dimension can be treated as a frequency type
-   template<typename T>
-   concept is_frequency = std::is_convertible_v<T, base_dimension<
+   template<typename T, typename Rep>
+   concept is_frequency_as = matching_dimension<T, Rep,
       unit_exponent<primary_timespan, -1>
-   >>;
+   >;
+
+   template<typename T>
+   concept is_frequency = is_frequency_as<T, double>;
 
    /// @brief Retrieves the value of a frequency object with specific units
    /// @tparam timespanUnit The timespan unit used for all timespan components of frequency
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
-   /// @return The raw value in terms of template units as a PrecisionType
+   /// @return The raw value in terms of template units as the representative type of DimType
    template<
       is_timespan_unit timespanUnit,
       is_frequency DimType>
    // TODO: Unit test this and remove suppression
    [[maybe_unused]]
-   constexpr PrecisionType get_frequency_as(const DimType& obj)
+   constexpr DimType::rep get_frequency_as(const DimType& obj)
    {
       return get_dimension_as<
          unit_exponent<timespanUnit, -1>
@@ -54,10 +60,10 @@ namespace dimension
    /// @tparam Named The named unit to extract in terms of
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
-   /// @return The raw value in terms of template units as a PrecisionType
+   /// @return The raw value in terms of template units as the representative type of DimType
    template<IsNamedfrequencyUnit Named, is_frequency DimType>
    // TODO: Unit test this and remove suppression
-   constexpr PrecisionType get_frequency_as(const DimType& obj)
+   constexpr DimType::rep get_frequency_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
@@ -75,13 +81,13 @@ namespace dimension
    requires are_frequency_units<
       T0
    >
-   class frequency<T0, Cs...> : public base_dimension<double,
+   class frequency<T0, Cs...> : public base_dimension_impl<double,
       unit_exponent<typename Extractor<timespanType, T0>::type, -1>,
       Cs...
    >
    {
    public:
-      using Base = base_dimension<double,
+      using Base = base_dimension_impl<double,
          unit_exponent<typename Extractor<timespanType, T0>::type, -1>,
          Cs...
       >;
@@ -105,13 +111,13 @@ namespace dimension
    requires are_frequency_units<
       T0
    >
-   class frequency<Rep, T0, Cs...> : public base_dimension<Rep,
+   class frequency<Rep, T0, Cs...> : public base_dimension_impl<Rep,
       unit_exponent<typename Extractor<timespanType, T0>::type, -1>,
       Cs...
    >
    {
    public:
-      using Base = base_dimension<Rep,
+      using Base = base_dimension_impl<Rep,
          unit_exponent<typename Extractor<timespanType, T0>::type, -1>,
          Cs...
       >;

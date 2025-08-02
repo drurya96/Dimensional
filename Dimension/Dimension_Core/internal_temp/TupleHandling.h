@@ -73,55 +73,6 @@ namespace dimension
       using type = decltype(rebuild_tuple(std::make_index_sequence<std::tuple_size_v<Tuple>>{}));
    };
 
-   /// @brief Sort tuple type based on qualified name
-   /// @tparam Tuple Tuple type to sort
-   /// @tparam N Current index to evaluate
-   template <typename Tuple, std::size_t N = std::tuple_size_v<Tuple>>
-   struct tuple_bubble_sort 
-   {
-   private:
-      // Perform one pass of bubble sort
-      template <std::size_t Index = 0, typename CurrentTuple = Tuple>
-      struct one_pass 
-      {
-
-         using ThisElement = std::tuple_element_t<Index, CurrentTuple>;
-         using NextElement = std::tuple_element_t<Index + 1, CurrentTuple>;
-
-         using type = std::conditional_t<
-            (Index < N - 1) && !(ThisElement::qualifiedName < NextElement::qualifiedName),
-            typename tuple_swap<CurrentTuple, Index, Index + 1>::type, 
-            CurrentTuple>;
-
-         using next_type = typename one_pass<Index + 1, type>::type;
-      };
-
-      // Base case for one_pass recursion
-      template <typename CurrentTuple>
-      struct one_pass<N - 1, CurrentTuple>
-      {
-         using type = CurrentTuple;
-      };
-
-   public:
-      // Apply bubble sort recursively
-      using type = typename tuple_bubble_sort<typename one_pass<0, Tuple>::type, N - 1>::type;
-   };
-
-   // Base case for bubble sort recursion
-   template <typename Tuple>
-   struct tuple_bubble_sort<Tuple, 1>
-   {
-      using type = Tuple;
-   };
-
-   // Bubble sort empty tuple
-   template <>
-   struct tuple_bubble_sort<std::tuple<>, 0>
-   {
-      using type = std::tuple<>;
-   };
-
    // 1. Helper to slice a tuple based on an index_sequence
    template <typename Tuple, typename Indices>
    struct tuple_slice_impl;

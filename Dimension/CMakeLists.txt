@@ -8,8 +8,6 @@ target_include_directories(Dimension_LIB INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/DerivedDimensions
 )
 
-target_compile_definitions(Dimension_LIB INTERFACE ${DIMENSIONAL_PrecisionType})
-
 if(DIMENSIONAL_REQUIRE_CONVERSIONS)
     target_compile_definitions(Dimension_LIB INTERFACE REQUIRE_CONVERSIONS)
 endif()

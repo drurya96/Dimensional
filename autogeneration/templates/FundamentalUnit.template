@@ -13,9 +13,9 @@ namespace dimension
    {% if name != dim.base_unit %}
    {% set conversion = dim.base.conversions.To[name] %}
    {% if conversion.__class__.__name__ == 'list' %}
-   template<> struct Conversion<{{ dim.base_unit }}, {{ name }}> { static constexpr PrecisionType slope = ({{ conversion[0] }}{%if 'e' not in conversion[0]|string %}.0{%endif%} / {{ conversion[1] }}{%if 'e' not in conversion[1]|string %}.0{%endif%}); };
+   template<> struct Conversion<{{ dim.base_unit }}, {{ name }}> { static constexpr double slope = ({{ conversion[0] }}{%if 'e' not in conversion[0]|string %}.0{%endif%} / {{ conversion[1] }}{%if 'e' not in conversion[1]|string %}.0{%endif%}); };
    {% else %}
-   template<> struct Conversion<{{ dim.base_unit }}, {{ name }}> { static constexpr PrecisionType slope = {{ conversion }}; };
+   template<> struct Conversion<{{ dim.base_unit }}, {{ name }}> { static constexpr double slope = {{ conversion }}; };
    {% endif %}
    {% endif %}
    {% endfor %}

@@ -9,7 +9,7 @@ TEST(SymbolicConstruction, ValueAndPi) {
         typename decltype(l)::symbols,
         std::tuple<symbol_exponent<symbols::pi,1,1>>>);
 
-    EXPECT_NEAR(get_length_as<meters>(l), 2.0 * 3.1415, 1e-12);
+    EXPECT_NEAR(get_length_as<meters>(l), 2.0 * std::numbers::pi, 1e-12);
 }
 
 TEST(Arithmetic, MultiplyAndCancel) {
@@ -28,7 +28,7 @@ TEST(CTAD, CoefficientsPreservedThroughAuto) {
     area c = b;
     static_assert(std::tuple_size_v<typename decltype(b)::symbols> == 1);
 
-    EXPECT_NEAR(get_area_as<meters>(c), 100.0 * 3.1415 * 3.1415, 0.001);
+    EXPECT_NEAR(get_area_as<meters>(c), 100.0 * std::numbers::pi * std::numbers::pi, 0.001);
 }
 
 
@@ -46,7 +46,7 @@ TEST(Derived, Test2) {
     timespan b = make_timespan<seconds>(2.0);
     length c = a * b;
 
-    EXPECT_NEAR(get_length_as<meters>(c), 20.0 * 3.1415, 0.001);
+    EXPECT_NEAR(get_length_as<meters>(c), 20.0 * std::numbers::pi, 0.001);
 }
 
 

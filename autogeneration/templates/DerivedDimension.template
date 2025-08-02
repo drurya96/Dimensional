@@ -1,10 +1,13 @@
 #ifndef STATIC_DIMENSION_{{ dim.name.upper() }}_IMPL_H
 #define STATIC_DIMENSION_{{ dim.name.upper() }}_IMPL_H
 
-#include "../../base_dimension.h"
+#include "../../base_unit.h"
+#include "../../base_dimension_impl.h"
 {% for de in dim.definition %}
 #include "../../dimensions/fundamental/{{ de.dim }}_dimension.h"
 {% endfor %}
+
+#include "../../Dimension_Core/internal_temp/utils.h"
 
 {% set dim_num = dim.definition | length %}
 {% set t_items = [] %}
@@ -45,12 +48,15 @@ namespace dimension
    };
 
    /// @brief Concept to verify a dimension can be treated as a {{ dim.name }} type
-   template<typename T>
-   concept is_{{ dim.name }} = std::is_convertible_v<T, base_dimension<
+   template<typename T, typename Rep>
+   concept is_{{ dim.name }}_as = matching_dimension<T, Rep,
       {% for de in dim.definition %}
       unit_exponent<primary_{{ de.dim }}, {{ de.exponent_num }}>{{ ", " if not loop.last }}
       {% endfor %}
-   >>;
+   >;
+
+   template<typename T>
+   concept is_{{ dim.name }} = is_{{ dim.name }}_as<T, double>;
 
    /// @brief Retrieves the value of a {{ dim.name }} object with specific units
    {% for de in dim.definition %}
@@ -58,7 +64,7 @@ namespace dimension
    {% endfor %}
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
-   /// @return The raw value in terms of template units as a PrecisionType
+   /// @return The raw value in terms of template units as the representative type of DimType
    template<
       {% for de in dim.definition %}
       is_{{ de.dim }}_unit {{ de.dim }}Unit,
@@ -66,7 +72,7 @@ namespace dimension
       is_{{ dim.name }} DimType>
    // TODO: Unit test this and remove suppression
    [[maybe_unused]]
-   constexpr PrecisionType get_{{ dim.name.lower() }}_as(const DimType& obj)
+   constexpr DimType::rep get_{{ dim.name.lower() }}_as(const DimType& obj)
    {
       return get_dimension_as<
          {% for de in dim.definition %}
@@ -79,10 +85,10 @@ namespace dimension
    /// @tparam Named The named unit to extract in terms of
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
-   /// @return The raw value in terms of template units as a PrecisionType
+   /// @return The raw value in terms of template units as the representative type of DimType
    template<IsNamed{{ dim.name }}Unit Named, is_{{ dim.name }} DimType>
    // TODO: Unit test this and remove suppression
-   constexpr PrecisionType get_{{ dim.name.lower() }}_as(const DimType& obj)
+   constexpr DimType::rep get_{{ dim.name.lower() }}_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
@@ -104,7 +110,7 @@ namespace dimension
       T{{num}}{{ "," if not loop.last }}
       {% endfor %}
    >
-   class {{ dim.name }}<{{t_list}}, Cs...> : public base_dimension<double,
+   class {{ dim.name }}<{{t_list}}, Cs...> : public base_dimension_impl<double,
       {% for de in dim.definition %}
       unit_exponent<typename Extractor<{{ de.dim }}Type, {{t_list}}>::type, {{ de.exponent_num }}>,
       {% endfor %}
@@ -112,7 +118,7 @@ namespace dimension
    >
    {
    public:
-      using Base = base_dimension<double,
+      using Base = base_dimension_impl<double,
          {% for de in dim.definition %}
          unit_exponent<typename Extractor<{{ de.dim }}Type, {{t_list}}>::type, {{ de.exponent_num }}>,
          {% endfor %}
@@ -142,7 +148,7 @@ namespace dimension
       T{{num}}{{ "," if not loop.last }}
       {% endfor %}
    >
-   class {{ dim.name }}<Rep, {{t_list}}, Cs...> : public base_dimension<Rep,
+   class {{ dim.name }}<Rep, {{t_list}}, Cs...> : public base_dimension_impl<Rep,
       {% for de in dim.definition %}
       unit_exponent<typename Extractor<{{ de.dim }}Type, {{t_list}}>::type, {{ de.exponent_num }}>,
       {% endfor %}
@@ -150,7 +156,7 @@ namespace dimension
    >
    {
    public:
-      using Base = base_dimension<Rep,
+      using Base = base_dimension_impl<Rep,
          {% for de in dim.definition %}
          unit_exponent<typename Extractor<{{ de.dim }}Type, {{t_list}}>::type, {{ de.exponent_num }}>,
          {% endfor %}

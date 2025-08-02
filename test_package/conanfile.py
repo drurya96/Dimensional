@@ -17,7 +17,6 @@ class TestPackageConan(ConanFile):
 
     def build(self):
         cmake = CMake(self)
-        cmake.definitions["DIMENSIONAL_PrecisionType"] = "USE_DOUBLE"  # or any other type you want to test
         cmake.configure()
         cmake.build()
 

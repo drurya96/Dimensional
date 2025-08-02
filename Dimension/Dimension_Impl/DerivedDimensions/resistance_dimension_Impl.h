@@ -1,11 +1,14 @@
 #ifndef STATIC_DIMENSION_RESISTANCE_IMPL_H
 #define STATIC_DIMENSION_RESISTANCE_IMPL_H
 
-#include "../../base_dimension.h"
+#include "../../base_unit.h"
+#include "../../base_dimension_impl.h"
 #include "../../dimensions/fundamental/mass_dimension.h"
 #include "../../dimensions/fundamental/length_dimension.h"
 #include "../../dimensions/fundamental/timespan_dimension.h"
 #include "../../dimensions/fundamental/charge_dimension.h"
+
+#include "../../Dimension_Core/internal_temp/utils.h"
 
 
 namespace dimension
@@ -178,13 +181,16 @@ namespace dimension
    };
 
    /// @brief Concept to verify a dimension can be treated as a resistance type
-   template<typename T>
-   concept is_resistance = std::is_convertible_v<T, base_dimension<
+   template<typename T, typename Rep>
+   concept is_resistance_as = matching_dimension<T, Rep,
       unit_exponent<primary_mass, 1>, 
       unit_exponent<primary_length, 2>, 
       unit_exponent<primary_timespan, -1>, 
       unit_exponent<primary_charge, -2>
-   >>;
+   >;
+
+   template<typename T>
+   concept is_resistance = is_resistance_as<T, double>;
 
    /// @brief Retrieves the value of a resistance object with specific units
    /// @tparam massUnit The mass unit used for all mass components of resistance
@@ -193,7 +199,7 @@ namespace dimension
    /// @tparam chargeUnit The charge unit used for all charge components of resistance
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
-   /// @return The raw value in terms of template units as a PrecisionType
+   /// @return The raw value in terms of template units as the representative type of DimType
    template<
       is_mass_unit massUnit,
       is_length_unit lengthUnit,
@@ -202,7 +208,7 @@ namespace dimension
       is_resistance DimType>
    // TODO: Unit test this and remove suppression
    [[maybe_unused]]
-   constexpr PrecisionType get_resistance_as(const DimType& obj)
+   constexpr DimType::rep get_resistance_as(const DimType& obj)
    {
       return get_dimension_as<
          unit_exponent<massUnit, 1>,
@@ -216,10 +222,10 @@ namespace dimension
    /// @tparam Named The named unit to extract in terms of
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
-   /// @return The raw value in terms of template units as a PrecisionType
+   /// @return The raw value in terms of template units as the representative type of DimType
    template<IsNamedresistanceUnit Named, is_resistance DimType>
    // TODO: Unit test this and remove suppression
-   constexpr PrecisionType get_resistance_as(const DimType& obj)
+   constexpr DimType::rep get_resistance_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
@@ -243,7 +249,7 @@ namespace dimension
       T2,
       T3
    >
-   class resistance<T0, T1, T2, T3, Cs...> : public base_dimension<double,
+   class resistance<T0, T1, T2, T3, Cs...> : public base_dimension_impl<double,
       unit_exponent<typename Extractor<massType, T0, T1, T2, T3>::type, 1>,
       unit_exponent<typename Extractor<lengthType, T0, T1, T2, T3>::type, 2>,
       unit_exponent<typename Extractor<timespanType, T0, T1, T2, T3>::type, -1>,
@@ -252,7 +258,7 @@ namespace dimension
    >
    {
    public:
-      using Base = base_dimension<double,
+      using Base = base_dimension_impl<double,
          unit_exponent<typename Extractor<massType, T0, T1, T2, T3>::type, 1>,
          unit_exponent<typename Extractor<lengthType, T0, T1, T2, T3>::type, 2>,
          unit_exponent<typename Extractor<timespanType, T0, T1, T2, T3>::type, -1>,
@@ -285,7 +291,7 @@ namespace dimension
       T2,
       T3
    >
-   class resistance<Rep, T0, T1, T2, T3, Cs...> : public base_dimension<Rep,
+   class resistance<Rep, T0, T1, T2, T3, Cs...> : public base_dimension_impl<Rep,
       unit_exponent<typename Extractor<massType, T0, T1, T2, T3>::type, 1>,
       unit_exponent<typename Extractor<lengthType, T0, T1, T2, T3>::type, 2>,
       unit_exponent<typename Extractor<timespanType, T0, T1, T2, T3>::type, -1>,
@@ -294,7 +300,7 @@ namespace dimension
    >
    {
    public:
-      using Base = base_dimension<Rep,
+      using Base = base_dimension_impl<Rep,
          unit_exponent<typename Extractor<massType, T0, T1, T2, T3>::type, 1>,
          unit_exponent<typename Extractor<lengthType, T0, T1, T2, T3>::type, 2>,
          unit_exponent<typename Extractor<timespanType, T0, T1, T2, T3>::type, -1>,

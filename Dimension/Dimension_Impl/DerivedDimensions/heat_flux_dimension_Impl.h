@@ -1,9 +1,12 @@
 #ifndef STATIC_DIMENSION_HEAT_FLUX_IMPL_H
 #define STATIC_DIMENSION_HEAT_FLUX_IMPL_H
 
-#include "../../base_dimension.h"
+#include "../../base_unit.h"
+#include "../../base_dimension_impl.h"
 #include "../../dimensions/fundamental/mass_dimension.h"
 #include "../../dimensions/fundamental/timespan_dimension.h"
+
+#include "../../Dimension_Core/internal_temp/utils.h"
 
 
 namespace dimension
@@ -36,25 +39,28 @@ namespace dimension
    };
 
    /// @brief Concept to verify a dimension can be treated as a heat_flux type
-   template<typename T>
-   concept is_heat_flux = std::is_convertible_v<T, base_dimension<
+   template<typename T, typename Rep>
+   concept is_heat_flux_as = matching_dimension<T, Rep,
       unit_exponent<primary_mass, 1>, 
       unit_exponent<primary_timespan, -3>
-   >>;
+   >;
+
+   template<typename T>
+   concept is_heat_flux = is_heat_flux_as<T, double>;
 
    /// @brief Retrieves the value of a heat_flux object with specific units
    /// @tparam massUnit The mass unit used for all mass components of heat_flux
    /// @tparam timespanUnit The timespan unit used for all timespan components of heat_flux
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
-   /// @return The raw value in terms of template units as a PrecisionType
+   /// @return The raw value in terms of template units as the representative type of DimType
    template<
       is_mass_unit massUnit,
       is_timespan_unit timespanUnit,
       is_heat_flux DimType>
    // TODO: Unit test this and remove suppression
    [[maybe_unused]]
-   constexpr PrecisionType get_heat_flux_as(const DimType& obj)
+   constexpr DimType::rep get_heat_flux_as(const DimType& obj)
    {
       return get_dimension_as<
          unit_exponent<massUnit, 1>,
@@ -66,10 +72,10 @@ namespace dimension
    /// @tparam Named The named unit to extract in terms of
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
-   /// @return The raw value in terms of template units as a PrecisionType
+   /// @return The raw value in terms of template units as the representative type of DimType
    template<IsNamedheat_fluxUnit Named, is_heat_flux DimType>
    // TODO: Unit test this and remove suppression
-   constexpr PrecisionType get_heat_flux_as(const DimType& obj)
+   constexpr DimType::rep get_heat_flux_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
@@ -89,14 +95,14 @@ namespace dimension
       T0,
       T1
    >
-   class heat_flux<T0, T1, Cs...> : public base_dimension<double,
+   class heat_flux<T0, T1, Cs...> : public base_dimension_impl<double,
       unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
       unit_exponent<typename Extractor<timespanType, T0, T1>::type, -3>,
       Cs...
    >
    {
    public:
-      using Base = base_dimension<double,
+      using Base = base_dimension_impl<double,
          unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
          unit_exponent<typename Extractor<timespanType, T0, T1>::type, -3>,
          Cs...
@@ -123,14 +129,14 @@ namespace dimension
       T0,
       T1
    >
-   class heat_flux<Rep, T0, T1, Cs...> : public base_dimension<Rep,
+   class heat_flux<Rep, T0, T1, Cs...> : public base_dimension_impl<Rep,
       unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
       unit_exponent<typename Extractor<timespanType, T0, T1>::type, -3>,
       Cs...
    >
    {
    public:
-      using Base = base_dimension<Rep,
+      using Base = base_dimension_impl<Rep,
          unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
          unit_exponent<typename Extractor<timespanType, T0, T1>::type, -3>,
          Cs...

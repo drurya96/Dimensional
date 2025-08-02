@@ -2,65 +2,24 @@
 #define DIMENSION_UNIT_SIMPLIFIER_H
 
 #include <concepts>
+#include <type_traits>
+#include <ratio>
 
 #include "TemplateUtils/RatioUtils.h"
 #include "TemplateUtils/GenericUtils.h"
 
-#include "base_dimension_signature.h"
 #include "TupleHandling.h"
 
 #include "FundamentalUnitExtractor.h"
 
+#include "exponent_math.h"
+
+#include "ratio_utils.h" // TODO: Maybe not needed
+
+#include "utils.h"
+
 namespace dimension
 {
-
-   // TODO: Maybe not needed? Keep until verified
-   template<typename IncomingUnit, typename... Units>
-   struct AddPower;
-
-   template<typename IncomingUnit>
-   struct AddPower<IncomingUnit, std::tuple<>>
-   {
-      static constexpr bool success = false;
-      using units = std::tuple<>;
-   };
-
-   template<typename IncomingUnit, typename Unit>
-   struct AddPower<IncomingUnit, std::tuple<Unit>>
-   {
-      // Use a conditional to set `units` to either the added value or empty tuple
-      static constexpr bool success = std::is_same_v<typename IncomingUnit::unit, typename Unit::unit>;
-
-      using added = unit_exponent<typename Unit::unit, std::ratio_add<typename Unit::exponent, typename IncomingUnit::exponent>::num, std::ratio_add<typename Unit::exponent, typename IncomingUnit::exponent>::den>;
-
-      using units = std::conditional_t<success,
-         std::tuple<added>,
-         std::tuple<Unit>>;
-   };
-
-   template<typename IncomingUnit, typename Unit, typename... Units>
-   struct AddPower<IncomingUnit, std::tuple<Unit, Units...>>
-   {
-
-      // Use conditional to check if AddPower was a real value or empty
-      // If real, concatenate the rest and halt
-      // If empty, continue
-      using current = AddPower<IncomingUnit, std::tuple<Unit>>;
-
-      using units = std::conditional_t<current::success,
-         tuple_cat_t<typename current::units, std::tuple<Units...>>,
-         tuple_cat_t<typename current::units, typename AddPower<IncomingUnit, std::tuple<Units...>>::units>>;
-
-      using before = std::conditional_t<current::success,
-         std::tuple<>,
-         tuple_cat_t<std::tuple<Unit>>>;
-
-      using added = std::conditional_t<current::success, typename current::added, void>;
-
-      static constexpr bool success = current::success || AddPower<IncomingUnit, std::tuple<Units...>>::success;
-
-   };
-
    // ============================================================
    // ===================== Combine Power ========================
    // ============================================================
@@ -147,99 +106,6 @@ namespace dimension
    // =================== Conversion Stuff =======================
    // ============================================================
 
-   namespace Math
-   {
-      template<int Power>
-      constexpr double PowInt(double value)
-      {
-         if constexpr (Power % 2 == 0)
-         {
-            double half = PowInt<Power / 2>(value);
-            return half * half;
-         }
-         else
-         {
-            return value * PowInt<Power - 1>(value);
-         }
-      }
-
-      template<int Power>
-      requires (Power < 0)
-      constexpr double PowInt(double value)
-      {
-         return 1.0 / PowInt<-Power>(value);
-      }
-
-      template<>
-      constexpr double PowInt<0>(double)
-      {
-         return 1.0;
-      }
-
-      template<>
-      constexpr double PowInt<1>(double value)
-      {
-         return value;
-      }
-
-      template<>
-      constexpr double PowInt<2>(double value)
-      {
-         return value * value;
-      }
-
-      template<>
-      constexpr double PowInt<3>(double value)
-      {
-         return value * value * value;
-      }
-
-      template<>
-      constexpr double PowInt<4>(double value)
-      {
-         return value * value * value * value;
-      }
-
-      template<>
-      constexpr double PowInt<5>(double value)
-      {
-         return value * value * value * value * value;
-      }
-
-      template<int Root>
-      constexpr double RootInt(double value)
-      {
-         static_assert(Root != 0, "RootInt<0> is undefined.");
-
-         return std::pow(value, 1.0 / static_cast<double>(Root));
-      }
-
-      template<>
-      inline double RootInt<1>(double value)
-      {
-         return value;
-      }
-
-      template<>
-      inline double RootInt<2>(double value)
-      {
-         return std::sqrt(value);
-      }
-
-      template<>
-      inline double RootInt<3>(double value)
-      {
-         return std::cbrt(value);
-      }
-
-      template<>
-      inline double RootInt<4>(double value)
-      {
-         return std::sqrt(std::sqrt(value));
-      }
-
-   }
-
    template<typename StartingUnit, typename TargetUnit>
    constexpr double GetSlope()
    {
@@ -259,7 +125,6 @@ namespace dimension
       {
          using Primary = typename StartingUnit::Primary;
          return GetSlope<StartingUnit, Primary>() * GetSlope<Primary, TargetUnit>();
-         //return Conversion<StartingUnit, Primary>::slope * Conversion<Primary, TargetUnit>::slope;
       }
    }
 
@@ -272,11 +137,11 @@ namespace dimension
 
       if constexpr (Unit::exponent::den == 1)
       {
-         return value * Math::PowInt<Unit::exponent::num>(scale);
+         return value * math::PowInt<Unit::exponent::num>(scale);
       }
       else
       {
-         return value * Math::RootInt<Unit::exponent::den>(Math::PowInt<Unit::exponent::num>(scale));
+         return value * math::RootInt<Unit::exponent::den>(math::PowInt<Unit::exponent::num>(scale));
       }
    }
 
@@ -371,19 +236,19 @@ namespace dimension
    template<typename Rep, typename Ratio, typename... Units, typename... Coeffs>
    struct base_dimensionFromTuple<Rep, Ratio, std::tuple<Units...>, std::tuple<Coeffs...>>
    {
-      using dim = base_dimension<Rep, Units..., Coeffs..., Ratio>;
+      using dim = base_dimension_impl<Rep, Units..., Coeffs..., Ratio>;
    };
 
    template<typename Rep, typename... Units, typename... Coeffs>
    struct base_dimensionFromTuple<Rep, std::tuple<Units...>, std::tuple<Coeffs...>>
    {
-      using dim = base_dimension<Rep, Units..., Coeffs...>;
+      using dim = base_dimension_impl<Rep, Units..., Coeffs...>;
    };
 
    template<typename... Units>
    struct base_dimensionFromTuple<std::tuple<Units...>>
    {
-      using dim = base_dimension<Units...>;
+      using dim = base_dimension_impl<double, Units...>;
    };
 
    // ============================================================

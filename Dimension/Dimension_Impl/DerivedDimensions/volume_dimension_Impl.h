@@ -1,8 +1,11 @@
 #ifndef STATIC_DIMENSION_VOLUME_IMPL_H
 #define STATIC_DIMENSION_VOLUME_IMPL_H
 
-#include "../../base_dimension.h"
+#include "../../base_unit.h"
+#include "../../base_dimension_impl.h"
 #include "../../dimensions/fundamental/length_dimension.h"
+
+#include "../../Dimension_Core/internal_temp/utils.h"
 
 
 namespace dimension
@@ -28,22 +31,25 @@ namespace dimension
    };
 
    /// @brief Concept to verify a dimension can be treated as a volume type
-   template<typename T>
-   concept is_volume = std::is_convertible_v<T, base_dimension<
+   template<typename T, typename Rep>
+   concept is_volume_as = matching_dimension<T, Rep,
       unit_exponent<primary_length, 3>
-   >>;
+   >;
+
+   template<typename T>
+   concept is_volume = is_volume_as<T, double>;
 
    /// @brief Retrieves the value of a volume object with specific units
    /// @tparam lengthUnit The length unit used for all length components of volume
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
-   /// @return The raw value in terms of template units as a PrecisionType
+   /// @return The raw value in terms of template units as the representative type of DimType
    template<
       is_length_unit lengthUnit,
       is_volume DimType>
    // TODO: Unit test this and remove suppression
    [[maybe_unused]]
-   constexpr PrecisionType get_volume_as(const DimType& obj)
+   constexpr DimType::rep get_volume_as(const DimType& obj)
    {
       return get_dimension_as<
          unit_exponent<lengthUnit, 3>
@@ -54,10 +60,10 @@ namespace dimension
    /// @tparam Named The named unit to extract in terms of
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
-   /// @return The raw value in terms of template units as a PrecisionType
+   /// @return The raw value in terms of template units as the representative type of DimType
    template<IsNamedvolumeUnit Named, is_volume DimType>
    // TODO: Unit test this and remove suppression
-   constexpr PrecisionType get_volume_as(const DimType& obj)
+   constexpr DimType::rep get_volume_as(const DimType& obj)
    {
       return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
@@ -75,13 +81,13 @@ namespace dimension
    requires are_volume_units<
       T0
    >
-   class volume<T0, Cs...> : public base_dimension<double,
+   class volume<T0, Cs...> : public base_dimension_impl<double,
       unit_exponent<typename Extractor<lengthType, T0>::type, 3>,
       Cs...
    >
    {
    public:
-      using Base = base_dimension<double,
+      using Base = base_dimension_impl<double,
          unit_exponent<typename Extractor<lengthType, T0>::type, 3>,
          Cs...
       >;
@@ -105,13 +111,13 @@ namespace dimension
    requires are_volume_units<
       T0
    >
-   class volume<Rep, T0, Cs...> : public base_dimension<Rep,
+   class volume<Rep, T0, Cs...> : public base_dimension_impl<Rep,
       unit_exponent<typename Extractor<lengthType, T0>::type, 3>,
       Cs...
    >
    {
    public:
-      using Base = base_dimension<Rep,
+      using Base = base_dimension_impl<Rep,
          unit_exponent<typename Extractor<lengthType, T0>::type, 3>,
          Cs...
       >;

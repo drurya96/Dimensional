@@ -4,7 +4,8 @@
 #include <type_traits>
 #include <tuple>
 
-#include "../../base_dimension.h"
+#include "../../base_unit.h"
+#include "../../base_dimension_impl.h"
 
 namespace dimension
 {
@@ -49,8 +50,8 @@ namespace dimension
    /// @tparam T The unit type.
    /// @param obj The timespan object.
    /// @return The value in the specified unit.
-   template<is_timespan_unit T>
-   constexpr PrecisionType get_timespan_as(/*timespan_type*/ auto obj)
+   template<is_timespan_unit T, is_timespan DimType>
+   constexpr DimType::rep get_timespan_as(DimType obj)
    {
       return get_dimension_as<unit_exponent<T>>(obj);
    }

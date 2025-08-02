@@ -41,13 +41,11 @@ namespace dimension
 
       using units = std::tuple<unit_exponent<NonBaseUnit>>;
 
-      static constexpr string_literal<12> qualifiedName = "NonBaseUnit"; // Size three due to null terminator
-
       // cppcheck-suppress unusedStructMember
       constexpr static int ID = 0;
    };
 
-   template<> struct Conversion<NonBaseUnit,  meters> { static constexpr PrecisionType slope = 3.14; };
+   template<> struct Conversion<NonBaseUnit,  meters> { static constexpr double slope = 3.14; };
 }
 
 TEST(Functions, TestFunctionParameters) {

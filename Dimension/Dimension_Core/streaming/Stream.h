@@ -7,7 +7,6 @@
 #include <sstream>
 
 #include "../internal_temp/TupleHandling.h"
-#include "../internal_temp/base_dimension_signature.h"
 
 namespace dimension
 {
@@ -88,8 +87,6 @@ namespace dimension
    template<is_base_dimension Dim>
    std::ostream& to_stream(std::ostream& os, const Dim& obj)
    {
-      //using NumTuple = base_dimension<NumTupleT, DenTupleT>::NumTuple;
-      //using DenTuple = base_dimension<NumTupleT, DenTupleT>::DenTuple;
       using units = typename Dim::units;
 
       os << get_dimension_tuple<units>(obj) << " [";

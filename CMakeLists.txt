@@ -34,10 +34,6 @@ else()
     message(STATUS "Conan is disabled. Proceeding without Conan dependency management.")
 endif()
 
-if (NOT DEFINED DIMENSIONAL_PrecisionType)
-    set(DIMENSIONAL_PrecisionType USE_DOUBLE CACHE STRING "This controls the PrecisionType of the library. Use one of USE_DOUBLE, USE_FLOAT, or USE_LONG_DOUBLE")
-endif()
-
 if(Enable_Dimensional_Tests)
     enable_testing()
 endif()

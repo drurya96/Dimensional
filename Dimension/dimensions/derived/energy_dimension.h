@@ -9,7 +9,7 @@ namespace dimension
    //   These don't map to typical physical units, but are necessary to
    //   produce some derived units
    struct calorie_mass : public massUnit<calorie_mass, "Caloriemass", "Caloriemass"> {};
-   template<> struct Conversion<calorie_mass, grams> { static constexpr PrecisionType slope = 4184.0; };
+   template<> struct Conversion<calorie_mass, grams> { static constexpr double slope = 4184.0; };
 
 
    struct joules

@@ -4,112 +4,11 @@
 #include <tuple> // For std::tuple and related functions
 #include <type_traits> // For std::is_same, std::remove_cv, std::disjunction
 
+#include "unit_exponent.h"
 #include "Conversion.h" // TODO: Remove this by moving PrimaryConvertible and friends to a separate header
 
 namespace dimension
 {
-
-   static constexpr bool delta = false;
-   static constexpr bool quantity = true;
-
-   // TODO: No idea where this should live...
-   struct qname_builder
-   {
-         static constexpr string_literal<2> delim = "|";
-
-         /* base case : one unit */
-         template<typename UE>
-         static constexpr auto build()
-         {
-            return UE::qualifiedName;
-         }
-
-         /* recursive : First | build(Rest…) */
-         template<typename First, typename Second, typename... Rest>
-         static constexpr auto build()
-         {
-            return concat(
-                        concat(First::qualifiedName, delim),
-                        build<Second, Rest...>());
-         }
-   };
-
-   // ──────────────────────────────────────────────────────────────
-   //  2.  Tuple interface
-   //      make_units_qname<Tuple>()
-   //      where Tuple = std::tuple<unit_exponent<…>, …>
-   // ──────────────────────────────────────────────────────────────
-   template<typename Tuple, std::size_t... Is>
-   constexpr auto make_units_qname_impl(std::index_sequence<Is...>)
-   {
-      return qname_builder::build<
-                  std::tuple_element_t<Is, Tuple>...>();
-   }
-
-   template<typename Tuple>
-   constexpr auto make_units_qname_tuple()
-   {
-      static_assert(std::tuple_size_v<Tuple> > 0,
-                     "make_units_qname<Tuple> : Tuple must contain units");
-      return make_units_qname_impl<Tuple>(
-                  std::make_index_sequence<std::tuple_size_v<Tuple>>{});
-   }
-
-   struct FundamentalUnitTag;
-
-   // TODO: MOVE THIS
-   template<typename Unit, int Num = 1, int Den = 1>
-   struct unit_exponent
-   {
-      using unit = Unit;
-      using exponent = std::ratio<Num, Den>;
-
-      static constexpr auto exponentString = ratio_literal<Num, Den>();
-
-      static constexpr string_literal<3> delim = "::"; // Size three due to null terminator
-      //static constexpr string_literal<2> delim = ":"; // Size three due to null terminator
-
-      static constexpr auto unit_qname = []{
-            if constexpr (std::is_base_of_v<FundamentalUnitTag, Unit>)
-                  return Unit::qualifiedName;                        // e.g. "length::meters"
-            else
-                  return dimension::make_units_qname_tuple<typename Unit::units>(); // e.g. "length::feet|length::feet"
-         }();
-
-      //static constexpr string_literal<unit_qname.size + delim.size - 1> test = concat(unit_qname, delim); // size - 1 to account for removed null terminator from first param
-      
-      //static constexpr string_literal<test.size + exponentString.size - 1> qualifiedName = concat(test, exponentString); // size - 1 to account for removed null terminator from first param
-
-      static constexpr auto qualifiedName = concat(unit_qname, delim, exponentString);
-   };
-
-   // ───────────────────────────── helper: map one unit_exponent ─────────────────────────────
-   template<typename UE> struct to_primary_ue;                 // primary template
-
-   template<typename U, int Num, int Den>                     // specialization
-   struct to_primary_ue<unit_exponent<U, Num, Den>>
-   {
-      using type = unit_exponent<typename U::Primary, Num, Den>;
-   };
-
-   template<typename UE>
-   using to_primary_ue_t = typename to_primary_ue<UE>::type;
-
-   // ───────────────────────────── helper: map a whole std::tuple ────────────────────────────
-   template<typename Tuple> struct to_primary_tuple;           // primary template
-
-   template<typename... UE>
-   struct to_primary_tuple<std::tuple<UE...>>
-   {
-      using type = std::tuple<to_primary_ue_t<UE>...>;
-   };
-
-   template<typename Tuple>
-   using to_primary_tuple_t = typename to_primary_tuple<Tuple>::type;
-
-
-
-
    template <typename> struct is_tuple: std::false_type {};
 
    template <typename ...T> struct is_tuple<std::tuple<T...>>: std::true_type {};

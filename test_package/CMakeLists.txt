@@ -10,9 +10,4 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
-# Set precision type as a compile definition, default to USE_DOUBLE if not set
-if(NOT DEFINED DIMENSIONAL_PrecisionType)
-    set(DIMENSIONAL_PrecisionType USE_DOUBLE CACHE STRING "Precision type")
-endif()
-
 add_executable(Dimension_Example ../example_project/example.cpp)

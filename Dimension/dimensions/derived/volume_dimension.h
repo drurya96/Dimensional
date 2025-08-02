@@ -9,25 +9,25 @@ namespace dimension
    //   These don't map to typical physical units, but are necessary to
    //   produce some derived units
    struct fluid_ounce_length : public lengthUnit<fluid_ounce_length, "FluidOuncelength", "FluidOuncelength"> {};
-   template<> struct Conversion<fluid_ounce_length, meters> { static constexpr PrecisionType slope = 0.03092440948; };
+   template<> struct Conversion<fluid_ounce_length, meters> { static constexpr double slope = 0.03092440948; };
 
    struct cup_length : public lengthUnit<cup_length, "Cuplength", "Cuplength"> {};
-   template<> struct Conversion<cup_length, meters> { static constexpr PrecisionType slope = 0.061848767433875; };
+   template<> struct Conversion<cup_length, meters> { static constexpr double slope = 0.061848767433875; };
 
    struct pint_length : public lengthUnit<pint_length, "Pintlength", "Pintlength"> {};
-   template<> struct Conversion<pint_length, meters> { static constexpr PrecisionType slope = 0.077924564; };
+   template<> struct Conversion<pint_length, meters> { static constexpr double slope = 0.077924564; };
 
    struct quart_length : public lengthUnit<quart_length, "Quartlength", "Quartlength"> {};
-   template<> struct Conversion<quart_length, meters> { static constexpr PrecisionType slope = 0.09817886355045986; };
+   template<> struct Conversion<quart_length, meters> { static constexpr double slope = 0.09817886355045986; };
 
    struct gallon_length : public lengthUnit<gallon_length, "Gallonlength", "Gallonlength"> {};
-   template<> struct Conversion<gallon_length, meters> { static constexpr PrecisionType slope = 0.155849128; };
+   template<> struct Conversion<gallon_length, meters> { static constexpr double slope = 0.155849128; };
 
    struct teaspoon_length : public lengthUnit<teaspoon_length, "Teaspoonlength", "Teaspoonlength"> {};
-   template<> struct Conversion<teaspoon_length, meters> { static constexpr PrecisionType slope = 0.017018344209166245; };
+   template<> struct Conversion<teaspoon_length, meters> { static constexpr double slope = 0.017018344209166245; };
 
    struct tablespoon_length : public lengthUnit<tablespoon_length, "Tablespoonlength", "Tablespoonlength"> {};
-   template<> struct Conversion<tablespoon_length, meters> { static constexpr PrecisionType slope = 0.02454469962137835; };
+   template<> struct Conversion<tablespoon_length, meters> { static constexpr double slope = 0.02454469962137835; };
 
 
    struct liters

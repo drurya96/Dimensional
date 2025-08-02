@@ -4,7 +4,8 @@
 #include <type_traits>
 #include <tuple>
 
-#include "../../base_dimension.h"
+#include "../../base_unit.h"
+#include "../../base_dimension_impl.h"
 
 namespace dimension
 {
@@ -49,8 +50,8 @@ namespace dimension
    /// @tparam T The unit type.
    /// @param obj The temperature object.
    /// @return The value in the specified unit.
-   template<is_temperature_unit T>
-   constexpr PrecisionType get_temperature_as(/*temperature_type*/ auto obj)
+   template<is_temperature_unit T, is_temperature DimType>
+   constexpr DimType::rep get_temperature_as(DimType obj)
    {
       return get_dimension_as<unit_exponent<T>>(obj);
    }

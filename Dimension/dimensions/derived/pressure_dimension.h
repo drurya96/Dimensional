@@ -9,16 +9,16 @@ namespace dimension
    //   These don't map to typical physical units, but are necessary to
    //   produce some derived units
    struct atmosphere_mass : public massUnit<atmosphere_mass, "Atmospheremass", "Atmospheremass"> {};
-   template<> struct Conversion<atmosphere_mass, grams> { static constexpr PrecisionType slope = 101325000.0; };
+   template<> struct Conversion<atmosphere_mass, grams> { static constexpr double slope = 101325000.0; };
 
    struct bar_mass : public massUnit<bar_mass, "Barmass", "Barmass"> {};
-   template<> struct Conversion<bar_mass, grams> { static constexpr PrecisionType slope = 100000000.0; };
+   template<> struct Conversion<bar_mass, grams> { static constexpr double slope = 100000000.0; };
 
    struct torr_mass : public massUnit<torr_mass, "Torrmass", "Torrmass"> {};
-   template<> struct Conversion<torr_mass, grams> { static constexpr PrecisionType slope = 133322.31202220617; };
+   template<> struct Conversion<torr_mass, grams> { static constexpr double slope = 133322.31202220617; };
 
    struct in_hg_mass : public massUnit<in_hg_mass, "inHgmass", "inHgmass"> {};
-   template<> struct Conversion<in_hg_mass, grams> { static constexpr PrecisionType slope = 3386386.725364; };
+   template<> struct Conversion<in_hg_mass, grams> { static constexpr double slope = 3386386.725364; };
 
 
    struct pascals

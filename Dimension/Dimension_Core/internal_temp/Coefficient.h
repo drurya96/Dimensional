@@ -5,8 +5,6 @@
 #include <ratio>
 #include <type_traits>
 
-#include "base_dimension_signature.h"
-
 namespace dimension
 {
 
