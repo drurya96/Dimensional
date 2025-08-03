@@ -4,6 +4,7 @@
 #include <array> // For std::array
 
 #include "string_literal.h"
+#include "string_concat.h"
 
 namespace dimension
 {

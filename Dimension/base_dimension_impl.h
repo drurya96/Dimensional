@@ -13,7 +13,10 @@
 
 #include "Dimension_Core/internal_temp/uuid.h"
 #include "Dimension_Core/internal_temp/UnitValidation.h"
-#include "Dimension_Core/internal_temp/UnitSimplifier.h"
+#include "Dimension_Core/internal_temp/full_simplify.h"
+#include "Dimension_Core/internal_temp/dim_extractor.h"
+#include "Dimension_Core/internal_temp/dimensional_equivalence.h"
+#include "Dimension_Core/internal_temp/collapse_units.h"
 #include "Dimension_Core/internal_temp/FundamentalUnitExtractor.h"
 #include "Dimension_Core/internal_temp/Conversion.h"
 #include "Dimension_Core/internal_temp/SI_Macro.h"
@@ -37,7 +40,7 @@ namespace dimension
    /// @tparam DenTuple tuple of Unit types to convert denominator to
    /// @return The value in terms of the given units
    template<are_unit_exponents... Units, typename Dim>
-   requires (matching_dimensions<base_dimension_impl<double, Units...>, Dim> && !same_units<std::tuple<Units...>, typename Dim::units>)
+   requires (dimensionally_equivalent<base_dimension_impl<double, Units...>, Dim> && !same_unit_representation<std::tuple<Units...>, typename Dim::units>)
    constexpr Dim::rep get_dimension_as(Dim obj)
    {
       return ConvertDim<typename Dim::units, std::tuple<Units...>>::Convert(
@@ -46,20 +49,20 @@ namespace dimension
    }
    
    template<are_unit_exponents... Units, typename Dim>
-   requires same_units<std::tuple<Units...>, typename Dim::units>
+   requires same_unit_representation<std::tuple<Units...>, typename Dim::units>
    constexpr Dim::rep get_dimension_as(Dim obj)
    {
       return obj.template get<Units...>();
    }
 
    template<typename UnitTuple>
-   constexpr base_dimensionFromTuple<UnitTuple>::dim::rep get_dimension_tuple(typename base_dimensionFromTuple<UnitTuple>::dim obj)
+   constexpr base_dimension_from_tuple<UnitTuple>::dim::rep get_dimension_tuple(typename base_dimension_from_tuple<UnitTuple>::dim obj)
    {
       return call_unpack<UnitTuple>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
 
    template<are_unit_exponents... Units, typename Dim>
-   requires (matching_dimensions<base_dimension_impl<double, Units...>, Dim> && !same_units<std::tuple<Units...>, typename Dim::units>)
+   requires (dimensionally_equivalent<base_dimension_impl<double, Units...>, Dim> && !same_unit_representation<std::tuple<Units...>, typename Dim::units>)
    constexpr Dim::rep get_scalar_as(Dim obj)
    {
       return ConvertDim<typename Dim::units, std::tuple<Units...>>::Convert(
@@ -68,7 +71,7 @@ namespace dimension
    }
    
    template<are_unit_exponents... Units, typename Dim>
-   requires same_units<std::tuple<Units...>, typename Dim::units>
+   requires same_unit_representation<std::tuple<Units...>, typename Dim::units>
    constexpr Dim::rep get_scalar_as(Dim obj)
    {
       return obj.template get_scalar<Units...>();
@@ -114,7 +117,7 @@ namespace dimension
       using symbols = typename handle_coefficients_tuple<coeffs>::symbols;
       using ratio = typename handle_coefficients_tuple<coeffs>::ratio;
 
-      using simplified = FullSimplifyType<units>::final_units;
+      using simplified = simplified_units_t<units>;
       using rep = Rep;
       
       //------------------------------------------------------------------
@@ -144,7 +147,7 @@ namespace dimension
       }
       
       template<typename... OtherUnits>
-      requires matching_dimensions<base_dimension_impl<Rep, Ts...>, base_dimension_impl<Rep, OtherUnits...>>
+      requires dimensionally_equivalent<base_dimension_impl<Rep, Ts...>, base_dimension_impl<Rep, OtherUnits...>>
       // Implicit conversion between dimensions of the same unit is core to Dimensional
       // cppcheck-suppress noExplicitConstructor
       constexpr base_dimension_impl(base_dimension_impl<Rep, OtherUnits...> obj) :
@@ -175,7 +178,7 @@ namespace dimension
       /// @param[in] rhs The object being added
       template<are_unit_exponents... Units2>
       //requires MatchingDimensionsNew<base_dimension_impl<NumTuple, DenTuple>, base_dimension_impl<NumTuple2, DenTuple2>>
-      requires matching_dimensions<base_dimension_impl<Rep, Ts...>, base_dimension_impl<Rep, Units2...>>
+      requires dimensionally_equivalent<base_dimension_impl<Rep, Ts...>, base_dimension_impl<Rep, Units2...>>
       constexpr base_dimension_impl<Rep, Ts...>& operator+=(const base_dimension_impl<Rep, Units2...>& rhs)
       {
          scalar += get_dimension_as<Ts...>(rhs);
@@ -188,7 +191,7 @@ namespace dimension
       /// @param[in] rhs The object being substracted
       template<are_unit_exponents... Units2>
       //requires MatchingDimensionsNew<base_dimension_impl<NumTuple, DenTuple>, base_dimension_impl<NumTuple2, DenTuple2>>
-      requires matching_dimensions<base_dimension_impl<Rep, Ts...>, base_dimension_impl<Rep, Units2...>>
+      requires dimensionally_equivalent<base_dimension_impl<Rep, Ts...>, base_dimension_impl<Rep, Units2...>>
       constexpr base_dimension_impl<Rep, Ts...>& operator-=(const base_dimension_impl<Rep, Units2...>& rhs)
       {
          scalar -= get_dimension_as<Ts...>(rhs);
@@ -218,37 +221,37 @@ namespace dimension
       base_dimension_impl<Rep, Ts...>& operator-=(Rep rhs) = delete; // Subtraction cannot be performed between a dimension and a scalar
 
       template<typename... Units2>
-      requires matching_dimensions<base_dimension_impl<Rep, Ts...>, base_dimension_impl<Rep, Units2...>>
+      requires dimensionally_equivalent<base_dimension_impl<Rep, Ts...>, base_dimension_impl<Rep, Units2...>>
       constexpr bool operator<(const base_dimension_impl<Rep, Units2...>& rhs) const {
          return scalar < get_dimension_as<Ts...>(rhs);
       }
 
       template<typename... Units2>
-      requires matching_dimensions<base_dimension_impl<Rep, Ts...>, base_dimension_impl<Rep, Units2...>>
+      requires dimensionally_equivalent<base_dimension_impl<Rep, Ts...>, base_dimension_impl<Rep, Units2...>>
       constexpr bool operator>(const base_dimension_impl<Rep, Units2...>& rhs) const {
          return scalar > get_dimension_as<Ts...>(rhs);
       }
 
       template<typename... Units2>
-      requires matching_dimensions<base_dimension_impl<Rep, Ts...>, base_dimension_impl<Rep, Units2...>>
+      requires dimensionally_equivalent<base_dimension_impl<Rep, Ts...>, base_dimension_impl<Rep, Units2...>>
       constexpr bool operator<=(const base_dimension_impl<Rep, Units2...>& rhs) const {
          return scalar <= get_dimension_as<Ts...>(rhs);
       }
 
       template<typename... Units2>
-      requires matching_dimensions<base_dimension_impl<Rep, Ts...>, base_dimension_impl<Rep, Units2...>>
+      requires dimensionally_equivalent<base_dimension_impl<Rep, Ts...>, base_dimension_impl<Rep, Units2...>>
       constexpr bool operator>=(const base_dimension_impl<Rep, Units2...>& rhs) const {
          return scalar >= get_dimension_as<Ts...>(rhs);
       }
 
       template<typename... Units2>
-      requires matching_dimensions<base_dimension_impl<Rep, Ts...>, base_dimension_impl<Rep, Units2...>>
+      requires dimensionally_equivalent<base_dimension_impl<Rep, Ts...>, base_dimension_impl<Rep, Units2...>>
       constexpr bool operator==(const base_dimension_impl<Rep, Units2...>& rhs) const {
          return scalar == get_dimension_as<Ts...>(rhs);
       }
 
       template<typename... Units2>
-      requires matching_dimensions<base_dimension_impl<Rep, Ts...>, base_dimension_impl<Rep, Units2...>>
+      requires dimensionally_equivalent<base_dimension_impl<Rep, Ts...>, base_dimension_impl<Rep, Units2...>>
       constexpr bool operator!=(const base_dimension_impl<Rep, Units2...>& rhs) const {
          return !(*this == rhs);
       }
@@ -256,7 +259,7 @@ namespace dimension
       template<typename... Units2>
       [[nodiscard]] constexpr Rep get() const
       {
-         static_assert(same_units<units, std::tuple<Units2...>>,
+         static_assert(same_unit_representation<units, std::tuple<Units2...>>,
             "get is an implementation detail of Dimensional and is not meant to be called externally! Prefer get_dimension_as. When using get directly, template parameter units must exactly match units of the object."
          );
 
@@ -268,7 +271,7 @@ namespace dimension
       template<typename... Units2>
       [[nodiscard]] constexpr Rep get_scalar() const
       {
-         static_assert(same_units<units, std::tuple<Units2...>>,
+         static_assert(same_unit_representation<units, std::tuple<Units2...>>,
             "get_scalar is an implementation detail of Dimensional and is not meant to be called externally! Prefer get_dimension_as. When using get directly, template parameter units must exactly match units of the object."
          );
 
@@ -278,7 +281,7 @@ namespace dimension
       template<typename Tuple>
       [[nodiscard]] constexpr Rep get_tuple_scalar() const
       {
-         static_assert(same_units<units, Tuple>,
+         static_assert(same_unit_representation<units, Tuple>,
             "get_tuple_scalar is an implementation detail of Dimensional and is not meant to be called externally! Prefer get_dimension_as. When using get directly, template parameter units must exactly match units of the object."
          );
 
@@ -322,9 +325,9 @@ namespace dimension
       using ratio = std::ratio_divide<typename Lhs::ratio, typename Rhs::ratio>;
       using symbols = typename divide_symbol_tuples<typename Lhs::symbols, typename Rhs::symbols>::type;
       using units_combined = tuple_cat_t<typename Lhs::units, typename FlipExponents<typename Rhs::units>::units>;
-      using units = typename InitialSimplifier<units_combined>::units;
+      using units = typename collapse_units<units_combined>::units;
 
-      return typename base_dimensionFromTuple<Rep, ratio, units, symbols>::dim(
+      return typename base_dimension_from_tuple<Rep, ratio, units, symbols>::dim(
          get_scalar_tuple<typename Lhs::units>(lhs) /
          get_scalar_tuple<typename Rhs::units>(rhs)
       );
@@ -346,9 +349,9 @@ namespace dimension
       using ratio = std::ratio_multiply<typename Lhs::ratio, typename Rhs::ratio>;
       using symbols = typename multiply_symbol_tuples<typename Lhs::symbols, typename Rhs::symbols>::type;
       using units_combined = tuple_cat_t<typename Lhs::units, typename Rhs::units>;
-      using units = typename InitialSimplifier<units_combined>::units;
+      using units = typename collapse_units<units_combined>::units;
       
-      return typename base_dimensionFromTuple<Rep, ratio, units, symbols>::dim(
+      return typename base_dimension_from_tuple<Rep, ratio, units, symbols>::dim(
          get_scalar_tuple<typename Lhs::units>(lhs) *
          get_scalar_tuple<typename Rhs::units>(rhs)
       );
@@ -361,7 +364,7 @@ namespace dimension
    template<typename Lhs>
    constexpr auto operator*(const Lhs& lhs, double scalar)
    {
-      return typename base_dimensionFromTuple<typename Lhs::units>::dim(
+      return typename base_dimension_from_tuple<typename Lhs::units>::dim(
          call_unpack<typename Lhs::units>([&]<typename... Units> { return get_dimension_as<Units...>(lhs); }) * scalar
       );
    }
@@ -377,7 +380,7 @@ namespace dimension
    template<typename Lhs>
    constexpr auto operator/(const Lhs& lhs, double scalar)
    {
-      return typename base_dimensionFromTuple<typename Lhs::units>::dim(
+      return typename base_dimension_from_tuple<typename Lhs::units>::dim(
          call_unpack<typename Lhs::units>([&]<typename... Units> { return get_dimension_as<Units...>(lhs); }) / scalar
       );
    }
@@ -386,7 +389,7 @@ namespace dimension
    template<typename Rhs>
    constexpr auto operator/(double scalar, const Rhs& rhs)
    {
-      return typename base_dimensionFromTuple<typename FlipExponents<typename Rhs::units>::units>::dim(
+      return typename base_dimension_from_tuple<typename FlipExponents<typename Rhs::units>::units>::dim(
          scalar / call_unpack<typename Rhs::units>([&]<typename... Units> { return get_dimension_as<Units...>(rhs); })
       );
    }
@@ -398,7 +401,7 @@ namespace dimension
    template<is_base_dimension Lhs, is_base_dimension Rhs>
    constexpr auto operator+(const Lhs& lhs, const Rhs& rhs)
    {
-      return typename base_dimensionFromTuple<typename Lhs::units>::dim(
+      return typename base_dimension_from_tuple<typename Lhs::units>::dim(
          call_unpack<typename Lhs::units>([&]<typename... Units> { return get_dimension_as<Units...>(lhs); }) +
          call_unpack<typename Lhs::units>([&]<typename... Units> { return get_dimension_as<Units...>(rhs); })
       );
@@ -410,7 +413,7 @@ namespace dimension
    template<is_base_dimension Lhs, is_base_dimension Rhs>
    constexpr auto operator-(const Lhs& lhs, const Rhs& rhs)
    {
-      return typename base_dimensionFromTuple<typename Lhs::units>::dim(
+      return typename base_dimension_from_tuple<typename Lhs::units>::dim(
          call_unpack<typename Lhs::units>([&]<typename... Units> { return get_dimension_as<Units...>(lhs); }) -
          call_unpack<typename Lhs::units>([&]<typename... Units> { return get_dimension_as<Units...>(rhs); })
       );

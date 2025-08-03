@@ -6,6 +6,7 @@
 #include "ratio_utils.h"
 #include "symbol_utils.h"
 #include "rep_type.h"
+#include "unit_exponent.h"
 
 namespace dimension
 {
@@ -21,10 +22,26 @@ namespace dimension
    class base_dimension_impl;
 
    template<typename T, typename Rep, typename... Exponents>
-   concept matching_dimension = std::is_convertible_v<
+   concept dimension_convertible_to = std::is_convertible_v<
       T,
       base_dimension_impl<Rep, Exponents...>
    >;
+
+   template<typename... Units>
+   struct FlipExponents;
+   
+   template<>
+   struct FlipExponents<std::tuple<>> {
+       using units = std::tuple<>;
+   };
+   
+   template<typename Unit, typename... Rest>
+   struct FlipExponents<std::tuple<Unit, Rest...>> {
+       using units = tuple_cat_t<
+           std::tuple<unit_exponent<typename Unit::unit, -Unit::exponent::num, Unit::exponent::den>>,
+           typename FlipExponents<std::tuple<Rest...>>::units
+       >;
+   };
 
 } // end dimension
 

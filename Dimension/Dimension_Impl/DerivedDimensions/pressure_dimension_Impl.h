@@ -65,7 +65,7 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a pressure type
    template<typename T, typename Rep>
-   concept is_pressure_as = matching_dimension<T, Rep,
+   concept is_pressure_as = dimension_convertible_to<T, Rep,
       unit_exponent<primary_mass, 1>, 
       unit_exponent<primary_length, -1>, 
       unit_exponent<primary_timespan, -2>
@@ -193,10 +193,10 @@ namespace dimension
    /// @brief Template specialization for named pressure units
    /// @tparam Named The named unit this pressure type is in terms of
    template<IsNamedpressureUnit Named, is_coefficient... Cs>
-   class pressure<Named, Cs...> : public base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim
+   class pressure<Named, Cs...> : public base_dimension_from_tuple<double, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim;
+      using Base = typename base_dimension_from_tuple<double, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
@@ -210,10 +210,10 @@ namespace dimension
    /// @brief Template specialization for named pressure units
    /// @tparam Named The named unit this pressure type is in terms of
    template<rep_type Rep, IsNamedpressureUnit Named, is_coefficient... Cs>
-   class pressure<Rep, Named, Cs...> : public base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
+   class pressure<Rep, Named, Cs...> : public base_dimension_from_tuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
+      using Base = typename base_dimension_from_tuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>

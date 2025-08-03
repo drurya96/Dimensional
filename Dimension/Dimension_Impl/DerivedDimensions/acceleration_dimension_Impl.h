@@ -40,7 +40,7 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a acceleration type
    template<typename T, typename Rep>
-   concept is_acceleration_as = matching_dimension<T, Rep,
+   concept is_acceleration_as = dimension_convertible_to<T, Rep,
       unit_exponent<primary_length, 1>, 
       unit_exponent<primary_timespan, -2>
    >;
@@ -156,10 +156,10 @@ namespace dimension
    /// @brief Template specialization for named acceleration units
    /// @tparam Named The named unit this acceleration type is in terms of
    template<IsNamedaccelerationUnit Named, is_coefficient... Cs>
-   class acceleration<Named, Cs...> : public base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim
+   class acceleration<Named, Cs...> : public base_dimension_from_tuple<double, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim;
+      using Base = typename base_dimension_from_tuple<double, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
@@ -173,10 +173,10 @@ namespace dimension
    /// @brief Template specialization for named acceleration units
    /// @tparam Named The named unit this acceleration type is in terms of
    template<rep_type Rep, IsNamedaccelerationUnit Named, is_coefficient... Cs>
-   class acceleration<Rep, Named, Cs...> : public base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
+   class acceleration<Rep, Named, Cs...> : public base_dimension_from_tuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
+      using Base = typename base_dimension_from_tuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>

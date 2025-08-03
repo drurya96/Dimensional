@@ -40,7 +40,7 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a angular_speed type
    template<typename T, typename Rep>
-   concept is_angular_speed_as = matching_dimension<T, Rep,
+   concept is_angular_speed_as = dimension_convertible_to<T, Rep,
       unit_exponent<primary_angle, 1>, 
       unit_exponent<primary_timespan, -1>
    >;
@@ -156,10 +156,10 @@ namespace dimension
    /// @brief Template specialization for named angular_speed units
    /// @tparam Named The named unit this angular_speed type is in terms of
    template<IsNamedangular_speedUnit Named, is_coefficient... Cs>
-   class angular_speed<Named, Cs...> : public base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim
+   class angular_speed<Named, Cs...> : public base_dimension_from_tuple<double, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim;
+      using Base = typename base_dimension_from_tuple<double, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
@@ -173,10 +173,10 @@ namespace dimension
    /// @brief Template specialization for named angular_speed units
    /// @tparam Named The named unit this angular_speed type is in terms of
    template<rep_type Rep, IsNamedangular_speedUnit Named, is_coefficient... Cs>
-   class angular_speed<Rep, Named, Cs...> : public base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
+   class angular_speed<Rep, Named, Cs...> : public base_dimension_from_tuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
+      using Base = typename base_dimension_from_tuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>

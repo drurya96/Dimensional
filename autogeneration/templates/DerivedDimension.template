@@ -49,7 +49,7 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a {{ dim.name }} type
    template<typename T, typename Rep>
-   concept is_{{ dim.name }}_as = matching_dimension<T, Rep,
+   concept is_{{ dim.name }}_as = dimension_convertible_to<T, Rep,
       {% for de in dim.definition %}
       unit_exponent<primary_{{ de.dim }}, {{ de.exponent_num }}>{{ ", " if not loop.last }}
       {% endfor %}
@@ -177,10 +177,10 @@ namespace dimension
    /// @brief Template specialization for named {{ dim.name }} units
    /// @tparam Named The named unit this {{ dim.name }} type is in terms of
    template<IsNamed{{ dim.name }}Unit Named, is_coefficient... Cs>
-   class {{ dim.name }}<Named, Cs...> : public base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim
+   class {{ dim.name }}<Named, Cs...> : public base_dimension_from_tuple<double, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim;
+      using Base = typename base_dimension_from_tuple<double, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
@@ -194,10 +194,10 @@ namespace dimension
    /// @brief Template specialization for named {{ dim.name }} units
    /// @tparam Named The named unit this {{ dim.name }} type is in terms of
    template<rep_type Rep, IsNamed{{ dim.name }}Unit Named, is_coefficient... Cs>
-   class {{ dim.name }}<Rep, Named, Cs...> : public base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
+   class {{ dim.name }}<Rep, Named, Cs...> : public base_dimension_from_tuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
+      using Base = typename base_dimension_from_tuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>

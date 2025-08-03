@@ -6,6 +6,10 @@
 
 #include "TupleHandling.h"
 #include "rep_type.h"
+#include "base_dimension_from_tuple.h"
+#include "collapse_units.h"
+#include "full_simplify.h"
+#include "convertible.h"
 
 namespace dimension
 {
@@ -99,17 +103,6 @@ namespace dimension
    template<typename From, typename To>
    struct Conversion;
 
-   /// @brief Concept to check if Conversion is defined
-   template<typename From, typename To>
-   concept HasConversion = requires { Conversion<From, To>::slope; };
-
-   /// @brief Concept to check if the unit is convertible to a primary unit (either direction)
-   template<typename T>
-   concept PrimaryConvertible = requires {
-      typename T::Primary;
-      requires (std::is_same_v<T, typename T::Primary> || HasConversion<T, typename T::Primary> || HasConversion<typename T::Primary, T>);
-   };
-
    /// @brief Implementation of convert function
    /// @tparam Conv Conversion struct
    /// @tparam Inverse Whether to use the inverse of the conversion traits
@@ -181,6 +174,184 @@ namespace dimension
       [[deprecated("Attempting to create new dimension ...")]]
       static void call() {}
    };
+
+
+
+
+
+
+   // =================================
+   // ======= More Things... ==========
+   // =================================
+
+
+   // ============================================================
+   // ============== Find Matching Unit by Dimension =============
+   // ============================================================
+
+   // THIS IS NAMED VERY WRONG AND IS CONFUSING
+   // THIS IS REALLY FINDING MATCHING UNITS, NOT DIMENSIONS
+
+   template<typename Target, typename Tuple>
+   struct find_unit_by_dimension;
+
+   // Empty case
+   template<typename Target>
+   struct find_unit_by_dimension<Target, std::tuple<>> {
+      static constexpr bool found = false;
+
+      struct Dummy
+      {
+         using exponent = std::ratio<0>;
+      };
+      using type = Dummy;
+   };
+
+   // Recursive case
+   template<typename Target, typename Head, typename... Tail>
+   struct find_unit_by_dimension<Target, std::tuple<Head, Tail...>> {
+   private:
+      static constexpr bool is_match = std::is_same_v<typename Target::unit, typename Head::unit>;
+
+   public:
+      static constexpr bool found = is_match || find_unit_by_dimension<Target, std::tuple<Tail...>>::found;
+      using type = std::conditional_t<is_match, Head, typename find_unit_by_dimension<Target, std::tuple<Tail...>>::type>;
+   };
+
+   template<typename From, typename ToTuple>
+   struct MatchUnit;
+   
+
+   template<typename From>
+   struct MatchUnit<From, std::tuple<>>
+   {
+      using type = void; // Should never occur
+   };
+
+   template<typename From, typename Head, typename... Tail>
+   struct MatchUnit<From, std::tuple<Head, Tail...>>
+   {
+      //using unit_type = typename From::unit;
+   
+      static constexpr bool match = is_same_dim<typename From::unit, typename Head::unit>::value;
+
+      using type = std::conditional_t<
+         match,
+         Head,
+         typename MatchUnit<From, std::tuple<Tail...>>::type
+      >;
+   };
+
+   template<typename... Units>
+   struct ConvertSimplified;
+
+   template<typename... ToUnits>
+   struct ConvertSimplified<std::tuple<>, std::tuple<ToUnits...>>
+   {
+      static constexpr double scalar = 1.0;
+   };
+
+   template<typename FromUnit, typename... FromRest, typename... ToUnits>
+   struct ConvertSimplified<std::tuple<FromUnit, FromRest...>, std::tuple<ToUnits...>>
+   {
+      using ToMatch = typename MatchUnit<FromUnit, std::tuple<ToUnits...>>::type;
+
+      static constexpr double scalar =
+         details::do_conversion<typename ToMatch::unit, FromUnit>(1.0) *
+         ConvertSimplified<std::tuple<FromRest...>, std::tuple<ToUnits...>>::scalar;
+   };
+
+
+
+
+
+
+
+   // ============================================================
+   // ==================== Subtract Tuples =======================
+   // ============================================================
+
+   template<typename TupleA, typename TupleB>
+   struct Subtractunit_exponents;
+
+   // Empty base case
+   template<>
+   struct Subtractunit_exponents<std::tuple<>, std::tuple<>> {
+      using type = std::tuple<>;
+   };
+
+   // General case: A and B are std::tuple<unit_exponent<...>...>
+   template<typename... UnitsA, typename... UnitsB>
+   struct Subtractunit_exponents<std::tuple<UnitsA...>, std::tuple<UnitsB...>> {
+   private:
+      template<typename UnitA>
+      struct subtract_one {
+         using matching = find_unit_by_dimension<UnitA, std::tuple<UnitsB...>>;
+         
+         using result = std::conditional_t<
+               matching::found,
+               unit_exponent<
+                  typename UnitA::unit,
+                  std::ratio_subtract<
+                     typename UnitA::exponent,
+                     typename matching::type::exponent
+                  >::num,
+                  std::ratio_subtract<
+                     typename UnitA::exponent,
+                     typename matching::type::exponent
+                  >::den
+               >,
+               UnitA
+         >;
+      };
+
+   public:
+      using type = tuple_cat_t<
+         std::tuple<typename subtract_one<UnitsA>::result>...
+      >;
+   };
+
+   // ============================================================
+   // ======================= ConvertDim =========================
+   // ============================================================
+
+   template<typename FromTuple, typename ToTuple>
+   struct ConvertDim
+   {
+
+       using RawFrom = typename base_dimension_from_tuple<FromTuple>::dim;
+       using RawTo = typename base_dimension_from_tuple<ToTuple>::dim;
+
+       using SimplifiedFrom = typename collapse_units<FromTuple>::units;
+       using SimplifiedTo = typename collapse_units<ToTuple>::units;
+   
+       using FromRemainingRaw = typename Subtractunit_exponents<SimplifiedFrom, SimplifiedTo>::type;
+       using ToRemainingRaw = typename Subtractunit_exponents<SimplifiedTo, SimplifiedFrom>::type;
+   
+       using FromRemaining = typename RemoveZeros<FromRemainingRaw>::units;
+       using ToRemaining = typename RemoveZeros<ToRemainingRaw>::units;
+
+      static constexpr double Convert(double value) 
+      {
+
+         using FromFullySimplified = decltype(full_simplify(RawFrom(1.0)));
+         using ToFullySimplified = decltype(full_simplify(RawTo(1.0)));
+
+         FromFullySimplified fullSimplified = full_simplify(RawFrom(value));
+         constexpr double inverse_scalar = 1.0 / (full_simplify(RawTo(1.0)).template get_tuple_scalar<typename ToFullySimplified::units>());
+
+         using converter = ConvertSimplified<typename FromFullySimplified::units, typename ToFullySimplified::units>;
+
+         return fullSimplified.template get_tuple_scalar<typename FromFullySimplified::units>() * inverse_scalar * converter::scalar;
+   }
+   };
+
+
+
+
+
+
+
 
 
 } // end Dimension

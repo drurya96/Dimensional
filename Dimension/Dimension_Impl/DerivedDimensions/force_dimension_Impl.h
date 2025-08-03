@@ -65,7 +65,7 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a force type
    template<typename T, typename Rep>
-   concept is_force_as = matching_dimension<T, Rep,
+   concept is_force_as = dimension_convertible_to<T, Rep,
       unit_exponent<primary_mass, 1>, 
       unit_exponent<primary_length, 1>, 
       unit_exponent<primary_timespan, -2>
@@ -193,10 +193,10 @@ namespace dimension
    /// @brief Template specialization for named force units
    /// @tparam Named The named unit this force type is in terms of
    template<IsNamedforceUnit Named, is_coefficient... Cs>
-   class force<Named, Cs...> : public base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim
+   class force<Named, Cs...> : public base_dimension_from_tuple<double, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim;
+      using Base = typename base_dimension_from_tuple<double, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
@@ -210,10 +210,10 @@ namespace dimension
    /// @brief Template specialization for named force units
    /// @tparam Named The named unit this force type is in terms of
    template<rep_type Rep, IsNamedforceUnit Named, is_coefficient... Cs>
-   class force<Rep, Named, Cs...> : public base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
+   class force<Rep, Named, Cs...> : public base_dimension_from_tuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
+      using Base = typename base_dimension_from_tuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>

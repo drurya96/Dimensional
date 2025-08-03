@@ -42,15 +42,6 @@ namespace dimension
       std::tuple_size_v<Tuple> == 0 || 
       all_satisfy_unit_constraints<Tuple>(std::make_index_sequence<std::tuple_size_v<Tuple>>{});
 
-
-   template<typename T>
-   concept is_unit_exponent = requires {
-         typename T::unit;
-         typename T::exponent;
-   };
-
-   template<typename... Ts>
-   concept are_unit_exponents = (is_unit_exponent<Ts> && ...);
 }
 
 #endif // DIMENSION_UNIT_VALIDATION_H

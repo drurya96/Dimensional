@@ -14,7 +14,7 @@ TEST(TempTests, Test1) {
    length<double, meters> a{5};
    base_dimension_impl<int, unit_exponent<meters>> t{5};
 
-   static_assert(same_units<std::tuple<unit_exponent<meters>>, typename decltype(t)::units>);
+   static_assert(same_unit_representation<std::tuple<unit_exponent<meters>>, typename decltype(t)::units>);
 
    double b = get_dimension_as<unit_exponent<meters>>(t);
    double c = get_length_as<kilo_meters>(a);

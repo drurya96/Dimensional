@@ -40,7 +40,7 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a diffusion_coefficient type
    template<typename T, typename Rep>
-   concept is_diffusion_coefficient_as = matching_dimension<T, Rep,
+   concept is_diffusion_coefficient_as = dimension_convertible_to<T, Rep,
       unit_exponent<primary_length, 2>, 
       unit_exponent<primary_timespan, -1>
    >;
@@ -156,10 +156,10 @@ namespace dimension
    /// @brief Template specialization for named diffusion_coefficient units
    /// @tparam Named The named unit this diffusion_coefficient type is in terms of
    template<IsNameddiffusion_coefficientUnit Named, is_coefficient... Cs>
-   class diffusion_coefficient<Named, Cs...> : public base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim
+   class diffusion_coefficient<Named, Cs...> : public base_dimension_from_tuple<double, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim;
+      using Base = typename base_dimension_from_tuple<double, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
@@ -173,10 +173,10 @@ namespace dimension
    /// @brief Template specialization for named diffusion_coefficient units
    /// @tparam Named The named unit this diffusion_coefficient type is in terms of
    template<rep_type Rep, IsNameddiffusion_coefficientUnit Named, is_coefficient... Cs>
-   class diffusion_coefficient<Rep, Named, Cs...> : public base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
+   class diffusion_coefficient<Rep, Named, Cs...> : public base_dimension_from_tuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
+      using Base = typename base_dimension_from_tuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>

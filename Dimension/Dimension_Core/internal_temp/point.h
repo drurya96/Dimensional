@@ -8,6 +8,8 @@
 
 #include "Conversion.h"
 
+#include "get_factor.h"
+
 namespace dimension {
 
    struct FundamentalUnitTag;
@@ -96,7 +98,7 @@ namespace dimension {
       template<typename P>
       static constexpr double convert(const P& obj) {
          double raw = get_point_as_impl<SourceFrame, SourceFrame>::convert(obj) + point_offset<SourceFrame>();
-         return DoConversion<TargetUnit,  unit_exponent<typename SourceFrame::unit>>(raw);
+         return details::do_conversion<TargetUnit,  unit_exponent<typename SourceFrame::unit>>(raw);
       }
    };
    
@@ -111,7 +113,7 @@ namespace dimension {
       template<typename P>
       static constexpr double convert(const P& obj) {
          double raw = get_point_as_impl<SourceFrame, SourceFrame>::convert(obj) + point_offset<SourceFrame>();
-         double in_target_unit = DoConversion<typename TargetFrame::unit, unit_exponent<typename SourceFrame::unit>>(raw);
+         double in_target_unit = details::do_conversion<typename TargetFrame::unit, unit_exponent<typename SourceFrame::unit>>(raw);
          return in_target_unit - point_offset<TargetFrame>();
       }
    };
@@ -140,7 +142,7 @@ namespace dimension {
       template<typename P>
       static constexpr double convert(const P& obj) {
          double raw = get_point_as_impl<SourceUnit, SourceUnit>::convert(obj);
-         double in_target_unit = DoConversion<typename TargetFrame::unit, unit_exponent<typename SourceUnit::unit>>(raw);
+         double in_target_unit = details::do_conversion<typename TargetFrame::unit, unit_exponent<typename SourceUnit::unit>>(raw);
          return in_target_unit - point_offset<TargetFrame>();
       }
    };

@@ -182,7 +182,7 @@ namespace dimension
 
    /// @brief Concept to verify a dimension can be treated as a electric_potential type
    template<typename T, typename Rep>
-   concept is_electric_potential_as = matching_dimension<T, Rep,
+   concept is_electric_potential_as = dimension_convertible_to<T, Rep,
       unit_exponent<primary_mass, 1>, 
       unit_exponent<primary_length, 2>, 
       unit_exponent<primary_timespan, -2>, 
@@ -322,10 +322,10 @@ namespace dimension
    /// @brief Template specialization for named electric_potential units
    /// @tparam Named The named unit this electric_potential type is in terms of
    template<IsNamedelectric_potentialUnit Named, is_coefficient... Cs>
-   class electric_potential<Named, Cs...> : public base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim
+   class electric_potential<Named, Cs...> : public base_dimension_from_tuple<double, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<double, typename Named::units, std::tuple<Cs...>>::dim;
+      using Base = typename base_dimension_from_tuple<double, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
@@ -339,10 +339,10 @@ namespace dimension
    /// @brief Template specialization for named electric_potential units
    /// @tparam Named The named unit this electric_potential type is in terms of
    template<rep_type Rep, IsNamedelectric_potentialUnit Named, is_coefficient... Cs>
-   class electric_potential<Rep, Named, Cs...> : public base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
+   class electric_potential<Rep, Named, Cs...> : public base_dimension_from_tuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimensionFromTuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
+      using Base = typename base_dimension_from_tuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>

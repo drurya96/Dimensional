@@ -17,7 +17,7 @@ TEST(Simplification, SimplificationWithMath) {
    // So the value should be 0.056959025955088914139 seconds
    auto test = ((length1 * time1) / (length2 * time2)) * time1;
    //timespan t = ((length1 * time1) / (length2 * time2)) * time1;
-   ASSERT_TRUE((is_same_v<decltype(FullSimplify(test)), base_dimension<unit_exponent<seconds>>>));
+   ASSERT_TRUE((is_same_v<decltype(full_simplify(test)), base_dimension<unit_exponent<seconds>>>));
    
    ASSERT_NEAR((get_dimension_as<unit_exponent<seconds>>(test)), 0.056959027777777775, TOLERANCE); // TODO: Double check precision
    ASSERT_NEAR((get_timespan_as<seconds>(test)), 0.056959027777777775, TOLERANCE); // TODO: Double check precision
@@ -34,7 +34,7 @@ TEST(Simplification, Simplification) {
    // Note, simplification currently works left-to-right, so minutes won't cancel with minutes in this example
 
    // This means the final type will be a per-minutes
-   auto test_after = FullSimplify(test_before);
+   auto test_after = full_simplify(test_before);
 
    ASSERT_TRUE((is_same_v<decltype(test_after), base_dimension<unit_exponent<seconds, -1>>>));
    ASSERT_NEAR((get_dimension_as<unit_exponent<minutes, -1>>(test_after)), 1968.504, TOLERANCE);

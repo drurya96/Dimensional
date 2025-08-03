@@ -40,11 +40,9 @@ namespace dimension
    /// @brief Concept to check if a type is a timespan dimension.
    /// @tparam T The type to check.
    template<typename T>
-   concept is_timespan = requires {
-      typename decltype(FullSimplify(T{}))::units;
-   } &&
-   std::tuple_size_v<typename decltype(FullSimplify(T{}))::units> == 1 &&
-   is_timespan_unit<typename std::tuple_element_t<0, typename decltype(FullSimplify(T{}))::units>::unit>;
+   concept is_timespan = 
+      std::tuple_size_v<simplified_units_t<typename T::units>> == 1 &&
+      is_timespan_unit<typename std::tuple_element_t<0, simplified_units_t<typename T::units>>::unit>;
 
    /// @brief Retrieves the value of a timespan object in the specified unit.
    /// @tparam T The unit type.
@@ -89,7 +87,7 @@ namespace dimension
       /// @tparam Ts The units of the base_dimension.
       /// @param base The base_dimension object to construct from.
       template<typename... Ts>
-      requires matching_dimensions<impl, base_dimension_impl<Rep, Ts...>>
+      requires is_timespan<base_dimension_impl<Rep, Ts...>>
       // Implicit conversion between dimensions of the same unit is core to Dimensional
       // cppcheck-suppress noExplicitConstructor
       constexpr timespan(const base_dimension_impl<Rep, Ts...>& base) : impl(get_dimension_as<unit_exponent<Unit>>(base)) {}

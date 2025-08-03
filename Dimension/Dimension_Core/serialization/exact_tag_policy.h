@@ -29,7 +29,7 @@ namespace dimension
    [[nodiscard]]
    constexpr Dim make_from_primary(double val)
    {
-      return typename base_dimensionFromTuple<to_primary_tuple_t<typename Dim::simplified>>::dim{val};
+      return typename base_dimension_from_tuple<to_primary_tuple_t<typename Dim::simplified>>::dim{val};
    }
 
    // ---------------------------------------------------------------------
