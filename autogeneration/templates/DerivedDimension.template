@@ -112,7 +112,7 @@ namespace dimension
    >
    class {{ dim.name }}<{{t_list}}, Cs...> : public base_dimension_impl<double,
       {% for de in dim.definition %}
-      unit_exponent<typename Extractor<{{ de.dim }}Type, {{t_list}}>::type, {{ de.exponent_num }}>,
+      unit_exponent<typename unit_filter<{{ de.dim }}Type, {{t_list}}>::type, {{ de.exponent_num }}>,
       {% endfor %}
       Cs...
    >
@@ -120,7 +120,7 @@ namespace dimension
    public:
       using Base = base_dimension_impl<double,
          {% for de in dim.definition %}
-         unit_exponent<typename Extractor<{{ de.dim }}Type, {{t_list}}>::type, {{ de.exponent_num }}>,
+         unit_exponent<typename unit_filter<{{ de.dim }}Type, {{t_list}}>::type, {{ de.exponent_num }}>,
          {% endfor %}
          Cs...
       >;
@@ -150,7 +150,7 @@ namespace dimension
    >
    class {{ dim.name }}<Rep, {{t_list}}, Cs...> : public base_dimension_impl<Rep,
       {% for de in dim.definition %}
-      unit_exponent<typename Extractor<{{ de.dim }}Type, {{t_list}}>::type, {{ de.exponent_num }}>,
+      unit_exponent<typename unit_filter<{{ de.dim }}Type, {{t_list}}>::type, {{ de.exponent_num }}>,
       {% endfor %}
       Cs...
    >
@@ -158,7 +158,7 @@ namespace dimension
    public:
       using Base = base_dimension_impl<Rep,
          {% for de in dim.definition %}
-         unit_exponent<typename Extractor<{{ de.dim }}Type, {{t_list}}>::type, {{ de.exponent_num }}>,
+         unit_exponent<typename unit_filter<{{ de.dim }}Type, {{t_list}}>::type, {{ de.exponent_num }}>,
          {% endfor %}
          Cs...
       >;
@@ -276,7 +276,7 @@ namespace dimension
    {{ dim.name }}(Dim) -> 
    {{ dim.name }}<
       {% for de in dim.definition %}
-      DimExtractor<{{ de.dim }}Type, Dim>{{ "," if not loop.last}}
+      simplified_unit_filter<{{ de.dim }}Type, typename Dim::units>{{ "," if not loop.last}}
       {% endfor %}
    >;
 }

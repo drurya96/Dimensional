@@ -127,17 +127,17 @@ namespace dimension
       T2
    >
    class magnetic_field<T0, T1, T2, Cs...> : public base_dimension_impl<double,
-      unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
-      unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -1>,
-      unit_exponent<typename Extractor<chargeType, T0, T1, T2>::type, -1>,
+      unit_exponent<typename unit_filter<massType, T0, T1, T2>::type, 1>,
+      unit_exponent<typename unit_filter<timespanType, T0, T1, T2>::type, -1>,
+      unit_exponent<typename unit_filter<chargeType, T0, T1, T2>::type, -1>,
       Cs...
    >
    {
    public:
       using Base = base_dimension_impl<double,
-         unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
-         unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -1>,
-         unit_exponent<typename Extractor<chargeType, T0, T1, T2>::type, -1>,
+         unit_exponent<typename unit_filter<massType, T0, T1, T2>::type, 1>,
+         unit_exponent<typename unit_filter<timespanType, T0, T1, T2>::type, -1>,
+         unit_exponent<typename unit_filter<chargeType, T0, T1, T2>::type, -1>,
          Cs...
       >;
    
@@ -165,17 +165,17 @@ namespace dimension
       T2
    >
    class magnetic_field<Rep, T0, T1, T2, Cs...> : public base_dimension_impl<Rep,
-      unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
-      unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -1>,
-      unit_exponent<typename Extractor<chargeType, T0, T1, T2>::type, -1>,
+      unit_exponent<typename unit_filter<massType, T0, T1, T2>::type, 1>,
+      unit_exponent<typename unit_filter<timespanType, T0, T1, T2>::type, -1>,
+      unit_exponent<typename unit_filter<chargeType, T0, T1, T2>::type, -1>,
       Cs...
    >
    {
    public:
       using Base = base_dimension_impl<Rep,
-         unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
-         unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -1>,
-         unit_exponent<typename Extractor<chargeType, T0, T1, T2>::type, -1>,
+         unit_exponent<typename unit_filter<massType, T0, T1, T2>::type, 1>,
+         unit_exponent<typename unit_filter<timespanType, T0, T1, T2>::type, -1>,
+         unit_exponent<typename unit_filter<chargeType, T0, T1, T2>::type, -1>,
          Cs...
       >;
    
@@ -291,9 +291,9 @@ namespace dimension
    template<is_magnetic_field Dim>
    magnetic_field(Dim) -> 
    magnetic_field<
-      DimExtractor<massType, Dim>,
-      DimExtractor<timespanType, Dim>,
-      DimExtractor<chargeType, Dim>
+      simplified_unit_filter<massType, typename Dim::units>,
+      simplified_unit_filter<timespanType, typename Dim::units>,
+      simplified_unit_filter<chargeType, typename Dim::units>
    >;
 }
 

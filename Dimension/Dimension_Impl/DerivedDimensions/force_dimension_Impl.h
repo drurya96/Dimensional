@@ -127,17 +127,17 @@ namespace dimension
       T2
    >
    class force<T0, T1, T2, Cs...> : public base_dimension_impl<double,
-      unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
-      unit_exponent<typename Extractor<lengthType, T0, T1, T2>::type, 1>,
-      unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -2>,
+      unit_exponent<typename unit_filter<massType, T0, T1, T2>::type, 1>,
+      unit_exponent<typename unit_filter<lengthType, T0, T1, T2>::type, 1>,
+      unit_exponent<typename unit_filter<timespanType, T0, T1, T2>::type, -2>,
       Cs...
    >
    {
    public:
       using Base = base_dimension_impl<double,
-         unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
-         unit_exponent<typename Extractor<lengthType, T0, T1, T2>::type, 1>,
-         unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -2>,
+         unit_exponent<typename unit_filter<massType, T0, T1, T2>::type, 1>,
+         unit_exponent<typename unit_filter<lengthType, T0, T1, T2>::type, 1>,
+         unit_exponent<typename unit_filter<timespanType, T0, T1, T2>::type, -2>,
          Cs...
       >;
    
@@ -165,17 +165,17 @@ namespace dimension
       T2
    >
    class force<Rep, T0, T1, T2, Cs...> : public base_dimension_impl<Rep,
-      unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
-      unit_exponent<typename Extractor<lengthType, T0, T1, T2>::type, 1>,
-      unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -2>,
+      unit_exponent<typename unit_filter<massType, T0, T1, T2>::type, 1>,
+      unit_exponent<typename unit_filter<lengthType, T0, T1, T2>::type, 1>,
+      unit_exponent<typename unit_filter<timespanType, T0, T1, T2>::type, -2>,
       Cs...
    >
    {
    public:
       using Base = base_dimension_impl<Rep,
-         unit_exponent<typename Extractor<massType, T0, T1, T2>::type, 1>,
-         unit_exponent<typename Extractor<lengthType, T0, T1, T2>::type, 1>,
-         unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -2>,
+         unit_exponent<typename unit_filter<massType, T0, T1, T2>::type, 1>,
+         unit_exponent<typename unit_filter<lengthType, T0, T1, T2>::type, 1>,
+         unit_exponent<typename unit_filter<timespanType, T0, T1, T2>::type, -2>,
          Cs...
       >;
    
@@ -291,9 +291,9 @@ namespace dimension
    template<is_force Dim>
    force(Dim) -> 
    force<
-      DimExtractor<massType, Dim>,
-      DimExtractor<lengthType, Dim>,
-      DimExtractor<timespanType, Dim>
+      simplified_unit_filter<massType, typename Dim::units>,
+      simplified_unit_filter<lengthType, typename Dim::units>,
+      simplified_unit_filter<timespanType, typename Dim::units>
    >;
 }
 

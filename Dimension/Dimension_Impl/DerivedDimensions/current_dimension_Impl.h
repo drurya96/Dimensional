@@ -96,15 +96,15 @@ namespace dimension
       T1
    >
    class current<T0, T1, Cs...> : public base_dimension_impl<double,
-      unit_exponent<typename Extractor<chargeType, T0, T1>::type, 1>,
-      unit_exponent<typename Extractor<timespanType, T0, T1>::type, -1>,
+      unit_exponent<typename unit_filter<chargeType, T0, T1>::type, 1>,
+      unit_exponent<typename unit_filter<timespanType, T0, T1>::type, -1>,
       Cs...
    >
    {
    public:
       using Base = base_dimension_impl<double,
-         unit_exponent<typename Extractor<chargeType, T0, T1>::type, 1>,
-         unit_exponent<typename Extractor<timespanType, T0, T1>::type, -1>,
+         unit_exponent<typename unit_filter<chargeType, T0, T1>::type, 1>,
+         unit_exponent<typename unit_filter<timespanType, T0, T1>::type, -1>,
          Cs...
       >;
    
@@ -130,15 +130,15 @@ namespace dimension
       T1
    >
    class current<Rep, T0, T1, Cs...> : public base_dimension_impl<Rep,
-      unit_exponent<typename Extractor<chargeType, T0, T1>::type, 1>,
-      unit_exponent<typename Extractor<timespanType, T0, T1>::type, -1>,
+      unit_exponent<typename unit_filter<chargeType, T0, T1>::type, 1>,
+      unit_exponent<typename unit_filter<timespanType, T0, T1>::type, -1>,
       Cs...
    >
    {
    public:
       using Base = base_dimension_impl<Rep,
-         unit_exponent<typename Extractor<chargeType, T0, T1>::type, 1>,
-         unit_exponent<typename Extractor<timespanType, T0, T1>::type, -1>,
+         unit_exponent<typename unit_filter<chargeType, T0, T1>::type, 1>,
+         unit_exponent<typename unit_filter<timespanType, T0, T1>::type, -1>,
          Cs...
       >;
    
@@ -250,8 +250,8 @@ namespace dimension
    template<is_current Dim>
    current(Dim) -> 
    current<
-      DimExtractor<chargeType, Dim>,
-      DimExtractor<timespanType, Dim>
+      simplified_unit_filter<chargeType, typename Dim::units>,
+      simplified_unit_filter<timespanType, typename Dim::units>
    >;
 }
 

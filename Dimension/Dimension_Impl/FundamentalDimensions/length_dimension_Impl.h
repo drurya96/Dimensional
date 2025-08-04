@@ -119,7 +119,7 @@ namespace dimension
    /// @brief Deduction guide for length constructor with base_dimension.
    /// @tparam lengthUnit The unit type.
    template<is_length Dim>
-   length(Dim) -> length<typename Dim::rep, DimExtractor<lengthType, Dim>>;
+   length(Dim) -> length<typename Dim::rep, simplified_unit_filter<lengthType, typename Dim::units>>;
 
    template<rep_type Rep, is_length_unit Unit, is_coefficient... Cs>
    length(const length<Rep, Unit, Cs...>&) -> length<Rep, Unit, Cs...>;

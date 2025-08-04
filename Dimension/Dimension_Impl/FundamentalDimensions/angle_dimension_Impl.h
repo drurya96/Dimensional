@@ -119,7 +119,7 @@ namespace dimension
    /// @brief Deduction guide for angle constructor with base_dimension.
    /// @tparam angleUnit The unit type.
    template<is_angle Dim>
-   angle(Dim) -> angle<typename Dim::rep, DimExtractor<angleType, Dim>>;
+   angle(Dim) -> angle<typename Dim::rep, simplified_unit_filter<angleType, typename Dim::units>>;
 
    template<rep_type Rep, is_angle_unit Unit, is_coefficient... Cs>
    angle(const angle<Rep, Unit, Cs...>&) -> angle<Rep, Unit, Cs...>;

@@ -82,13 +82,13 @@ namespace dimension
       T0
    >
    class volume<T0, Cs...> : public base_dimension_impl<double,
-      unit_exponent<typename Extractor<lengthType, T0>::type, 3>,
+      unit_exponent<typename unit_filter<lengthType, T0>::type, 3>,
       Cs...
    >
    {
    public:
       using Base = base_dimension_impl<double,
-         unit_exponent<typename Extractor<lengthType, T0>::type, 3>,
+         unit_exponent<typename unit_filter<lengthType, T0>::type, 3>,
          Cs...
       >;
    
@@ -112,13 +112,13 @@ namespace dimension
       T0
    >
    class volume<Rep, T0, Cs...> : public base_dimension_impl<Rep,
-      unit_exponent<typename Extractor<lengthType, T0>::type, 3>,
+      unit_exponent<typename unit_filter<lengthType, T0>::type, 3>,
       Cs...
    >
    {
    public:
       using Base = base_dimension_impl<Rep,
-         unit_exponent<typename Extractor<lengthType, T0>::type, 3>,
+         unit_exponent<typename unit_filter<lengthType, T0>::type, 3>,
          Cs...
       >;
    
@@ -226,7 +226,7 @@ namespace dimension
    template<is_volume Dim>
    volume(Dim) -> 
    volume<
-      DimExtractor<lengthType, Dim>
+      simplified_unit_filter<lengthType, typename Dim::units>
    >;
 }
 

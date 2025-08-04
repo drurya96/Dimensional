@@ -119,7 +119,7 @@ namespace dimension
    /// @brief Deduction guide for charge constructor with base_dimension.
    /// @tparam chargeUnit The unit type.
    template<is_charge Dim>
-   charge(Dim) -> charge<typename Dim::rep, DimExtractor<chargeType, Dim>>;
+   charge(Dim) -> charge<typename Dim::rep, simplified_unit_filter<chargeType, typename Dim::units>>;
 
    template<rep_type Rep, is_charge_unit Unit, is_coefficient... Cs>
    charge(const charge<Rep, Unit, Cs...>&) -> charge<Rep, Unit, Cs...>;

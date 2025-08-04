@@ -1,5 +1,5 @@
-#ifndef DIMENSION_UNIT_EXPONENT_H
-#define DIMENSION_UNIT_EXPONENT_H
+#ifndef DIMENSIONAL_UNIT_EXPONENT_H
+#define DIMENSIONAL_UNIT_EXPONENT_H
 
 #include <tuple> // For std::tuple and related functions
 #include <type_traits> // For std::is_same, std::remove_cv, std::disjunction
@@ -7,8 +7,6 @@
 
 #include "strings/string_numeric.h"
 #include "TupleHandling.h"
-
-//#include "Conversion.h" // TODO: Remove this by moving PrimaryConvertible and friends to a separate header
 
 namespace dimension
 {
@@ -112,4 +110,4 @@ namespace dimension
 
 }
 
-#endif // DIMENSION_UNIT_EXPONENT_H
+#endif // DIMENSIONAL_UNIT_EXPONENT_H

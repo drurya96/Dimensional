@@ -82,13 +82,13 @@ namespace dimension
       T0
    >
    class area<T0, Cs...> : public base_dimension_impl<double,
-      unit_exponent<typename Extractor<lengthType, T0>::type, 2>,
+      unit_exponent<typename unit_filter<lengthType, T0>::type, 2>,
       Cs...
    >
    {
    public:
       using Base = base_dimension_impl<double,
-         unit_exponent<typename Extractor<lengthType, T0>::type, 2>,
+         unit_exponent<typename unit_filter<lengthType, T0>::type, 2>,
          Cs...
       >;
    
@@ -112,13 +112,13 @@ namespace dimension
       T0
    >
    class area<Rep, T0, Cs...> : public base_dimension_impl<Rep,
-      unit_exponent<typename Extractor<lengthType, T0>::type, 2>,
+      unit_exponent<typename unit_filter<lengthType, T0>::type, 2>,
       Cs...
    >
    {
    public:
       using Base = base_dimension_impl<Rep,
-         unit_exponent<typename Extractor<lengthType, T0>::type, 2>,
+         unit_exponent<typename unit_filter<lengthType, T0>::type, 2>,
          Cs...
       >;
    
@@ -226,7 +226,7 @@ namespace dimension
    template<is_area Dim>
    area(Dim) -> 
    area<
-      DimExtractor<lengthType, Dim>
+      simplified_unit_filter<lengthType, typename Dim::units>
    >;
 }
 

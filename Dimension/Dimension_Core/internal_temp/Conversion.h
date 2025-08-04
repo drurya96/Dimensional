@@ -10,92 +10,14 @@
 #include "collapse_units.h"
 #include "full_simplify.h"
 #include "convertible.h"
+#include "null_unit.h"
+#include "unit_filter.h" // Shouldn't be needed after cleanup
+#include "unit_exponent_utils.h"
+
+// TODO: IMPORTANT: Figure out best way to handle do_conversion
 
 namespace dimension
 {
-
-   /// @brief A type-trait with void Dim and Primary, only used to satisfy a metaprogramming condition
-   struct NullUnit
-   {
-      using Dim = void;
-      using Primary = void;
-      static constexpr int ID = 0;
-   };
-
-   /// @brief Struct to check if a tuple of units contains a unit of the given Dimension
-   template<typename Dim, typename Tuple>
-   struct has_same_dim;
-
-   /// @brief Struct to check if a tuple of units contains a unit of the given Dimension
-   /// @tparam T The type to check for
-   /// @tparam Us The types within the tuple
-   /// @typedef value A constexpr bool indicating whether Us contains T
-   template<typename Dim, typename... Us>
-   struct has_same_dim<Dim, std::tuple<Us...>> : std::disjunction<is_same_dim<Dim, Us>...> {};
-
-   /// @brief Struct to check if a tuple of units contains a unit of the given Dimension
-   template<typename Dim, typename Tuple>
-   struct has_dim;
-
-   /// @brief Struct to check if a tuple of units contains a unit of the given Dimension
-   /// @tparam T The type to check for
-   /// @tparam Us The types within the tuple
-   /// @typedef value A constexpr bool indicating whether Us contains T
-   template<typename Dim, typename... Us>
-   struct has_dim<Dim, std::tuple<Us...>> : std::disjunction<is_dim<Dim, Us>...> {};
-
-   /// @brief get the first unit in the tuple matching the dimension of T
-   template<template<typename, typename> typename Compare, typename T, typename Tuple>
-   struct get_first_match;
-
-   /// @brief get the first unit in the tuple matching the dimension of T
-   /// @details Specialization for no match found, return a NullUnit
-   ///    This should not typical occur and is a sign of problematic code elsewhere
-   /// @tparam T Unit to match against
-   /// @tparam Tuple Tuple of units
-   template<template<typename, typename> typename Compare, typename T>
-   struct get_first_match<Compare, T, std::tuple<>> {
-      using type = NullUnit;
-   };
-
-   /// @brief get the first unit in the tuple matching the dimension of T
-   /// @details Primary specialization
-   /// @tparam T Unit to match against
-   /// @tparam Tuple Tuple of units
-   /// @typedef type The type of unit of matching dimension to T
-   template<template<typename, typename> typename Compare, typename T, typename Head, typename... Tail>
-   struct get_first_match<Compare, T, std::tuple<Head, Tail...>> {
-      using type = std::conditional_t<Compare<T, Head>::value,
-         Head,
-         typename get_first_match<Compare, T, std::tuple<Tail...>>::type>;
-   };
-
-   // Specialization when RhsType is Delta
-   template <typename LhsType, typename RhsUnit>
-   struct transform_rhs_element
-   {
-      using type = typename extract_type<LhsType>::type;
-   };
-
-   // Metafunction to transform the entire rhs tuple based on lhs tuple
-   template <typename LhsTuple, typename RhsTuple, size_t... Is>
-   auto transform_rhs_impl(std::index_sequence<Is...>) 
-      -> std::tuple< typename transform_rhs_element<
-                     std::tuple_element_t<Is, LhsTuple>, 
-                     std::tuple_element_t<Is, RhsTuple>
-                  >::type... >
-   {
-      return {};
-   }
-
-   template <typename LhsTuple, typename RhsTuple>
-   struct transform_rhs_tuple {
-      static constexpr size_t N = std::tuple_size_v<LhsTuple>;
-      static_assert(N == std::tuple_size_v<RhsTuple>, "Tuples must be of the same size.");
-      
-      using type = decltype(transform_rhs_impl<LhsTuple, RhsTuple>(std::make_index_sequence<N>{}));
-   };
-
    /// @brief Conversion traits to be defined for each conversion
    /// @details For each conversion, define a slope and optionally an offset
    /// @tparam From Unit to convert from
@@ -162,85 +84,10 @@ namespace dimension
       }
    }
 
-   template <bool B>
-   struct implicit_cast_to_build_warning
-   {
-      static void call() {}
-   };
-
-   template <>
-   struct implicit_cast_to_build_warning<true>
-   {
-      [[deprecated("Attempting to create new dimension ...")]]
-      static void call() {}
-   };
-
-
-
-
-
-
-   // =================================
-   // ======= More Things... ==========
-   // =================================
-
 
    // ============================================================
-   // ============== Find Matching Unit by Dimension =============
+   // =================== ConvertSimplified ======================
    // ============================================================
-
-   // THIS IS NAMED VERY WRONG AND IS CONFUSING
-   // THIS IS REALLY FINDING MATCHING UNITS, NOT DIMENSIONS
-
-   template<typename Target, typename Tuple>
-   struct find_unit_by_dimension;
-
-   // Empty case
-   template<typename Target>
-   struct find_unit_by_dimension<Target, std::tuple<>> {
-      static constexpr bool found = false;
-
-      struct Dummy
-      {
-         using exponent = std::ratio<0>;
-      };
-      using type = Dummy;
-   };
-
-   // Recursive case
-   template<typename Target, typename Head, typename... Tail>
-   struct find_unit_by_dimension<Target, std::tuple<Head, Tail...>> {
-   private:
-      static constexpr bool is_match = std::is_same_v<typename Target::unit, typename Head::unit>;
-
-   public:
-      static constexpr bool found = is_match || find_unit_by_dimension<Target, std::tuple<Tail...>>::found;
-      using type = std::conditional_t<is_match, Head, typename find_unit_by_dimension<Target, std::tuple<Tail...>>::type>;
-   };
-
-   template<typename From, typename ToTuple>
-   struct MatchUnit;
-   
-
-   template<typename From>
-   struct MatchUnit<From, std::tuple<>>
-   {
-      using type = void; // Should never occur
-   };
-
-   template<typename From, typename Head, typename... Tail>
-   struct MatchUnit<From, std::tuple<Head, Tail...>>
-   {
-      //using unit_type = typename From::unit;
-   
-      static constexpr bool match = is_same_dim<typename From::unit, typename Head::unit>::value;
-
-      using type = std::conditional_t<
-         match,
-         Head,
-         typename MatchUnit<From, std::tuple<Tail...>>::type
-      >;
-   };
 
    template<typename... Units>
    struct ConvertSimplified;
@@ -259,56 +106,6 @@ namespace dimension
       static constexpr double scalar =
          details::do_conversion<typename ToMatch::unit, FromUnit>(1.0) *
          ConvertSimplified<std::tuple<FromRest...>, std::tuple<ToUnits...>>::scalar;
-   };
-
-
-
-
-
-
-
-   // ============================================================
-   // ==================== Subtract Tuples =======================
-   // ============================================================
-
-   template<typename TupleA, typename TupleB>
-   struct Subtractunit_exponents;
-
-   // Empty base case
-   template<>
-   struct Subtractunit_exponents<std::tuple<>, std::tuple<>> {
-      using type = std::tuple<>;
-   };
-
-   // General case: A and B are std::tuple<unit_exponent<...>...>
-   template<typename... UnitsA, typename... UnitsB>
-   struct Subtractunit_exponents<std::tuple<UnitsA...>, std::tuple<UnitsB...>> {
-   private:
-      template<typename UnitA>
-      struct subtract_one {
-         using matching = find_unit_by_dimension<UnitA, std::tuple<UnitsB...>>;
-         
-         using result = std::conditional_t<
-               matching::found,
-               unit_exponent<
-                  typename UnitA::unit,
-                  std::ratio_subtract<
-                     typename UnitA::exponent,
-                     typename matching::type::exponent
-                  >::num,
-                  std::ratio_subtract<
-                     typename UnitA::exponent,
-                     typename matching::type::exponent
-                  >::den
-               >,
-               UnitA
-         >;
-      };
-
-   public:
-      using type = tuple_cat_t<
-         std::tuple<typename subtract_one<UnitsA>::result>...
-      >;
    };
 
    // ============================================================
@@ -345,14 +142,6 @@ namespace dimension
          return fullSimplified.template get_tuple_scalar<typename FromFullySimplified::units>() * inverse_scalar * converter::scalar;
    }
    };
-
-
-
-
-
-
-
-
 
 } // end Dimension
 

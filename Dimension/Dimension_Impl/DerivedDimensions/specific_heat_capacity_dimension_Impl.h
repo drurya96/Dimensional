@@ -127,17 +127,17 @@ namespace dimension
       T2
    >
    class specific_heat_capacity<T0, T1, T2, Cs...> : public base_dimension_impl<double,
-      unit_exponent<typename Extractor<lengthType, T0, T1, T2>::type, 2>,
-      unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -2>,
-      unit_exponent<typename Extractor<temperatureType, T0, T1, T2>::type, -1>,
+      unit_exponent<typename unit_filter<lengthType, T0, T1, T2>::type, 2>,
+      unit_exponent<typename unit_filter<timespanType, T0, T1, T2>::type, -2>,
+      unit_exponent<typename unit_filter<temperatureType, T0, T1, T2>::type, -1>,
       Cs...
    >
    {
    public:
       using Base = base_dimension_impl<double,
-         unit_exponent<typename Extractor<lengthType, T0, T1, T2>::type, 2>,
-         unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -2>,
-         unit_exponent<typename Extractor<temperatureType, T0, T1, T2>::type, -1>,
+         unit_exponent<typename unit_filter<lengthType, T0, T1, T2>::type, 2>,
+         unit_exponent<typename unit_filter<timespanType, T0, T1, T2>::type, -2>,
+         unit_exponent<typename unit_filter<temperatureType, T0, T1, T2>::type, -1>,
          Cs...
       >;
    
@@ -165,17 +165,17 @@ namespace dimension
       T2
    >
    class specific_heat_capacity<Rep, T0, T1, T2, Cs...> : public base_dimension_impl<Rep,
-      unit_exponent<typename Extractor<lengthType, T0, T1, T2>::type, 2>,
-      unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -2>,
-      unit_exponent<typename Extractor<temperatureType, T0, T1, T2>::type, -1>,
+      unit_exponent<typename unit_filter<lengthType, T0, T1, T2>::type, 2>,
+      unit_exponent<typename unit_filter<timespanType, T0, T1, T2>::type, -2>,
+      unit_exponent<typename unit_filter<temperatureType, T0, T1, T2>::type, -1>,
       Cs...
    >
    {
    public:
       using Base = base_dimension_impl<Rep,
-         unit_exponent<typename Extractor<lengthType, T0, T1, T2>::type, 2>,
-         unit_exponent<typename Extractor<timespanType, T0, T1, T2>::type, -2>,
-         unit_exponent<typename Extractor<temperatureType, T0, T1, T2>::type, -1>,
+         unit_exponent<typename unit_filter<lengthType, T0, T1, T2>::type, 2>,
+         unit_exponent<typename unit_filter<timespanType, T0, T1, T2>::type, -2>,
+         unit_exponent<typename unit_filter<temperatureType, T0, T1, T2>::type, -1>,
          Cs...
       >;
    
@@ -291,9 +291,9 @@ namespace dimension
    template<is_specific_heat_capacity Dim>
    specific_heat_capacity(Dim) -> 
    specific_heat_capacity<
-      DimExtractor<lengthType, Dim>,
-      DimExtractor<timespanType, Dim>,
-      DimExtractor<temperatureType, Dim>
+      simplified_unit_filter<lengthType, typename Dim::units>,
+      simplified_unit_filter<timespanType, typename Dim::units>,
+      simplified_unit_filter<temperatureType, typename Dim::units>
    >;
 }
 

@@ -250,19 +250,19 @@ namespace dimension
       T3
    >
    class capacitance<T0, T1, T2, T3, Cs...> : public base_dimension_impl<double,
-      unit_exponent<typename Extractor<chargeType, T0, T1, T2, T3>::type, 2>,
-      unit_exponent<typename Extractor<timespanType, T0, T1, T2, T3>::type, 2>,
-      unit_exponent<typename Extractor<massType, T0, T1, T2, T3>::type, -1>,
-      unit_exponent<typename Extractor<lengthType, T0, T1, T2, T3>::type, -2>,
+      unit_exponent<typename unit_filter<chargeType, T0, T1, T2, T3>::type, 2>,
+      unit_exponent<typename unit_filter<timespanType, T0, T1, T2, T3>::type, 2>,
+      unit_exponent<typename unit_filter<massType, T0, T1, T2, T3>::type, -1>,
+      unit_exponent<typename unit_filter<lengthType, T0, T1, T2, T3>::type, -2>,
       Cs...
    >
    {
    public:
       using Base = base_dimension_impl<double,
-         unit_exponent<typename Extractor<chargeType, T0, T1, T2, T3>::type, 2>,
-         unit_exponent<typename Extractor<timespanType, T0, T1, T2, T3>::type, 2>,
-         unit_exponent<typename Extractor<massType, T0, T1, T2, T3>::type, -1>,
-         unit_exponent<typename Extractor<lengthType, T0, T1, T2, T3>::type, -2>,
+         unit_exponent<typename unit_filter<chargeType, T0, T1, T2, T3>::type, 2>,
+         unit_exponent<typename unit_filter<timespanType, T0, T1, T2, T3>::type, 2>,
+         unit_exponent<typename unit_filter<massType, T0, T1, T2, T3>::type, -1>,
+         unit_exponent<typename unit_filter<lengthType, T0, T1, T2, T3>::type, -2>,
          Cs...
       >;
    
@@ -292,19 +292,19 @@ namespace dimension
       T3
    >
    class capacitance<Rep, T0, T1, T2, T3, Cs...> : public base_dimension_impl<Rep,
-      unit_exponent<typename Extractor<chargeType, T0, T1, T2, T3>::type, 2>,
-      unit_exponent<typename Extractor<timespanType, T0, T1, T2, T3>::type, 2>,
-      unit_exponent<typename Extractor<massType, T0, T1, T2, T3>::type, -1>,
-      unit_exponent<typename Extractor<lengthType, T0, T1, T2, T3>::type, -2>,
+      unit_exponent<typename unit_filter<chargeType, T0, T1, T2, T3>::type, 2>,
+      unit_exponent<typename unit_filter<timespanType, T0, T1, T2, T3>::type, 2>,
+      unit_exponent<typename unit_filter<massType, T0, T1, T2, T3>::type, -1>,
+      unit_exponent<typename unit_filter<lengthType, T0, T1, T2, T3>::type, -2>,
       Cs...
    >
    {
    public:
       using Base = base_dimension_impl<Rep,
-         unit_exponent<typename Extractor<chargeType, T0, T1, T2, T3>::type, 2>,
-         unit_exponent<typename Extractor<timespanType, T0, T1, T2, T3>::type, 2>,
-         unit_exponent<typename Extractor<massType, T0, T1, T2, T3>::type, -1>,
-         unit_exponent<typename Extractor<lengthType, T0, T1, T2, T3>::type, -2>,
+         unit_exponent<typename unit_filter<chargeType, T0, T1, T2, T3>::type, 2>,
+         unit_exponent<typename unit_filter<timespanType, T0, T1, T2, T3>::type, 2>,
+         unit_exponent<typename unit_filter<massType, T0, T1, T2, T3>::type, -1>,
+         unit_exponent<typename unit_filter<lengthType, T0, T1, T2, T3>::type, -2>,
          Cs...
       >;
    
@@ -424,10 +424,10 @@ namespace dimension
    template<is_capacitance Dim>
    capacitance(Dim) -> 
    capacitance<
-      DimExtractor<chargeType, Dim>,
-      DimExtractor<timespanType, Dim>,
-      DimExtractor<massType, Dim>,
-      DimExtractor<lengthType, Dim>
+      simplified_unit_filter<chargeType, typename Dim::units>,
+      simplified_unit_filter<timespanType, typename Dim::units>,
+      simplified_unit_filter<massType, typename Dim::units>,
+      simplified_unit_filter<lengthType, typename Dim::units>
    >;
 }
 

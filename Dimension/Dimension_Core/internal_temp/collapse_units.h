@@ -7,7 +7,7 @@
 #include "TemplateUtils/GenericUtils.h" // filter_tuple
 #include "TemplateUtils/RatioUtils.h" // filter_tuple
 #include "TupleHandling.h"
-#include "FundamentalUnitExtractor.h"
+#include "unit_decomposition.h"
 
 namespace dimension
 {
@@ -75,7 +75,7 @@ namespace dimension
    struct collapse_units<std::tuple<Units...>>
    {
    private:
-      using flattened = typename FundamentalUnitExtractor<std::tuple<Units...>>::units;
+      using flattened = typename unit_decomposition<std::tuple<Units...>>::units;
       
       template<typename FullTuple>
       struct CombineUniqueFrom {

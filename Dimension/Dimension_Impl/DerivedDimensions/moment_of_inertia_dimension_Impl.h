@@ -96,15 +96,15 @@ namespace dimension
       T1
    >
    class moment_of_inertia<T0, T1, Cs...> : public base_dimension_impl<double,
-      unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
-      unit_exponent<typename Extractor<lengthType, T0, T1>::type, 2>,
+      unit_exponent<typename unit_filter<massType, T0, T1>::type, 1>,
+      unit_exponent<typename unit_filter<lengthType, T0, T1>::type, 2>,
       Cs...
    >
    {
    public:
       using Base = base_dimension_impl<double,
-         unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
-         unit_exponent<typename Extractor<lengthType, T0, T1>::type, 2>,
+         unit_exponent<typename unit_filter<massType, T0, T1>::type, 1>,
+         unit_exponent<typename unit_filter<lengthType, T0, T1>::type, 2>,
          Cs...
       >;
    
@@ -130,15 +130,15 @@ namespace dimension
       T1
    >
    class moment_of_inertia<Rep, T0, T1, Cs...> : public base_dimension_impl<Rep,
-      unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
-      unit_exponent<typename Extractor<lengthType, T0, T1>::type, 2>,
+      unit_exponent<typename unit_filter<massType, T0, T1>::type, 1>,
+      unit_exponent<typename unit_filter<lengthType, T0, T1>::type, 2>,
       Cs...
    >
    {
    public:
       using Base = base_dimension_impl<Rep,
-         unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
-         unit_exponent<typename Extractor<lengthType, T0, T1>::type, 2>,
+         unit_exponent<typename unit_filter<massType, T0, T1>::type, 1>,
+         unit_exponent<typename unit_filter<lengthType, T0, T1>::type, 2>,
          Cs...
       >;
    
@@ -250,8 +250,8 @@ namespace dimension
    template<is_moment_of_inertia Dim>
    moment_of_inertia(Dim) -> 
    moment_of_inertia<
-      DimExtractor<massType, Dim>,
-      DimExtractor<lengthType, Dim>
+      simplified_unit_filter<massType, typename Dim::units>,
+      simplified_unit_filter<lengthType, typename Dim::units>
    >;
 }
 

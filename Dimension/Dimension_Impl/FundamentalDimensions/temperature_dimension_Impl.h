@@ -119,7 +119,7 @@ namespace dimension
    /// @brief Deduction guide for temperature constructor with base_dimension.
    /// @tparam temperatureUnit The unit type.
    template<is_temperature Dim>
-   temperature(Dim) -> temperature<typename Dim::rep, DimExtractor<temperatureType, Dim>>;
+   temperature(Dim) -> temperature<typename Dim::rep, simplified_unit_filter<temperatureType, typename Dim::units>>;
 
    template<rep_type Rep, is_temperature_unit Unit, is_coefficient... Cs>
    temperature(const temperature<Rep, Unit, Cs...>&) -> temperature<Rep, Unit, Cs...>;

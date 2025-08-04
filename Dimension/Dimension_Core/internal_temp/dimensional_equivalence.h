@@ -10,7 +10,7 @@
 
 #include "TupleHandling.h"
 
-#include "FundamentalUnitExtractor.h"
+#include "unit_decomposition.h"
 
 #include "exponent_math.h"
 

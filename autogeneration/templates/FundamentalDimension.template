@@ -119,7 +119,7 @@ namespace dimension
    /// @brief Deduction guide for {{ dim.name }} constructor with base_dimension.
    /// @tparam {{ dim.name }}Unit The unit type.
    template<is_{{ dim.name }} Dim>
-   {{ dim.name }}(Dim) -> {{ dim.name }}<typename Dim::rep, DimExtractor<{{ dim.name }}Type, Dim>>;
+   {{ dim.name }}(Dim) -> {{ dim.name }}<typename Dim::rep, simplified_unit_filter<{{ dim.name }}Type, typename Dim::units>>;
 
    template<rep_type Rep, is_{{ dim.name }}_unit Unit, is_coefficient... Cs>
    {{ dim.name }}(const {{ dim.name }}<Rep, Unit, Cs...>&) -> {{ dim.name }}<Rep, Unit, Cs...>;

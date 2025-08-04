@@ -119,7 +119,7 @@ namespace dimension
    /// @brief Deduction guide for amount constructor with base_dimension.
    /// @tparam amountUnit The unit type.
    template<is_amount Dim>
-   amount(Dim) -> amount<typename Dim::rep, DimExtractor<amountType, Dim>>;
+   amount(Dim) -> amount<typename Dim::rep, simplified_unit_filter<amountType, typename Dim::units>>;
 
    template<rep_type Rep, is_amount_unit Unit, is_coefficient... Cs>
    amount(const amount<Rep, Unit, Cs...>&) -> amount<Rep, Unit, Cs...>;

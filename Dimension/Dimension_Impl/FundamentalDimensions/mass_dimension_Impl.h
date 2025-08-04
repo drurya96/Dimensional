@@ -119,7 +119,7 @@ namespace dimension
    /// @brief Deduction guide for mass constructor with base_dimension.
    /// @tparam massUnit The unit type.
    template<is_mass Dim>
-   mass(Dim) -> mass<typename Dim::rep, DimExtractor<massType, Dim>>;
+   mass(Dim) -> mass<typename Dim::rep, simplified_unit_filter<massType, typename Dim::units>>;
 
    template<rep_type Rep, is_mass_unit Unit, is_coefficient... Cs>
    mass(const mass<Rep, Unit, Cs...>&) -> mass<Rep, Unit, Cs...>;

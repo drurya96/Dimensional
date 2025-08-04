@@ -1,5 +1,5 @@
-#ifndef DIMENSION_UTILS_H
-#define DIMENSION_UTILS_H
+#ifndef DIMENSIONAL_UTILS_H
+#define DIMENSIONAL_UTILS_H
 
 #include <concepts>
 
@@ -45,4 +45,4 @@ namespace dimension
 
 } // end dimension
 
-#endif // DIMENSION_UTILS_H
+#endif // DIMENSIONAL_UTILS_H

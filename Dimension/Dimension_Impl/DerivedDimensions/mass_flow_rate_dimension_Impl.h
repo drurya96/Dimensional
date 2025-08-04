@@ -96,15 +96,15 @@ namespace dimension
       T1
    >
    class mass_flow_rate<T0, T1, Cs...> : public base_dimension_impl<double,
-      unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
-      unit_exponent<typename Extractor<timespanType, T0, T1>::type, -1>,
+      unit_exponent<typename unit_filter<massType, T0, T1>::type, 1>,
+      unit_exponent<typename unit_filter<timespanType, T0, T1>::type, -1>,
       Cs...
    >
    {
    public:
       using Base = base_dimension_impl<double,
-         unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
-         unit_exponent<typename Extractor<timespanType, T0, T1>::type, -1>,
+         unit_exponent<typename unit_filter<massType, T0, T1>::type, 1>,
+         unit_exponent<typename unit_filter<timespanType, T0, T1>::type, -1>,
          Cs...
       >;
    
@@ -130,15 +130,15 @@ namespace dimension
       T1
    >
    class mass_flow_rate<Rep, T0, T1, Cs...> : public base_dimension_impl<Rep,
-      unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
-      unit_exponent<typename Extractor<timespanType, T0, T1>::type, -1>,
+      unit_exponent<typename unit_filter<massType, T0, T1>::type, 1>,
+      unit_exponent<typename unit_filter<timespanType, T0, T1>::type, -1>,
       Cs...
    >
    {
    public:
       using Base = base_dimension_impl<Rep,
-         unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
-         unit_exponent<typename Extractor<timespanType, T0, T1>::type, -1>,
+         unit_exponent<typename unit_filter<massType, T0, T1>::type, 1>,
+         unit_exponent<typename unit_filter<timespanType, T0, T1>::type, -1>,
          Cs...
       >;
    
@@ -250,8 +250,8 @@ namespace dimension
    template<is_mass_flow_rate Dim>
    mass_flow_rate(Dim) -> 
    mass_flow_rate<
-      DimExtractor<massType, Dim>,
-      DimExtractor<timespanType, Dim>
+      simplified_unit_filter<massType, typename Dim::units>,
+      simplified_unit_filter<timespanType, typename Dim::units>
    >;
 }
 

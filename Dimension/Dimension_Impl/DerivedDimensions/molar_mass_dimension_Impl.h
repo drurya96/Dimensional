@@ -96,15 +96,15 @@ namespace dimension
       T1
    >
    class molar_mass<T0, T1, Cs...> : public base_dimension_impl<double,
-      unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
-      unit_exponent<typename Extractor<amountType, T0, T1>::type, -1>,
+      unit_exponent<typename unit_filter<massType, T0, T1>::type, 1>,
+      unit_exponent<typename unit_filter<amountType, T0, T1>::type, -1>,
       Cs...
    >
    {
    public:
       using Base = base_dimension_impl<double,
-         unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
-         unit_exponent<typename Extractor<amountType, T0, T1>::type, -1>,
+         unit_exponent<typename unit_filter<massType, T0, T1>::type, 1>,
+         unit_exponent<typename unit_filter<amountType, T0, T1>::type, -1>,
          Cs...
       >;
    
@@ -130,15 +130,15 @@ namespace dimension
       T1
    >
    class molar_mass<Rep, T0, T1, Cs...> : public base_dimension_impl<Rep,
-      unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
-      unit_exponent<typename Extractor<amountType, T0, T1>::type, -1>,
+      unit_exponent<typename unit_filter<massType, T0, T1>::type, 1>,
+      unit_exponent<typename unit_filter<amountType, T0, T1>::type, -1>,
       Cs...
    >
    {
    public:
       using Base = base_dimension_impl<Rep,
-         unit_exponent<typename Extractor<massType, T0, T1>::type, 1>,
-         unit_exponent<typename Extractor<amountType, T0, T1>::type, -1>,
+         unit_exponent<typename unit_filter<massType, T0, T1>::type, 1>,
+         unit_exponent<typename unit_filter<amountType, T0, T1>::type, -1>,
          Cs...
       >;
    
@@ -250,8 +250,8 @@ namespace dimension
    template<is_molar_mass Dim>
    molar_mass(Dim) -> 
    molar_mass<
-      DimExtractor<massType, Dim>,
-      DimExtractor<amountType, Dim>
+      simplified_unit_filter<massType, typename Dim::units>,
+      simplified_unit_filter<amountType, typename Dim::units>
    >;
 }
 

@@ -1,5 +1,5 @@
-#ifndef DIMENSION_RATIO_UTILS_H
-#define DIMENSION_RATIO_UTILS_H
+#ifndef DIMENSIONAL_RATIO_UTILS_H
+#define DIMENSIONAL_RATIO_UTILS_H
 
 #include <ratio>
 
@@ -25,7 +25,7 @@ namespace dimension
 
    template<typename... R>
    struct ratio_multiply_fold {
-       using type = std::ratio<0>;
+       using type = std::ratio<1>;
    };
    
    template<typename R1, typename... Rs>
@@ -89,4 +89,4 @@ namespace dimension
 
 }
 
-#endif // DIMENSION_RATIO_UTILS_H
+#endif // DIMENSIONAL_RATIO_UTILS_H

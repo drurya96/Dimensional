@@ -119,7 +119,7 @@ namespace dimension
    /// @brief Deduction guide for timespan constructor with base_dimension.
    /// @tparam timespanUnit The unit type.
    template<is_timespan Dim>
-   timespan(Dim) -> timespan<typename Dim::rep, DimExtractor<timespanType, Dim>>;
+   timespan(Dim) -> timespan<typename Dim::rep, simplified_unit_filter<timespanType, typename Dim::units>>;
 
    template<rep_type Rep, is_timespan_unit Unit, is_coefficient... Cs>
    timespan(const timespan<Rep, Unit, Cs...>&) -> timespan<Rep, Unit, Cs...>;
