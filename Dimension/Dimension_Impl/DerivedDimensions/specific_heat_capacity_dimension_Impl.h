@@ -246,7 +246,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_specific_heat_capacity(Cs... coeffs)
    {
-      return specific_heat_capacity<double, T0, T1, T2, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return specific_heat_capacity<double, T0, T1, T2, Cs...>(1.0);
    }
 
    template<
@@ -265,7 +266,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_specific_heat_capacity(Rep value, Cs... coeffs)
    {
-      return specific_heat_capacity<Rep, T0, T1, T2, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return specific_heat_capacity<Rep, T0, T1, T2, Cs...>(value);
    }
 
    /// @brief Template specialization for named specific_heat_capacity units
@@ -275,7 +277,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_specific_heat_capacity(Cs... coeffs)
    {
-      return specific_heat_capacity<double, Named, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return specific_heat_capacity<double, Named, Cs...>(1.0);
    }
 
    /// @brief Template specialization for named specific_heat_capacity units
@@ -285,7 +288,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_specific_heat_capacity(Rep value, Cs... coeffs)
    {
-      return specific_heat_capacity<Rep, Named, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return specific_heat_capacity<Rep, Named, Cs...>(value);
    }
 
    template<is_specific_heat_capacity Dim>

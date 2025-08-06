@@ -207,7 +207,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_acceleration(Cs... coeffs)
    {
-      return acceleration<double, T0, T1, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return acceleration<double, T0, T1, Cs...>(1.0);
    }
 
    template<
@@ -224,7 +225,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_acceleration(Rep value, Cs... coeffs)
    {
-      return acceleration<Rep, T0, T1, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return acceleration<Rep, T0, T1, Cs...>(value);
    }
 
    /// @brief Template specialization for named acceleration units
@@ -234,7 +236,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_acceleration(Cs... coeffs)
    {
-      return acceleration<double, Named, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return acceleration<double, Named, Cs...>(1.0);
    }
 
    /// @brief Template specialization for named acceleration units
@@ -244,7 +247,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_acceleration(Rep value, Cs... coeffs)
    {
-      return acceleration<Rep, Named, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return acceleration<Rep, Named, Cs...>(value);
    }
 
    template<is_acceleration Dim>

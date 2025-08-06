@@ -246,7 +246,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_magnetic_field(Cs... coeffs)
    {
-      return magnetic_field<double, T0, T1, T2, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return magnetic_field<double, T0, T1, T2, Cs...>(1.0);
    }
 
    template<
@@ -265,7 +266,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_magnetic_field(Rep value, Cs... coeffs)
    {
-      return magnetic_field<Rep, T0, T1, T2, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return magnetic_field<Rep, T0, T1, T2, Cs...>(value);
    }
 
    /// @brief Template specialization for named magnetic_field units
@@ -275,7 +277,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_magnetic_field(Cs... coeffs)
    {
-      return magnetic_field<double, Named, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return magnetic_field<double, Named, Cs...>(1.0);
    }
 
    /// @brief Template specialization for named magnetic_field units
@@ -285,7 +288,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_magnetic_field(Rep value, Cs... coeffs)
    {
-      return magnetic_field<Rep, Named, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return magnetic_field<Rep, Named, Cs...>(value);
    }
 
    template<is_magnetic_field Dim>

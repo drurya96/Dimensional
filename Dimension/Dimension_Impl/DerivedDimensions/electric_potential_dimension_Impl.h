@@ -377,7 +377,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_electric_potential(Cs... coeffs)
    {
-      return electric_potential<double, T0, T1, T2, T3, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return electric_potential<double, T0, T1, T2, T3, Cs...>(1.0);
    }
 
    template<
@@ -398,7 +399,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_electric_potential(Rep value, Cs... coeffs)
    {
-      return electric_potential<Rep, T0, T1, T2, T3, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return electric_potential<Rep, T0, T1, T2, T3, Cs...>(value);
    }
 
    /// @brief Template specialization for named electric_potential units
@@ -408,7 +410,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_electric_potential(Cs... coeffs)
    {
-      return electric_potential<double, Named, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return electric_potential<double, Named, Cs...>(1.0);
    }
 
    /// @brief Template specialization for named electric_potential units
@@ -418,7 +421,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_electric_potential(Rep value, Cs... coeffs)
    {
-      return electric_potential<Rep, Named, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return electric_potential<Rep, Named, Cs...>(value);
    }
 
    template<is_electric_potential Dim>

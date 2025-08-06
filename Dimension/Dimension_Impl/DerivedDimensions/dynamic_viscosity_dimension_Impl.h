@@ -246,7 +246,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_dynamic_viscosity(Cs... coeffs)
    {
-      return dynamic_viscosity<double, T0, T1, T2, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return dynamic_viscosity<double, T0, T1, T2, Cs...>(1.0);
    }
 
    template<
@@ -265,7 +266,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_dynamic_viscosity(Rep value, Cs... coeffs)
    {
-      return dynamic_viscosity<Rep, T0, T1, T2, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return dynamic_viscosity<Rep, T0, T1, T2, Cs...>(value);
    }
 
    /// @brief Template specialization for named dynamic_viscosity units
@@ -275,7 +277,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_dynamic_viscosity(Cs... coeffs)
    {
-      return dynamic_viscosity<double, Named, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return dynamic_viscosity<double, Named, Cs...>(1.0);
    }
 
    /// @brief Template specialization for named dynamic_viscosity units
@@ -285,7 +288,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_dynamic_viscosity(Rep value, Cs... coeffs)
    {
-      return dynamic_viscosity<Rep, Named, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return dynamic_viscosity<Rep, Named, Cs...>(value);
    }
 
    template<is_dynamic_viscosity Dim>

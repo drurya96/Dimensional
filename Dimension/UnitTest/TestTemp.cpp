@@ -145,3 +145,12 @@ TEST(TempTests, symbolTest) {
          symbol_exponent<symbols::pi, 1, 1>>>);
 
 }
+
+TEST(TempTests, quickTest) {
+
+   base_dimension_impl<double, unit_exponent<meters>, symbols::pi> test1{10.0};
+   EXPECT_NEAR(get_length_as<meters>(test1), 10.0*std::numbers::pi, 0.001);
+
+   // Intentionally fails to compile
+   //base_dimension_impl<double, unit_exponent<meters>> test2{10.0, symbols::pi{}};
+}

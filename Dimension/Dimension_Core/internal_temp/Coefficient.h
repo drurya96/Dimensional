@@ -142,57 +142,6 @@ namespace dimension
          typename build_symbols<next_tuple, Rest...>::type;
    };
 
-   // ───────────────────────────────────────────────────────────────
-   // 6.  handle_coefficients<Ts…>
-   // ───────────────────────────────────────────────────────────────
-   template<is_coefficient... Ts>
-   struct handle_coefficients
-   {
-   private:
-      /*  split Ts...  */
-      using ratio_list   = typename combine_ratios<
-                              std::conditional_t< is_ratio<Ts>, Ts, std::ratio<1>>...
-                           >::type;
-
-      using symbol_tuple = typename build_symbols<std::tuple<>, Ts...>::type;
-
-   public:
-      using ratio   = ratio_list;         // aggregate ∏ ratios
-      using symbols = symbol_tuple;       // merged symbol_exponent tuple
-   };
-
-   template<typename Tuple>
-   struct handle_coefficients_tuple;                      // forward declaration
-
-   template<typename... Ts>
-   struct handle_coefficients_tuple<std::tuple<Ts...>>
-      : handle_coefficients<Ts...> { };
-
-
-   template<typename... Ts> struct partition_coeffs;
-
-   template<>
-   struct partition_coeffs<> {
-      using units   = std::tuple<>;
-      using coeffs  = std::tuple<>;
-   };
-
-   template<typename Head, typename... Tail>
-   struct partition_coeffs<Head, Tail...> {
-   private:
-      using tail = partition_coeffs<Tail...>;
-   public:
-      using units  = std::conditional_t<are_unit_exponents<Head>,
-                                       decltype(std::tuple_cat(std::declval<std::tuple<Head>>(),
-                                                               std::declval<typename tail::units>())),
-                                       typename tail::units>;
-
-      using coeffs = std::conditional_t<is_coefficient<Head>,
-                                       decltype(std::tuple_cat(std::declval<std::tuple<Head>>(),
-                                                               std::declval<typename tail::coeffs>())),
-                                       typename tail::coeffs>;
-   };
-
 
    // ─────────────── eval-one trait  (specialisable) ───────────────
    template<typename T> struct eval_one_trait;               // primary (never used)
@@ -236,6 +185,63 @@ namespace dimension
    {
       return eval_symbol_tuple_impl<std::remove_cvref_t<Tuple>>::value;
    }
+
+
+   // ───────────────────────────────────────────────────────────────
+   // 6.  handle_coefficients<Ts…>
+   // ───────────────────────────────────────────────────────────────
+   template<is_coefficient... Ts>
+   struct handle_coefficients
+   {
+   private:
+      /*  split Ts...  */
+      using ratio_list   = typename combine_ratios<
+                              std::conditional_t< is_ratio<Ts>, Ts, std::ratio<1>>...
+                           >::type;
+
+      using symbol_tuple = typename build_symbols<std::tuple<>, Ts...>::type;
+
+   public:
+      using ratio   = ratio_list;         // aggregate ∏ ratios
+      using symbols = symbol_tuple;       // merged symbol_exponent tuple
+      
+      static constexpr double value()
+      {
+         return ratio_value<ratio>() * eval_symbol_tuple<symbols>();
+      }
+   };
+
+   template<typename Tuple>
+   struct handle_coefficients_tuple;                      // forward declaration
+
+   template<typename... Ts>
+   struct handle_coefficients_tuple<std::tuple<Ts...>>
+      : handle_coefficients<Ts...> { };
+
+
+   template<typename... Ts> struct partition_coeffs;
+
+   template<>
+   struct partition_coeffs<> {
+      using units   = std::tuple<>;
+      using coeffs  = std::tuple<>;
+   };
+
+   template<typename Head, typename... Tail>
+   struct partition_coeffs<Head, Tail...> {
+   private:
+      using tail = partition_coeffs<Tail...>;
+   public:
+      using units  = std::conditional_t<are_unit_exponents<Head>,
+                                       decltype(std::tuple_cat(std::declval<std::tuple<Head>>(),
+                                                               std::declval<typename tail::units>())),
+                                       typename tail::units>;
+
+      using coeffs = std::conditional_t<is_coefficient<Head>,
+                                       decltype(std::tuple_cat(std::declval<std::tuple<Head>>(),
+                                                               std::declval<typename tail::coeffs>())),
+                                       typename tail::coeffs>;
+   };
 
    // ============================================================================
    //  helper: negate a coefficient (for division)

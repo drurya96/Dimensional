@@ -246,7 +246,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_power(Cs... coeffs)
    {
-      return power<double, T0, T1, T2, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return power<double, T0, T1, T2, Cs...>(1.0);
    }
 
    template<
@@ -265,7 +266,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_power(Rep value, Cs... coeffs)
    {
-      return power<Rep, T0, T1, T2, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return power<Rep, T0, T1, T2, Cs...>(value);
    }
 
    /// @brief Template specialization for named power units
@@ -275,7 +277,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_power(Cs... coeffs)
    {
-      return power<double, Named, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return power<double, Named, Cs...>(1.0);
    }
 
    /// @brief Template specialization for named power units
@@ -285,7 +288,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_power(Rep value, Cs... coeffs)
    {
-      return power<Rep, Named, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return power<Rep, Named, Cs...>(value);
    }
 
    template<is_power Dim>

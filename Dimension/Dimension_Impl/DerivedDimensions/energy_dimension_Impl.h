@@ -246,7 +246,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_energy(Cs... coeffs)
    {
-      return energy<double, T0, T1, T2, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return energy<double, T0, T1, T2, Cs...>(1.0);
    }
 
    template<
@@ -265,7 +266,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_energy(Rep value, Cs... coeffs)
    {
-      return energy<Rep, T0, T1, T2, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return energy<Rep, T0, T1, T2, Cs...>(value);
    }
 
    /// @brief Template specialization for named energy units
@@ -275,7 +277,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_energy(Cs... coeffs)
    {
-      return energy<double, Named, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return energy<double, Named, Cs...>(1.0);
    }
 
    /// @brief Template specialization for named energy units
@@ -285,7 +288,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_energy(Rep value, Cs... coeffs)
    {
-      return energy<Rep, Named, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return energy<Rep, Named, Cs...>(value);
    }
 
    template<is_energy Dim>

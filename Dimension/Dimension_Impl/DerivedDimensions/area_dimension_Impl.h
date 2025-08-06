@@ -185,7 +185,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_area(Cs... coeffs)
    {
-      return area<double, T0, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return area<double, T0, Cs...>(1.0);
    }
 
    template<
@@ -200,7 +201,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_area(Rep value, Cs... coeffs)
    {
-      return area<Rep, T0, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return area<Rep, T0, Cs...>(value);
    }
 
    /// @brief Template specialization for named area units
@@ -210,7 +212,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_area(Cs... coeffs)
    {
-      return area<double, Named, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return area<double, Named, Cs...>(1.0);
    }
 
    /// @brief Template specialization for named area units
@@ -220,7 +223,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_area(Rep value, Cs... coeffs)
    {
-      return area<Rep, Named, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return area<Rep, Named, Cs...>(value);
    }
 
    template<is_area Dim>

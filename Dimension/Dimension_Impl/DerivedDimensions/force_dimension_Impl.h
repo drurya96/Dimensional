@@ -246,7 +246,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_force(Cs... coeffs)
    {
-      return force<double, T0, T1, T2, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return force<double, T0, T1, T2, Cs...>(1.0);
    }
 
    template<
@@ -265,7 +266,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_force(Rep value, Cs... coeffs)
    {
-      return force<Rep, T0, T1, T2, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return force<Rep, T0, T1, T2, Cs...>(value);
    }
 
    /// @brief Template specialization for named force units
@@ -275,7 +277,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_force(Cs... coeffs)
    {
-      return force<double, Named, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return force<double, Named, Cs...>(1.0);
    }
 
    /// @brief Template specialization for named force units
@@ -285,7 +288,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_force(Rep value, Cs... coeffs)
    {
-      return force<Rep, Named, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return force<Rep, Named, Cs...>(value);
    }
 
    template<is_force Dim>

@@ -230,7 +230,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_{{ dim.name }}(Cs... coeffs)
    {
-      return {{ dim.name }}<double, {{t_list}}, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return {{ dim.name }}<double, {{t_list}}, Cs...>(1.0);
    }
 
    template<
@@ -249,7 +250,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_{{ dim.name }}(Rep value, Cs... coeffs)
    {
-      return {{ dim.name }}<Rep, {{t_list}}, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return {{ dim.name }}<Rep, {{t_list}}, Cs...>(value);
    }
 
    /// @brief Template specialization for named {{ dim.name }} units
@@ -259,7 +261,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_{{ dim.name }}(Cs... coeffs)
    {
-      return {{ dim.name }}<double, Named, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return {{ dim.name }}<double, Named, Cs...>(1.0);
    }
 
    /// @brief Template specialization for named {{ dim.name }} units
@@ -269,7 +272,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_{{ dim.name }}(Rep value, Cs... coeffs)
    {
-      return {{ dim.name }}<Rep, Named, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return {{ dim.name }}<Rep, Named, Cs...>(value);
    }
 
    template<is_{{ dim.name }} Dim>

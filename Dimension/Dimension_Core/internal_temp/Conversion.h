@@ -43,7 +43,6 @@ namespace dimension
       }
    }
 
-
    /// @brief Convert from one unit to another
    /// @tparam From Unit to convert from
    /// @tparam To Unit to convert to
@@ -115,33 +114,53 @@ namespace dimension
    template<typename FromTuple, typename ToTuple>
    struct ConvertDim
    {
-
-       using RawFrom = typename base_dimension_from_tuple<FromTuple>::dim;
-       using RawTo = typename base_dimension_from_tuple<ToTuple>::dim;
-
-       using SimplifiedFrom = typename collapse_units<FromTuple>::units;
-       using SimplifiedTo = typename collapse_units<ToTuple>::units;
-   
-       using FromRemainingRaw = typename Subtractunit_exponents<SimplifiedFrom, SimplifiedTo>::type;
-       using ToRemainingRaw = typename Subtractunit_exponents<SimplifiedTo, SimplifiedFrom>::type;
-   
-       using FromRemaining = typename RemoveZeros<FromRemainingRaw>::units;
-       using ToRemaining = typename RemoveZeros<ToRemainingRaw>::units;
-
-      static constexpr double Convert(double value) 
+      static constexpr double Convert(auto input /*dimension*/) 
       {
-
-         using FromFullySimplified = decltype(full_simplify(RawFrom(1.0)));
-         using ToFullySimplified = decltype(full_simplify(RawTo(1.0)));
-
-         FromFullySimplified fullSimplified = full_simplify(RawFrom(value));
-         constexpr double inverse_scalar = 1.0 / (full_simplify(RawTo(1.0)).template get_tuple_scalar<typename ToFullySimplified::units>());
-
-         using converter = ConvertSimplified<typename FromFullySimplified::units, typename ToFullySimplified::units>;
-
-         return fullSimplified.template get_tuple_scalar<typename FromFullySimplified::units>() * inverse_scalar * converter::scalar;
+         return 
+            ConvertSimplified<simplified_units_t<FromTuple>, simplified_units_t<ToTuple>>::scalar * 
+            simplification::SimplifiedDimension<FromTuple>::convert_scalar(input.template get_tuple_scalar<FromTuple>());
    }
    };
+
+
+
+
+
+
+
+namespace detail {
+
+   template<typename FromTuple, typename ToTuple>
+   constexpr double get_conversion_factor()
+   {
+      return ConvertSimplified<simplified_units_t<FromTuple>, simplified_units_t<ToTuple>>::scalar;
+   }
+
+   template<typename FromTuple, typename ToTuple>
+   constexpr double convert_scalar_units(double value)
+   {
+      return get_conversion_factor<FromTuple, ToTuple>() * value;
+   }
+
+
+   template<typename ToTuple, typename FromDim>
+   static constexpr double convert_scalar_units(FromDim input) 
+   {
+      return 
+         ConvertSimplified<simplified_units_t<typename FromDim::units>, simplified_units_t<ToTuple>>::scalar * 
+         simplification::SimplifiedDimension<typename FromDim::units>::convert_scalar(input.template get_tuple_scalar<typename FromDim::units>());
+   }
+   
+
+} // namespace detail
+
+
+
+
+
+
+
+
 
 } // end Dimension
 

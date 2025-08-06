@@ -99,7 +99,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_temperature(Rep value, Cs... coeffs)
    {
-      return temperature<Rep, U, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return temperature<Rep, U, Cs...>(value);
    }
 
    template<is_temperature_unit U, is_coefficient... Cs>
@@ -107,7 +108,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_temperature(Cs... coeffs)
    {
-      return temperature<double, U, Cs...>(1.0, coeffs...);   // 1 × coeffs
+      ignore_unused(coeffs...);
+      return temperature<double, U, Cs...>(1.0);   // 1 × coeffs
    }
 
    template<is_temperature_unit Unit, is_coefficient... Cs>

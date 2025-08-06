@@ -34,7 +34,21 @@
 namespace dimension
 {
 
+
+   template<are_unit_exponents... Units, typename Dim>
+   requires (dimensionally_equivalent<base_dimension_impl<double, Units...>, Dim> && !same_unit_representation<std::tuple<Units...>, typename Dim::units>)
+   constexpr Dim::rep get_scalar_as(Dim obj)
+   {
+      return detail::convert_scalar_units<std::tuple<Units...>>(obj);
+   }
    
+   template<are_unit_exponents... Units, typename Dim>
+   requires same_unit_representation<std::tuple<Units...>, typename Dim::units>
+   constexpr Dim::rep get_scalar_as(Dim obj)
+   {
+      return obj.template get_scalar<Units...>();
+   }
+
    /// @brief Return the internal value as a double in terms of the provided units
    /// @tparam NumTuple tuple of Unit types to convert numerator to
    /// @tparam DenTuple tuple of Unit types to convert denominator to
@@ -43,9 +57,9 @@ namespace dimension
    requires (dimensionally_equivalent<base_dimension_impl<double, Units...>, Dim> && !same_unit_representation<std::tuple<Units...>, typename Dim::units>)
    constexpr Dim::rep get_dimension_as(Dim obj)
    {
-      return ConvertDim<typename Dim::units, std::tuple<Units...>>::Convert(
-         call_unpack<typename Dim::units>([&]<typename... OrigUnits> { return get_dimension_as<OrigUnits...>(static_cast<const base_dimension_impl<double, OrigUnits...>&>(obj)); })
-      );
+      // TODO: URGENT: Need to "apply coefficients"
+      constexpr double coefficients = ratio_value<typename Dim::ratio>() * eval_symbol_tuple<typename Dim::symbols>();
+      return get_scalar_as<Units...>(obj) * coefficients;
    }
    
    template<are_unit_exponents... Units, typename Dim>
@@ -59,22 +73,6 @@ namespace dimension
    constexpr base_dimension_from_tuple<UnitTuple>::dim::rep get_dimension_tuple(typename base_dimension_from_tuple<UnitTuple>::dim obj)
    {
       return call_unpack<UnitTuple>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
-   }
-
-   template<are_unit_exponents... Units, typename Dim>
-   requires (dimensionally_equivalent<base_dimension_impl<double, Units...>, Dim> && !same_unit_representation<std::tuple<Units...>, typename Dim::units>)
-   constexpr Dim::rep get_scalar_as(Dim obj)
-   {
-      return ConvertDim<typename Dim::units, std::tuple<Units...>>::Convert(
-         call_unpack<typename Dim::units>([&]<typename... OrigUnits> { return get_scalar_as<OrigUnits...>(static_cast<const base_dimension_impl<double, OrigUnits...>&>(obj)); })
-      );
-   }
-   
-   template<are_unit_exponents... Units, typename Dim>
-   requires same_unit_representation<std::tuple<Units...>, typename Dim::units>
-   constexpr Dim::rep get_scalar_as(Dim obj)
-   {
-      return obj.template get_scalar<Units...>();
    }
 
    template<typename UnitTuple, typename Dim>
@@ -107,9 +105,6 @@ namespace dimension
    private:
       using ts_split = partition_coeffs<Ts...>;
 
-      template<typename... Us>
-      static constexpr void ignore_unused(Us&&...) noexcept {}
-
    public:
 
       using units = typename ts_split::units;
@@ -121,31 +116,26 @@ namespace dimension
       using rep = Rep;
       
       //------------------------------------------------------------------
-      // 1. default / “coefficients-only” constructor
+      // 1. default ctor – no run-time coeffs
       //------------------------------------------------------------------
-      template<is_coefficient... Cs>
-      constexpr base_dimension_impl(Cs... incoming_coeffs) noexcept
-         : scalar(Rep{0})
-      {
-         static_assert(sizeof...(Cs) == 0 ||               // plain default
-                        (std::is_empty_v<Cs> && ...),        // all tags are EBO
-                        "Run-time coefficient arguments must be empty types");
-         ignore_unused(incoming_coeffs...);                          // discard at run time
-      }
+      constexpr base_dimension_impl() noexcept : scalar(Rep{}) {}
 
       //------------------------------------------------------------------
-      // 2. value (+ optional coefficients) constructor
+      // 2. numeric value ctor – no run-time coeffs
+      //------------------------------------------------------------------
+      explicit constexpr base_dimension_impl(Rep v) noexcept : scalar(v) {}
+
+      //------------------------------------------------------------------
+      // 3.  catch-all that triggers a hard error if *any* coeff tags are given
       //------------------------------------------------------------------
       template<is_coefficient... Cs>
-      explicit constexpr base_dimension_impl(Rep v,
-                                             Cs... incoming_coeffs) noexcept
-         : scalar(v)
+      explicit constexpr base_dimension_impl(Rep, Cs...)
       {
-         static_assert((std::is_empty_v<Cs> && ...),
-                        "Run-time coefficient arguments must be empty types");
-         ignore_unused(incoming_coeffs...);
+         static_assert(sizeof...(Cs) == 0,
+                        "run-time coefficient tags (e.g. symbols::pi{}) are disallowed");
       }
-      
+
+
       template<typename... OtherUnits>
       requires dimensionally_equivalent<base_dimension_impl<Rep, Ts...>, base_dimension_impl<Rep, OtherUnits...>>
       // Implicit conversion between dimensions of the same unit is core to Dimensional
@@ -268,6 +258,18 @@ namespace dimension
                                  eval_symbol_tuple<symbols>());
       }
 
+      template<typename Tuple>
+      [[nodiscard]] constexpr Rep get_tuple() const
+      {
+         static_assert(same_unit_representation<units, Tuple>,
+            "get_tuple is an implementation detail of Dimensional and is not meant to be called externally! Prefer get_dimension_as. When using get directly, template parameter units must exactly match units of the object."
+         );
+
+         return static_cast<Rep>(scalar *
+                                 ratio_value<ratio>() * 
+                                 eval_symbol_tuple<symbols>());
+      }
+
       template<typename... Units2>
       [[nodiscard]] constexpr Rep get_scalar() const
       {
@@ -294,7 +296,7 @@ namespace dimension
    };
 
    // ─── generic factory ──────────────────────────────────────────────
-   template<are_unit_exponents U,
+   template<are_unit_exponents... Us,
             typename Rep,                          // deduced
             is_coefficient... Cs>                  // deduced
    // TODO: Unit test this and remove suppression
@@ -303,10 +305,10 @@ namespace dimension
    {
       // compile-time guard: Rep must work with base_dimension’s ctor
       static_assert(requires(Rep v)
-                     { base_dimension_impl<Rep, U, Cs...>(v, coeffs...); },
+                     { base_dimension_impl<Rep, Us..., Cs...>(v, coeffs...); },
                      "make_dimension: provided value type cannot be used as Rep");
 
-      return base_dimension_impl<Rep, U, Cs...>(value, coeffs...);
+      return base_dimension_impl<Rep, Us..., Cs...>(value);
    }
 
    /// @brief Division operator for two Dimensions

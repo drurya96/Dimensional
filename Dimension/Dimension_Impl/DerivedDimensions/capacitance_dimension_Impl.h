@@ -377,7 +377,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_capacitance(Cs... coeffs)
    {
-      return capacitance<double, T0, T1, T2, T3, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return capacitance<double, T0, T1, T2, T3, Cs...>(1.0);
    }
 
    template<
@@ -398,7 +399,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_capacitance(Rep value, Cs... coeffs)
    {
-      return capacitance<Rep, T0, T1, T2, T3, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return capacitance<Rep, T0, T1, T2, T3, Cs...>(value);
    }
 
    /// @brief Template specialization for named capacitance units
@@ -408,7 +410,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_capacitance(Cs... coeffs)
    {
-      return capacitance<double, Named, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return capacitance<double, Named, Cs...>(1.0);
    }
 
    /// @brief Template specialization for named capacitance units
@@ -418,7 +421,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_capacitance(Rep value, Cs... coeffs)
    {
-      return capacitance<Rep, Named, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return capacitance<Rep, Named, Cs...>(value);
    }
 
    template<is_capacitance Dim>

@@ -185,7 +185,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_volume(Cs... coeffs)
    {
-      return volume<double, T0, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return volume<double, T0, Cs...>(1.0);
    }
 
    template<
@@ -200,7 +201,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_volume(Rep value, Cs... coeffs)
    {
-      return volume<Rep, T0, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return volume<Rep, T0, Cs...>(value);
    }
 
    /// @brief Template specialization for named volume units
@@ -210,7 +212,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_volume(Cs... coeffs)
    {
-      return volume<double, Named, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return volume<double, Named, Cs...>(1.0);
    }
 
    /// @brief Template specialization for named volume units
@@ -220,7 +223,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_volume(Rep value, Cs... coeffs)
    {
-      return volume<Rep, Named, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return volume<Rep, Named, Cs...>(value);
    }
 
    template<is_volume Dim>

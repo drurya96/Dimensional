@@ -99,7 +99,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_length(Rep value, Cs... coeffs)
    {
-      return length<Rep, U, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return length<Rep, U, Cs...>(value);
    }
 
    template<is_length_unit U, is_coefficient... Cs>
@@ -107,7 +108,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_length(Cs... coeffs)
    {
-      return length<double, U, Cs...>(1.0, coeffs...);   // 1 × coeffs
+      ignore_unused(coeffs...);
+      return length<double, U, Cs...>(1.0);   // 1 × coeffs
    }
 
    template<is_length_unit Unit, is_coefficient... Cs>

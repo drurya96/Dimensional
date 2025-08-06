@@ -99,7 +99,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_timespan(Rep value, Cs... coeffs)
    {
-      return timespan<Rep, U, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return timespan<Rep, U, Cs...>(value);
    }
 
    template<is_timespan_unit U, is_coefficient... Cs>
@@ -107,7 +108,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_timespan(Cs... coeffs)
    {
-      return timespan<double, U, Cs...>(1.0, coeffs...);   // 1 × coeffs
+      ignore_unused(coeffs...);
+      return timespan<double, U, Cs...>(1.0);   // 1 × coeffs
    }
 
    template<is_timespan_unit Unit, is_coefficient... Cs>

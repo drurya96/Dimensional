@@ -207,7 +207,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_volumetric_flow_rate(Cs... coeffs)
    {
-      return volumetric_flow_rate<double, T0, T1, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return volumetric_flow_rate<double, T0, T1, Cs...>(1.0);
    }
 
    template<
@@ -224,7 +225,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_volumetric_flow_rate(Rep value, Cs... coeffs)
    {
-      return volumetric_flow_rate<Rep, T0, T1, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return volumetric_flow_rate<Rep, T0, T1, Cs...>(value);
    }
 
    /// @brief Template specialization for named volumetric_flow_rate units
@@ -234,7 +236,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_volumetric_flow_rate(Cs... coeffs)
    {
-      return volumetric_flow_rate<double, Named, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return volumetric_flow_rate<double, Named, Cs...>(1.0);
    }
 
    /// @brief Template specialization for named volumetric_flow_rate units
@@ -244,7 +247,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_volumetric_flow_rate(Rep value, Cs... coeffs)
    {
-      return volumetric_flow_rate<Rep, Named, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return volumetric_flow_rate<Rep, Named, Cs...>(value);
    }
 
    template<is_volumetric_flow_rate Dim>

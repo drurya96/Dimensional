@@ -99,7 +99,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_amount(Rep value, Cs... coeffs)
    {
-      return amount<Rep, U, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return amount<Rep, U, Cs...>(value);
    }
 
    template<is_amount_unit U, is_coefficient... Cs>
@@ -107,7 +108,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_amount(Cs... coeffs)
    {
-      return amount<double, U, Cs...>(1.0, coeffs...);   // 1 × coeffs
+      ignore_unused(coeffs...);
+      return amount<double, U, Cs...>(1.0);   // 1 × coeffs
    }
 
    template<is_amount_unit Unit, is_coefficient... Cs>

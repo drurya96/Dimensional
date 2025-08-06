@@ -99,7 +99,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_{{ dim.name }}(Rep value, Cs... coeffs)
    {
-      return {{ dim.name }}<Rep, U, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return {{ dim.name }}<Rep, U, Cs...>(value);
    }
 
    template<is_{{ dim.name }}_unit U, is_coefficient... Cs>
@@ -107,7 +108,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_{{ dim.name }}(Cs... coeffs)
    {
-      return {{ dim.name }}<double, U, Cs...>(1.0, coeffs...);   // 1 × coeffs
+      ignore_unused(coeffs...);
+      return {{ dim.name }}<double, U, Cs...>(1.0);   // 1 × coeffs
    }
 
    template<is_{{ dim.name }}_unit Unit, is_coefficient... Cs>

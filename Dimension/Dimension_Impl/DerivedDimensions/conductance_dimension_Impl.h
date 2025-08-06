@@ -377,7 +377,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_conductance(Cs... coeffs)
    {
-      return conductance<double, T0, T1, T2, T3, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return conductance<double, T0, T1, T2, T3, Cs...>(1.0);
    }
 
    template<
@@ -398,7 +399,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_conductance(Rep value, Cs... coeffs)
    {
-      return conductance<Rep, T0, T1, T2, T3, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return conductance<Rep, T0, T1, T2, T3, Cs...>(value);
    }
 
    /// @brief Template specialization for named conductance units
@@ -408,7 +410,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_conductance(Cs... coeffs)
    {
-      return conductance<double, Named, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return conductance<double, Named, Cs...>(1.0);
    }
 
    /// @brief Template specialization for named conductance units
@@ -418,7 +421,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_conductance(Rep value, Cs... coeffs)
    {
-      return conductance<Rep, Named, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return conductance<Rep, Named, Cs...>(value);
    }
 
    template<is_conductance Dim>

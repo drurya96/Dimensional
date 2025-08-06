@@ -207,7 +207,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_moment_of_inertia(Cs... coeffs)
    {
-      return moment_of_inertia<double, T0, T1, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return moment_of_inertia<double, T0, T1, Cs...>(1.0);
    }
 
    template<
@@ -224,7 +225,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_moment_of_inertia(Rep value, Cs... coeffs)
    {
-      return moment_of_inertia<Rep, T0, T1, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return moment_of_inertia<Rep, T0, T1, Cs...>(value);
    }
 
    /// @brief Template specialization for named moment_of_inertia units
@@ -234,7 +236,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_moment_of_inertia(Cs... coeffs)
    {
-      return moment_of_inertia<double, Named, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return moment_of_inertia<double, Named, Cs...>(1.0);
    }
 
    /// @brief Template specialization for named moment_of_inertia units
@@ -244,7 +247,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_moment_of_inertia(Rep value, Cs... coeffs)
    {
-      return moment_of_inertia<Rep, Named, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return moment_of_inertia<Rep, Named, Cs...>(value);
    }
 
    template<is_moment_of_inertia Dim>

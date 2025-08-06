@@ -377,7 +377,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_resistance(Cs... coeffs)
    {
-      return resistance<double, T0, T1, T2, T3, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return resistance<double, T0, T1, T2, T3, Cs...>(1.0);
    }
 
    template<
@@ -398,7 +399,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_resistance(Rep value, Cs... coeffs)
    {
-      return resistance<Rep, T0, T1, T2, T3, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return resistance<Rep, T0, T1, T2, T3, Cs...>(value);
    }
 
    /// @brief Template specialization for named resistance units
@@ -408,7 +410,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_resistance(Cs... coeffs)
    {
-      return resistance<double, Named, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return resistance<double, Named, Cs...>(1.0);
    }
 
    /// @brief Template specialization for named resistance units
@@ -418,7 +421,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_resistance(Rep value, Cs... coeffs)
    {
-      return resistance<Rep, Named, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return resistance<Rep, Named, Cs...>(value);
    }
 
    template<is_resistance Dim>

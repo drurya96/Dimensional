@@ -246,7 +246,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_inductance(Cs... coeffs)
    {
-      return inductance<double, T0, T1, T2, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return inductance<double, T0, T1, T2, Cs...>(1.0);
    }
 
    template<
@@ -265,7 +266,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_inductance(Rep value, Cs... coeffs)
    {
-      return inductance<Rep, T0, T1, T2, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return inductance<Rep, T0, T1, T2, Cs...>(value);
    }
 
    /// @brief Template specialization for named inductance units
@@ -275,7 +277,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_inductance(Cs... coeffs)
    {
-      return inductance<double, Named, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return inductance<double, Named, Cs...>(1.0);
    }
 
    /// @brief Template specialization for named inductance units
@@ -285,7 +288,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_inductance(Rep value, Cs... coeffs)
    {
-      return inductance<Rep, Named, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return inductance<Rep, Named, Cs...>(value);
    }
 
    template<is_inductance Dim>

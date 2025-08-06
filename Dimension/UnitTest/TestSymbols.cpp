@@ -60,8 +60,16 @@ TEST(Derived, Test3) {
 
 TEST(Derived, Test4) {
     speed a = make_speed<knots>(10.0, symbols::pi{}, std::ratio<1, 2>{});
+    EXPECT_NEAR(get_speed_as<knots>(a), 5.0 * 3.1415, 0.001);
+
+
+    EXPECT_NEAR((a.get_scalar<unit_exponent<nautical_miles>, unit_exponent<hours, -1>>()), 10.0, 0.001);
+
+
     timespan b = make_timespan<hours>(2.0);
     length c = a * b;
+
+    //double result = get_length_as<nautical_miles>(c);
 
     EXPECT_NEAR(get_length_as<nautical_miles>(c), 10.0 * 3.1415, 0.001);
 }

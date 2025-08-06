@@ -99,7 +99,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_charge(Rep value, Cs... coeffs)
    {
-      return charge<Rep, U, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return charge<Rep, U, Cs...>(value);
    }
 
    template<is_charge_unit U, is_coefficient... Cs>
@@ -107,7 +108,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_charge(Cs... coeffs)
    {
-      return charge<double, U, Cs...>(1.0, coeffs...);   // 1 × coeffs
+      ignore_unused(coeffs...);
+      return charge<double, U, Cs...>(1.0);   // 1 × coeffs
    }
 
    template<is_charge_unit Unit, is_coefficient... Cs>

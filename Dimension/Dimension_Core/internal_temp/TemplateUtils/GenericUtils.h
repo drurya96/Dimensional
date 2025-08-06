@@ -59,6 +59,9 @@ namespace dimension
       }
    };
 
+   template<typename... Us>
+   constexpr void ignore_unused(Us&&...) noexcept {}
+
 }
 
 #endif // DIMENSIONAL_GENERIC_UTILS_H

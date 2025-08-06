@@ -207,7 +207,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_speed(Cs... coeffs)
    {
-      return speed<double, T0, T1, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return speed<double, T0, T1, Cs...>(1.0);
    }
 
    template<
@@ -224,7 +225,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_speed(Rep value, Cs... coeffs)
    {
-      return speed<Rep, T0, T1, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return speed<Rep, T0, T1, Cs...>(value);
    }
 
    /// @brief Template specialization for named speed units
@@ -234,7 +236,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_speed(Cs... coeffs)
    {
-      return speed<double, Named, Cs...>(1.0, coeffs...);
+      ignore_unused(coeffs...);
+      return speed<double, Named, Cs...>(1.0);
    }
 
    /// @brief Template specialization for named speed units
@@ -244,7 +247,8 @@ namespace dimension
    [[maybe_unused]]
    constexpr auto make_speed(Rep value, Cs... coeffs)
    {
-      return speed<Rep, Named, Cs...>(value, coeffs...);
+      ignore_unused(coeffs...);
+      return speed<Rep, Named, Cs...>(value);
    }
 
    template<is_speed Dim>
