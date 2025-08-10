@@ -55,6 +55,13 @@ namespace dimension
       >;
    };
 
+   template<class T>
+   struct is_unit_exponents_trait
+   : std::bool_constant<are_unit_exponents<std::remove_cvref_t<T>>> {};
+
+   template<class... Ts>
+   using extract_units_t  = filter_pack_tuple_t<is_unit_exponents_trait, Ts...>;
+
 }
 
 #endif // DIMENSIONAL_UNIT_EXPONENT_UTILS_H

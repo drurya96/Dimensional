@@ -6,51 +6,63 @@
 
 namespace dimension
 {
+   // TODO: IMPORTANT: Write an issue for future work:
+   //   We could have a `ratio_exponent` alongside `unit_exponent` and `symbol_exponent`
+   //   This would allow "perfect" representation of ratio-roots.
+   //   API surface should remain unchanged if this is added later,
+   //   so it will not be include in Dimensional 3.0.0
 
-   /// @brief Implementation for Pow (exponential)
-   /// @details Uses exponentiation by squares method
-   /// @tparam exponent the exponent to raise to. This must be a positive integer
-   /// @tparam Dim The input dimension type
-   /// @tparam TransitiveDim The dimension type returned from this recursive call of PowImpl
-   /// @param[in] obj The input dimension object
-   /// @param[in] transitiveDim The transitive object from the previous recursive call
-   /// @return transitiveDim multiplied by obj either one or two times
-   ///    for even or odd exponents, respectively.
-   template<unsigned int exponent, is_base_dimension T>
-   constexpr auto PowImpl(const T& base)
+   template<int Num, unsigned int Den = 1, is_base_dimension T>
+   constexpr auto pow_dimension_impl(T base)
    {
-      if constexpr (exponent == 0)
+      if constexpr (Num == 0)
       {
          // 0th power: returns dimensionless with value 1.0
          return base_dimension_impl<double>{1.0};
       }
-      else if constexpr (exponent == 1)
+      else if constexpr (Num == 1 && Den == 1)
       {
          return base;
       }
-      else if constexpr (exponent % 2 == 0)
+      else if constexpr (Den == 1)
       {
-         auto half = PowImpl<exponent / 2>(base);
-         return half * half;
+         // Exact ratio handling
+         using ratio = raise_ratio_t<typename T::ratio, Num>;
+         using symbols = detail::raise_all_symbol_exponents_t<typename T::symbols, std::ratio<Num, Den>>;
+         using units = raise_all_unit_exponents_t<typename T::units, std::ratio<Num, Den>>;
+
+         return typename base_dimension_from_tuple<typename T::rep, ratio, units, symbols>::dim(
+            pow_rational(base.template get_tuple_scalar<typename T::units>(), Num, Den)
+         );
       }
       else
       {
-         auto half = PowImpl<exponent / 2>(base);
-         return half * half * base;
+         // Root - cannot do exact ratio handling
+         using symbols = detail::raise_all_symbol_exponents_t<typename T::symbols, std::ratio<Num, Den>>;
+         using units = raise_all_unit_exponents_t<typename T::units, std::ratio<Num, Den>>;
+
+         return typename base_dimension_from_tuple<typename T::rep, units, symbols>::dim(
+            pow_rational(base.template get_tuple_scalar<typename T::units>() * ratio_v<typename T::ratio>, Num, Den)
+         );
       }
    }
 
-   /// @brief Implementation for Pow (exponential)
-   /// @tparam exponent the exponent to raise to. This must be a positive integer
-   /// @tparam Dim The input dimension type
-   /// @param[in] obj The object to raise to exponent power
-   /// @return A dimension object of units raised to exponent power,
-   ///    and a value raised to exponent power
+
+
+   
    template<unsigned int exponent, typename Dim>
    [[nodiscard]] constexpr auto Pow(Dim obj)
    {
-      return PowImpl<exponent>(obj);
+      return pow_dimension_impl<exponent>(obj);
    }
+
+
+
+
+
+
+
+
 
    /// @brief Calculate hypotenuse from two sides of a right triangle
    /// @tparam T Side type, must be a base_dimension

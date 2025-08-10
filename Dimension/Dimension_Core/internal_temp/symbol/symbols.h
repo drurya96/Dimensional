@@ -37,7 +37,7 @@ namespace dimension::symbols
    };
 
    struct sqrt_pi : public symbol{
-      static constexpr double value = 1 / std::numbers::inv_sqrtpi;
+      static constexpr double value = 1.0 / std::numbers::inv_sqrtpi;
    };
 
    // natural logs

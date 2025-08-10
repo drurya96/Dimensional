@@ -3,8 +3,8 @@
 
 #include <concepts>
 
-#include "ratio_utils.h"
-#include "symbol_utils.h"
+#include "ratio/ratio_utils.h"
+#include "symbol/symbol_utils.h"
 #include "rep_type.h"
 #include "unit_exponent.h"
 

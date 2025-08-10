@@ -10,7 +10,6 @@
 #include "collapse_units.h"
 #include "full_simplify.h"
 #include "convertible.h"
-#include "null_unit.h"
 #include "unit_filter.h" // Shouldn't be needed after cleanup
 #include "unit_exponent_utils.h"
 
@@ -83,10 +82,7 @@ namespace dimension
       }
    }
 
-
-   // ============================================================
-   // =================== ConvertSimplified ======================
-   // ============================================================
+namespace detail {
 
    template<typename... Units>
    struct ConvertSimplified;
@@ -107,42 +103,6 @@ namespace dimension
          ConvertSimplified<std::tuple<FromRest...>, std::tuple<ToUnits...>>::scalar;
    };
 
-   // ============================================================
-   // ======================= ConvertDim =========================
-   // ============================================================
-
-   template<typename FromTuple, typename ToTuple>
-   struct ConvertDim
-   {
-      static constexpr double Convert(auto input /*dimension*/) 
-      {
-         return 
-            ConvertSimplified<simplified_units_t<FromTuple>, simplified_units_t<ToTuple>>::scalar * 
-            simplification::SimplifiedDimension<FromTuple>::convert_scalar(input.template get_tuple_scalar<FromTuple>());
-   }
-   };
-
-
-
-
-
-
-
-namespace detail {
-
-   template<typename FromTuple, typename ToTuple>
-   constexpr double get_conversion_factor()
-   {
-      return ConvertSimplified<simplified_units_t<FromTuple>, simplified_units_t<ToTuple>>::scalar;
-   }
-
-   template<typename FromTuple, typename ToTuple>
-   constexpr double convert_scalar_units(double value)
-   {
-      return get_conversion_factor<FromTuple, ToTuple>() * value;
-   }
-
-
    template<typename ToTuple, typename FromDim>
    static constexpr double convert_scalar_units(FromDim input) 
    {
@@ -151,16 +111,7 @@ namespace detail {
          simplification::SimplifiedDimension<typename FromDim::units>::convert_scalar(input.template get_tuple_scalar<typename FromDim::units>());
    }
    
-
 } // namespace detail
-
-
-
-
-
-
-
-
 
 } // end Dimension
 

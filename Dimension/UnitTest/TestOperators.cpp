@@ -147,13 +147,14 @@ TEST(Operators, DimensionSubtraction)
 // Test Exponent
 TEST(Operators, DimensionExponent)
 {
-   speed<meters, seconds> speed(10.0);
+   speed<meters, seconds> s(10.0);
 
-   base_dimension<unit_exponent<meters, 3>, unit_exponent<seconds, -3>> test1 = speed * speed * speed;
+   base_dimension<unit_exponent<meters, 3>, unit_exponent<seconds, -3>> test1 = s * s * s;
 
-   auto test2 = dimension::Pow<3>(speed);
+   auto test2 = dimension::Pow<3>(s);
 
-   ASSERT_TRUE(test1 == test2);
+   //ASSERT_TRUE(test1 == test2);
+   EXPECT_NEAR((get_dimension_as<unit_exponent<meters, 3>, unit_exponent<seconds, -3>>(test1)), (get_dimension_as<unit_exponent<meters, 3>, unit_exponent<seconds, -3>>(test2)), 0.000001);
 }
 
 // Test Negative

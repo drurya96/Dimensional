@@ -62,6 +62,14 @@ namespace dimension
    template<typename... Us>
    constexpr void ignore_unused(Us&&...) noexcept {}
 
+   template<template<class> class Pred, class... Ts>
+   using filter_pack_tuple_t =
+      decltype(std::tuple_cat(
+         std::conditional_t<Pred<Ts>::value,
+                              std::tuple<std::remove_cvref_t<Ts>>,
+                              std::tuple<>>{}...
+      ));
+
 }
 
 #endif // DIMENSIONAL_GENERIC_UTILS_H

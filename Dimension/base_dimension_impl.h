@@ -27,7 +27,6 @@
 #include "Dimension_Core/serialization/Serialization.h"
 #include "Dimension_Core/serialization/exact_tag_policy.h"
 #include "Dimension_Core/serialization/raw_value_policy.h"
-#include "Dimension_Core/internal_temp/Coefficient.h"
 
 #include "Dimension_Core/internal_temp/point.h"
 
@@ -58,7 +57,7 @@ namespace dimension
    constexpr Dim::rep get_dimension_as(Dim obj)
    {
       // TODO: URGENT: Need to "apply coefficients"
-      constexpr double coefficients = ratio_value<typename Dim::ratio>() * eval_symbol_tuple<typename Dim::symbols>();
+      constexpr double coefficients = ratio_v<typename Dim::ratio> * detail::multiply_symbol_exponent_values_v<typename Dim::symbols>;
       return get_scalar_as<Units...>(obj) * coefficients;
    }
    
@@ -102,15 +101,10 @@ namespace dimension
    template<rep_type Rep, is_coefficient_or_unit... Ts>
    class base_dimension_impl : public base_dimension_marker
    {
-   private:
-      using ts_split = partition_coeffs<Ts...>;
-
    public:
-
-      using units = typename ts_split::units;
-      using coeffs = typename ts_split::coeffs;
-      using symbols = typename handle_coefficients_tuple<coeffs>::symbols;
-      using ratio = typename handle_coefficients_tuple<coeffs>::ratio;
+      using units = extract_units_t<Ts...>;
+      using symbols = extract_symbols_t<Ts...>;
+      using ratio = extract_ratio_t<Ts...>;
 
       using simplified = simplified_units_t<units>;
       using rep = Rep;
@@ -254,8 +248,8 @@ namespace dimension
          );
 
          return static_cast<Rep>(scalar *
-                                 ratio_value<ratio>() * 
-                                 eval_symbol_tuple<symbols>());
+                                 ratio_v<ratio> * 
+                                 detail::multiply_symbol_exponent_values_v<symbols>);
       }
 
       template<typename Tuple>
@@ -266,8 +260,8 @@ namespace dimension
          );
 
          return static_cast<Rep>(scalar *
-                                 ratio_value<ratio>() * 
-                                 eval_symbol_tuple<symbols>());
+                                 ratio_v<ratio> * 
+                                 detail::multiply_symbol_exponent_values_v<symbols>);
       }
 
       template<typename... Units2>
@@ -325,7 +319,8 @@ namespace dimension
    {
       using Rep = std::common_type_t<typename Lhs::rep, typename Rhs::rep>;
       using ratio = std::ratio_divide<typename Lhs::ratio, typename Rhs::ratio>;
-      using symbols = typename divide_symbol_tuples<typename Lhs::symbols, typename Rhs::symbols>::type;
+      using symbols = detail::divide_symbol_tuples_t<typename Lhs::symbols, typename Rhs::symbols>;
+      //using symbols = std::tuple<>;
       using units_combined = tuple_cat_t<typename Lhs::units, typename FlipExponents<typename Rhs::units>::units>;
       using units = typename collapse_units<units_combined>::units;
 
@@ -349,7 +344,8 @@ namespace dimension
    {
       using Rep = std::common_type_t<typename Lhs::rep, typename Rhs::rep>;
       using ratio = std::ratio_multiply<typename Lhs::ratio, typename Rhs::ratio>;
-      using symbols = typename multiply_symbol_tuples<typename Lhs::symbols, typename Rhs::symbols>::type;
+      using symbols = detail::multiply_symbol_tuples_t<typename Lhs::symbols, typename Rhs::symbols>;
+      //using symbols = std::tuple<>;
       using units_combined = tuple_cat_t<typename Lhs::units, typename Rhs::units>;
       using units = typename collapse_units<units_combined>::units;
       

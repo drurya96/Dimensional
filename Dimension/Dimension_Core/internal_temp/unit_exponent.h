@@ -7,6 +7,7 @@
 
 #include "strings/string_numeric.h"
 #include "TupleHandling.h"
+#include "ratio/ratio_utils.h"
 
 namespace dimension
 {
@@ -85,28 +86,29 @@ namespace dimension
             (contains_unit_exponent<B, std::tuple<A...>>::value && ...)
       > {};
 
-   template<typename Power, typename... Units>
-   struct raise_unit_exponent;
 
-   template<typename Power>
-   struct raise_unit_exponent<Power, std::tuple<>>
+   // TODO: Consider a generic "Raise" and "Raise All" to apply to each _exponent type
+
+   template<is_unit_exponent T, is_ratio R>
+   struct raise_unit_exponent
    {
-      using units = std::tuple<>;
+   private:
+      using new_exponent = std::ratio_multiply<typename T::exponent, R>;
+   public:
+      using type = unit_exponent<typename T::unit, new_exponent::num, new_exponent::den>;
    };
 
-   template<typename Power, typename Unit>
-   struct raise_unit_exponent<Power, std::tuple<Unit>>
+   template<typename Tuple, is_ratio R>
+   struct raise_all_unit_exponents;  // primary
+
+   template<typename... Ts, is_ratio R>
+   struct raise_all_unit_exponents<std::tuple<Ts...>, R>
    {
-      using units = std::tuple<unit_exponent<typename Unit::unit, std::ratio_multiply<typename Unit::exponent, Power>::num, std::ratio_multiply<typename Unit::exponent, Power>::den>>;
+       using type = std::tuple<typename raise_unit_exponent<Ts, R>::type...>;
    };
 
-   template<typename Power, typename Unit, typename... Units>
-   struct raise_unit_exponent<Power, std::tuple<Unit, Units...>>
-   {
-      using units = tuple_cat_t<typename raise_unit_exponent<Power, std::tuple<Unit>>::units, 
-         typename raise_unit_exponent<Power, std::tuple<Units...>>::units>;
-   };
-
+   template<typename Tuple, is_ratio R>
+   using raise_all_unit_exponents_t = typename raise_all_unit_exponents<Tuple, R>::type;
 
 }
 

@@ -5,16 +5,15 @@
 #include <type_traits>
 #include <ratio>
 
-#include "TemplateUtils/RatioUtils.h"
 #include "TemplateUtils/GenericUtils.h"
 
 #include "TupleHandling.h"
 
 #include "unit_decomposition.h"
 
-#include "exponent_math.h"
+#include "exponentiation/exponentiation.h"
 
-#include "ratio_utils.h"
+#include "ratio/ratio_utils.h"
 #include "utils.h"
 
 #include "full_simplify.h"

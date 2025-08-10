@@ -23,7 +23,6 @@
 #include "Dimension_Core/serialization/Serialization.h"
 #include "Dimension_Core/serialization/exact_tag_policy.h"
 #include "Dimension_Core/serialization/raw_value_policy.h"
-#include "Dimension_Core/internal_temp/Coefficient.h"
 
 #include "Dimension_Core/internal_temp/point.h"
 

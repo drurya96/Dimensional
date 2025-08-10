@@ -2,7 +2,7 @@
 #define DIMENSIONAL_GET_FACTOR_H
 
 #include "convertible.h"
-#include "exponent_math.h"
+#include "exponentiation/exponentiation.h"
 
 namespace dimension::details {
 
@@ -34,18 +34,10 @@ namespace dimension::details {
    template<typename TargetUnit, typename Unit>
    constexpr double do_conversion(double value)
    {
-      // Assumptions for now:
-      // Only called on deltas (deal with this once Quantities are working)
-      constexpr double scale = factor::get_factor<typename Unit::unit, TargetUnit>();
-
-      if constexpr (Unit::exponent::den == 1)
-      {
-         return value * math::PowInt<Unit::exponent::num>(scale);
-      }
-      else
-      {
-         return value * math::RootInt<Unit::exponent::den>(math::PowInt<Unit::exponent::num>(scale));
-      }
+      return value * pow_rational(
+         factor::get_factor<typename Unit::unit, TargetUnit>(),
+         typename Unit::exponent{}
+      );
    }
 
 

@@ -19,7 +19,7 @@ namespace dimension
    template<typename Unit>
    struct unit_decomposition<std::tuple<Unit>>
    {
-      using units = typename raise_unit_exponent<typename Unit::exponent, typename Unit::unit::units>::units;
+      using units = raise_all_unit_exponents_t<typename Unit::unit::units, typename Unit::exponent>;
    };
 
    template<typename Unit, typename... Units>

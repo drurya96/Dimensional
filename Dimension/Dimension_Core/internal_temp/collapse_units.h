@@ -5,7 +5,7 @@
 
 #include "unit_exponent.h"
 #include "TemplateUtils/GenericUtils.h" // filter_tuple
-#include "TemplateUtils/RatioUtils.h" // filter_tuple
+#include "ratio/ratio_utils.h"
 #include "TupleHandling.h"
 #include "unit_decomposition.h"
 
@@ -25,7 +25,7 @@ namespace dimension
       {
       private:
          // Fold over matching unit exponents
-         using combined_exponent = ratio_add_fold_t<
+         using combined_exponent = ratio_add_t<
          std::conditional_t<
                std::is_same_v<IncomingUnit, typename Units::unit>,
                typename Units::exponent,
