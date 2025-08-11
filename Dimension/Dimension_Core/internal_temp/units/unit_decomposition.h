@@ -1,7 +1,7 @@
 #ifndef DIMENSION_UNIT_DECOMPOSITION_H
 #define DIMENSION_UNIT_DECOMPOSITION_H
 
-#include "TupleHandling.h"
+#include "../TupleHandling.h"
 #include "unit_exponent.h"
 
 namespace dimension

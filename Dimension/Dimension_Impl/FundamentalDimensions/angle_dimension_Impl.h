@@ -20,7 +20,7 @@ namespace dimension
    /// @brief Concept to check if a type is a valid angle unit.
    /// @tparam T The type to check.
    template<typename T>
-   concept is_angle_unit = std::is_base_of_v<FundamentalUnitTag, T> && std::is_same_v<typename T::Dim, angleType>;
+   concept is_angle_unit = std::is_base_of_v<FundamentalUnitTag, T> && std::is_same_v<unit_dim_t<T>, angleType>;
 
    /// @brief Base class for angle units.
    /// @tparam Unit The unit type.

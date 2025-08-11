@@ -20,7 +20,7 @@ namespace dimension
    /// @brief Concept to check if a type is a valid temperature unit.
    /// @tparam T The type to check.
    template<typename T>
-   concept is_temperature_unit = std::is_base_of_v<FundamentalUnitTag, T> && std::is_same_v<typename T::Dim, temperatureType>;
+   concept is_temperature_unit = std::is_base_of_v<FundamentalUnitTag, T> && std::is_same_v<unit_dim_t<T>, temperatureType>;
 
    /// @brief Base class for temperature units.
    /// @tparam Unit The unit type.

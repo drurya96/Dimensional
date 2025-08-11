@@ -20,7 +20,7 @@ namespace dimension
    /// @brief Concept to check if a type is a valid length unit.
    /// @tparam T The type to check.
    template<typename T>
-   concept is_length_unit = std::is_base_of_v<FundamentalUnitTag, T> && std::is_same_v<typename T::Dim, lengthType>;
+   concept is_length_unit = std::is_base_of_v<FundamentalUnitTag, T> && std::is_same_v<unit_dim_t<T>, lengthType>;
 
    /// @brief Base class for length units.
    /// @tparam Unit The unit type.

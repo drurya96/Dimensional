@@ -20,7 +20,7 @@ namespace dimension
    /// @brief Concept to check if a type is a valid mass unit.
    /// @tparam T The type to check.
    template<typename T>
-   concept is_mass_unit = std::is_base_of_v<FundamentalUnitTag, T> && std::is_same_v<typename T::Dim, massType>;
+   concept is_mass_unit = std::is_base_of_v<FundamentalUnitTag, T> && std::is_same_v<unit_dim_t<T>, massType>;
 
    /// @brief Base class for mass units.
    /// @tparam Unit The unit type.

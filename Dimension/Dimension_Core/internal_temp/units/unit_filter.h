@@ -5,15 +5,16 @@
 #include <tuple>
 #include <type_traits>
 
-#include "TupleHandling.h"
+#include "../TupleHandling.h"
 #include "unit_exponent.h"
+#include "unit_dim.h"
 
 namespace dimension
 {
 
    // -- Dimension tag check
    template<typename T, typename ExpectedTag>
-   constexpr bool matches_tag = std::is_same_v<typename T::Dim, ExpectedTag>;
+   constexpr bool matches_tag = std::is_same_v<unit_dim_t<T>, ExpectedTag>;
 
    template<typename ExpectedTag, typename... Units>
    struct unit_filter;

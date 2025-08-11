@@ -12,12 +12,12 @@
 #include <utility>
 
 #include "Dimension_Core/internal_temp/uuid.h"
-#include "Dimension_Core/internal_temp/UnitValidation.h"
+#include "Dimension_Core/internal_temp/units/UnitValidation.h"
 #include "Dimension_Core/internal_temp/full_simplify.h"
-#include "Dimension_Core/internal_temp/unit_filter.h"
+#include "Dimension_Core/internal_temp/units/unit_filter.h"
 #include "Dimension_Core/internal_temp/dimensional_equivalence.h"
-#include "Dimension_Core/internal_temp/collapse_units.h"
-#include "Dimension_Core/internal_temp/unit_decomposition.h"
+#include "Dimension_Core/internal_temp/units/collapse_units.h"
+#include "Dimension_Core/internal_temp/units/unit_decomposition.h"
 #include "Dimension_Core/internal_temp/Conversion.h"
 #include "Dimension_Core/internal_temp/SI_Macro.h"
 #include "Dimension_Core/internal_temp/strings/string_literal.h"
@@ -322,7 +322,7 @@ namespace dimension
       using symbols = detail::divide_symbol_tuples_t<typename Lhs::symbols, typename Rhs::symbols>;
       //using symbols = std::tuple<>;
       using units_combined = tuple_cat_t<typename Lhs::units, typename FlipExponents<typename Rhs::units>::units>;
-      using units = typename collapse_units<units_combined>::units;
+      using units = collapse_units_t<units_combined>;
 
       return typename base_dimension_from_tuple<Rep, ratio, units, symbols>::dim(
          get_scalar_tuple<typename Lhs::units>(lhs) /
@@ -347,7 +347,7 @@ namespace dimension
       using symbols = detail::multiply_symbol_tuples_t<typename Lhs::symbols, typename Rhs::symbols>;
       //using symbols = std::tuple<>;
       using units_combined = tuple_cat_t<typename Lhs::units, typename Rhs::units>;
-      using units = typename collapse_units<units_combined>::units;
+      using units = collapse_units_t<units_combined>;
       
       return typename base_dimension_from_tuple<Rep, ratio, units, symbols>::dim(
          get_scalar_tuple<typename Lhs::units>(lhs) *

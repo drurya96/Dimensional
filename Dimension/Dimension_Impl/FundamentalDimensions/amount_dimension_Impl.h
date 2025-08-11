@@ -20,7 +20,7 @@ namespace dimension
    /// @brief Concept to check if a type is a valid amount unit.
    /// @tparam T The type to check.
    template<typename T>
-   concept is_amount_unit = std::is_base_of_v<FundamentalUnitTag, T> && std::is_same_v<typename T::Dim, amountType>;
+   concept is_amount_unit = std::is_base_of_v<FundamentalUnitTag, T> && std::is_same_v<unit_dim_t<T>, amountType>;
 
    /// @brief Base class for amount units.
    /// @tparam Unit The unit type.

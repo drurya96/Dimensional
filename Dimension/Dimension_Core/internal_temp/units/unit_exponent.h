@@ -5,9 +5,10 @@
 #include <type_traits> // For std::is_same, std::remove_cv, std::disjunction
 #include <ratio>
 
-#include "strings/string_numeric.h"
-#include "TupleHandling.h"
-#include "ratio/ratio_utils.h"
+#include "unit_dim.h"
+#include "../strings/string_numeric.h"
+#include "../TupleHandling.h"
+#include "../ratio/ratio_utils.h"
 
 namespace dimension
 {
@@ -26,7 +27,7 @@ namespace dimension
    template<typename U, int Num, int Den>                     // specialization
    struct to_primary_ue<unit_exponent<U, Num, Den>>
    {
-      using type = unit_exponent<typename U::Primary, Num, Den>;
+      using type = unit_exponent<unit_primary_t<U>, Num, Den>;
    };
 
    template<typename UE>

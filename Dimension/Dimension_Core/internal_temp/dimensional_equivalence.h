@@ -9,7 +9,7 @@
 
 #include "TupleHandling.h"
 
-#include "unit_decomposition.h"
+#include "units/unit_decomposition.h"
 
 #include "exponentiation/exponentiation.h"
 
@@ -18,8 +18,8 @@
 
 #include "full_simplify.h"
 
-#include "collapse_units.h"
-#include "unit_exponent.h"
+#include "units/collapse_units.h"
+#include "units/unit_exponent.h"
 
 namespace dimension {
    namespace dimensional_equivalence
@@ -68,8 +68,8 @@ namespace dimension {
 
    template<typename T1, typename T2>
    concept same_unit_representation = unit_exponent_sets_equal<
-      typename collapse_units<T1>::units,
-      typename collapse_units<T2>::units
+      collapse_units_t<T1>,
+      collapse_units_t<T2>
    >::value;
 
 }

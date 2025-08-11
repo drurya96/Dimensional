@@ -6,7 +6,7 @@
 #include "ratio/ratio_utils.h"
 #include "symbol/symbol_utils.h"
 #include "rep_type.h"
-#include "unit_exponent.h"
+#include "units/unit_exponent.h"
 
 namespace dimension
 {
@@ -42,6 +42,25 @@ namespace dimension
            typename FlipExponents<std::tuple<Rest...>>::units
        >;
    };
+
+   class base_dimension_marker;
+
+   template<typename T>
+   concept is_base_dimension = std::is_base_of_v<base_dimension_marker, T>;
+
+   /// @brief Check if two units are of the same dimension
+   /// @tparam T First unit to compare
+   /// @tparam U Second unit to compare
+   /// @typedef value const cool indicating whether the units are the same dimension
+   /// @todo When upgrading to C++20 use/replace with concept/require
+   template<typename T, typename U>
+   // TODO: Consider a requirement that T and U are dimensions
+   struct is_same_dim : std::integral_constant<
+      bool,
+      std::is_same<typename std::remove_cv<typename T::Dim>::type, typename std::remove_cv<typename U::Dim>::type>::value &&
+      (T::ID == U::ID)
+   > {};
+
 
 } // end dimension
 

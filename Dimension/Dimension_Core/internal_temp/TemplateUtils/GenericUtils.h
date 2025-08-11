@@ -19,15 +19,9 @@ namespace dimension
        using type = typename fold_over_tuple_with_state<std::tuple<Ts...>, next, Func>::type;
    };
 
-   template<typename Tuple, template<typename> class Predicate>
-   struct filter_tuple;
-
-   template<template<typename> class Predicate, typename... Ts>
-   struct filter_tuple<std::tuple<Ts...>, Predicate> {
-      using type = tuple_cat_t<
-         std::conditional_t<Predicate<Ts>::value, std::tuple<Ts>, std::tuple<>>...
-      >;
-   };
+   template<class Tuple, class State, template<class,class> class Func>
+   using fold_over_tuple_with_state_t =
+      typename fold_over_tuple_with_state<Tuple, State, Func>::type;
 
    template<typename Tuple, typename F>
    constexpr auto call_unpack(F&& f) {
@@ -35,29 +29,6 @@ namespace dimension
          return f.template operator()<Units...>();
       }(static_cast<Tuple*>(nullptr));
    }
-
-   // Primary template – never used directly
-   template<typename Tuple>
-   struct apply;
-
-   // Partial specialisation that actually contains the parameter pack
-   template<typename... Ts>
-   struct apply<std::tuple<Ts...>>
-   {
-      // ─── 1.  Re-use the pack to build a *type* ──────────────────────────
-      template<template<typename...> class Template>
-      using to = Template<Ts...>;
-
-      // ─── 2.  Invoke a callable that itself needs the pack ──────────────
-      template<typename F, typename... Args>
-      static constexpr decltype(auto) call(F&& f, Args&&... args)
-      {
-         // F must be a generic callable with a templated operator():
-         //   auto f = []<typename... Us>(Args...){ /*…*/ };
-         return std::forward<F>(f)
-                  .template operator()<Ts...>(std::forward<Args>(args)...);
-      }
-   };
 
    template<typename... Us>
    constexpr void ignore_unused(Us&&...) noexcept {}
@@ -69,6 +40,19 @@ namespace dimension
                               std::tuple<std::remove_cvref_t<Ts>>,
                               std::tuple<>>{}...
       ));
+
+   template<template<class> class Pred, class Tuple>
+   struct filter_tuple;
+
+   template<template<class> class Pred, class... Ts>
+   struct filter_tuple<Pred, std::tuple<Ts...>> {
+      using type = filter_pack_tuple_t<Pred, Ts...>; // uses remove_cvref_t
+   };
+
+   template<template<class> class Pred, class Tuple>
+   using filter_tuple_t = typename filter_tuple<Pred, Tuple>::type;
+
+
 
 }
 

@@ -25,8 +25,7 @@ namespace dimension::details {
          }
          else
          {
-            using Primary = typename StartingUnit::Primary;
-            return get_factor<StartingUnit, Primary>() * get_factor<Primary, TargetUnit>();
+            return get_factor<StartingUnit, unit_primary_t<StartingUnit>>() * get_factor<unit_primary_t<StartingUnit>, TargetUnit>();
          }
       }
    }

@@ -12,8 +12,9 @@
 #include <utility>
 
 #include "Dimension_Core/internal_temp/uuid.h"
-#include "Dimension_Core/internal_temp/UnitValidation.h"
-#include "Dimension_Core/internal_temp/unit_decomposition.h"
+#include "Dimension_Core/internal_temp/units/UnitValidation.h"
+#include "Dimension_Core/internal_temp/units/unit_decomposition.h"
+#include "Dimension_Core/internal_temp/units/unit_dim.h"
 #include "Dimension_Core/internal_temp/Conversion.h"
 #include "Dimension_Core/internal_temp/SI_Macro.h"
 #include "Dimension_Core/internal_temp/strings/string_literal.h"

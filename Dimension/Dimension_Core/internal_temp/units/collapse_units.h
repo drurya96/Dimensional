@@ -4,9 +4,9 @@
 #include <type_traits>
 
 #include "unit_exponent.h"
-#include "TemplateUtils/GenericUtils.h" // filter_tuple
-#include "ratio/ratio_utils.h"
-#include "TupleHandling.h"
+#include "../TemplateUtils/GenericUtils.h" // filter_tuple
+#include "../ratio/ratio_utils.h"
+#include "../TupleHandling.h"
 #include "unit_decomposition.h"
 
 namespace dimension
@@ -49,6 +49,18 @@ namespace dimension
       struct UnitPresent<IncomingUnit, std::tuple<Units...>>
          : std::bool_constant<(... || std::is_same_v<IncomingUnit, typename Units::unit>)> {};
 
+    template<class Unit, class Tuple>
+    inline constexpr bool UnitPresent_v = simplification::UnitPresent<Unit, Tuple>::value;
+
+    // TODO: This probably doens't belong here...
+    template<class Accum, class Unit, class FullTuple>
+    using append_once_t =
+    std::conditional_t<
+        UnitPresent_v<typename Unit::unit, Accum>,
+        Accum,
+        append_t<Accum, typename simplification::CombinePower<typename Unit::unit, FullTuple>::unit>
+    >;
+
    }
 
    // ============================================================
@@ -61,42 +73,41 @@ namespace dimension
    template<typename Tuple>
    struct RemoveZeros
    {
-      using units = typename filter_tuple<Tuple, is_nonzero_unit>::type;
+      using units = filter_tuple_t<is_nonzero_unit, Tuple>;
    };
 
    // ============================================================
    // ================== Initial Simplifier ======================
    // ============================================================
 
-   template<typename InputTuple>
-   struct collapse_units;
-   
-   template<typename... Units>
-   struct collapse_units<std::tuple<Units...>>
-   {
-   private:
-      using flattened = typename unit_decomposition<std::tuple<Units...>>::units;
-      
-      template<typename FullTuple>
-      struct CombineUniqueFrom {
-          template<typename Accum, typename Unit>
-          struct apply {      
-              using type = std::conditional_t<
-                  simplification::UnitPresent<typename Unit::unit, Accum>::value,
-                  Accum,
-                  tuple_cat_t<
-                      Accum,
-                      std::tuple<typename simplification::CombinePower<typename Unit::unit, FullTuple>::unit>
-                  >
-              >;
-          };
-      };
+    template<class InputTuple>
+    struct collapse_units;
 
-       using combined = fold_over_tuple_with_state<flattened,std::tuple<>, CombineUniqueFrom<flattened>::template apply>::type;
-      
-   public:
-       using units = typename RemoveZeros<combined>::units;
-   };
+    template<class... Units>
+    struct collapse_units<std::tuple<Units...>> {
+    private:
+        using flattened = typename unit_decomposition<std::tuple<Units...>>::units;
+
+        // Binary metafunction for the fold: F<Accum, Unit> -> ::type
+        template<class Accum, class Unit>
+        struct combine_unique_from_flattened {
+            using type = simplification::append_once_t<Accum, Unit, flattened>;
+        };
+
+        using combined =
+            fold_over_tuple_with_state_t<
+            flattened,
+            std::tuple<>,
+            combine_unique_from_flattened
+            >;
+
+    public:
+        using type = typename RemoveZeros<combined>::units;
+    };
+
+   template<typename Tuple>
+   using collapse_units_t = typename collapse_units<Tuple>::type;
+
 
 } // end Dimension
 

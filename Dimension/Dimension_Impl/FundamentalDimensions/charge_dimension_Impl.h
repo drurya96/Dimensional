@@ -20,7 +20,7 @@ namespace dimension
    /// @brief Concept to check if a type is a valid charge unit.
    /// @tparam T The type to check.
    template<typename T>
-   concept is_charge_unit = std::is_base_of_v<FundamentalUnitTag, T> && std::is_same_v<typename T::Dim, chargeType>;
+   concept is_charge_unit = std::is_base_of_v<FundamentalUnitTag, T> && std::is_same_v<unit_dim_t<T>, chargeType>;
 
    /// @brief Base class for charge units.
    /// @tparam Unit The unit type.

@@ -5,7 +5,7 @@
 
 #include "TupleHandling.h"
 #include "get_factor.h" // TODO: Only needed for do_conversion — may want to extract that
-#include "collapse_units.h"
+#include "units/collapse_units.h"
 #include "base_dimension_from_tuple.h"
 
 namespace dimension
@@ -102,7 +102,7 @@ namespace dimension
       struct SimplifiedDimension<std::tuple<Units...>>
       {
       private:
-         using initial = typename collapse_units<std::tuple<Units...>>::units;
+         using initial = collapse_units_t<std::tuple<Units...>>;
          using after_conversion = Convert_All_Dims<initial>;
 
       public:
@@ -111,7 +111,7 @@ namespace dimension
             return after_conversion::Convert(val);
          }
 
-         using units = typename collapse_units<typename after_conversion::units>::units;
+         using units = collapse_units_t<typename after_conversion::units>;
          using dim   = typename base_dimension_from_tuple<units>::dim;
       };
 

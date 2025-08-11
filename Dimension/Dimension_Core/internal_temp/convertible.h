@@ -16,8 +16,7 @@ namespace dimension {
    /// @brief Concept to check if the unit is convertible to a primary unit (either direction)
    template<typename T>
    concept PrimaryConvertible = requires {
-      typename T::Primary;
-      requires (std::is_same_v<T, typename T::Primary> || HasConversion<T, typename T::Primary> || HasConversion<typename T::Primary, T>);
+      requires (std::is_same_v<T, unit_primary_t<T>> || HasConversion<T, unit_primary_t<T>> || HasConversion<unit_primary_t<T>, T>);
    };
 
 }

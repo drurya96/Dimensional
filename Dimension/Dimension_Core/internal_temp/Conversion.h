@@ -7,11 +7,11 @@
 #include "TupleHandling.h"
 #include "rep_type.h"
 #include "base_dimension_from_tuple.h"
-#include "collapse_units.h"
+#include "units/collapse_units.h"
 #include "full_simplify.h"
 #include "convertible.h"
-#include "unit_filter.h" // Shouldn't be needed after cleanup
-#include "unit_exponent_utils.h"
+#include "units/unit_filter.h" // Shouldn't be needed after cleanup
+#include "units/unit_exponent_utils.h"
 
 // TODO: IMPORTANT: Figure out best way to handle do_conversion
 
@@ -51,8 +51,8 @@ namespace dimension
    template<typename From, typename To, bool Inverse = false>
    constexpr auto Convert(rep_type auto input)
    {
-      using FromT = extract_type<From>::type;
-      using ToT = extract_type<To>::type;
+      using FromT = typename From::unit;
+      using ToT = typename To::unit;
 
       // Checks on base_dimension ensure a conversion to/from Primary exists.
       // No need to further constrain this function.
@@ -75,9 +75,9 @@ namespace dimension
             static_assert(sizeof(fromUnit) == -1, "No specialized conversion found. See compiler output for more details");
          #endif
          // Temporary variable is NOT created to allow full constexpr behavior in situations where input itself is constexpr
-         return Convert<typename FromT::Primary, To, Inverse>
+         return Convert<unit_primary_t<FromT>, To, Inverse>
          (
-            Convert<FromT, typename FromT::Primary, Inverse>(input)
+            Convert<FromT, unit_primary_t<FromT>, Inverse>(input)
          );
       }
    }
