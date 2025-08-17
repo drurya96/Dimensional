@@ -26,7 +26,6 @@ namespace dimension
    template<typename... Units>
    angle<radians> atan2(const base_dimension_impl<double, Units...>& obj1, const base_dimension_impl<double, Units...>& obj2)
    {
-      //return angle<radians>(std::atan2(obj1.template GetVal<NumTuple, DenTuple>() , obj2.template GetVal<NumTuple, DenTuple>()));
       return angle<radians>(std::atan2(get_dimension_as<Units...>(obj1) , get_dimension_as<Units...>(obj2)));
    }
 

@@ -2,10 +2,12 @@
 #define STATIC_DIMENSION_ANGULAR_SPEED_H
 
 #include "Dimension_Impl/DerivedDimensions/angular_speed_dimension_Impl.h"
+#include "Dimension_Core/internal_temp/units/new_unit_stuff.h"
 
 namespace dimension
 {
 
+   // This should only need to be an empty struct - WIP
 }
 
 

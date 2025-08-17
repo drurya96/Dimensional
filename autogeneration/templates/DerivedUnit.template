@@ -2,6 +2,7 @@
 #define STATIC_DIMENSION_{{ dim.name.upper() }}_H
 
 #include "Dimension_Impl/DerivedDimensions/{{ dim.name }}_dimension_Impl.h"
+#include "Dimension_Core/internal_temp/units/new_unit_stuff.h"
 
 namespace dimension
 {
@@ -11,13 +12,14 @@ namespace dimension
    //   produce some derived units
    {% endif %}
    {% for name, unit in dim.helper_units.items() %}
-   struct {{ name }} : public {{ unit.dim }}Unit<{{ name }}, "{{ unit.name }}", "{{ unit.abbreviation }}"> {};
+   struct {{ name }} : public {{ unit.dim }}Unit<{{ name }}> {};
    {% for to_name, value in unit.conversions.To.items() %}
    template<> struct Conversion<{{ name }}, {{ to_name }}> { static constexpr double slope = {{ value }}; };
    {% endfor %}
 
    {% endfor %}
 
+   // This should only need to be an empty struct - WIP
    {% for unit_name, unit in dim.units.items() %}
    struct {{ unit_name }}
    {
@@ -27,6 +29,19 @@ namespace dimension
          {% endfor %}
       >;
    };
+
+   template<> struct unit_traits<{{ unit_name }}> {
+      //using dimension = energy_dimension;
+      //static constexpr std::string_view name = "Joule";
+      //static constexpr std::string_view abbr = "J";
+      //static constexpr int id = 0;
+
+      using units = std::tuple<
+         {% for ue in unit %}
+         unit_exponent<{{ ue.unit }}, {{ ue.exponent_num }}, {{ ue.exponent_den }}>{{ "," if not loop.last }}
+         {% endfor %}
+      >;
+  };
 
    {% endfor %}
 }

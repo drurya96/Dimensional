@@ -56,7 +56,7 @@ namespace dimension
       static consteval std::array<TagPair, K> make(std::index_sequence<I...>)
       {
          return { TagPair{
-               /*uuid*/ std::tuple_element_t<I,Tuple>::unit::uuid,
+               /*uuid*/ detail::unit_uuid_v<typename std::tuple_element_t<I,Tuple>::unit>,
                /*num*/  static_cast<std::int8_t>(
                            std::tuple_element_t<I,Tuple>::exponent::num),
                /*den*/  static_cast<std::uint8_t>(

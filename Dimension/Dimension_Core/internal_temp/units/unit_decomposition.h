@@ -3,6 +3,7 @@
 
 #include "../TupleHandling.h"
 #include "unit_exponent.h"
+#include "new_unit_stuff.h"
 
 namespace dimension
 {
@@ -19,7 +20,7 @@ namespace dimension
    template<typename Unit>
    struct unit_decomposition<std::tuple<Unit>>
    {
-      using units = raise_all_unit_exponents_t<typename Unit::unit::units, typename Unit::exponent>;
+      using units = raise_all_unit_exponents_t<unit_units_t<typename Unit::unit>, typename Unit::exponent>;
    };
 
    template<typename Unit, typename... Units>

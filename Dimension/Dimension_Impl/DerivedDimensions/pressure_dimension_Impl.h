@@ -3,6 +3,9 @@
 
 #include "../../base_unit.h"
 #include "../../base_dimension_impl.h"
+
+#include "../../Dimension_Core/internal_temp/units/new_unit_stuff.h"
+
 #include "../../dimensions/fundamental/mass_dimension.h"
 #include "../../dimensions/fundamental/length_dimension.h"
 #include "../../dimensions/fundamental/timespan_dimension.h"
@@ -53,15 +56,12 @@ namespace dimension
 
    /// @brief Concept to verify a type can serve as a named pressure unit
    template<typename T>
-   concept IsNamedpressureUnit = requires {
-      typename T::units;
-      requires 
-         std::tuple_size_v<typename T::units> == 3 &&
-         is_mass_unit<typename std::tuple_element_t<0, typename T::units>::unit> &&
-         is_length_unit<typename std::tuple_element_t<1, typename T::units>::unit> &&
-         is_timespan_unit<typename std::tuple_element_t<2, typename T::units>::unit>;
-      requires !std::is_base_of_v<FundamentalUnitTag, T>;
-   };
+   concept IsNamedpressureUnit =
+      (std::tuple_size_v<unit_units_t<T>> == 3) &&
+      is_mass_unit<typename std::tuple_element_t<0, unit_units_t<T>>::unit> &&
+      is_length_unit<typename std::tuple_element_t<1, unit_units_t<T>>::unit> &&
+      is_timespan_unit<typename std::tuple_element_t<2, unit_units_t<T>>::unit> &&
+      (!std::is_base_of_v<FundamentalUnitTag, T>);
 
    /// @brief Concept to verify a dimension can be treated as a pressure type
    template<typename T, typename Rep>
@@ -106,7 +106,7 @@ namespace dimension
    // TODO: Unit test this and remove suppression
    constexpr DimType::rep get_pressure_as(const DimType& obj)
    {
-      return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
+      return call_unpack<unit_units_t<Named>>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
 
    template<typename... Ts>
@@ -193,34 +193,34 @@ namespace dimension
    /// @brief Template specialization for named pressure units
    /// @tparam Named The named unit this pressure type is in terms of
    template<IsNamedpressureUnit Named, is_coefficient... Cs>
-   class pressure<Named, Cs...> : public base_dimension_from_tuple<double, typename Named::units, std::tuple<Cs...>>::dim
+   class pressure<Named, Cs...> : public base_dimension_from_tuple<double, unit_units_t<Named>, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimension_from_tuple<double, typename Named::units, std::tuple<Cs...>>::dim;
+      using Base = typename base_dimension_from_tuple<double, unit_units_t<Named>, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
       requires is_pressure<Other>
       // cppcheck-suppress noExplicitConstructor
       constexpr pressure(const Other& base)
-         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
+         : Base(call_unpack<unit_units_t<Named>>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
 
    /// @brief Template specialization for named pressure units
    /// @tparam Named The named unit this pressure type is in terms of
    template<rep_type Rep, IsNamedpressureUnit Named, is_coefficient... Cs>
-   class pressure<Rep, Named, Cs...> : public base_dimension_from_tuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
+   class pressure<Rep, Named, Cs...> : public base_dimension_from_tuple<Rep, unit_units_t<Named>, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimension_from_tuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
+      using Base = typename base_dimension_from_tuple<Rep, unit_units_t<Named>, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
       requires is_pressure<Other>
       // cppcheck-suppress noExplicitConstructor
       constexpr pressure(const Other& base)
-         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
+         : Base(call_unpack<unit_units_t<Named>>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
 

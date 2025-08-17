@@ -55,8 +55,13 @@ namespace dimension
     #define CONCAT3(a, b, c) CONCAT3_INNER(a, b, c)
     #define CONCAT_AND_STRINGIFY(x, y) STRINGIFY(CONCAT3(x, _, y))
 
+    // Below names are placeholders and are wrong.
     #define SI_PREFIX(baseName, baseAbbr, UnitType, Prefix, Abbr) \
-    struct CONCAT3(Prefix, _, baseName) : public UnitType<CONCAT3(Prefix, _, baseName), CONCAT_AND_STRINGIFY(Prefix, baseName), Abbr baseAbbr> { public: using UnitType::UnitType; }; \
+    struct CONCAT3(Prefix, _, baseName) : public UnitType<CONCAT3(Prefix, _, baseName)> { \
+        static constexpr std::string_view name_view = "test"; \
+        static constexpr std::string_view abbr_view = "test"; \
+        static constexpr std::string_view dimName_view = "test"; \
+    }; \
     template<> struct Conversion<baseName, CONCAT3(Prefix, _, baseName)> { static constexpr double slope = 1.0 / SIFactor<Prefix>::value; }; \
     template<> struct Conversion<CONCAT3(Prefix, _, baseName), baseName> { static constexpr double slope = SIFactor<Prefix>::value; };
 

@@ -3,6 +3,9 @@
 
 #include "../../base_unit.h"
 #include "../../base_dimension_impl.h"
+
+#include "../../Dimension_Core/internal_temp/units/new_unit_stuff.h"
+
 {% for de in dim.definition %}
 #include "../../dimensions/fundamental/{{ de.dim }}_dimension.h"
 {% endfor %}
@@ -37,15 +40,12 @@ namespace dimension
 
    /// @brief Concept to verify a type can serve as a named {{ dim.name }} unit
    template<typename T>
-   concept IsNamed{{ dim.name }}Unit = requires {
-      typename T::units;
-      requires 
-         std::tuple_size_v<typename T::units> == {{ dim.definition | length }} &&
-         {% for i in range(dim.definition | length) %}
-         is_{{dim.definition[i].dim}}_unit<typename std::tuple_element_t<{{ i }}, typename T::units>::unit>{{ " &&" if not loop.last else ";"}}
-         {% endfor %}
-      requires !std::is_base_of_v<FundamentalUnitTag, T>;
-   };
+   concept IsNamed{{ dim.name }}Unit =
+      (std::tuple_size_v<unit_units_t<T>> == {{ dim.definition | length }}) &&
+      {% for i in range(dim.definition | length) %}
+      is_{{dim.definition[i].dim}}_unit<typename std::tuple_element_t<{{ i }}, unit_units_t<T>>::unit> &&
+      {% endfor %}
+      (!std::is_base_of_v<FundamentalUnitTag, T>);
 
    /// @brief Concept to verify a dimension can be treated as a {{ dim.name }} type
    template<typename T, typename Rep>
@@ -90,7 +90,7 @@ namespace dimension
    // TODO: Unit test this and remove suppression
    constexpr DimType::rep get_{{ dim.name.lower() }}_as(const DimType& obj)
    {
-      return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
+      return call_unpack<unit_units_t<Named>>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
 
    template<typename... Ts>
@@ -177,34 +177,34 @@ namespace dimension
    /// @brief Template specialization for named {{ dim.name }} units
    /// @tparam Named The named unit this {{ dim.name }} type is in terms of
    template<IsNamed{{ dim.name }}Unit Named, is_coefficient... Cs>
-   class {{ dim.name }}<Named, Cs...> : public base_dimension_from_tuple<double, typename Named::units, std::tuple<Cs...>>::dim
+   class {{ dim.name }}<Named, Cs...> : public base_dimension_from_tuple<double, unit_units_t<Named>, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimension_from_tuple<double, typename Named::units, std::tuple<Cs...>>::dim;
+      using Base = typename base_dimension_from_tuple<double, unit_units_t<Named>, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
       requires is_{{ dim.name }}<Other>
       // cppcheck-suppress noExplicitConstructor
       constexpr {{ dim.name }}(const Other& base)
-         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
+         : Base(call_unpack<unit_units_t<Named>>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
 
    /// @brief Template specialization for named {{ dim.name }} units
    /// @tparam Named The named unit this {{ dim.name }} type is in terms of
    template<rep_type Rep, IsNamed{{ dim.name }}Unit Named, is_coefficient... Cs>
-   class {{ dim.name }}<Rep, Named, Cs...> : public base_dimension_from_tuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
+   class {{ dim.name }}<Rep, Named, Cs...> : public base_dimension_from_tuple<Rep, unit_units_t<Named>, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimension_from_tuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
+      using Base = typename base_dimension_from_tuple<Rep, unit_units_t<Named>, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
       requires is_{{ dim.name }}<Other>
       // cppcheck-suppress noExplicitConstructor
       constexpr {{ dim.name }}(const Other& base)
-         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
+         : Base(call_unpack<unit_units_t<Named>>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
 

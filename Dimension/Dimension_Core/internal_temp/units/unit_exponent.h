@@ -6,7 +6,6 @@
 #include <ratio>
 
 #include "unit_dim.h"
-#include "../strings/string_numeric.h"
 #include "../TupleHandling.h"
 #include "../ratio/ratio_utils.h"
 
@@ -17,8 +16,6 @@ namespace dimension
    {
       using unit = Unit;
       using exponent = std::ratio<Num, Den>;
-
-      static constexpr auto exponentString = ratio_literal<Num, Den>();
    };
 
    // ───────────────────────────── helper: map one unit_exponent ─────────────────────────────

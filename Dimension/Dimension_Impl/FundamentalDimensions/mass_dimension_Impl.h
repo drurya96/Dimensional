@@ -26,8 +26,8 @@ namespace dimension
    /// @tparam Unit The unit type.
    /// @tparam Name The name of the unit.
    /// @tparam Abbreviation The abbreviation of the unit.
-   template<typename Unit, string_literal Name, string_literal Abbreviation, int ID = 0>
-   struct massUnit : public BaseUnit<Unit, Name, Abbreviation, "mass", ID>
+   template<typename Unit, int ID = 0>
+   struct massUnit : public BaseUnit<Unit, ID>
    {
    public:
       /// @brief The dimension type associated with the unit.

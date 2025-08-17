@@ -3,6 +3,9 @@
 
 #include "../../base_unit.h"
 #include "../../base_dimension_impl.h"
+
+#include "../../Dimension_Core/internal_temp/units/new_unit_stuff.h"
+
 #include "../../dimensions/fundamental/angle_dimension.h"
 #include "../../dimensions/fundamental/timespan_dimension.h"
 
@@ -29,14 +32,11 @@ namespace dimension
 
    /// @brief Concept to verify a type can serve as a named angular_speed unit
    template<typename T>
-   concept IsNamedangular_speedUnit = requires {
-      typename T::units;
-      requires 
-         std::tuple_size_v<typename T::units> == 2 &&
-         is_angle_unit<typename std::tuple_element_t<0, typename T::units>::unit> &&
-         is_timespan_unit<typename std::tuple_element_t<1, typename T::units>::unit>;
-      requires !std::is_base_of_v<FundamentalUnitTag, T>;
-   };
+   concept IsNamedangular_speedUnit =
+      (std::tuple_size_v<unit_units_t<T>> == 2) &&
+      is_angle_unit<typename std::tuple_element_t<0, unit_units_t<T>>::unit> &&
+      is_timespan_unit<typename std::tuple_element_t<1, unit_units_t<T>>::unit> &&
+      (!std::is_base_of_v<FundamentalUnitTag, T>);
 
    /// @brief Concept to verify a dimension can be treated as a angular_speed type
    template<typename T, typename Rep>
@@ -77,7 +77,7 @@ namespace dimension
    // TODO: Unit test this and remove suppression
    constexpr DimType::rep get_angular_speed_as(const DimType& obj)
    {
-      return call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
+      return call_unpack<unit_units_t<Named>>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
 
    template<typename... Ts>
@@ -156,34 +156,34 @@ namespace dimension
    /// @brief Template specialization for named angular_speed units
    /// @tparam Named The named unit this angular_speed type is in terms of
    template<IsNamedangular_speedUnit Named, is_coefficient... Cs>
-   class angular_speed<Named, Cs...> : public base_dimension_from_tuple<double, typename Named::units, std::tuple<Cs...>>::dim
+   class angular_speed<Named, Cs...> : public base_dimension_from_tuple<double, unit_units_t<Named>, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimension_from_tuple<double, typename Named::units, std::tuple<Cs...>>::dim;
+      using Base = typename base_dimension_from_tuple<double, unit_units_t<Named>, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
       requires is_angular_speed<Other>
       // cppcheck-suppress noExplicitConstructor
       constexpr angular_speed(const Other& base)
-         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
+         : Base(call_unpack<unit_units_t<Named>>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
 
    /// @brief Template specialization for named angular_speed units
    /// @tparam Named The named unit this angular_speed type is in terms of
    template<rep_type Rep, IsNamedangular_speedUnit Named, is_coefficient... Cs>
-   class angular_speed<Rep, Named, Cs...> : public base_dimension_from_tuple<Rep, typename Named::units, std::tuple<Cs...>>::dim
+   class angular_speed<Rep, Named, Cs...> : public base_dimension_from_tuple<Rep, unit_units_t<Named>, std::tuple<Cs...>>::dim
    {
    public:
-      using Base = typename base_dimension_from_tuple<Rep, typename Named::units, std::tuple<Cs...>>::dim;
+      using Base = typename base_dimension_from_tuple<Rep, unit_units_t<Named>, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
       requires is_angular_speed<Other>
       // cppcheck-suppress noExplicitConstructor
       constexpr angular_speed(const Other& base)
-         : Base(call_unpack<typename Named::units>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
+         : Base(call_unpack<unit_units_t<Named>>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
 

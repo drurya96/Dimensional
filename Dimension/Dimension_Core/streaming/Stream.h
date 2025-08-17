@@ -27,7 +27,7 @@ namespace dimension
       using Unit     = typename UE::unit;
       using Exponent = typename UE::exponent;   // std::ratio<Num,Den>
 
-      os << Unit::abbr;                         // "m", "s", …
+      os << Unit::abbr_view;                         // "m", "s", …
 
       // omit "^1"
       if constexpr (!(Exponent::num == 1 && Exponent::den == 1))

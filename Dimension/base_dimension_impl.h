@@ -20,15 +20,12 @@
 #include "Dimension_Core/internal_temp/units/unit_decomposition.h"
 #include "Dimension_Core/internal_temp/Conversion.h"
 #include "Dimension_Core/internal_temp/SI_Macro.h"
-#include "Dimension_Core/internal_temp/strings/string_literal.h"
-#include "Dimension_Core/internal_temp/strings/string_concat.h"
-#include "Dimension_Core/internal_temp/strings/string_numeric.h"
 #include "Dimension_Core/streaming/Stream.h"
 #include "Dimension_Core/serialization/Serialization.h"
 #include "Dimension_Core/serialization/exact_tag_policy.h"
 #include "Dimension_Core/serialization/raw_value_policy.h"
 
-#include "Dimension_Core/internal_temp/point.h"
+#include "Dimension_Core/internal_temp/point/point.h"
 
 namespace dimension
 {
@@ -161,7 +158,6 @@ namespace dimension
       /// @tparam DenTuple2 Tuple of denominator types of object being added
       /// @param[in] rhs The object being added
       template<are_unit_exponents... Units2>
-      //requires MatchingDimensionsNew<base_dimension_impl<NumTuple, DenTuple>, base_dimension_impl<NumTuple2, DenTuple2>>
       requires dimensionally_equivalent<base_dimension_impl<Rep, Ts...>, base_dimension_impl<Rep, Units2...>>
       constexpr base_dimension_impl<Rep, Ts...>& operator+=(const base_dimension_impl<Rep, Units2...>& rhs)
       {
@@ -174,7 +170,6 @@ namespace dimension
       /// @tparam DenTuple2 Tuple of denominator types of object being substracted
       /// @param[in] rhs The object being substracted
       template<are_unit_exponents... Units2>
-      //requires MatchingDimensionsNew<base_dimension_impl<NumTuple, DenTuple>, base_dimension_impl<NumTuple2, DenTuple2>>
       requires dimensionally_equivalent<base_dimension_impl<Rep, Ts...>, base_dimension_impl<Rep, Units2...>>
       constexpr base_dimension_impl<Rep, Ts...>& operator-=(const base_dimension_impl<Rep, Units2...>& rhs)
       {

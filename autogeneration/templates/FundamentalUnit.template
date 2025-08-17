@@ -1,12 +1,31 @@
 #ifndef STATIC_DIMENSION_{{ dim.name.upper() }}_H
 #define STATIC_DIMENSION_{{ dim.name.upper() }}_H
 
+#include <string_view>
+
 #include "Dimension_Impl/FundamentalDimensions/{{ dim.name }}_dimension_Impl.h"
+
+#include "Dimension_Core/internal_temp/units/new_unit_stuff.h"
 
 namespace dimension
 {
    {% for name, unit in dim.units.items() %}
-   struct {{ name }} : public {{ dim.name }}Unit<{{ name }}, "{{ unit.name }}", "{{ unit.abbreviation }}"> {};
+   // Only really need empty struct - WIP
+   struct {{ name }} : public {{ dim.name }}Unit<{{ name }}> {
+      static constexpr std::string_view name_view = "{{ unit.name }}";
+      static constexpr std::string_view abbr_view = "{{ unit.abbreviation }}";
+      static constexpr std::string_view dimName_view = "{{ dim.name }}";
+   };
+
+   // Should only need this part - WIP
+   template<> struct unit_traits<{{ name }}>{
+      using dimension = {{ dim.name }}Type; // Consider renaming to {{ dim.name }}_dimension
+      static constexpr std::string_view name = "{{ unit.name }}";
+      static constexpr std::string_view abbr = "{{ unit.abbreviation }}";
+      static constexpr std::string_view dimName = "{{ dim.name }}";
+      static constexpr int id = 0;
+   };
+
    {% endfor %}
 
    {% for name, unit in dim.units.items() %}
