@@ -2,7 +2,7 @@
 #include <type_traits>
 #include "point_fwd.h"
 #include "point_offset.h"
-#include "../frame_traits.h"
+#include "frame_core.h"
 
 namespace dimension::detail {
 

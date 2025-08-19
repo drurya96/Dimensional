@@ -108,7 +108,8 @@ namespace dimension
    {
       //using unit_type = typename From::unit;
    
-      static constexpr bool match = is_same_dim<typename From::unit, typename Head::unit>::value;
+      static constexpr bool match = is_same_dim<typename From::unit, typename Head::unit>::value &&
+         std::is_same_v<typename From::label, typename Head::label>;
 
       using type = std::conditional_t<
          match,

@@ -30,6 +30,7 @@ namespace dimension {
       {
          static constexpr bool value =
             is_same_dim<typename T::unit, typename U::unit>::value &&
+            std::is_same_v<typename T::label, typename U::label> &&
             std::ratio_equal<typename T::exponent, typename U::exponent>::value;
       };
 

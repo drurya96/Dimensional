@@ -11,11 +11,12 @@
 
 namespace dimension
 {
-   template<typename Unit, int Num = 1, int Den = 1>
+   template<typename Unit, int Num = 1, int Den = 1, class Label = void>
    struct unit_exponent
    {
       using unit = Unit;
       using exponent = std::ratio<Num, Den>;
+      using label = Label;
    };
 
    // ───────────────────────────── helper: map one unit_exponent ─────────────────────────────
@@ -85,6 +86,22 @@ namespace dimension
       > {};
 
 
+   template<typename Tuple, typename Label>
+   struct label_all_unit_exponents;
+
+   template<typename... Ts, typename Label>
+   struct label_all_unit_exponents<std::tuple<Ts...>, Label> {
+   using type = std::tuple<
+      unit_exponent<typename Ts::unit,
+                     Ts::exponent::num,
+                     Ts::exponent::den,
+                     Label>...>;
+   };
+
+   template<typename Tuple, typename Label>
+   using label_all_unit_exponents_t =
+   typename label_all_unit_exponents<Tuple, Label>::type;
+
    // TODO: Consider a generic "Raise" and "Raise All" to apply to each _exponent type
 
    template<is_unit_exponent T, is_ratio R>
@@ -93,7 +110,7 @@ namespace dimension
    private:
       using new_exponent = std::ratio_multiply<typename T::exponent, R>;
    public:
-      using type = unit_exponent<typename T::unit, new_exponent::num, new_exponent::den>;
+      using type = unit_exponent<typename T::unit, new_exponent::num, new_exponent::den, typename T::label>;
    };
 
    template<typename Tuple, is_ratio R>

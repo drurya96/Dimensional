@@ -57,8 +57,7 @@ namespace dimension
    // TODO: Consider a requirement that T and U are dimensions
    struct is_same_dim : std::integral_constant<
       bool,
-      std::is_same<typename std::remove_cv<typename T::Dim>::type, typename std::remove_cv<typename U::Dim>::type>::value &&
-      (T::ID == U::ID)
+      std::is_same<typename std::remove_cv<typename T::Dim>::type, typename std::remove_cv<typename U::Dim>::type>::value
    > {};
 
 

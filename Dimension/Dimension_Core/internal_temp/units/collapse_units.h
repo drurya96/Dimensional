@@ -27,14 +27,17 @@ namespace dimension
          // Fold over matching unit exponents
          using combined_exponent = ratio_add_t<
          std::conditional_t<
-               std::is_same_v<IncomingUnit, typename Units::unit>,
+               (
+                  std::is_same_v<typename IncomingUnit::unit, typename Units::unit> &&
+                  std::is_same_v<typename IncomingUnit::label, typename Units::label>
+               ),
                typename Units::exponent,
                std::ratio<0>
          >...
       >;
 
       public:
-         using unit = unit_exponent<IncomingUnit, combined_exponent::num, combined_exponent::den>;
+         using unit = unit_exponent<typename IncomingUnit::unit, combined_exponent::num, combined_exponent::den, typename IncomingUnit::label>;
       };
    
 
@@ -47,7 +50,10 @@ namespace dimension
 
       template<typename IncomingUnit, typename... Units>
       struct UnitPresent<IncomingUnit, std::tuple<Units...>>
-         : std::bool_constant<(... || std::is_same_v<IncomingUnit, typename Units::unit>)> {};
+         : std::bool_constant<(... || (
+            std::is_same_v<typename IncomingUnit::unit, typename Units::unit> &&
+            std::is_same_v<typename IncomingUnit::label, typename Units::label>
+         ))> {};
 
     template<class Unit, class Tuple>
     inline constexpr bool UnitPresent_v = simplification::UnitPresent<Unit, Tuple>::value;
@@ -56,9 +62,9 @@ namespace dimension
     template<class Accum, class Unit, class FullTuple>
     using append_once_t =
     std::conditional_t<
-        UnitPresent_v<typename Unit::unit, Accum>,
+        UnitPresent_v<Unit, Accum>,
         Accum,
-        append_t<Accum, typename simplification::CombinePower<typename Unit::unit, FullTuple>::unit>
+        append_t<Accum, typename simplification::CombinePower<Unit, FullTuple>::unit>
     >;
 
    }
@@ -94,6 +100,10 @@ namespace dimension
             using type = simplification::append_once_t<Accum, Unit, flattened>;
         };
 
+
+
+    public:
+        // Make this private, only public to validate a quick test
         using combined =
             fold_over_tuple_with_state_t<
             flattened,
@@ -101,7 +111,6 @@ namespace dimension
             combine_unique_from_flattened
             >;
 
-    public:
         using type = typename RemoveZeros<combined>::units;
     };
 

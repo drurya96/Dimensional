@@ -20,7 +20,6 @@ namespace dimension
       typename T::Dim; // Not sure why, but these two checks seem strictly necessary?
       typename T::Primary;
       requires std::is_same_v<unit_dim_t<T>, unit_dim_t<unit_primary_t<T>>>;
-      { T::ID } -> std::convertible_to<int>;
       requires PrimaryConvertible<T>;
    };
 

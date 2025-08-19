@@ -70,6 +70,11 @@ inline constexpr bool is_fundamental_unit_v = []{
   }
 }();
 
+template<class T>
+concept is_unit = requires {
+    typename unit_units_t<T>; // must be decomposable into exponents
+};
+
 } // namespace dimension
 
 

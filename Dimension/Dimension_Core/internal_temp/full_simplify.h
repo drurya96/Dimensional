@@ -31,11 +31,12 @@ namespace dimension
       template<typename TargetUnit, typename Unit, typename... Rest>
       struct Convert_All_Units<TargetUnit, std::tuple<Unit, Rest...>> {
       private:
-         static constexpr bool same_dim = is_same_dim<typename Unit::unit, TargetUnit>::value;
+         static constexpr bool same_dim = is_same_dim<typename Unit::unit, typename TargetUnit::unit>::value &&
+            std::is_same_v<typename Unit::label, typename TargetUnit::label>;
       
          using converted_unit = std::conditional_t<
             same_dim,
-            unit_exponent<TargetUnit, Unit::exponent::num, Unit::exponent::den>,
+            unit_exponent<typename TargetUnit::unit, Unit::exponent::num, Unit::exponent::den>,
             Unit
          >;
       
@@ -49,7 +50,7 @@ namespace dimension
       
          static constexpr double Convert(double val) {
             if constexpr (same_dim) {
-                  val = details::do_conversion<TargetUnit, Unit>(val);
+                  val = details::do_conversion<typename TargetUnit::unit, Unit>(val);
             }
             return tail_result::Convert(val);
          }
@@ -77,7 +78,7 @@ namespace dimension
          using tail = std::tuple<Units...>;
       
          // Convert all subsequent units to match Unit's unit
-         using converted = Convert_All_Units<typename Unit::unit, tail>;
+         using converted = Convert_All_Units<Unit, tail>;
       
          // Recurse on the updated tail
          using next = Convert_All_Dims<typename converted::units>;

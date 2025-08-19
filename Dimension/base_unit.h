@@ -38,12 +38,6 @@ namespace dimension
    public:
       /// @brief No constructor
       BaseUnit() = delete;
-
-      /// @brief Used to handle subscripting
-      /// @details Units only cancel if this value is the same.
-      ///    This means, creating units with different IDs and combining them
-      ///    into one dimension will prevent them from canelling out.
-      constexpr static int ID = UnitID;
    };
 
 }

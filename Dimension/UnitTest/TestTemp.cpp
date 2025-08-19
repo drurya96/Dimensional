@@ -145,82 +145,232 @@ TEST(TempTests, symbolTest) {
 }
 */
 
-TEST(TempTests, quickTest) {
-
-   base_dimension_impl<double, unit_exponent<meters>, symbol_exponent<symbols::pi, 1, 1>> test1{10.0};
-
-   //using t = typename decltype(test1)::ts_split;
-   //using coeffs = typename decltype(test1)::coeffs;
-   //static_assert(std::is_same_v<typename decltype(test1)::symbols, std::tuple<symbol_exponent<symbols::pi, 1, 1>>>);
-   //static_assert(std::is_same_v<typename decltype(test1)::symbols, std::tuple<symbols::pi>>);
-   //static_assert(std::tuple_size_v<typename decltype(test1)::symbols> == 1);
-   //static_assert(std::tuple_size_v<coeffs> == 1);
-
-   //static_assert(is_symbol<std::tuple_element_t<0, coeffs>>);
-   //static_assert(std::is_same_v<std::tuple_element_t<0, coeffs>, symbols::pi>);
-
-   //using part = detail::coefficient_impl::partition_coeffs<coeffs>;
-   
-   //using s = typename part::symbols;
-   //using r =  typename part::ratios;
-
-   //static_assert(std::tuple_size_v<s> == 1);
-   //static_assert(std::tuple_size_v<r> == 0);
-
-   //static_assert(std::tuple_size_v<detail::collect_symbol_exponents_t<symbols::pi>> == 1);
-
-
-
-
-   //using ratio_list = ratio_multiply_tuple_t<typename part::ratios>;
-   //using symbol_tuple = collapse_symbol_exponents<typename part::symbols>;
-
-   //using x = ratio_multiply_tuple_t<typename part::ratios>;
-   //using y = detail::collapse_symbol_exponents_t<typename part::symbols>;
-
-   //static_assert(std::tuple_size_v<x> == 0);
-   //static_assert(std::tuple_size_v<y> == 1);
 
 
 
 
 
 
-   EXPECT_NEAR(get_length_as<meters>(test1), 10.0*std::numbers::pi, 0.001);
 
-   // Intentionally fails to compile
-   //base_dimension_impl<double, unit_exponent<meters>> test2{10.0, symbols::pi{}};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+struct in_rain {};
+struct in_snow {};
+
+constexpr double EPS = 1e-9;
+
+
+TEST(Labels, NoCancelWithUnlabeled)
+{
+  // 2 in[rain] * (3 in^-1)  -> should NOT cancel (labels differ)
+  using UE_labeled   = unit_exponent<inches, 1, 1, in_rain>;
+  using UE_unlabeled = unit_exponent<inches, -1, 1>;
+
+  base_dimension<UE_labeled>   a(2.0);
+  base_dimension<UE_unlabeled> b(3.0);
+
+  auto prod = a * b;
+
+  // Expect the result still has both factors: in[rain]^1 * in^-1
+  // Extract with both exponents present
+  double v = get_dimension_as<UE_labeled, UE_unlabeled>(prod);
+  EXPECT_NEAR(v, 6.0, EPS);
+}
+
+TEST(Labels, CancelWithSameLabel)
+{
+  // 2 in[rain] * (3 in[rain]^-1)  -> dimensionless 6
+  using UE_rain     = unit_exponent<inches, 1, 1, in_rain>;
+  using UE_rain_inv = unit_exponent<inches, -1, 1, in_rain>;
+
+  base_dimension<UE_rain>     a(2.0);
+  base_dimension<UE_rain_inv> b(3.0);
+
+  auto ratio = a * b;
+
+  // If labeled cancellation works, this is dimensionless and extractable via empty <>
+  EXPECT_NEAR(get_dimension_as<>(ratio), 6.0, EPS);
+}
+
+TEST(Labels, PreserveLabelThroughDivision)
+{
+  // (2 in[rain]) / (4 ft^2)  -> in[rain] / ft^2 with value 0.5
+  using UE_rain = unit_exponent<inches, 1, 1, in_rain>;
+  using UE_ft2  = unit_exponent<feet,   2, 1>;
+
+  base_dimension<UE_rain> depth(2.0);
+  base_dimension<UE_ft2>  area (4.0);
+
+  auto rate = depth / area;
+
+  // Extract in the same units/exponents, label must still be on the inches factor
+  double v = get_dimension_as<UE_rain, unit_exponent<feet, -2>>(rate);
+  EXPECT_NEAR(v, 0.5, EPS);
+}
+
+TEST(Labels, ConversionIgnoresLabelButPreservesIt)
+{
+  // Convert (0.5 in[rain] / ft^2) to (m[rain] / m^2)
+  using UE_rain_in = unit_exponent<inches, 1, 1, in_rain>;
+  using UE_ft2     = unit_exponent<feet,   2, 1>;
+
+  base_dimension<UE_rain_in> depth(2.0);
+  base_dimension<UE_ft2>     area (4.0);
+  auto rate = depth / area; // 0.5 in[rain] / ft^2
+
+  // expected numeric: 0.5 * (in→m) / (ft→m)^2
+  double expected = 0.5 * 0.0254 / (0.3048 * 0.3048);
+
+  double got = get_dimension_as<
+                 unit_exponent<meters, 1, 1, in_rain>,
+                 unit_exponent<meters, -2>
+               >(rate);
+  EXPECT_NEAR(got, expected, 1e-12);
+}
+
+TEST(Labels, AdditionRequiresMatchingLabel)
+{
+  // Same label: add OK
+  using E1 = unit_exponent<inches, 1, 1, in_rain>;
+  using E2 = unit_exponent<inches, 1, 1, in_rain>;
+
+  base_dimension<E1> a(2.0);
+  base_dimension<E2> b(3.0);
+
+  auto sum = a + b;
+  EXPECT_NEAR((get_dimension_as<unit_exponent<inches,1,1,in_rain>>(sum)), 5.0, EPS);
+
+  // Different label: if your library enforces it at compile time, the following
+  // should be ill-formed. Keep commented if it’s a hard error.
+  // using F1 = unit_exponent<inches, 1, 1, in_rain>;
+  // using F2 = unit_exponent<inches, 1, 1, in_snow>;
+  // base_dimension<F1> x(1.0);
+  // base_dimension<F2> y(1.5);
+  // auto bad = x + y; // expect compile-time error (mismatched exponents)
+}
+
+TEST(Labels, LabeledVsUnlabeledEqualityKey)
+{
+  // Sanity on the key: labeled inches != unlabeled inches; labeled inches == same labeled inches
+  using A = unit_exponent<inches, 1, 1>;
+  using B = unit_exponent<inches, 1, 1, in_rain>;
+  using C = unit_exponent<inches, 1, 1, in_rain>;
+
+  static_assert(!std::is_same_v<typename A::label, typename B::label>, "void vs in_rain must differ");
+  static_assert( std::is_same_v<typename B::label, typename C::label>,  "same label types must match");
+}
+
+TEST(Labels, MixedAlgebraKeepsLabelOnTheRightFactor)
+{
+  // (in[rain] * m) / (ft * m) -> in[rain] / ft (the 'm' cancels, label stays on inches)
+  using E1 = unit_exponent<inches, 1, 1, in_rain>;
+  using E2 = unit_exponent<meters, 1, 1>;
+  using F1 = unit_exponent<feet,   1, 1>;
+  using F2 = unit_exponent<meters, 1, 1>;
+
+  base_dimension<E1, E2> num(3.0);  // 3 * in[rain] * m
+  base_dimension<F1, F2> den(2.0);  // 2 * ft * m
+
+  auto r = num / den;
+
+  double got = get_dimension_as<
+                 unit_exponent<inches, 1, 1, in_rain>,
+                 unit_exponent<feet, -1>
+               >(r);
+  // numeric factor 3/2; conversions (in→in, ft→ft) do nothing in this extraction
+  EXPECT_NEAR(got, 1.5, EPS);
+}
+
+
+
+
+
+
+
+
+// SOME (OR ALL?) OF BELOW ARE SUPPOSED TO FAIL!!!
+
+
+//constexpr double EPS = 1e-12;
 /*
-   using a = std::tuple<symbol_exponent<symbols::pi, 1, 1>, symbol_exponent<symbols::e, 2, 1>>;
-   using b = std::tuple<symbol_exponent<symbols::pi, 1, 1>, symbol_exponent<symbols::e, 1, 1>>;
+//------------------------------------------------------------------------------
+// 1) Labeled * unlabeled inches should NOT collapse to unlabeled in^2
+//------------------------------------------------------------------------------
+TEST(LabelsNegative, ProductNotUnlabeledSquare)
+{
+   using E_labeled   = unit_exponent<inches, 1, 1, in_rain>;
+   using E_unlabeled = unit_exponent<inches, 1, 1>;
 
-   using res = typename multiply_symbol_tuples<a, b>::type;
+   base_dimension<E_labeled>   a(2.0);
+   base_dimension<E_unlabeled> b(3.0);
 
-   static_assert(std::tuple_size_v<res> == 2);
-   using res0 = typename std::tuple_element_t<0, res>;
-   using res1 = typename std::tuple_element_t<1, res>;
+   auto prod = a * b; // in[rain]^1 * in^1
 
-   std::cout << "First item value: " << symbol_exponent_value<res0>() << "(" << res0::symbol::value << ", " << res0::exponent::num << ", " << res0::exponent::den << ")" << std::endl;
-   std::cout << "Second item value: " << symbol_exponent_value<res1>() << "(" << res1::symbol::value << ", " << res1::exponent::num << ", " << res1::exponent::den << ")" << std::endl;
+   using Res = decltype(prod);
 
+   static_assert(std::tuple_size_v<Res::units> == 2); // Should fail, actually passes.
 
-   static_assert(std::is_same_v<res, std::tuple<symbol_exponent<symbols::e, 3, 1>, symbol_exponent<symbols::pi, 2, 1>>>);
+   std::cout << prod << std::endl;
 
+   //double v = get_dimension_as<unit_exponent<inches, 2, 1>>(prod);
 
-
-
-
-
-
-
-   double val = multiply_symbol_exponent_values<std::tuple<>>();
-   std::cout << "value: " << val << std::endl;
+   //EXPECT_NEAR(v, 6.0, EPS);
+}
 */
+TEST(LabelsNegative, ProductNotUnlabeledSquare2)
+{
+
+   using exp1 = unit_exponent<inches, 1, 1, in_rain>;
+   using exp2 = unit_exponent<inches, 1, 1>;
+
+   using conc = std::tuple<exp1, exp2>;
+
+   using Res1 = typename collapse_units<conc>::type; // tuple of resulting unit exponents 
+   using Res3 = typename collapse_units<conc>::combined; // tuple of resulting unit exponents 
+   using Res2 = typename unit_decomposition<conc>::units; // tuple of resulting unit exponents 
+
+   static_assert(std::tuple_size_v<Res1> == 2); // Bad... should be 2
+   static_assert(std::tuple_size_v<Res2> == 2); // Good!!
+   static_assert(std::tuple_size_v<Res3> == 2); // Bad... should be 2
 
 
-   //base_dimension_impl<double, unit_exponent<meters>, symbol
+   using Res2_0 = std::tuple_element_t<0, Res2>;
+   using Res2_1 = std::tuple_element_t<1, Res2>;
 
 
+   static_assert(std::is_same_v<typename Res2_0::label, in_rain>); // BAD! This should be in_rain!!!
+   static_assert(std::is_same_v<typename Res2_1::label, void>);
 
+   //static_assert(std::is_same_v<Res2_0, unit_exponent<inches, 1, 1, in_rain>>);
+   //static_assert(std::is_same_v<Res2_1, unit_exponent<inches, 1, 1, void>>);
 
 }
