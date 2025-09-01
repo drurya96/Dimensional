@@ -7,6 +7,18 @@ namespace dimension {
   template<class U> struct unit_traits; // users specialize elsewhere
 }
 
+namespace dimension::frame_detail {
+
+// Detect whether unit_traits<T>::dimension exists (i.e., T is a unit)
+template<class T, class = void>
+struct _has_unit_traits_dimension : std::false_type {};
+
+template<class T>
+struct _has_unit_traits_dimension<T, std::void_t<typename unit_traits<T>::dimension>>
+    : std::true_type {};
+
+}
+
 namespace dimension {
 
 // Primary template (no definition)
@@ -40,5 +52,8 @@ concept frame_like = requires {
   typename frame_unit_t<F>;
   { frame_offset_v<F> } -> std::convertible_to<double>;
 };
+
+template<class F>
+concept is_frame = frame_like<F> && (!frame_detail::_has_unit_traits_dimension<F>::value);
 
 } // namespace dimension

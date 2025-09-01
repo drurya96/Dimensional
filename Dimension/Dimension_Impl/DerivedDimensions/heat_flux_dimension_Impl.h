@@ -1,10 +1,10 @@
 #ifndef STATIC_DIMENSION_HEAT_FLUX_IMPL_H
 #define STATIC_DIMENSION_HEAT_FLUX_IMPL_H
 
-#include "../../base_unit.h"
 #include "../../base_dimension_impl.h"
 
 #include "../../Dimension_Core/internal_temp/units/new_unit_stuff.h"
+#include "../../Dimension_Core/internal_temp/dimension/base_dimension_from_tuple.h"
 
 #include "../../dimensions/fundamental/mass_dimension.h"
 #include "../../dimensions/fundamental/timespan_dimension.h"
@@ -36,7 +36,7 @@ namespace dimension
       (std::tuple_size_v<unit_units_t<T>> == 2) &&
       is_mass_unit<typename std::tuple_element_t<0, unit_units_t<T>>::unit> &&
       is_timespan_unit<typename std::tuple_element_t<1, unit_units_t<T>>::unit> &&
-      (!std::is_base_of_v<FundamentalUnitTag, T>);
+      !is_fundamental_unit_v<T>;
 
    /// @brief Concept to verify a dimension can be treated as a heat_flux type
    template<typename T, typename Rep>
@@ -60,7 +60,7 @@ namespace dimension
       is_heat_flux DimType>
    // TODO: Unit test this and remove suppression
    [[maybe_unused]]
-   constexpr DimType::rep get_heat_flux_as(const DimType& obj)
+   constexpr typename DimType::rep get_heat_flux_as(const DimType& obj)
    {
       return get_dimension_as<
          unit_exponent<massUnit, 1>,
@@ -75,16 +75,13 @@ namespace dimension
    /// @return The raw value in terms of template units as the representative type of DimType
    template<IsNamedheat_fluxUnit Named, is_heat_flux DimType>
    // TODO: Unit test this and remove suppression
-   constexpr DimType::rep get_heat_flux_as(const DimType& obj)
+   constexpr typename DimType::rep get_heat_flux_as(const DimType& obj)
    {
       return call_unpack<unit_units_t<Named>>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
 
    template<typename... Ts>
    class heat_flux;
-
-
-
 
    template<
       IsBasicUnitType T0,
@@ -107,17 +104,14 @@ namespace dimension
          unit_exponent<typename unit_filter<timespanType, T0, T1>::type, -3>,
          Cs...
       >;
-   
+
       using Base::Base;
-   
+
       template<typename T>
       requires is_heat_flux<T>
       // cppcheck-suppress noExplicitConstructor
       constexpr heat_flux(const T& base) : Base(base) {}
    };
-
-
-
 
    template<
       rep_type Rep,
@@ -141,17 +135,14 @@ namespace dimension
          unit_exponent<typename unit_filter<timespanType, T0, T1>::type, -3>,
          Cs...
       >;
-   
+
       using Base::Base;
-   
+
       template<typename T>
       requires is_heat_flux<T>
       // cppcheck-suppress noExplicitConstructor
       constexpr heat_flux(const T& base) : Base(base) {}
    };
-
-
-
 
    /// @brief Template specialization for named heat_flux units
    /// @tparam Named The named unit this heat_flux type is in terms of
@@ -169,7 +160,6 @@ namespace dimension
          : Base(call_unpack<unit_units_t<Named>>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-
    /// @brief Template specialization for named heat_flux units
    /// @tparam Named The named unit this heat_flux type is in terms of
    template<rep_type Rep, IsNamedheat_fluxUnit Named, is_coefficient... Cs>
@@ -186,14 +176,7 @@ namespace dimension
          : Base(call_unpack<unit_units_t<Named>>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-
-
-
-   
-
-
-
-
+   // ───────────────────── factory helpers (make_*) ─────────────────────
    template<
       IsBasicUnitType T0,
       IsBasicUnitType T1,
@@ -251,8 +234,9 @@ namespace dimension
       return heat_flux<Rep, Named, Cs...>(value);
    }
 
+   // deduction guide
    template<is_heat_flux Dim>
-   heat_flux(Dim) -> 
+   heat_flux(Dim) ->
    heat_flux<
       simplified_unit_filter<massType, typename Dim::units>,
       simplified_unit_filter<timespanType, typename Dim::units>

@@ -7,7 +7,7 @@
 namespace dimension::detail {
 
 // Case 1: Same frame
-template<typename Frame>
+template<frame_like Frame>
 struct get_point_as_impl<Frame, Frame> {
   template<typename P>
   static constexpr double convert(const P& obj) {
@@ -16,8 +16,8 @@ struct get_point_as_impl<Frame, Frame> {
 };
 
 // Case 2: Target is the unit of the source's frame
-template<typename Unit, typename Frame>
-  requires std::is_same_v<Unit, frame_unit_t<Frame>>
+template<is_unit Unit, frame_like Frame>
+  requires std::same_as<Unit, frame_unit_t<Frame>>
 struct get_point_as_impl<Unit, Frame> {
   template<typename P>
   static constexpr double convert(const P& obj) {
@@ -26,63 +26,66 @@ struct get_point_as_impl<Unit, Frame> {
 };
 
 // Case 3: Target is a different unit entirely
-template<typename TargetUnit, typename SourceFrame>
-  requires (
-    std::is_base_of_v<::dimension::FundamentalUnitTag, TargetUnit> &&
-    !std::is_same_v<TargetUnit, frame_unit_t<SourceFrame>>
-  )
+template<is_unit TargetUnit, frame_like SourceFrame>
+  requires (!std::same_as<TargetUnit, frame_unit_t<SourceFrame>>)
 struct get_point_as_impl<TargetUnit, SourceFrame> {
   template<typename P>
   static constexpr double convert(const P& obj) {
-    double raw = get_point_as_impl<SourceFrame, SourceFrame>::convert(obj) + point_offset_v<SourceFrame>;
+    const double raw =
+      get_point_as_impl<SourceFrame, SourceFrame>::convert(obj) + point_offset_v<SourceFrame>;
+
     // keep your existing conversion surface:
-    return ::dimension::details::do_conversion<TargetUnit, unit_exponent<frame_unit_t<SourceFrame>>>(raw);
+    return ::dimension::details::do_conversion<
+              TargetUnit,
+              unit_exponent<frame_unit_t<SourceFrame>>
+           >(raw);
   }
 };
 
 // Case 4: Target is a different frame
-template<typename TargetFrame, typename SourceFrame>
-  requires (
-    !std::is_base_of_v<::dimension::FundamentalUnitTag, TargetFrame> &&
-    !std::is_base_of_v<::dimension::FundamentalUnitTag, SourceFrame> &&
-    !std::is_same_v<TargetFrame, SourceFrame>
-  )
+template<is_frame TargetFrame, is_frame SourceFrame>
+  requires (!std::same_as<TargetFrame, SourceFrame>)
 struct get_point_as_impl<TargetFrame, SourceFrame> {
   template<typename P>
   static constexpr double convert(const P& obj) {
-    double raw = get_point_as_impl<SourceFrame, SourceFrame>::convert(obj) + point_offset_v<SourceFrame>;
-    double in_target_unit =
-      ::dimension::details::do_conversion<frame_unit_t<TargetFrame>, unit_exponent<frame_unit_t<SourceFrame>>>(raw);
+    const double raw =
+      get_point_as_impl<SourceFrame, SourceFrame>::convert(obj) + point_offset_v<SourceFrame>;
+
+    const double in_target_unit =
+      ::dimension::details::do_conversion<
+        frame_unit_t<TargetFrame>,
+        unit_exponent<frame_unit_t<SourceFrame>>
+      >(raw);
+
     return in_target_unit - point_offset_v<TargetFrame>;
   }
 };
 
 // Case 5: Target is a frame of this unit
-template<typename TargetFrame, typename SourceUnit>
-  requires (
-    std::is_base_of_v<::dimension::FundamentalUnitTag, SourceUnit> &&
-    std::is_same_v<SourceUnit, frame_unit_t<TargetFrame>>
-  )
+template<is_frame TargetFrame, is_unit SourceUnit>
+  requires std::same_as<SourceUnit, frame_unit_t<TargetFrame>>
 struct get_point_as_impl<TargetFrame, SourceUnit> {
   template<typename P>
   static constexpr double convert(const P& obj) {
-    double raw = get_point_as_impl<SourceUnit, SourceUnit>::convert(obj);
+    const double raw = get_point_as_impl<SourceUnit, SourceUnit>::convert(obj);
     return raw - point_offset_v<TargetFrame>;
   }
 };
 
 // Case 6: Target is a frame of a different unit
-template<typename TargetFrame, typename SourceUnit>
-  requires (
-    std::is_base_of_v<::dimension::FundamentalUnitTag, SourceUnit> &&
-    !std::is_same_v<SourceUnit, frame_unit_t<TargetFrame>>
-  )
+template<is_frame TargetFrame, is_unit SourceUnit>
+  requires (!std::same_as<SourceUnit, frame_unit_t<TargetFrame>>)
 struct get_point_as_impl<TargetFrame, SourceUnit> {
   template<typename P>
   static constexpr double convert(const P& obj) {
-    double raw = get_point_as_impl<SourceUnit, SourceUnit>::convert(obj);
-    double in_target_unit =
-      ::dimension::details::do_conversion<frame_unit_t<TargetFrame>, unit_exponent<SourceUnit>>(raw);
+    const double raw = get_point_as_impl<SourceUnit, SourceUnit>::convert(obj);
+
+    const double in_target_unit =
+      ::dimension::details::do_conversion<
+        frame_unit_t<TargetFrame>,
+        unit_exponent<SourceUnit>
+      >(raw);
+
     return in_target_unit - point_offset_v<TargetFrame>;
   }
 };

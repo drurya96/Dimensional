@@ -12,8 +12,9 @@
 #include <tuple> // std::tuple and related
 #include <utility> // std::index_sequence, std::make_index_sequence
 
-#include "../internal_temp/uuid.h"
+#include "uuid.h"
 #include "../internal_temp/units/unit_exponent.h"
+#include "../internal_temp/dimension/base_dimension_from_tuple.h"
 
 namespace dimension
 {

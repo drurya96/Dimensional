@@ -1,24 +1,24 @@
-#ifndef STATIC_DIMENSION_{{ dim.name.upper() }}_IMPL_H
-#define STATIC_DIMENSION_{{ dim.name.upper() }}_IMPL_H
+#ifndef STATIC_DIMENSION_{{ dim.Dimension|upper }}_IMPL_H
+#define STATIC_DIMENSION_{{ dim.Dimension|upper }}_IMPL_H
 
-#include "../../base_unit.h"
 #include "../../base_dimension_impl.h"
 
 #include "../../Dimension_Core/internal_temp/units/new_unit_stuff.h"
+#include "../../Dimension_Core/internal_temp/dimension/base_dimension_from_tuple.h"
 
-{% for de in dim.definition %}
+{% for de in dim.Definition %}
 #include "../../dimensions/fundamental/{{ de.dim }}_dimension.h"
 {% endfor %}
 
 #include "../../Dimension_Core/internal_temp/utils.h"
 
-{% set dim_num = dim.definition | length %}
+{% set dim_num = dim.Definition | length %}
 {% set t_items = [] %}
 {% for i in range(dim_num) %}
    {% set _ = t_items.append('T' ~ i) %}
 {% endfor %}
 {% set t_list = t_items | join(', ') %}
-{% set perms = constraint_permutations(dim.definition) %}
+{% set perms = constraint_permutations(dim.Definition) %}
 
 namespace dimension
 {
@@ -28,7 +28,7 @@ namespace dimension
          typename {{ t }}{{ "," if not loop.last }}
       {% endfor %}
    >
-   concept are_{{ dim.name }}_units =
+   concept are_{{ dim.Dimension }}_units =
       {% for perm in perms %}
          (
          {% for i in range(dim_num) %}
@@ -38,66 +38,63 @@ namespace dimension
       {% endfor %}
    ;
 
-   /// @brief Concept to verify a type can serve as a named {{ dim.name }} unit
+   /// @brief Concept to verify a type can serve as a named {{ dim.Dimension }} unit
    template<typename T>
-   concept IsNamed{{ dim.name }}Unit =
-      (std::tuple_size_v<unit_units_t<T>> == {{ dim.definition | length }}) &&
-      {% for i in range(dim.definition | length) %}
-      is_{{dim.definition[i].dim}}_unit<typename std::tuple_element_t<{{ i }}, unit_units_t<T>>::unit> &&
+   concept IsNamed{{ dim.Dimension }}Unit =
+      (std::tuple_size_v<unit_units_t<T>> == {{ dim.Definition | length }}) &&
+      {% for i in range(dim.Definition | length) %}
+      is_{{dim.Definition[i].dim}}_unit<typename std::tuple_element_t<{{ i }}, unit_units_t<T>>::unit> &&
       {% endfor %}
-      (!std::is_base_of_v<FundamentalUnitTag, T>);
+      !is_fundamental_unit_v<T>;
 
-   /// @brief Concept to verify a dimension can be treated as a {{ dim.name }} type
+   /// @brief Concept to verify a dimension can be treated as a {{ dim.Dimension }} type
    template<typename T, typename Rep>
-   concept is_{{ dim.name }}_as = dimension_convertible_to<T, Rep,
-      {% for de in dim.definition %}
-      unit_exponent<primary_{{ de.dim }}, {{ de.exponent_num }}>{{ ", " if not loop.last }}
+   concept is_{{ dim.Dimension }}_as = dimension_convertible_to<T, Rep,
+      {% for de in dim.Definition %}
+      unit_exponent<primary_{{ de.dim }}, {{ de.ExponentNum }}>{{ ", " if not loop.last }}
       {% endfor %}
    >;
 
    template<typename T>
-   concept is_{{ dim.name }} = is_{{ dim.name }}_as<T, double>;
+   concept is_{{ dim.Dimension }} = is_{{ dim.Dimension }}_as<T, double>;
 
-   /// @brief Retrieves the value of a {{ dim.name }} object with specific units
-   {% for de in dim.definition %}
-   /// @tparam {{ de.dim }}Unit The {{ de.dim }} unit used for all {{ de.dim }} components of {{ dim.name }}
+   /// @brief Retrieves the value of a {{ dim.Dimension }} object with specific units
+   {% for de in dim.Definition %}
+   /// @tparam {{ de.dim }}Unit The {{ de.dim }} unit used for all {{ de.dim }} components of {{ dim.Dimension }}
    {% endfor %}
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as the representative type of DimType
    template<
-      {% for de in dim.definition %}
+      {% for de in dim.Definition %}
       is_{{ de.dim }}_unit {{ de.dim }}Unit,
       {% endfor %}
-      is_{{ dim.name }} DimType>
+      is_{{ dim.Dimension }} DimType>
    // TODO: Unit test this and remove suppression
    [[maybe_unused]]
-   constexpr DimType::rep get_{{ dim.name.lower() }}_as(const DimType& obj)
+   constexpr typename DimType::rep get_{{ dim.Dimension | lower }}_as(const DimType& obj)
    {
       return get_dimension_as<
-         {% for de in dim.definition %}
-         unit_exponent<{{ de.dim }}Unit, {{ de.exponent_num }}>{{ "," if not loop.last }}
+         {% for de in dim.Definition %}
+         unit_exponent<{{ de.dim }}Unit, {{ de.ExponentNum }}>{{ "," if not loop.last }}
          {% endfor %}
       >(obj);
    }
 
-   /// @brief Retrieves the value of a named {{ dim.name }} object.
+   /// @brief Retrieves the value of a named {{ dim.Dimension }} object.
    /// @tparam Named The named unit to extract in terms of
    /// @tparam DimType The dimension object type, deduced
    /// @param obj The dimension to extract a raw value from
    /// @return The raw value in terms of template units as the representative type of DimType
-   template<IsNamed{{ dim.name }}Unit Named, is_{{ dim.name }} DimType>
+   template<IsNamed{{ dim.Dimension }}Unit Named, is_{{ dim.Dimension }} DimType>
    // TODO: Unit test this and remove suppression
-   constexpr DimType::rep get_{{ dim.name.lower() }}_as(const DimType& obj)
+   constexpr typename DimType::rep get_{{ dim.Dimension | lower }}_as(const DimType& obj)
    {
       return call_unpack<unit_units_t<Named>>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
 
    template<typename... Ts>
-   class {{ dim.name }};
-
-
-
+   class {{ dim.Dimension }};
 
    template<
       {% for num in range(dim_num) %}
@@ -105,36 +102,33 @@ namespace dimension
       {% endfor %}
       is_coefficient... Cs
    >
-   requires are_{{ dim.name }}_units<
+   requires are_{{ dim.Dimension }}_units<
       {% for num in range(dim_num) %}
       T{{num}}{{ "," if not loop.last }}
       {% endfor %}
    >
-   class {{ dim.name }}<{{t_list}}, Cs...> : public base_dimension_impl<double,
-      {% for de in dim.definition %}
-      unit_exponent<typename unit_filter<{{ de.dim }}Type, {{t_list}}>::type, {{ de.exponent_num }}>,
+   class {{ dim.Dimension }}<{{t_list}}, Cs...> : public base_dimension_impl<double,
+      {% for de in dim.Definition %}
+      unit_exponent<typename unit_filter<{{ de.dim }}Type, {{t_list}}>::type, {{ de.ExponentNum }}>,
       {% endfor %}
       Cs...
    >
    {
    public:
       using Base = base_dimension_impl<double,
-         {% for de in dim.definition %}
-         unit_exponent<typename unit_filter<{{ de.dim }}Type, {{t_list}}>::type, {{ de.exponent_num }}>,
+         {% for de in dim.Definition %}
+         unit_exponent<typename unit_filter<{{ de.dim }}Type, {{t_list}}>::type, {{ de.ExponentNum }}>,
          {% endfor %}
          Cs...
       >;
-   
+
       using Base::Base;
-   
+
       template<typename T>
-      requires is_{{ dim.name }}<T>
+      requires is_{{ dim.Dimension }}<T>
       // cppcheck-suppress noExplicitConstructor
-      constexpr {{ dim.name }}(const T& base) : Base(base) {}
+      constexpr {{ dim.Dimension }}(const T& base) : Base(base) {}
    };
-
-
-
 
    template<
       rep_type Rep,
@@ -143,95 +137,84 @@ namespace dimension
       {% endfor %}
       is_coefficient... Cs
    >
-   requires are_{{ dim.name }}_units<
+   requires are_{{ dim.Dimension }}_units<
       {% for num in range(dim_num) %}
       T{{num}}{{ "," if not loop.last }}
       {% endfor %}
    >
-   class {{ dim.name }}<Rep, {{t_list}}, Cs...> : public base_dimension_impl<Rep,
-      {% for de in dim.definition %}
-      unit_exponent<typename unit_filter<{{ de.dim }}Type, {{t_list}}>::type, {{ de.exponent_num }}>,
+   class {{ dim.Dimension }}<Rep, {{t_list}}, Cs...> : public base_dimension_impl<Rep,
+      {% for de in dim.Definition %}
+      unit_exponent<typename unit_filter<{{ de.dim }}Type, {{t_list}}>::type, {{ de.ExponentNum }}>,
       {% endfor %}
       Cs...
    >
    {
    public:
       using Base = base_dimension_impl<Rep,
-         {% for de in dim.definition %}
-         unit_exponent<typename unit_filter<{{ de.dim }}Type, {{t_list}}>::type, {{ de.exponent_num }}>,
+         {% for de in dim.Definition %}
+         unit_exponent<typename unit_filter<{{ de.dim }}Type, {{t_list}}>::type, {{ de.ExponentNum }}>,
          {% endfor %}
          Cs...
       >;
-   
+
       using Base::Base;
-   
+
       template<typename T>
-      requires is_{{ dim.name }}<T>
+      requires is_{{ dim.Dimension }}<T>
       // cppcheck-suppress noExplicitConstructor
-      constexpr {{ dim.name }}(const T& base) : Base(base) {}
+      constexpr {{ dim.Dimension }}(const T& base) : Base(base) {}
    };
 
-
-
-
-   /// @brief Template specialization for named {{ dim.name }} units
-   /// @tparam Named The named unit this {{ dim.name }} type is in terms of
-   template<IsNamed{{ dim.name }}Unit Named, is_coefficient... Cs>
-   class {{ dim.name }}<Named, Cs...> : public base_dimension_from_tuple<double, unit_units_t<Named>, std::tuple<Cs...>>::dim
+   /// @brief Template specialization for named {{ dim.Dimension }} units
+   /// @tparam Named The named unit this {{ dim.Dimension }} type is in terms of
+   template<IsNamed{{ dim.Dimension }}Unit Named, is_coefficient... Cs>
+   class {{ dim.Dimension }}<Named, Cs...> : public base_dimension_from_tuple<double, unit_units_t<Named>, std::tuple<Cs...>>::dim
    {
    public:
       using Base = typename base_dimension_from_tuple<double, unit_units_t<Named>, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
-      requires is_{{ dim.name }}<Other>
+      requires is_{{ dim.Dimension }}<Other>
       // cppcheck-suppress noExplicitConstructor
-      constexpr {{ dim.name }}(const Other& base)
+      constexpr {{ dim.Dimension }}(const Other& base)
          : Base(call_unpack<unit_units_t<Named>>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-
-   /// @brief Template specialization for named {{ dim.name }} units
-   /// @tparam Named The named unit this {{ dim.name }} type is in terms of
-   template<rep_type Rep, IsNamed{{ dim.name }}Unit Named, is_coefficient... Cs>
-   class {{ dim.name }}<Rep, Named, Cs...> : public base_dimension_from_tuple<Rep, unit_units_t<Named>, std::tuple<Cs...>>::dim
+   /// @brief Template specialization for named {{ dim.Dimension }} units
+   /// @tparam Named The named unit this {{ dim.Dimension }} type is in terms of
+   template<rep_type Rep, IsNamed{{ dim.Dimension }}Unit Named, is_coefficient... Cs>
+   class {{ dim.Dimension }}<Rep, Named, Cs...> : public base_dimension_from_tuple<Rep, unit_units_t<Named>, std::tuple<Cs...>>::dim
    {
    public:
       using Base = typename base_dimension_from_tuple<Rep, unit_units_t<Named>, std::tuple<Cs...>>::dim;
       using Base::Base;
 
       template<typename Other>
-      requires is_{{ dim.name }}<Other>
+      requires is_{{ dim.Dimension }}<Other>
       // cppcheck-suppress noExplicitConstructor
-      constexpr {{ dim.name }}(const Other& base)
+      constexpr {{ dim.Dimension }}(const Other& base)
          : Base(call_unpack<unit_units_t<Named>>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-
-
-
-   
-
-
-
-
+   // ───────────────────── factory helpers (make_*) ─────────────────────
    template<
       {% for num in range(dim_num) %}
       IsBasicUnitType T{{num}},
       {% endfor %}
       is_coefficient... Cs
    >
-   requires are_{{ dim.name }}_units<
+   requires are_{{ dim.Dimension }}_units<
       {% for num in range(dim_num) %}
       T{{num}}{{ "," if not loop.last }}
       {% endfor %}
    >
    // TODO: Unit test this and remove suppression
    [[maybe_unused]]
-   constexpr auto make_{{ dim.name }}(Cs... coeffs)
+   constexpr auto make_{{ dim.Dimension }}(Cs... coeffs)
    {
       ignore_unused(coeffs...);
-      return {{ dim.name }}<double, {{t_list}}, Cs...>(1.0);
+      return {{ dim.Dimension }}<double, {{t_list}}, Cs...>(1.0);
    }
 
    template<
@@ -241,48 +224,49 @@ namespace dimension
       rep_type Rep,
       is_coefficient... Cs
    >
-   requires are_{{ dim.name }}_units<
+   requires are_{{ dim.Dimension }}_units<
       {% for num in range(dim_num) %}
       T{{num}}{{ "," if not loop.last }}
       {% endfor %}
    > && (!is_coefficient<Rep>)
    // TODO: Unit test this and remove suppression
    [[maybe_unused]]
-   constexpr auto make_{{ dim.name }}(Rep value, Cs... coeffs)
+   constexpr auto make_{{ dim.Dimension }}(Rep value, Cs... coeffs)
    {
       ignore_unused(coeffs...);
-      return {{ dim.name }}<Rep, {{t_list}}, Cs...>(value);
+      return {{ dim.Dimension }}<Rep, {{t_list}}, Cs...>(value);
    }
 
-   /// @brief Template specialization for named {{ dim.name }} units
-   /// @tparam Named The named unit this {{ dim.name }} type is in terms of
-   template<IsNamed{{ dim.name }}Unit Named, is_coefficient... Cs>
+   /// @brief Template specialization for named {{ dim.Dimension }} units
+   /// @tparam Named The named unit this {{ dim.Dimension }} type is in terms of
+   template<IsNamed{{ dim.Dimension }}Unit Named, is_coefficient... Cs>
    // TODO: Unit test this and remove suppression
    [[maybe_unused]]
-   constexpr auto make_{{ dim.name }}(Cs... coeffs)
+   constexpr auto make_{{ dim.Dimension }}(Cs... coeffs)
    {
       ignore_unused(coeffs...);
-      return {{ dim.name }}<double, Named, Cs...>(1.0);
+      return {{ dim.Dimension }}<double, Named, Cs...>(1.0);
    }
 
-   /// @brief Template specialization for named {{ dim.name }} units
-   /// @tparam Named The named unit this {{ dim.name }} type is in terms of
-   template<IsNamed{{ dim.name }}Unit Named, rep_type Rep, is_coefficient... Cs>
+   /// @brief Template specialization for named {{ dim.Dimension }} units
+   /// @tparam Named The named unit this {{ dim.Dimension }} type is in terms of
+   template<IsNamed{{ dim.Dimension }}Unit Named, rep_type Rep, is_coefficient... Cs>
    // TODO: Unit test this and remove suppression
    [[maybe_unused]]
-   constexpr auto make_{{ dim.name }}(Rep value, Cs... coeffs)
+   constexpr auto make_{{ dim.Dimension }}(Rep value, Cs... coeffs)
    {
       ignore_unused(coeffs...);
-      return {{ dim.name }}<Rep, Named, Cs...>(value);
+      return {{ dim.Dimension }}<Rep, Named, Cs...>(value);
    }
 
-   template<is_{{ dim.name }} Dim>
-   {{ dim.name }}(Dim) -> 
-   {{ dim.name }}<
-      {% for de in dim.definition %}
+   // deduction guide
+   template<is_{{ dim.Dimension }} Dim>
+   {{ dim.Dimension }}(Dim) ->
+   {{ dim.Dimension }}<
+      {% for de in dim.Definition %}
       simplified_unit_filter<{{ de.dim }}Type, typename Dim::units>{{ "," if not loop.last}}
       {% endfor %}
    >;
 }
 
-#endif // STATIC_DIMENSION_{{ dim.name.upper() }}_IMPL_H
+#endif // STATIC_DIMENSION_{{ dim.Dimension|upper }}_IMPL_H

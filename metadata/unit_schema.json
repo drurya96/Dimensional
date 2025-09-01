@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/dimensional.schema.json",
+  "title": "Dimensional Units & Dimensions",
+  "type": "array",
+  "items": { "$ref": "#/$defs/DimensionBlock" },
+
+  "$defs": {
+    "Identifier": {
+      "type": "string",
+      "minLength": 1
+    },
+
+    "Rational": {
+      "type": "array",
+      "prefixItems": [
+        { "type": "integer" },
+        { "type": "integer", "not": { "const": 0 } }
+      ],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2,
+      "description": "[num, den] exact rational."
+    },
+
+    "SymbolTerm": {
+      "type": "array",
+      "prefixItems": [
+        { "$ref": "#/$defs/Identifier", "description": "symbol name (e.g., \"pi\", \"sqrt2\", \"ten\")" },
+        { "$ref": "#/$defs/Rational", "description": "exponent as [num, den]" }
+      ],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
+    },
+
+    "FactorObject": {
+      "type": "object",
+      "description": "factor = (rational) × 10^e10 × Π sym_i^(exp_i)",
+      "properties": {
+        "r": { "$ref": "#/$defs/Rational" },
+        "e10": { "type": "integer", "description": "power of 10 (can be negative)" },
+        "sym": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/SymbolTerm" }
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "Factor": {
+      "oneOf": [
+        { "$ref": "#/$defs/FactorObject" },
+
+        {
+          "$ref": "#/$defs/Rational",
+          "description": "BACK-COMPAT: [num, den] → {\"r\":[num,den]}"
+        },
+
+        {
+          "type": "array",
+          "prefixItems": [
+            { "type": ["integer", "number"] },
+            { "type": "string" }
+          ],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2,
+          "description": "BACK-COMPAT (legacy like [180, \"pi\"]). Interpret as r=[first,1] and sym=[[second,[-1,1]]]."
+        },
+
+        {
+          "type": "number",
+          "description": "BACK-COMPAT: numeric scalar (inexact). Prefer FactorObject."
+        }
+      ]
+    },
+
+    "ConversionMap": {
+      "type": "object",
+      "description": "target-unit → Factor",
+      "additionalProperties": { "$ref": "#/$defs/Factor" }
+    },
+
+    "Conversions": {
+      "type": "object",
+      "properties": {
+        "From": { "$ref": "#/$defs/ConversionMap" },
+        "To":   { "$ref": "#/$defs/ConversionMap" }
+      },
+      "additionalProperties": false,
+      "required": [ "From", "To" ]
+    },
+
+    "UnitDef": {
+      "type": "object",
+      "properties": {
+        "Name": { "type": "string" },
+        "Abbreviation": { "type": "string" },
+        "SI_Prefixes": { "type": "boolean" },
+        "Conversions": { "$ref": "#/$defs/Conversions" }
+      },
+      "required": [ "Name", "Abbreviation", "SI_Prefixes" ],
+      "additionalProperties": false
+    },
+
+    "UnitsMap": {
+      "type": "object",
+      "description": "unit-key → UnitDef (for fundamental), or → array of unit-exponents (for derived).",
+      "additionalProperties": true
+    },
+
+    "DimExponent": {
+      "type": "object",
+      "properties": {
+        "Dimension": { "$ref": "#/$defs/Identifier" },
+        "Exponent":  { "type": "integer" }
+      },
+      "required": [ "Dimension", "Exponent" ],
+      "additionalProperties": false
+    },
+
+    "UnitExponent": {
+      "type": "object",
+      "properties": {
+        "Unit":     { "$ref": "#/$defs/Identifier" },
+        "Exponent": { "type": "integer" }
+      },
+      "required": [ "Unit", "Exponent" ],
+      "additionalProperties": false
+    },
+
+    "HelperUnitDef": {
+      "type": "object",
+      "properties": {
+        "Dimension":   { "$ref": "#/$defs/Identifier" },
+        "Name":        { "type": "string" },
+        "Abbreviation":{ "type": "string" },
+        "Conversions": { "$ref": "#/$defs/Conversions" }
+      },
+      "required": [ "Dimension", "Name", "Abbreviation", "Conversions" ],
+      "additionalProperties": false
+    },
+
+    "HelperUnitsMap": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/HelperUnitDef" }
+    },
+
+    "FundamentalBlock": {
+      "type": "object",
+      "properties": {
+        "Dimension":   { "$ref": "#/$defs/Identifier" },
+        "Fundamental": { "const": true },
+        "HasExtras":   { "type": "boolean" },
+        "BaseUnit":    { "$ref": "#/$defs/Identifier" },
+        "SI_Prefixes": { "type": "boolean" },
+        "Units": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/UnitDef" }
+        }
+      },
+      "required": [ "Dimension", "Fundamental", "HasExtras", "BaseUnit", "SI_Prefixes", "Units" ],
+      "additionalProperties": false
+    },
+
+    "DerivedBlock": {
+      "type": "object",
+      "properties": {
+        "Dimension":   { "$ref": "#/$defs/Identifier" },
+        "Fundamental": { "const": false },
+        "HasExtras":   { "type": "boolean" },
+        "Definition": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/DimExponent" },
+          "minItems": 1
+        },
+        "Units": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/UnitExponent" },
+            "minItems": 1
+          }
+        },
+        "HelperUnits": { "$ref": "#/$defs/HelperUnitsMap" }
+      },
+      "required": [ "Dimension", "Fundamental", "HasExtras", "Definition", "Units", "HelperUnits" ],
+      "additionalProperties": false
+    },
+
+    "DimensionBlock": {
+      "oneOf": [
+        { "$ref": "#/$defs/FundamentalBlock" },
+        { "$ref": "#/$defs/DerivedBlock" }
+      ]
+    }
+  }
+}

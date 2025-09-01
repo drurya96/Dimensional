@@ -1,8 +1,8 @@
 #pragma once
 #include "point_fwd.h"
 #include "point_convert_impl.h" // for get_point_as_impl
-#include "../../Conversion.h"
-#include "../../get_factor.h"
+#include "../../units/Conversion.h"
+#include "../../units/get_factor.h"
 #include "../frame_traits.h"
 
 namespace dimension {

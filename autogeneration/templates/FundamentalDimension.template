@@ -1,133 +1,115 @@
-#ifndef STATIC_DIMENSION_{{ dim.name.upper() }}_IMPL_H
-#define STATIC_DIMENSION_{{ dim.name.upper() }}_IMPL_H
+#ifndef STATIC_DIMENSION_{{ dim.Dimension|upper }}_IMPL_H
+#define STATIC_DIMENSION_{{ dim.Dimension|upper }}_IMPL_H
 
 #include <type_traits>
 #include <tuple>
 
-#include "../../base_unit.h"
 #include "../../base_dimension_impl.h"
 
 namespace dimension
 {
-   /// @brief Represents the {{ dim.name }} type tag.
-   struct {{ dim.name }}Type {};
+   /// @brief Represents the primary unit for {{ dim.Dimension }}.
+   struct {{ dim.BaseUnit }};
 
-   /// @brief Represents the primary unit for {{ dim.name }}.
-   struct {{ dim.base_unit }};
+   using primary_{{ dim.Dimension }} = {{ dim.BaseUnit }};
 
-   using primary_{{ dim.name }} = {{ dim.base_unit }};
-
-   /// @brief Concept to check if a type is a valid {{ dim.name }} unit.
-   /// @tparam T The type to check.
-   template<typename T>
-   concept is_{{ dim.name }}_unit = std::is_base_of_v<FundamentalUnitTag, T> && std::is_same_v<unit_dim_t<T>, {{ dim.name }}Type>;
-
-   /// @brief Base class for {{ dim.name }} units.
-   /// @tparam Unit The unit type.
-   /// @tparam Name The name of the unit.
-   /// @tparam Abbreviation The abbreviation of the unit.
-   template<typename Unit, int ID = 0>
-   struct {{ dim.name }}Unit : public BaseUnit<Unit, ID>
-   {
-   public:
-      /// @brief The dimension type associated with the unit.
-      using Dim = {{ dim.name }}Type;
-
-      /// @brief The primary unit type for this dimension.
-      using Primary = primary_{{ dim.name }};
+   /// @brief {{ dim.Dimension }} type tag.
+   struct {{ dim.Dimension }}Type {
+      using primary = primary_{{ dim.Dimension }};
    };
 
-   /// @brief Concept to check if a type is a {{ dim.name }} dimension.
-   /// @tparam T The type to check.
+   /// @brief Concept: a valid {{ dim.Dimension }} unit.
    template<typename T>
-   concept is_{{ dim.name }} = 
-      std::tuple_size_v<simplified_units_t<typename T::units>> == 1 &&
-      is_{{ dim.name }}_unit<typename std::tuple_element_t<0, simplified_units_t<typename T::units>>::unit>;
+   concept is_{{ dim.Dimension }}_unit =
+      is_unit<T> && std::is_same_v<unit_dimension_t<T>, {{ dim.Dimension }}Type>;
 
-   /// @brief Retrieves the value of a {{ dim.name }} object in the specified unit.
-   /// @tparam T The unit type.
-   /// @param obj The {{ dim.name }} object.
-   /// @return The value in the specified unit.
-   template<is_{{ dim.name }}_unit T, is_{{ dim.name }} DimType>
-   constexpr DimType::rep get_{{ dim.name.lower() }}_as(DimType obj)
+   /// @brief Concept: a {{ dim.Dimension }} dimension (exactly one {{ dim.Dimension }} unit after simplification).
+   template<typename T>
+   concept is_{{ dim.Dimension }} =
+      std::tuple_size_v<simplified_units_t<typename T::units>> == 1 &&
+      is_{{ dim.Dimension }}_unit<typename std::tuple_element_t<0, simplified_units_t<typename T::units>>::unit>;
+
+   /// @brief Get a {{ dim.Dimension }} object in unit T.
+   template<is_{{ dim.Dimension }}_unit T, is_{{ dim.Dimension }} DimType>
+   constexpr typename DimType::rep get_{{ dim.Dimension | lower }}_as(DimType obj)
    {
       return get_dimension_as<unit_exponent<T>>(obj);
    }
 
    template<typename... Ts>
-   class {{dim.name}};
+   class {{ dim.Dimension }};
 
-   /// @brief Represents a dimension type for {{ dim.name }}.
-   /// @tparam Unit The primary unit type.
-   template<rep_type Rep, is_{{ dim.name }}_unit Unit, is_coefficient... Cs>
-   class {{ dim.name }}<Rep, Unit, Cs...> : public base_dimension_impl<Rep, unit_exponent<Unit>, Cs...>
+   /// @brief {{ dim.Dimension }} dimension type.
+   template<rep_type Rep, is_{{ dim.Dimension }}_unit Unit, is_coefficient... Cs>
+   class {{ dim.Dimension }}<Rep, Unit, Cs...> : public base_dimension_impl<Rep, unit_exponent<Unit>, Cs...>
    {
-
       using impl = base_dimension_impl<Rep, unit_exponent<Unit>, Cs...>;
 
    public:
-      /// @brief Default constructor initializing to zero.
-      constexpr {{ dim.name }}() : impl(0.0) {}
+      /// @brief Default constructs to zero.
+      constexpr {{ dim.Dimension }}() : impl(0.0) {}
 
-      /// @brief Constructs a {{ dim.name }} object with a specific value.
-      /// @param val The value to initialize with.
-      explicit constexpr {{ dim.name }}(double val) : impl(val) {}
+      /// @brief Construct with a numeric value.
+      explicit constexpr {{ dim.Dimension }}(double val) : impl(val) {}
 
-      /* perfect-forward ctor so factory can pass symbols --------------------- */
+      // perfect-forward ctor so factory can pass symbols
       template<typename V, is_coefficient... Ds>
       requires std::is_constructible_v<Rep, V>
-      explicit constexpr {{ dim.name }}(V&& v, Ds... ds) : impl(static_cast<Rep>(std::forward<V>(v)), ds...) {}
+      explicit constexpr {{ dim.Dimension }}(V&& v, Ds... ds)
+         : impl(static_cast<Rep>(std::forward<V>(v)), ds...) {}
 
       template<is_coefficient... Ds>
       requires std::same_as<std::tuple<Cs...>, std::tuple<Ds...>>
       // cppcheck-suppress noExplicitConstructor
-      constexpr {{ dim.name }}(const base_dimension_impl<Rep, unit_exponent<Unit>, Ds...>& src) : impl(src) {}
+      constexpr {{ dim.Dimension }}(const base_dimension_impl<Rep, unit_exponent<Unit>, Ds...>& src)
+         : impl(src) {}
 
-      /// @brief Constructs a {{ dim.name }} object from another base_dimension.
-      /// @tparam Ts The units of the base_dimension.
-      /// @param base The base_dimension object to construct from.
+      /// @brief Construct from another base_dimension of same {{ dim.Dimension }}.
       template<typename... Ts>
-      requires is_{{ dim.name }}<base_dimension_impl<Rep, Ts...>>
-      // Implicit conversion between dimensions of the same unit is core to Dimensional
+      requires is_{{ dim.Dimension }}<base_dimension_impl<Rep, Ts...>>
+      // Implicit conversion between same-dimension types is intentional.
       // cppcheck-suppress noExplicitConstructor
-      constexpr {{ dim.name }}(const base_dimension_impl<Rep, Ts...>& base) : impl(get_dimension_as<unit_exponent<Unit>>(base)) {}
+      constexpr {{ dim.Dimension }}(const base_dimension_impl<Rep, Ts...>& base)
+         : impl(get_dimension_as<unit_exponent<Unit>>(base)) {}
    };
 
-   template<is_{{ dim.name }}_unit U, typename Rep, is_coefficient... Cs>
+   template<is_{{ dim.Dimension }}_unit U, typename Rep, is_coefficient... Cs>
    requires (!is_coefficient<Rep>)
-   // TODO: Unit test this and remove suppression
    [[maybe_unused]]
-   constexpr auto make_{{ dim.name }}(Rep value, Cs... coeffs)
+   constexpr auto make_{{ dim.Dimension }}(Rep value, Cs... coeffs)
    {
       ignore_unused(coeffs...);
-      return {{ dim.name }}<Rep, U, Cs...>(value);
+      return {{ dim.Dimension }}<Rep, U, Cs...>(value);
    }
 
-   template<is_{{ dim.name }}_unit U, is_coefficient... Cs>
-   // TODO: Unit test this and remove suppression
+   template<is_{{ dim.Dimension }}_unit U, is_coefficient... Cs>
    [[maybe_unused]]
-   constexpr auto make_{{ dim.name }}(Cs... coeffs)
+   constexpr auto make_{{ dim.Dimension }}(Cs... coeffs)
    {
       ignore_unused(coeffs...);
-      return {{ dim.name }}<double, U, Cs...>(1.0);   // 1 × coeffs
+      return {{ dim.Dimension }}<double, U, Cs...>(1.0);   // 1 × coeffs
    }
 
-   template<is_{{ dim.name }}_unit Unit, is_coefficient... Cs>
-   class {{ dim.name }}<Unit, Cs...> : public {{ dim.name }}<double, Unit, Cs...> {
+   template<is_{{ dim.Dimension }}_unit Unit, is_coefficient... Cs>
+   class {{ dim.Dimension }}<Unit, Cs...> : public {{ dim.Dimension }}<double, Unit, Cs...>
+   {
    public:
-      using {{ dim.name }}<double, Unit, Cs...>::{{ dim.name }};
+      using {{ dim.Dimension }}<double, Unit, Cs...>::{{ dim.Dimension }};
    };
 
-   /// @brief Deduction guide for {{ dim.name }} constructor with base_dimension.
-   /// @tparam {{ dim.name }}Unit The unit type.
-   template<is_{{ dim.name }} Dim>
-   {{ dim.name }}(Dim) -> {{ dim.name }}<typename Dim::rep, simplified_unit_filter<{{ dim.name }}Type, typename Dim::units>>;
+   /// @brief Deduction guides
+   template<is_{{ dim.Dimension }} Dim>
+   {{ dim.Dimension }}(Dim) -> {{ dim.Dimension }}<
+      typename Dim::rep,
+      simplified_unit_filter<{{ dim.Dimension }}Type, typename Dim::units>>;
 
-   template<rep_type Rep, is_{{ dim.name }}_unit Unit, is_coefficient... Cs>
-   {{ dim.name }}(const {{ dim.name }}<Rep, Unit, Cs...>&) -> {{ dim.name }}<Rep, Unit, Cs...>;
+   template<rep_type Rep, is_{{ dim.Dimension }}_unit Unit, is_coefficient... Cs>
+   {{ dim.Dimension }}(const {{ dim.Dimension }}<Rep, Unit, Cs...>&)
+      -> {{ dim.Dimension }}<Rep, Unit, Cs...>;
 
-   template<rep_type R, is_{{ dim.name }}_unit U, is_coefficient... Cs>
-   {{ dim.name }}(base_dimension_impl<R, unit_exponent<U>, Cs...>) -> {{ dim.name }}<R, U, Cs...>;
+   template<rep_type R, is_{{ dim.Dimension }}_unit U, is_coefficient... Cs>
+   {{ dim.Dimension }}(base_dimension_impl<R, unit_exponent<U>, Cs...>)
+      -> {{ dim.Dimension }}<R, U, Cs...>;
 }
 
-#endif // STATIC_DIMENSION_{{ dim.name.upper() }}_IMPL_H
+#endif // STATIC_DIMENSION_{{ dim.Dimension|upper }}_IMPL_H

@@ -1,53 +1,73 @@
-#ifndef STATIC_DIMENSION_{{ dim.name.upper() }}_H
-#define STATIC_DIMENSION_{{ dim.name.upper() }}_H
+#ifndef STATIC_DIMENSION_{{ dim.Dimension|upper }}_H
+#define STATIC_DIMENSION_{{ dim.Dimension|upper }}_H
 
-#include "Dimension_Impl/DerivedDimensions/{{ dim.name }}_dimension_Impl.h"
+#include "Dimension_Impl/DerivedDimensions/{{ dim.Dimension }}_dimension_Impl.h"
+
 #include "Dimension_Core/internal_temp/units/new_unit_stuff.h"
+#include "Dimension_Core/internal_temp/units/factor.h"
+#include "Dimension_Core/internal_temp/symbol/symbols.h"
 
 namespace dimension
 {
-   {% if dim.helper_units %}
-   // Helper fundamental units that exist only to compose derived units
-   //   These don't map to typical physical units, but are necessary to
-   //   produce some derived units
-   {% endif %}
-   {% for name, unit in dim.helper_units.items() %}
-   struct {{ name }} : public {{ unit.dim }}Unit<{{ name }}> {};
-   {% for to_name, value in unit.conversions.To.items() %}
-   template<> struct Conversion<{{ name }}, {{ to_name }}> { static constexpr double slope = {{ value }}; };
-   {% endfor %}
+  {#-------------------------------------------#
+   # Helper fundamental-like units (if any)    #
+   #-------------------------------------------#}
+  {% if dim.HelperUnits and dim.HelperUnits|length > 0 %}
+  // Helper fundamental units used only to compose derived units
+  {% for h in dim.HelperUnits %}
+  struct {{ h.key }}{};
 
-   {% endfor %}
-
-   // This should only need to be an empty struct - WIP
-   {% for unit_name, unit in dim.units.items() %}
-   struct {{ unit_name }}
-   {
-      using units = std::tuple<
-         {% for ue in unit %}
-         unit_exponent<{{ ue.unit }}, {{ ue.exponent_num }}, {{ ue.exponent_den }}>{{ "," if not loop.last }}
-         {% endfor %}
-      >;
-   };
-
-   template<> struct unit_traits<{{ unit_name }}> {
-      //using dimension = energy_dimension;
-      //static constexpr std::string_view name = "Joule";
-      //static constexpr std::string_view abbr = "J";
-      //static constexpr int id = 0;
-
-      using units = std::tuple<
-         {% for ue in unit %}
-         unit_exponent<{{ ue.unit }}, {{ ue.exponent_num }}, {{ ue.exponent_den }}>{{ "," if not loop.last }}
-         {% endfor %}
-      >;
+  template<> struct unit_traits<{{ h.key }}>
+  {
+     using dimension = {{ h.Dim }}Type;
+     static constexpr std::string_view name   = "{{ h.Name }}";
+     static constexpr std::string_view abbr   = "{{ h.Abbreviation }}";
+     static constexpr std::string_view dimName= "{{ dim.Dimension }}";
+     static constexpr int id = 0;
   };
 
-   {% endfor %}
+  {% for c in h.Conversions %}
+  template<> struct Conversion<{{ h.key }}, {{ c.To }}>
+  {
+     using scale = factor_t<
+        std::ratio<{{ c.rnum }}, {{ c.rden }}>
+        {%- if c.symbols|length > 0 or c.e10 != 0 -%}, {% endif -%}
+        {%- for s in c.symbols -%}{% if not loop.first %}, {% endif %}symbol_exponent<{{ s.name }}, {{ s.num }}, {{ s.den }}>{% endfor -%}
+        {%- if c.e10 != 0 %}{% if c.symbols|length > 0 %}, {% endif %}pow10<{{ c.e10 }}>{% endif -%}
+     >;
+  };
+  {% endfor %}
+
+  {% endfor %}
+  {% endif %}
+
+  {#-------------------------------------------#
+   # Derived units (as products of base units) #
+   #-------------------------------------------#}
+  {% for u in dim.Units %}
+  struct {{ u.key }}
+  {
+     using units = std::tuple<
+        {%- for e in u.Exponents -%}
+        unit_exponent<{{ e.Unit }}, {{ e.Num }}, {{ e.Den }}>{% if not loop.last %}, {% endif %}
+        {%- endfor -%}
+     >;
+  };
+
+  template<> struct unit_traits<{{ u.key }}>
+  {
+     // If/when you add names/abbr to JSON for derived units, emit here.
+     using units = std::tuple<
+        {%- for e in u.Exponents -%}
+        unit_exponent<{{ e.Unit }}, {{ e.Num }}, {{ e.Den }}>{% if not loop.last %}, {% endif %}
+        {%- endfor -%}
+     >;
+  };
+  {% endfor %}
 }
 
-{% if dim.has_extras %}
-#include "{{dim.name}}Extras.h"
+{% if dim.HasExtras %}
+#include "extensions/{{ dim.Dimension }}Extras.h"
 {% endif %}
 
-#endif // STATIC_DIMENSION_{{ dim.name.upper() }}_H
+#endif // STATIC_DIMENSION_{{ dim.Dimension|upper }}_H

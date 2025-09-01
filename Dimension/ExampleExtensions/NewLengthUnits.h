@@ -42,8 +42,8 @@ namespace dimension
       using lengthUnit<BarSub<I>, "BarSub", "zzz", I>::lengthUnit;
    };
 
-   template<int I> struct Conversion<meters, BarSub<I>> { static constexpr double slope = Conversion<meters, Bar>::slope; };
-   template<int I> struct Conversion<BarSub<I>, meters> { static constexpr double slope = Conversion<Bar, meters>::slope; };
+   //template<int I> struct Conversion<meters, BarSub<I>> { static constexpr double slope = Conversion<meters, Bar>::slope; };
+   //template<int I> struct Conversion<BarSub<I>, meters> { static constexpr double slope = Conversion<Bar, meters>::slope; };
 
    /// @todo Move this to a different example
    struct grault

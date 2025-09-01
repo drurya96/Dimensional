@@ -17,10 +17,10 @@ namespace dimension
       using exponent = std::ratio<Num, Den>;
    };
 
-   namespace detail{
-      template<typename Tuple>
-      inline constexpr double multiply_symbol_exponent_values_v = detail::symbol_utils_impl::multiply_symbol_exponent_values<Tuple>::value;
+   template<typename Tuple>
+   inline constexpr double multiply_symbol_exponent_values_v = detail::symbol_utils_impl::multiply_symbol_exponent_values<Tuple>::value;
 
+   namespace detail{
       template<typename Tuple>
       using collapse_symbol_exponents_t = typename detail::symbol_utils_impl::collapse_symbol_exponents<Tuple>::type;
 
@@ -35,10 +35,21 @@ namespace dimension
 
       template<typename Tuple, is_ratio R>
       using raise_all_symbol_exponents_t = typename detail::symbol_utils_impl::raise_all_symbol_exponents<Tuple, R>::type;
+
+
+      // "ten" for the sake of scientific notation
+      // Consider replacing this later
+      struct ten : public symbol{
+         static constexpr double value = 10.0;
+      }; 
+
    }
 
    template<typename... Ts>
    using extract_symbols_t = detail::collapse_symbol_exponents_t<detail::collect_symbol_exponents_t<Ts...>>;
+
+   template<int P>
+   using pow10 = symbol_exponent<detail::ten, P, 1>;
 
 }
 

@@ -1,10 +1,10 @@
 #ifndef STATIC_DIMENSION_MAGNETIC_FIELD_IMPL_H
 #define STATIC_DIMENSION_MAGNETIC_FIELD_IMPL_H
 
-#include "../../base_unit.h"
 #include "../../base_dimension_impl.h"
 
 #include "../../Dimension_Core/internal_temp/units/new_unit_stuff.h"
+#include "../../Dimension_Core/internal_temp/dimension/base_dimension_from_tuple.h"
 
 #include "../../dimensions/fundamental/mass_dimension.h"
 #include "../../dimensions/fundamental/timespan_dimension.h"
@@ -61,7 +61,7 @@ namespace dimension
       is_mass_unit<typename std::tuple_element_t<0, unit_units_t<T>>::unit> &&
       is_timespan_unit<typename std::tuple_element_t<1, unit_units_t<T>>::unit> &&
       is_charge_unit<typename std::tuple_element_t<2, unit_units_t<T>>::unit> &&
-      (!std::is_base_of_v<FundamentalUnitTag, T>);
+      !is_fundamental_unit_v<T>;
 
    /// @brief Concept to verify a dimension can be treated as a magnetic_field type
    template<typename T, typename Rep>
@@ -88,7 +88,7 @@ namespace dimension
       is_magnetic_field DimType>
    // TODO: Unit test this and remove suppression
    [[maybe_unused]]
-   constexpr DimType::rep get_magnetic_field_as(const DimType& obj)
+   constexpr typename DimType::rep get_magnetic_field_as(const DimType& obj)
    {
       return get_dimension_as<
          unit_exponent<massUnit, 1>,
@@ -104,16 +104,13 @@ namespace dimension
    /// @return The raw value in terms of template units as the representative type of DimType
    template<IsNamedmagnetic_fieldUnit Named, is_magnetic_field DimType>
    // TODO: Unit test this and remove suppression
-   constexpr DimType::rep get_magnetic_field_as(const DimType& obj)
+   constexpr typename DimType::rep get_magnetic_field_as(const DimType& obj)
    {
       return call_unpack<unit_units_t<Named>>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
 
    template<typename... Ts>
    class magnetic_field;
-
-
-
 
    template<
       IsBasicUnitType T0,
@@ -140,17 +137,14 @@ namespace dimension
          unit_exponent<typename unit_filter<chargeType, T0, T1, T2>::type, -1>,
          Cs...
       >;
-   
+
       using Base::Base;
-   
+
       template<typename T>
       requires is_magnetic_field<T>
       // cppcheck-suppress noExplicitConstructor
       constexpr magnetic_field(const T& base) : Base(base) {}
    };
-
-
-
 
    template<
       rep_type Rep,
@@ -178,17 +172,14 @@ namespace dimension
          unit_exponent<typename unit_filter<chargeType, T0, T1, T2>::type, -1>,
          Cs...
       >;
-   
+
       using Base::Base;
-   
+
       template<typename T>
       requires is_magnetic_field<T>
       // cppcheck-suppress noExplicitConstructor
       constexpr magnetic_field(const T& base) : Base(base) {}
    };
-
-
-
 
    /// @brief Template specialization for named magnetic_field units
    /// @tparam Named The named unit this magnetic_field type is in terms of
@@ -206,7 +197,6 @@ namespace dimension
          : Base(call_unpack<unit_units_t<Named>>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-
    /// @brief Template specialization for named magnetic_field units
    /// @tparam Named The named unit this magnetic_field type is in terms of
    template<rep_type Rep, IsNamedmagnetic_fieldUnit Named, is_coefficient... Cs>
@@ -223,14 +213,7 @@ namespace dimension
          : Base(call_unpack<unit_units_t<Named>>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-
-
-
-   
-
-
-
-
+   // ───────────────────── factory helpers (make_*) ─────────────────────
    template<
       IsBasicUnitType T0,
       IsBasicUnitType T1,
@@ -292,8 +275,9 @@ namespace dimension
       return magnetic_field<Rep, Named, Cs...>(value);
    }
 
+   // deduction guide
    template<is_magnetic_field Dim>
-   magnetic_field(Dim) -> 
+   magnetic_field(Dim) ->
    magnetic_field<
       simplified_unit_filter<massType, typename Dim::units>,
       simplified_unit_filter<timespanType, typename Dim::units>,

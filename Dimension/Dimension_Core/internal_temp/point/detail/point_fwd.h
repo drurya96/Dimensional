@@ -3,8 +3,6 @@
 
 namespace dimension {
 
-struct FundamentalUnitTag; // as in your original
-
 template<typename T>
 struct reference_frame;
 

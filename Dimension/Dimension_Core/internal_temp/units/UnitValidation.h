@@ -5,8 +5,7 @@
 #include <type_traits> // For std::is_same, std::remove_cv, std::disjunction
 
 #include "unit_exponent.h"
-#include "unit_dim.h"
-#include "../Conversion.h" // TODO: Remove this by moving PrimaryConvertible and friends to a separate header
+#include "Conversion.h" // TODO: Remove this by moving PrimaryConvertible and friends to a separate header
 
 namespace dimension
 {
@@ -17,9 +16,7 @@ namespace dimension
    template<typename T>
    concept IsBasicUnitType = requires
    {
-      typename T::Dim; // Not sure why, but these two checks seem strictly necessary?
-      typename T::Primary;
-      requires std::is_same_v<unit_dim_t<T>, unit_dim_t<unit_primary_t<T>>>;
+      requires std::is_same_v<unit_dimension_t<T>, unit_dimension_t<unit_primary_t<T>>>;
       requires PrimaryConvertible<T>;
    };
 

@@ -3,6 +3,7 @@
 
 // TODO: Add appropriate includes
 #include "base_dimension_impl.h"
+#include "Dimension_Core/internal_temp/dimension/base_dimension_from_tuple.h"
 
 namespace dimension
 {

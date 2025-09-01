@@ -5,21 +5,21 @@
 #include <type_traits>
 #include <ratio>
 
-#include "TemplateUtils/GenericUtils.h"
+#include "../TemplateUtils/GenericUtils.h"
 
-#include "TupleHandling.h"
+#include "../TupleHandling.h"
 
-#include "units/unit_decomposition.h"
+#include "../units/unit_decomposition.h"
 
-#include "exponentiation/exponentiation.h"
+#include "../exponentiation/exponentiation.h"
 
-#include "ratio/ratio_utils.h"
-#include "utils.h"
+#include "../ratio/ratio_utils.h"
+#include "../utils.h"
 
 #include "full_simplify.h"
 
-#include "units/collapse_units.h"
-#include "units/unit_exponent.h"
+#include "../units/collapse_units.h"
+#include "../units/unit_exponent.h"
 
 namespace dimension {
    namespace dimensional_equivalence

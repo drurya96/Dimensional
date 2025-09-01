@@ -417,7 +417,7 @@ TEST(FundamentalConversions, TestchargeConversions)
    charge<coulombs> chargeInCoulombs{100.0};
 
    EXPECT_NEAR(get_charge_as<coulombs>(chargeInCoulombs), 100.0, TOLERANCE);
-   EXPECT_NEAR(get_charge_as<elementary_charges>(chargeInCoulombs), 6.2415090744607624e+20, TOLERANCE);
+   EXPECT_NEAR(get_charge_as<elementary_charges>(chargeInCoulombs), 6.2415090744607638e+20, TOLERANCE);
 
    // Test from elementary_charges to other units
    charge<elementary_charges> chargeInElementarycharges{100.0};

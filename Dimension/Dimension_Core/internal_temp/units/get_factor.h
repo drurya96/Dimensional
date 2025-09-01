@@ -2,12 +2,21 @@
 #define DIMENSIONAL_GET_FACTOR_H
 
 #include "convertible.h"
-#include "exponentiation/exponentiation.h"
+#include "../exponentiation/exponentiation.h"
+#include "factor.h"
 
 namespace dimension::details {
 
    namespace factor
    {
+
+      template<typename StartingUnit, typename TargetUnit>
+      requires HasConversion<StartingUnit, TargetUnit>
+      constexpr double get_raw_factor()
+      {
+         return dimension::factor::eval_factor<typename Conversion<StartingUnit, TargetUnit>::scale, double>();
+      }
+
       template<typename StartingUnit, typename TargetUnit>
       constexpr double get_factor()
       {
@@ -17,11 +26,11 @@ namespace dimension::details {
          }
          else if constexpr (HasConversion<StartingUnit, TargetUnit>)
          {
-            return Conversion<StartingUnit, TargetUnit>::slope;
+            return get_raw_factor<StartingUnit, TargetUnit>();
          }
          else if constexpr (HasConversion<TargetUnit, StartingUnit>)
          {
-            return 1 / Conversion<TargetUnit, StartingUnit>::slope;
+            return 1 / get_raw_factor<TargetUnit, StartingUnit>();
          }
          else
          {

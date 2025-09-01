@@ -7,7 +7,8 @@ include(${CMAKE_CURRENT_LIST_DIR}/../ExampleExtensions/CMakeLists.txt)
 set(TEST_SOURCES
     
 #[===[
-]===]
+ ]===]  
+
     ${CMAKE_CURRENT_LIST_DIR}/TestFundamentalConversions.cpp
     ${CMAKE_CURRENT_LIST_DIR}/TestCompoundConversions.cpp
     ${CMAKE_CURRENT_LIST_DIR}/TestOperators.cpp
@@ -20,7 +21,6 @@ set(TEST_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/PhysicsProblemsExamples/Example1.cpp
     ${CMAKE_CURRENT_LIST_DIR}/TestSerialization.cpp
 
-
     #${CMAKE_CURRENT_LIST_DIR}/TestNewDimension.cpp
 
 
@@ -28,6 +28,11 @@ set(TEST_SOURCES
     #${CMAKE_CURRENT_LIST_DIR}/TestUtilities.cpp
     
     ${CMAKE_CURRENT_LIST_DIR}/TestTemp.cpp
+ 
+    
+
+
+    ${CMAKE_CURRENT_LIST_DIR}/TestInclude.cpp
 )
 
 add_executable(Dimension_UnitTests ${TEST_SOURCES})

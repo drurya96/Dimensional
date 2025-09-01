@@ -4,6 +4,8 @@
 #include <concepts>
 #include <type_traits>
 
+#include "new_unit_stuff.h"
+
 namespace dimension {
 
    template<typename From, typename To>
@@ -11,7 +13,7 @@ namespace dimension {
 
    /// @brief Concept to check if Conversion is defined
    template<typename From, typename To>
-   concept HasConversion = requires { Conversion<From, To>::slope; };
+   concept HasConversion = requires { typename Conversion<From, To>::scale; };
 
    /// @brief Concept to check if the unit is convertible to a primary unit (either direction)
    template<typename T>

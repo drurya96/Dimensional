@@ -1,162 +1,183 @@
 [
-   {
-      "Dimension": "length",
-      "Fundamental": true,
-      "HasExtras": false,
-      "BaseUnit": "meters",
-      "SI_Prefixes": true,
-      "Units": {
-         "meters": { "Name": "meters", "Abbreviation": "m", "SI_Prefixes": true,
-            "Conversions": {
-               "From": {},
-               "To": {
-                  "feet": [1250, 381],
-                  "inches": [15000, 381], 
-                  "astronomical_units": [1, 149597870700],
-                  "data_miles": [5, 9144],
-                  "nautical_miles": [1, 1852],
-                  "miles": [125, 201168],
-                  "fathoms": [3937, 7200],
-                  "furlong": [3937, 792000],
-                  "yards": [1250, 1143],
-                  "us_survey_feet": [3937, 1200]
-               }
-            }
-         },
-         "feet": { "Name": "Feet", "Abbreviation": "ft", "SI_Prefixes": false },
-         "inches": { "Name": "Inches", "Abbreviation": "in", "SI_Prefixes": false },
-         "astronomical_units": { "Name": "Astronomical Units", "Abbreviation": "au", "SI_Prefixes": false },
-         "data_miles": { "Name": "Data Miles", "Abbreviation": "DataMiles", "SI_Prefixes": false },
-         "nautical_miles": { "Name": "Nautical Miles", "Abbreviation": "nmi", "SI_Prefixes": false },
-         "miles": { "Name": "Miles", "Abbreviation": "mi", "SI_Prefixes": false },
-         "fathoms": { "Name": "Fathoms", "Abbreviation": "ftm", "SI_Prefixes": false },
-         "furlong": { "Name": "Furlong", "Abbreviation": "fur", "SI_Prefixes": false },
-         "yards": { "Name": "Yards", "Abbreviation": "yd", "SI_Prefixes": false },
-         "us_survey_feet": { "Name": "US Survey Feet", "Abbreviation": "ftUS", "SI_Prefixes": false }
-      }
-   },
-   {
-      "Dimension": "mass",
-      "Fundamental": true,
-      "HasExtras": false,
-      "BaseUnit": "grams",
-      "SI_Prefixes": true,
-      "Units": {
-         "grams": { "Name": "Grams", "Abbreviation": "g", "SI_Prefixes": true,
-         "Conversions": {
-               "From": {},
-               "To": {
-                  "pound_mass": [100000, 45359237],
-                  "ounces": [1600000, 45359237],
-                  "slugs": [609600000, 8896443230521],
-                  "grains": [100000000, 6479891],
-                  "stone": [50000, 317514659],
-                  "short_ton": [50, 45359237],
-                  "long_ton": [625, 635029318],
-                  "tonne": 1e-6
-               }
-            }
-         },
-         "pound_mass": { "Name": "Pound mass", "Abbreviation": "lb", "SI_Prefixes": false },
-         "ounces": { "Name": "Ounces", "Abbreviation": "oz", "SI_Prefixes": false },
-         "slugs": { "Name": "Slugs", "Abbreviation": "slug", "SI_Prefixes": false },
-         "grains": { "Name": "Grains", "Abbreviation": "gr", "SI_Prefixes": false },
-         "stone": { "Name": "Stone", "Abbreviation": "st", "SI_Prefixes": false },
-         "short_ton": { "Name": "Short Ton", "Abbreviation": "ton", "SI_Prefixes": false },
-         "long_ton": { "Name": "Long Ton", "Abbreviation": "LT", "SI_Prefixes": false },
-         "tonne": { "Name": "Tonne", "Abbreviation": "t", "SI_Prefixes": false }
-      }
-   },
-   {
-      "Dimension": "amount",
-      "Fundamental": true,
-      "HasExtras": false,
-      "BaseUnit": "moles",
-      "SI_Prefixes": true,
-      "Units": {
-         "moles": { "Name": "Moles", "Abbreviation": "mol", "SI_Prefixes": true,
-         "Conversions": {
-               "From": {},
-               "To": {
-                  "pound_moles": [100000, 45359237]
-               }
-            }
-         },
-         "pound_moles": { "Name": "Pound Moles", "Abbreviation": "lbmol", "SI_Prefixes": false }
-      }
-   },
-   {
-      "Dimension": "angle",
-      "Fundamental": true,
-      "HasExtras": true,
-      "BaseUnit": "radians",
-      "SI_Prefixes": false,
-      "Units": {
-         "radians": { "Name": "radians", "Abbreviation": "rad", "SI_Prefixes": false,
-         "Conversions": {
-               "From": {},
-               "To": {
-                  "degrees": 57.2958
-               }
-            }
-         },
-         "degrees": { "Name": "Degrees", "Abbreviation": "deg", "SI_Prefixes": false }
-      }
-   },
-   {
-      "Dimension": "charge",
-      "Fundamental": true,
-      "HasExtras": false,
-      "BaseUnit": "coulombs",
-      "SI_Prefixes": true,
-      "Units": {
-         "coulombs": { "Name": "Coulombs", "Abbreviation": "C", "SI_Prefixes": true,
-         "Conversions": {
-               "From": {},
-               "To": {
-                  "elementary_charges": [5e27, 801088317]
-               }
-            }
-         },
-         "elementary_charges": { "Name": "Elementary charges", "Abbreviation": "e", "SI_Prefixes": false }
-      }
-   },
-   {
-      "Dimension": "timespan",
-      "Fundamental": true,
-      "HasExtras": false,
-      "BaseUnit": "seconds",
-      "SI_Prefixes": true,
-      "Units": {
-         "seconds": { "Name": "seconds", "Abbreviation": "s", "SI_Prefixes": true,
-         "Conversions": {
-               "From": {},
-               "To": {
-                  "minutes": [1, 60],
-                  "hours": [1, 3600]
-               }
-            }
-         },
-         "minutes": { "Name": "minutes", "Abbreviation": "min", "SI_Prefixes": false },
-         "hours": { "Name": "Hours", "Abbreviation": "h", "SI_Prefixes": false }
-      }
-   },
-   {
-      "Dimension": "temperature",
-      "Fundamental": true,
-      "HasExtras": true,
-      "BaseUnit": "kelvin",
-      "SI_Prefixes": false,
-      "Units": {
-         "kelvin": { "Name": "Kelvin", "Abbreviation": "K", "SI_Prefixes": false,
-         "Conversions": {
-               "From": {},
-               "To": {
-                  "rankine": [9, 5]
-               }
-            }
-         },
-         "rankine": { "Name": "Rankine", "Abbreviation": "R", "SI_Prefixes": false }
-      }
-   }
+  {
+    "Dimension": "length",
+    "Fundamental": true,
+    "HasExtras": false,
+    "BaseUnit": "meters",
+    "SI_Prefixes": true,
+    "Units": {
+      "meters": {
+        "Name": "meters",
+        "Abbreviation": "m",
+        "SI_Prefixes": true,
+        "Conversions": {
+          "From": {},
+          "To": {
+            "feet": { "r": [1250, 381] },
+            "inches": { "r": [15000, 381] },
+            "astronomical_units": { "r": [1, 149597870700] },
+            "data_miles": { "r": [5, 9144] },
+            "nautical_miles": { "r": [1, 1852] },
+            "miles": { "r": [125, 201168] },
+            "fathoms": { "r": [3937, 7200] },
+            "furlong": { "r": [3937, 792000] },
+            "yards": { "r": [1250, 1143] },
+            "us_survey_feet": { "r": [3937, 1200] }
+          }
+        }
+      },
+      "feet": { "Name": "Feet", "Abbreviation": "ft", "SI_Prefixes": false },
+      "inches": { "Name": "Inches", "Abbreviation": "in", "SI_Prefixes": false },
+      "astronomical_units": { "Name": "Astronomical Units", "Abbreviation": "au", "SI_Prefixes": false },
+      "data_miles": { "Name": "Data Miles", "Abbreviation": "DataMiles", "SI_Prefixes": false },
+      "nautical_miles": { "Name": "Nautical Miles", "Abbreviation": "nmi", "SI_Prefixes": false },
+      "miles": { "Name": "Miles", "Abbreviation": "mi", "SI_Prefixes": false },
+      "fathoms": { "Name": "Fathoms", "Abbreviation": "ftm", "SI_Prefixes": false },
+      "furlong": { "Name": "Furlong", "Abbreviation": "fur", "SI_Prefixes": false },
+      "yards": { "Name": "Yards", "Abbreviation": "yd", "SI_Prefixes": false },
+      "us_survey_feet": { "Name": "US Survey Feet", "Abbreviation": "ftUS", "SI_Prefixes": false }
+    }
+  },
+  {
+    "Dimension": "mass",
+    "Fundamental": true,
+    "HasExtras": false,
+    "BaseUnit": "grams",
+    "SI_Prefixes": true,
+    "Units": {
+      "grams": {
+        "Name": "Grams",
+        "Abbreviation": "g",
+        "SI_Prefixes": true,
+        "Conversions": {
+          "From": {},
+          "To": {
+            "pound_mass": { "r": [100000, 45359237] },
+            "ounces": { "r": [1600000, 45359237] },
+            "slugs": { "r": [609600000, 8896443230521] },
+            "grains": { "r": [100000000, 6479891] },
+            "stone": { "r": [50000, 317514659] },
+            "short_ton": { "r": [50, 45359237] },
+            "long_ton": { "r": [625, 635029318] },
+            "tonne": { "r": [1, 1], "e10": -6 }
+          }
+        }
+      },
+      "pound_mass": { "Name": "Pound mass", "Abbreviation": "lb", "SI_Prefixes": false },
+      "ounces": { "Name": "Ounces", "Abbreviation": "oz", "SI_Prefixes": false },
+      "slugs": { "Name": "Slugs", "Abbreviation": "slug", "SI_Prefixes": false },
+      "grains": { "Name": "Grains", "Abbreviation": "gr", "SI_Prefixes": false },
+      "stone": { "Name": "Stone", "Abbreviation": "st", "SI_Prefixes": false },
+      "short_ton": { "Name": "Short Ton", "Abbreviation": "ton", "SI_Prefixes": false },
+      "long_ton": { "Name": "Long Ton", "Abbreviation": "LT", "SI_Prefixes": false },
+      "tonne": { "Name": "Tonne", "Abbreviation": "t", "SI_Prefixes": false }
+    }
+  },
+  {
+    "Dimension": "amount",
+    "Fundamental": true,
+    "HasExtras": false,
+    "BaseUnit": "moles",
+    "SI_Prefixes": true,
+    "Units": {
+      "moles": {
+        "Name": "Moles",
+        "Abbreviation": "mol",
+        "SI_Prefixes": true,
+        "Conversions": {
+          "From": {},
+          "To": {
+            "pound_moles": { "r": [100000, 45359237] }
+          }
+        }
+      },
+      "pound_moles": { "Name": "Pound Moles", "Abbreviation": "lbmol", "SI_Prefixes": false }
+    }
+  },
+  {
+    "Dimension": "angle",
+    "Fundamental": true,
+    "HasExtras": true,
+    "BaseUnit": "radians",
+    "SI_Prefixes": false,
+    "Units": {
+      "radians": {
+        "Name": "radians",
+        "Abbreviation": "rad",
+        "SI_Prefixes": false,
+        "Conversions": {
+          "From": {},
+          "To": {
+            "degrees": { "r": [180, 1], "sym": [["pi", [-1, 1]]] }
+          }
+        }
+      },
+      "degrees": { "Name": "Degrees", "Abbreviation": "deg", "SI_Prefixes": false }
+    }
+  },
+  {
+    "Dimension": "charge",
+    "Fundamental": true,
+    "HasExtras": false,
+    "BaseUnit": "coulombs",
+    "SI_Prefixes": true,
+    "Units": {
+      "coulombs": {
+        "Name": "Coulombs",
+        "Abbreviation": "C",
+        "SI_Prefixes": true,
+        "Conversions": {
+          "From": {},
+          "To": {
+            "elementary_charges": { "r": [5, 801088317], "e10": 27 }
+          }
+        }
+      },
+      "elementary_charges": { "Name": "Elementary charges", "Abbreviation": "e", "SI_Prefixes": false }
+    }
+  },
+  {
+    "Dimension": "timespan",
+    "Fundamental": true,
+    "HasExtras": false,
+    "BaseUnit": "seconds",
+    "SI_Prefixes": true,
+    "Units": {
+      "seconds": {
+        "Name": "seconds",
+        "Abbreviation": "s",
+        "SI_Prefixes": true,
+        "Conversions": {
+          "From": {},
+          "To": {
+            "minutes": { "r": [1, 60] },
+            "hours": { "r": [1, 3600] }
+          }
+        }
+      },
+      "minutes": { "Name": "minutes", "Abbreviation": "min", "SI_Prefixes": false },
+      "hours": { "Name": "Hours", "Abbreviation": "h", "SI_Prefixes": false }
+    }
+  },
+  {
+    "Dimension": "temperature",
+    "Fundamental": true,
+    "HasExtras": true,
+    "BaseUnit": "kelvin",
+    "SI_Prefixes": false,
+    "Units": {
+      "kelvin": {
+        "Name": "Kelvin",
+        "Abbreviation": "K",
+        "SI_Prefixes": false,
+        "Conversions": {
+          "From": {},
+          "To": {
+            "rankine": { "r": [9, 5] }
+          }
+        }
+      },
+      "rankine": { "Name": "Rankine", "Abbreviation": "R", "SI_Prefixes": false }
+    }
+  }
 ]

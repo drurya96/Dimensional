@@ -5,7 +5,10 @@
 #include <cstdint>
 #include <span>
 
-// #include "strings/string_literal.h"
+namespace dimension{
+    template<typename T>
+    struct unit_traits;
+}
 
 namespace dimension::detail
 {
@@ -63,7 +66,7 @@ namespace dimension::detail
     
     template<typename T>
     struct unit_uuid{
-        static constexpr std::array<std::uint64_t, 2> value = uuid128_of_new(T::name_view);
+        static constexpr std::array<std::uint64_t, 2> value = uuid128_of_new(::dimension::unit_traits<T>::name);
     };
 
     template<typename T>

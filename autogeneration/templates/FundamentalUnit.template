@@ -1,56 +1,76 @@
-#ifndef STATIC_DIMENSION_{{ dim.name.upper() }}_H
-#define STATIC_DIMENSION_{{ dim.name.upper() }}_H
+#ifndef STATIC_DIMENSION_{{ dim.Dimension|upper }}_H
+#define STATIC_DIMENSION_{{ dim.Dimension|upper }}_H
 
 #include <string_view>
 
-#include "Dimension_Impl/FundamentalDimensions/{{ dim.name }}_dimension_Impl.h"
+#include "Dimension_Impl/FundamentalDimensions/{{ dim.Dimension }}_dimension_Impl.h"
 
 #include "Dimension_Core/internal_temp/units/new_unit_stuff.h"
+#include "Dimension_Core/internal_temp/units/factor.h"
+#include "Dimension_Core/internal_temp/symbol/symbols.h"
 
 namespace dimension
 {
-   {% for name, unit in dim.units.items() %}
-   // Only really need empty struct - WIP
-   struct {{ name }} : public {{ dim.name }}Unit<{{ name }}> {
-      static constexpr std::string_view name_view = "{{ unit.name }}";
-      static constexpr std::string_view abbr_view = "{{ unit.abbreviation }}";
-      static constexpr std::string_view dimName_view = "{{ dim.name }}";
-   };
+  {# -------- Unprefixed unit types and traits -------- #}
+  {% for u in dim.Units %}
+  struct {{ u.key }}{};
 
-   // Should only need this part - WIP
-   template<> struct unit_traits<{{ name }}>{
-      using dimension = {{ dim.name }}Type; // Consider renaming to {{ dim.name }}_dimension
-      static constexpr std::string_view name = "{{ unit.name }}";
-      static constexpr std::string_view abbr = "{{ unit.abbreviation }}";
-      static constexpr std::string_view dimName = "{{ dim.name }}";
-      static constexpr int id = 0;
-   };
+  template<> struct unit_traits<{{ u.key }}>
+  {
+     using dimension = {{ dim.Dimension }}Type;
+     static constexpr std::string_view name   = "{{ u.Name }}";
+     static constexpr std::string_view abbr   = "{{ u.Abbreviation }}";
+     static constexpr std::string_view dimName= "{{ dim.Dimension }}";
+     static constexpr int id = 0;
+  };
+  {% endfor %}
 
-   {% endfor %}
+  {# -------- Base -> other (exact) conversions -------- #}
+  {% for u in dim.Units if (not u.is_base) and u.conv_from_base %}
+  template<> struct Conversion<{{ dim.BaseUnit }}, {{ u.key }}>
+  {
+     {% set c = u.conv_from_base %}
+     using scale = factor_t<
+        std::ratio<{{ c.rnum }}, {{ c.rden }}>
+        {%- if c.symbols|length > 0 or c.e10 != 0 -%}, {% endif -%}
+        {%- for s in c.symbols -%}{% if not loop.first %}, {% endif %}symbol_exponent<{{ s.name }}, {{ s.num }}, {{ s.den }}>{% endfor -%}
+        {%- if c.e10 != 0 %}{% if c.symbols|length > 0 %}, {% endif %}pow10<{{ c.e10 }}>{% endif -%}
+     >;
+  };
+  {% endfor %}
 
-   {% for name, unit in dim.units.items() %}
-   {% if name != dim.base_unit %}
-   {% set conversion = dim.base.conversions.To[name] %}
-   {% if conversion.__class__.__name__ == 'list' %}
-   template<> struct Conversion<{{ dim.base_unit }}, {{ name }}> { static constexpr double slope = ({{ conversion[0] }}{%if 'e' not in conversion[0]|string %}.0{%endif%} / {{ conversion[1] }}{%if 'e' not in conversion[1]|string %}.0{%endif%}); };
-   {% else %}
-   template<> struct Conversion<{{ dim.base_unit }}, {{ name }}> { static constexpr double slope = {{ conversion }}; };
-   {% endif %}
-   {% endif %}
-   {% endfor %}
+  {# -------- Auto-generated SI-prefixed units -------- #}
+  {% for u in dim.Units %}
+    {% for si in u.si_generated %}
+    struct {{ si.key }}{};
 
-   {% for name, unit in dim.units.items() %}
-   {% if unit.si_prefixes %}
-   ALL_SI_PREFIXES({{ name }}, "{{ unit.abbreviation }}", {{ dim.name }}Unit);
-   {% endif %}
-   {% endfor %}
+    template<> struct unit_traits<{{ si.key }}>
+    {
+       using dimension = {{ dim.Dimension }}Type;
+       static constexpr std::string_view name   = "{{ si.Name }}";
+       static constexpr std::string_view abbr   = "{{ si.Abbreviation }}";
+       static constexpr std::string_view dimName= "{{ dim.Dimension }}";
+       static constexpr int id = 0;
+    };
 
+    // {{ u.key }} <-> {{ si.key }}
+    // base->prefixed multiplies by 10^{-exp}
+    template<> struct Conversion<{{ u.key }}, {{ si.key }}>
+    {
+        using scale = factor_t<std::ratio<1>, pow10<{{ -si.exp }}>>;
+    };
+
+    // prefixed->base multiplies by 10^{+exp}
+    template<> struct Conversion<{{ si.key }}, {{ u.key }}>
+    {
+        using scale = factor_t<std::ratio<1>, pow10<{{ si.exp }}>>;
+    };
+    {% endfor %}
+  {% endfor %}
 }
 
-
-
-{% if dim.has_extras %}
-#include "extensions/{{ dim.name }}Extras.h"
+{% if dim.HasExtras %}
+#include "extensions/{{ dim.Dimension }}Extras.h"
 {% endif %}
 
-#endif //STATIC_DIMENSION_{{ dim.name.upper() }}_H
+#endif // STATIC_DIMENSION_{{ dim.Dimension|upper }}_H

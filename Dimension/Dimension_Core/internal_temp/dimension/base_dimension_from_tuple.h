@@ -1,8 +1,8 @@
 #ifndef DIMENSIONAL_DIMENSION_TUPLE_H
 #define DIMENSIONAL_DIMENSION_TUPLE_H
 
-#include "utils.h"
-#include "rep_type.h"
+#include "../utils.h"
+#include "../rep_type.h"
 
 namespace dimension
 {

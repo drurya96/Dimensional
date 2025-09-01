@@ -5,16 +5,13 @@
 #include <tuple>
 #include <type_traits>
 
-#include "unit_exponent.h"
+//#include "unit_exponent.h"
 
 namespace dimension {
 
-// Your dimension tags
-//struct length_dimension {};
-//struct time_dimension   {};
-//struct mass_dimension   {};
-//struct energy_dimension {};
-// ...
+// Forward declaration
+template<typename Unit, int Num, int Den, class Label>
+struct unit_exponent;
 
 // Primary trait (users specialize this *once* per unit)
 template<class Unit>
@@ -38,7 +35,7 @@ inline constexpr int unit_id_v = unit_traits<U>::id;
 // otherwise we treat U as fundamental: tuple<unit_exponent<U,1,1>>.
 
 template<class U, class = void>
-struct unit_units { using type = std::tuple<unit_exponent<U, 1, 1>>; };
+struct unit_units { using type = std::tuple<unit_exponent<U, 1, 1, void>>; };
 
 template<class U>
 struct unit_units<U, std::void_t<typename unit_traits<U>::units>> {
@@ -70,10 +67,20 @@ inline constexpr bool is_fundamental_unit_v = []{
   }
 }();
 
+namespace unit_detail{
+  template<class T, class = void>
+  struct _has_unit_traits_dimension : std::false_type {};
+
+  template<class T>
+  struct _has_unit_traits_dimension<T, std::void_t<typename unit_traits<T>::dimension>>
+    : std::true_type {};
+}
+
 template<class T>
-concept is_unit = requires {
-    typename unit_units_t<T>; // must be decomposable into exponents
-};
+concept is_unit = unit_detail::_has_unit_traits_dimension<T>::value;
+
+template<typename U>
+using unit_primary_t = typename unit_traits<U>::dimension::primary;
 
 } // namespace dimension
 

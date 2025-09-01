@@ -11,15 +11,15 @@
 #include <limits>
 #include <utility>
 
-#include "Dimension_Core/internal_temp/uuid.h"
+#include "Dimension_Core/internal_temp/dimension/base_dimension_from_tuple.h"
+#include "Dimension_Core/internal_temp/dimension/dimensional_equivalence.h"
+#include "Dimension_Core/internal_temp/units/new_unit_stuff.h"
 #include "Dimension_Core/internal_temp/units/UnitValidation.h"
-#include "Dimension_Core/internal_temp/full_simplify.h"
+#include "Dimension_Core/internal_temp/dimension/full_simplify.h"
 #include "Dimension_Core/internal_temp/units/unit_filter.h"
-#include "Dimension_Core/internal_temp/dimensional_equivalence.h"
 #include "Dimension_Core/internal_temp/units/collapse_units.h"
 #include "Dimension_Core/internal_temp/units/unit_decomposition.h"
-#include "Dimension_Core/internal_temp/Conversion.h"
-#include "Dimension_Core/internal_temp/SI_Macro.h"
+#include "Dimension_Core/internal_temp/units/Conversion.h"
 #include "Dimension_Core/streaming/Stream.h"
 #include "Dimension_Core/serialization/Serialization.h"
 #include "Dimension_Core/serialization/exact_tag_policy.h"
@@ -30,12 +30,22 @@
 namespace dimension
 {
 
+   // Consider moving this to some helper...
+   // This relies on specific stuff from the simplification header.. probably really shouldn't be here.
+   template<typename ToTuple, typename FromDim>
+   static constexpr double convert_scalar_units(FromDim input) 
+   {
+      return 
+         detail::ConvertSimplified<simplified_units_t<typename FromDim::units>, simplified_units_t<ToTuple>>::scalar * 
+         simplification::SimplifiedDimension<typename FromDim::units>::convert_scalar(input.template get_tuple_scalar<typename FromDim::units>());
+   }
+
 
    template<are_unit_exponents... Units, typename Dim>
    requires (dimensionally_equivalent<base_dimension_impl<double, Units...>, Dim> && !same_unit_representation<std::tuple<Units...>, typename Dim::units>)
    constexpr Dim::rep get_scalar_as(Dim obj)
    {
-      return detail::convert_scalar_units<std::tuple<Units...>>(obj);
+      return convert_scalar_units<std::tuple<Units...>>(obj);
    }
    
    template<are_unit_exponents... Units, typename Dim>
@@ -54,7 +64,7 @@ namespace dimension
    constexpr Dim::rep get_dimension_as(Dim obj)
    {
       // TODO: URGENT: Need to "apply coefficients"
-      constexpr double coefficients = ratio_v<typename Dim::ratio> * detail::multiply_symbol_exponent_values_v<typename Dim::symbols>;
+      constexpr double coefficients = ratio_v<typename Dim::ratio> * multiply_symbol_exponent_values_v<typename Dim::symbols>;
       return get_scalar_as<Units...>(obj) * coefficients;
    }
    
@@ -244,7 +254,7 @@ namespace dimension
 
          return static_cast<Rep>(scalar *
                                  ratio_v<ratio> * 
-                                 detail::multiply_symbol_exponent_values_v<symbols>);
+                                 multiply_symbol_exponent_values_v<symbols>);
       }
 
       template<typename Tuple>
@@ -256,7 +266,7 @@ namespace dimension
 
          return static_cast<Rep>(scalar *
                                  ratio_v<ratio> * 
-                                 detail::multiply_symbol_exponent_values_v<symbols>);
+                                 multiply_symbol_exponent_values_v<symbols>);
       }
 
       template<typename... Units2>

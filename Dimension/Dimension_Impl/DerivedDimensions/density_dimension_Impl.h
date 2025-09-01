@@ -1,10 +1,10 @@
 #ifndef STATIC_DIMENSION_DENSITY_IMPL_H
 #define STATIC_DIMENSION_DENSITY_IMPL_H
 
-#include "../../base_unit.h"
 #include "../../base_dimension_impl.h"
 
 #include "../../Dimension_Core/internal_temp/units/new_unit_stuff.h"
+#include "../../Dimension_Core/internal_temp/dimension/base_dimension_from_tuple.h"
 
 #include "../../dimensions/fundamental/mass_dimension.h"
 #include "../../dimensions/fundamental/length_dimension.h"
@@ -36,7 +36,7 @@ namespace dimension
       (std::tuple_size_v<unit_units_t<T>> == 2) &&
       is_mass_unit<typename std::tuple_element_t<0, unit_units_t<T>>::unit> &&
       is_length_unit<typename std::tuple_element_t<1, unit_units_t<T>>::unit> &&
-      (!std::is_base_of_v<FundamentalUnitTag, T>);
+      !is_fundamental_unit_v<T>;
 
    /// @brief Concept to verify a dimension can be treated as a density type
    template<typename T, typename Rep>
@@ -60,7 +60,7 @@ namespace dimension
       is_density DimType>
    // TODO: Unit test this and remove suppression
    [[maybe_unused]]
-   constexpr DimType::rep get_density_as(const DimType& obj)
+   constexpr typename DimType::rep get_density_as(const DimType& obj)
    {
       return get_dimension_as<
          unit_exponent<massUnit, 1>,
@@ -75,16 +75,13 @@ namespace dimension
    /// @return The raw value in terms of template units as the representative type of DimType
    template<IsNameddensityUnit Named, is_density DimType>
    // TODO: Unit test this and remove suppression
-   constexpr DimType::rep get_density_as(const DimType& obj)
+   constexpr typename DimType::rep get_density_as(const DimType& obj)
    {
       return call_unpack<unit_units_t<Named>>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
    }
 
    template<typename... Ts>
    class density;
-
-
-
 
    template<
       IsBasicUnitType T0,
@@ -107,17 +104,14 @@ namespace dimension
          unit_exponent<typename unit_filter<lengthType, T0, T1>::type, -3>,
          Cs...
       >;
-   
+
       using Base::Base;
-   
+
       template<typename T>
       requires is_density<T>
       // cppcheck-suppress noExplicitConstructor
       constexpr density(const T& base) : Base(base) {}
    };
-
-
-
 
    template<
       rep_type Rep,
@@ -141,17 +135,14 @@ namespace dimension
          unit_exponent<typename unit_filter<lengthType, T0, T1>::type, -3>,
          Cs...
       >;
-   
+
       using Base::Base;
-   
+
       template<typename T>
       requires is_density<T>
       // cppcheck-suppress noExplicitConstructor
       constexpr density(const T& base) : Base(base) {}
    };
-
-
-
 
    /// @brief Template specialization for named density units
    /// @tparam Named The named unit this density type is in terms of
@@ -169,7 +160,6 @@ namespace dimension
          : Base(call_unpack<unit_units_t<Named>>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-
    /// @brief Template specialization for named density units
    /// @tparam Named The named unit this density type is in terms of
    template<rep_type Rep, IsNameddensityUnit Named, is_coefficient... Cs>
@@ -186,14 +176,7 @@ namespace dimension
          : Base(call_unpack<unit_units_t<Named>>([&]<typename... Units> { return get_dimension_as<Units...>(base); })) {}
    };
 
-
-
-
-   
-
-
-
-
+   // ───────────────────── factory helpers (make_*) ─────────────────────
    template<
       IsBasicUnitType T0,
       IsBasicUnitType T1,
@@ -251,8 +234,9 @@ namespace dimension
       return density<Rep, Named, Cs...>(value);
    }
 
+   // deduction guide
    template<is_density Dim>
-   density(Dim) -> 
+   density(Dim) ->
    density<
       simplified_unit_filter<massType, typename Dim::units>,
       simplified_unit_filter<lengthType, typename Dim::units>

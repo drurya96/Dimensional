@@ -8,6 +8,11 @@
 
 #include "../internal_temp/TupleHandling.h"
 
+namespace dimension{
+    template<typename T>
+    struct unit_traits;
+}
+
 namespace dimension
 {
    // pretty-print one std::ratio
@@ -27,7 +32,7 @@ namespace dimension
       using Unit     = typename UE::unit;
       using Exponent = typename UE::exponent;   // std::ratio<Num,Den>
 
-      os << Unit::abbr_view;                         // "m", "s", …
+      os << unit_traits<Unit>::abbr;                         // "m", "s", …
 
       // omit "^1"
       if constexpr (!(Exponent::num == 1 && Exponent::den == 1))

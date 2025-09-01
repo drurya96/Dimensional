@@ -4,14 +4,12 @@
 #include <concepts>
 #include <iostream>
 
-#include "TupleHandling.h"
-#include "rep_type.h"
-#include "base_dimension_from_tuple.h"
-#include "units/collapse_units.h"
-#include "full_simplify.h"
+#include "../TupleHandling.h"
+#include "../rep_type.h"
+#include "collapse_units.h"
 #include "convertible.h"
-#include "units/unit_filter.h" // Shouldn't be needed after cleanup
-#include "units/unit_exponent_utils.h"
+#include "unit_filter.h" // Shouldn't be needed after cleanup
+#include "unit_exponent_utils.h"
 
 // TODO: IMPORTANT: Figure out best way to handle do_conversion
 
@@ -34,11 +32,11 @@ namespace dimension
    {
       if constexpr (!Inverse)
       {
-         return input * Conv::slope;
+         return input * factor::eval_factor<typename Conv::scale, double>();
       }
       else
       {
-         return input / Conv::slope;
+         return input / factor::eval_factor<typename Conv::scale, double>();
       }
    }
 
@@ -82,36 +80,27 @@ namespace dimension
       }
    }
 
-namespace detail {
+   namespace detail {
 
-   template<typename... Units>
-   struct ConvertSimplified;
+      template<typename... Units>
+      struct ConvertSimplified;
 
-   template<typename... ToUnits>
-   struct ConvertSimplified<std::tuple<>, std::tuple<ToUnits...>>
-   {
-      static constexpr double scalar = 1.0;
-   };
+      template<typename... ToUnits>
+      struct ConvertSimplified<std::tuple<>, std::tuple<ToUnits...>>
+      {
+         static constexpr double scalar = 1.0;
+      };
 
-   template<typename FromUnit, typename... FromRest, typename... ToUnits>
-   struct ConvertSimplified<std::tuple<FromUnit, FromRest...>, std::tuple<ToUnits...>>
-   {
-      using ToMatch = typename MatchUnit<FromUnit, std::tuple<ToUnits...>>::type;
+      template<typename FromUnit, typename... FromRest, typename... ToUnits>
+      struct ConvertSimplified<std::tuple<FromUnit, FromRest...>, std::tuple<ToUnits...>>
+      {
+         using ToMatch = typename MatchUnit<FromUnit, std::tuple<ToUnits...>>::type;
 
-      static constexpr double scalar =
-         details::do_conversion<typename ToMatch::unit, FromUnit>(1.0) *
-         ConvertSimplified<std::tuple<FromRest...>, std::tuple<ToUnits...>>::scalar;
-   };
-
-   template<typename ToTuple, typename FromDim>
-   static constexpr double convert_scalar_units(FromDim input) 
-   {
-      return 
-         ConvertSimplified<simplified_units_t<typename FromDim::units>, simplified_units_t<ToTuple>>::scalar * 
-         simplification::SimplifiedDimension<typename FromDim::units>::convert_scalar(input.template get_tuple_scalar<typename FromDim::units>());
-   }
-   
-} // namespace detail
+         static constexpr double scalar =
+            details::do_conversion<typename ToMatch::unit, FromUnit>(1.0) *
+            ConvertSimplified<std::tuple<FromRest...>, std::tuple<ToUnits...>>::scalar;
+      };
+   } // namespace detail
 
 } // end Dimension
 
