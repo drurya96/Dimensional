@@ -4,6 +4,7 @@
 #include <concepts>
 
 #include "ratio/ratio_utils.h"
+#include "ratio/ratio_exponent.h"
 #include "symbol/symbol_utils.h"
 #include "rep_type.h"
 #include "units/unit_exponent.h"
@@ -12,7 +13,7 @@ namespace dimension
 {
 
    template<typename T>
-   concept is_coefficient = is_ratio<T> || is_symbol<T> || is_symbol_exponent<T>;
+   concept is_coefficient = is_ratio<T> || is_ratio_exponent<T> || is_symbol<T> || is_symbol_exponent<T>;
 
    template<typename T>
    concept is_coefficient_or_unit = is_unit_exponent<T> || is_coefficient<T>;
@@ -59,6 +60,12 @@ namespace dimension
       bool,
       std::is_same<typename std::remove_cv<typename unit_traits<T>::dimension>::type, typename std::remove_cv<typename unit_traits<U>::dimension>::type>::value
    > {};
+
+   template<typename T, typename U>
+    inline constexpr bool is_same_dim_v = is_same_dim<T,U>::value;
+
+    template<typename T, typename U>
+concept SameDim = is_same_dim<T, U>::value;
 
 } // end dimension
 

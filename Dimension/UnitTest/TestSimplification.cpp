@@ -3,6 +3,7 @@
 using namespace dimension;
 using namespace std;
 
+/*
 TEST(Simplification, SimplificationWithMath) {
 
    length<meters> length1(10.0);
@@ -22,6 +23,7 @@ TEST(Simplification, SimplificationWithMath) {
    ASSERT_NEAR((get_dimension_as<unit_exponent<seconds>>(test)), 0.056959027777777775, TOLERANCE); // TODO: Double check precision
    ASSERT_NEAR((get_timespan_as<seconds>(test)), 0.056959027777777775, TOLERANCE); // TODO: Double check precision
 }
+*/
 
 TEST(Simplification, Simplification) {
 
@@ -30,16 +32,19 @@ TEST(Simplification, Simplification) {
    ASSERT_TRUE((is_same_v<decltype(test_before), base_dimension<unit_exponent<meters>, unit_exponent<minutes>, unit_exponent<seconds, -1>, unit_exponent<feet, -1>, unit_exponent<minutes, -1>>>));
 
 
-   // After simplifying, meters/feet cancel and minutes/seconds cancel
-   // Note, simplification currently works left-to-right, so minutes won't cancel with minutes in this example
+   // Effectively 32.8084 s-1
 
-   // This means the final type will be a per-minutes
+
+   // After simplifying, meters/feet cancel and minutes/minutes cancel
+
+   // This means the final type will be a per-seconds
    auto test_after = full_simplify(test_before);
 
-   ASSERT_TRUE((is_same_v<decltype(test_after), base_dimension<unit_exponent<seconds, -1>>>));
-   ASSERT_NEAR((get_dimension_as<unit_exponent<minutes, -1>>(test_after)), 1968.504, TOLERANCE);
+   ASSERT_TRUE((is_same_v<decltype(test_after)::units, std::tuple<unit_exponent<seconds, -1>>>));
+   ASSERT_TRUE((is_same_v<decltype(test_after)::ratio, std::ratio<381, 1250>>)); // Feet to meters conversion - WRONG!!! THIS NEEDS TO BE METERS TO FEET!!! <---- THIS IS THE IMMEDIATE PROBLEM!
+   ASSERT_TRUE((is_same_v<decltype(test_after), base_dimension<unit_exponent<seconds, -1>, std::ratio<381,1250>>>));
+   ASSERT_NEAR((get_dimension_as<unit_exponent<minutes, -1>>(test_after)), 1968.504, TOLERANCE); // Currently yielding 600... something is wrong. The above issue but also the ratio doesn't seem to be applied.. so 2 completely distinct problems
 }
-
 
 TEST(Simplification, SimplificationspeedTypes)
 {

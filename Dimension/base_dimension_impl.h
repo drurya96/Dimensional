@@ -25,6 +25,8 @@
 #include "Dimension_Core/serialization/exact_tag_policy.h"
 #include "Dimension_Core/serialization/raw_value_policy.h"
 
+#include "Dimension_Core/internal_temp/units/get_factor.h"
+
 #include "Dimension_Core/internal_temp/point/point.h"
 
 namespace dimension
@@ -36,55 +38,170 @@ namespace dimension
    static constexpr double convert_scalar_units(FromDim input) 
    {
       return 
-         detail::ConvertSimplified<simplified_units_t<typename FromDim::units>, simplified_units_t<ToTuple>>::scalar * 
-         simplification::SimplifiedDimension<typename FromDim::units>::convert_scalar(input.template get_tuple_scalar<typename FromDim::units>());
+         detail::ConvertSimplified<simplified_units_t<typename FromDim::units>, simplified_units_t<ToTuple>>::scalar * // conversion factor from-to
+         simplification::SimplifiedDimension<typename FromDim::units>::convert_scalar( // No idea...
+            input.get_raw() // From as a scalar
+         );
    }
 
+   // New struct that casts a dimension to another set of units, but retains as much compile-time knowledge as possible.
+   // So the conversion factors should be applied and any coefficients should be simplified.
+   // This means the scalar value will necessarily be the same, meaning this really isn't a function, its a struct.
+   // This new struct probably doens't belong in this header, but writing here first might be simpler.
+   template<class From, class TargetTuple>
+   using find_equivalent_unit_t = typename MatchUnit<From, TargetTuple>::type;
 
-   template<are_unit_exponents... Units, typename Dim>
-   requires (dimensionally_equivalent<base_dimension_impl<double, Units...>, Dim> && !same_unit_representation<std::tuple<Units...>, typename Dim::units>)
-   constexpr Dim::rep get_scalar_as(Dim obj)
-   {
-      return convert_scalar_units<std::tuple<Units...>>(obj);
-   }
+   // Primary template
+   // Expected tuple of unit_exponent
+   // IMPORTANT: ASSUMES UNITS ARE SIMPLIFIED!
+   template<class StartingTuple, class TargetTuple>
+   struct apply_all_conversions;
+
+   // Identity: same unit representation → no conversions
+   template<class... U>
+   struct apply_all_conversions<std::tuple<U...>, std::tuple<U...>> {
+      using factor = factor_t<>;
+      using ratio   = std::ratio<1>;
+      using symbols = std::tuple<>;
+   };
+
+   // General case: dimensionally equivalent but different representations
+   template<class... StartingUnits, class... TargetUnits>
+   requires (
+      dimensionally_equivalent<
+         base_dimension_impl<double, StartingUnits...>,
+         base_dimension_impl<double, TargetUnits...>> &&
+      !same_unit_representation<std::tuple<StartingUnits...>, std::tuple<TargetUnits...>>
+   )
+   struct apply_all_conversions<std::tuple<StartingUnits...>, std::tuple<TargetUnits...>> {
+   private:
+      using target_tuple = typename unit_decomposition<std::tuple<TargetUnits...>>::units;
+      
+      // Map each S to its matching T in target tuple and compute its factor
+      template<class UE>
+      using matched_target_t = find_equivalent_unit_t<UE, target_tuple>;
+
+      template<class UE>
+      using factor_for_t = details::get_factor_t<typename UE::unit, typename matched_target_t<UE>::unit>;
+
+   public:
+         // Fold ratios and concatenate symbols from all per-pair factors
+         using ratio = detail::ratio_impl::ratio_mul_t<
+               std::ratio<1>,
+               typename factor_for_t<StartingUnits>::ratio...>;
+
+         using symbols = tuple_cat_t<
+               typename factor_for_t<StartingUnits>::symbols...>;
+
+         using factors =
+         std::tuple<
+            raise_factor_t<
+               factor_for_t<StartingUnits>,
+               typename StartingUnits::exponent
+            >...
+         >;
+
+         using factor = multiply_and_reduce_tuple_t<factors>;
+   };
+
+
+   // ============== This section is to check if units are simplified =================
+   // This should definitely be moved elsewhere
+   template <typename Tuple>
+   struct has_duplicate_dims;
+
+   // empty / singleton: no duplicates
+   template <>
+   struct has_duplicate_dims<std::tuple<>> : std::false_type {};
+
+   template <typename T>
+   struct has_duplicate_dims<std::tuple<T>> : std::false_type {};
+
+   // any_same_dim<H, Ts...> : does any Ts share dimension with H?
+   template <typename H, typename... Ts> // Lets try this with assuming H and T are unit exponents
+   struct any_same_dim : std::bool_constant<((is_same_dim_v<typename H::unit, typename Ts::unit> && std::is_same_v<typename H::label, typename Ts::label>) || ...)> {};
+
+   template <typename H, typename... Ts>
+   struct has_duplicate_dims<std::tuple<H, Ts...>>
+      : std::bool_constant< any_same_dim<H, Ts...>::value
+                           || has_duplicate_dims<std::tuple<Ts...>>::value > {};
+
    
-   template<are_unit_exponents... Units, typename Dim>
-   requires same_unit_representation<std::tuple<Units...>, typename Dim::units>
-   constexpr Dim::rep get_scalar_as(Dim obj)
-   {
-      return obj.template get_scalar<Units...>();
-   }
+   template <typename... Units> // Expect a pack of unit exponents
+   concept are_simplified_units =
+      !has_duplicate_dims<
+         typename unit_decomposition<std::tuple<Units...>>::units // This will be a tuple of unit exponents
+      >::value;
+
+   // ================ End simplified units check ==================
 
    /// @brief Return the internal value as a double in terms of the provided units
    /// @tparam NumTuple tuple of Unit types to convert numerator to
    /// @tparam DenTuple tuple of Unit types to convert denominator to
    /// @return The value in terms of the given units
    template<are_unit_exponents... Units, typename Dim>
-   requires (dimensionally_equivalent<base_dimension_impl<double, Units...>, Dim> && !same_unit_representation<std::tuple<Units...>, typename Dim::units>)
+   requires (
+      dimensionally_equivalent<base_dimension_impl<double, Units...>, Dim> &&
+      !same_unit_representation<std::tuple<Units...>, typename Dim::units> &&
+      are_simplified_units<Units...>)
    constexpr Dim::rep get_dimension_as(Dim obj)
    {
-      // TODO: URGENT: Need to "apply coefficients"
-      constexpr double coefficients = ratio_v<typename Dim::ratio> * multiply_symbol_exponent_values_v<typename Dim::symbols>;
-      return get_scalar_as<Units...>(obj) * coefficients;
+      // Disallowed if units are not simplified
+
+      // TODO: See if we can repace the call to convert_scalar_units - we should be able to now.
+
+      // Big picture, this needs to extract a double (or rep_type really) from the object.
+      // This *necessarily* collapses all ratios, coefficients, exponents, etc, so we don't need to worry about retaining those.
+      // We could either collapse before or after conversion. Collapsing after conversion gives one final chance for ratios to simplify.
+      // I think this means the logical approach is to cast the type to the destination type, then just extract...
+      // But ideally we'd want to keep the coefficients intact, so just base_dimension<Units...> wouldn't be quite right since that would collapse coefficients...
+
+      // Maybe I should have a separate function that's an implementation detail that handles this part - cast to another set of units with max compile-time usage
+      // Then, I could just call that function here then extract.
+
+      //using conversions = apply_all_conversions<typename Dim::units, std::tuple<Units...>>;
+      //using ratio = typename conversions::ratio;
+      //using symbols = typename conversions::symbols;
+      //using new_dim = base_dimension_impl<rep, Units..., ratio, symbols>; // not reduced at this point
+
+      //constexpr new_obj = new_dim(obj.get_raw());
+
+
+      // Finally putting it all together...
+      //   We need to assume the requested units are simplified; that's already enforced by concepts
+      //   We need to simplify the Dim input type
+      //   We can then call apply_all_conversions to get the single factor_t object that represents the conversions needed
+      //   Finally, we just need to evaluate the factor and apply that to the dimension.
+      //     We could probably have a separate "apply_factor" struct...
+      //     Would apply_factor yield a dimension, or a value?
+      //     It would make sense to yield the dimension, then have the get_apply_coefficients yield the value when needed..
+      //       To do this, I'd need the base_dimension class to handle ratio_exponent... which it really should, but doesn't yet.
+      //       I think for now I should get things working by just yielding the value, but make a TODO for this...
+
+      // This block is just to work it out, I can collapse this down.
+      using simplified_units = simplified_units_t<typename Dim::units>;
+      //using simplified_dim = typename base_dimension_from_tuple<typename Dim::rep, simplified_units>::dim;
+      using conv_factor = typename apply_all_conversions<simplified_units, std::tuple<Units...>>::factor;
+      constexpr auto conversion = factor::eval_factor<conv_factor, typename Dim::rep>();
+      return obj.get_apply_coefficients() * conversion;
+
+
+      //constexpr double coefficients = ratio_v<typename Dim::ratio> * multiply_symbol_exponent_values_v<typename Dim::symbols>;
+      //return convert_scalar_units<std::tuple<Units...>>(obj) * coefficients;
    }
    
+   // Matching units
    template<are_unit_exponents... Units, typename Dim>
    requires same_unit_representation<std::tuple<Units...>, typename Dim::units>
    constexpr Dim::rep get_dimension_as(Dim obj)
    {
-      return obj.template get<Units...>();
+      return obj.template get_apply_coefficients(); // URGENT TODO: Need to apply coefficients
    }
 
    template<typename UnitTuple>
    constexpr base_dimension_from_tuple<UnitTuple>::dim::rep get_dimension_tuple(typename base_dimension_from_tuple<UnitTuple>::dim obj)
    {
       return call_unpack<UnitTuple>([&]<typename... Units> { return get_dimension_as<Units...>(obj); });
-   }
-
-   template<typename UnitTuple, typename Dim>
-   constexpr Dim::rep get_scalar_tuple(Dim obj)
-   {
-      return call_unpack<typename Dim::units>([&]<typename... Units> { return get_scalar_as<Units...>(obj); });
    }
 
    class base_dimension_marker{};
@@ -245,49 +362,19 @@ namespace dimension
          return !(*this == rhs);
       }
 
-      template<typename... Units2>
-      [[nodiscard]] constexpr Rep get() const
+      // This should **NEVER** be called by users. Doing so is considered undefined behavior!
+      // All internal calls to this should be HEAVILY scrutinized... TODO
+      [[nodiscard]] constexpr Rep get_raw() const
       {
-         static_assert(same_unit_representation<units, std::tuple<Units2...>>,
-            "get is an implementation detail of Dimensional and is not meant to be called externally! Prefer get_dimension_as. When using get directly, template parameter units must exactly match units of the object."
-         );
+         return scalar;
+      }
 
-         return static_cast<Rep>(scalar *
+      [[nodiscard]] constexpr Rep get_apply_coefficients() const
+      {
+         return static_cast<Rep>(get_raw() *
                                  ratio_v<ratio> * 
                                  multiply_symbol_exponent_values_v<symbols>);
-      }
-
-      template<typename Tuple>
-      [[nodiscard]] constexpr Rep get_tuple() const
-      {
-         static_assert(same_unit_representation<units, Tuple>,
-            "get_tuple is an implementation detail of Dimensional and is not meant to be called externally! Prefer get_dimension_as. When using get directly, template parameter units must exactly match units of the object."
-         );
-
-         return static_cast<Rep>(scalar *
-                                 ratio_v<ratio> * 
-                                 multiply_symbol_exponent_values_v<symbols>);
-      }
-
-      template<typename... Units2>
-      [[nodiscard]] constexpr Rep get_scalar() const
-      {
-         static_assert(same_unit_representation<units, std::tuple<Units2...>>,
-            "get_scalar is an implementation detail of Dimensional and is not meant to be called externally! Prefer get_dimension_as. When using get directly, template parameter units must exactly match units of the object."
-         );
-
-         return static_cast<Rep>(scalar);
-      }
-
-      template<typename Tuple>
-      [[nodiscard]] constexpr Rep get_tuple_scalar() const
-      {
-         static_assert(same_unit_representation<units, Tuple>,
-            "get_tuple_scalar is an implementation detail of Dimensional and is not meant to be called externally! Prefer get_dimension_as. When using get directly, template parameter units must exactly match units of the object."
-         );
-
-         return static_cast<Rep>(scalar);
-      }
+      }      
 
    private:
       /// @brief The scalar value of this dimension
@@ -330,8 +417,8 @@ namespace dimension
       using units = collapse_units_t<units_combined>;
 
       return typename base_dimension_from_tuple<Rep, ratio, units, symbols>::dim(
-         get_scalar_tuple<typename Lhs::units>(lhs) /
-         get_scalar_tuple<typename Rhs::units>(rhs)
+         lhs.get_raw() /
+         rhs.get_raw()
       );
    }
 
@@ -355,8 +442,8 @@ namespace dimension
       using units = collapse_units_t<units_combined>;
       
       return typename base_dimension_from_tuple<Rep, ratio, units, symbols>::dim(
-         get_scalar_tuple<typename Lhs::units>(lhs) *
-         get_scalar_tuple<typename Rhs::units>(rhs)
+         lhs.get_raw() *
+         rhs.get_raw()
       );
       
    }

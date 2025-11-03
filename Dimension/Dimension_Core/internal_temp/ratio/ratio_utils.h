@@ -20,6 +20,9 @@ namespace dimension {
    template<is_ratio R, int N>
    using raise_ratio_t = typename detail::ratio_impl::raise_ratio<R, N>::type;
 
+   template<typename R>
+   using inverse_ratio_t = std::ratio<R::den, R::num>;
+
 } // namespace dimension
 
 #endif // DIMENSIONAL_RATIO_UTILS_H

@@ -87,14 +87,15 @@ namespace dimension::detail::ratio_impl {
    // Negative powers → invert the ratio
    using type = std::conditional_t<
       (N < 0),
-      typename raise_ratio_pos<std::ratio<R::den, R::num>, N>::type,
-      typename raise_ratio_pos<R, N>::type
-   >;
+      raise_ratio_pos<std::ratio<R::den, R::num>, -N>,
+      raise_ratio_pos<R, N>
+   >::type;
    };
 
    template<class... Ts>
    using extract_ratios_t =
          filter_pack_tuple_t<is_ratio_trait, Ts...>;
+
 
 } // namespace dimension::detail::ratio_impl
 

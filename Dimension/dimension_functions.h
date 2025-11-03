@@ -33,7 +33,7 @@ namespace dimension
          using units = raise_all_unit_exponents_t<typename T::units, std::ratio<Num, Den>>;
 
          return typename base_dimension_from_tuple<typename T::rep, ratio, units, symbols>::dim(
-            pow_rational(base.template get_tuple_scalar<typename T::units>(), Num, Den)
+            pow_rational(base.get_raw(), Num, Den)
          );
       }
       else
@@ -43,7 +43,7 @@ namespace dimension
          using units = raise_all_unit_exponents_t<typename T::units, std::ratio<Num, Den>>;
 
          return typename base_dimension_from_tuple<typename T::rep, units, symbols>::dim(
-            pow_rational(base.template get_tuple_scalar<typename T::units>() * ratio_v<typename T::ratio>, Num, Den)
+            pow_rational(base.get_raw() * ratio_v<typename T::ratio>, Num, Den)
          );
       }
    }

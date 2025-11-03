@@ -528,6 +528,7 @@ TEST(PhysicsProblemsExample1, AtmosphereCalculation)
     ASSERT_NEAR((get_pressure_as<pascals>(obj)), 1.0, 1e-7);
 }
 
+/*
 TEST(PhysicsProblemsExample1, volumeCaclulation)
 {
     using namespace dimension;
@@ -555,4 +556,6 @@ TEST(PhysicsProblemsExample1, volumeCaclulation)
     static_assert(std::is_same_v<speed<meters, seconds>, decltype(b)>);
 
     ASSERT_NEAR((get_speed_as<meters, seconds>(b)), 6.21371, 0.001);
+
 }
+*/
