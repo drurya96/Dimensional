@@ -271,6 +271,190 @@ namespace dimension
       };
    }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+template<class U, class Tuple>
+struct find_first_match;
+
+template<class U>
+struct find_first_match<U, std::tuple<>> { using type = void; };
+
+template<class U, class Head, class... Tail>
+struct find_first_match<U, std::tuple<Head, Tail...>> {
+private:
+   static constexpr bool match =
+      is_same_dim_v<typename U::unit, typename Head::unit> &&
+      std::is_same_v<typename U::label, typename Head::label>;
+public:
+   using type = std::conditional_t<
+      match,
+      Head,
+      typename find_first_match<U, std::tuple<Tail...>>::type
+   >;
+};
+
+template<class UnitsTuple>
+struct some_simplify_operation;
+
+template<class... Us>
+struct some_simplify_operation<std::tuple<Us...>> {
+private:
+   // Lazily compute pow_factor only if a prior matching unit exists.
+   template<bool HaveExisting, class U, class Existing>
+   struct pow_selector { using type = factor_identity; };
+
+   template<class U, class Existing>
+   struct pow_selector<true, U, Existing> {
+      using type = raise_factor_t<
+         details::get_factor_t<typename U::unit, typename Existing::unit>,
+         typename U::exponent
+      >;
+   };
+
+   // Lazily compute next_kept only if a prior matching unit exists.
+   template<bool HaveExisting, class KeptUnits, class U, class Existing>
+   struct next_kept_selector {
+      // No match: append U as-is
+      using type = decltype(std::tuple_cat(std::declval<KeptUnits>(), std::declval<std::tuple<U>>()));
+   };
+
+   template<class KeptUnits, class U, class Existing>
+   struct next_kept_selector<true, KeptUnits, U, Existing> {
+      // Match: append exponent converted into Existing::unit with same label
+      using conv_exp = unit_exponent<
+         typename Existing::unit,
+         U::exponent::num,
+         U::exponent::den,
+         typename Existing::label
+      >;
+      using type = decltype(std::tuple_cat(std::declval<KeptUnits>(), std::declval<std::tuple<conv_exp>>()));
+   };
+
+   template<class KeptUnits, class Factor, class... Rest>
+   struct step;
+
+   // Base case
+   template<class KeptUnits, class Factor>
+   struct step<KeptUnits, Factor> {
+      using units  = KeptUnits;
+      using factor = Factor;
+   };
+
+   // Recursive case
+   template<class KeptUnits, class Factor, class U, class... Rest>
+   struct step<KeptUnits, Factor, U, Rest...> {
+   private:
+      using Existing = typename find_first_match<U, KeptUnits>::type;
+      static constexpr bool have_existing = !std::is_void_v<Existing>;
+
+      using pow_factor = typename pow_selector<have_existing, U, Existing>::type;
+
+      using next_factor = std::conditional_t<
+         have_existing,
+         multiply_factors_t<Factor, pow_factor>,
+         Factor
+      >;
+
+      using next_kept = typename next_kept_selector<have_existing, KeptUnits, U, Existing>::type;
+
+      using recur = step<next_kept, next_factor, Rest...>;
+
+   public:
+      using units  = typename recur::units;
+      using factor = typename recur::factor;
+   };
+
+   using run = step<
+      std::tuple<>,     // kept units (accumulator)
+      factor_identity,  // combined factor
+      Us...
+   >;
+
+public:
+   // Collapse once at the end so exponents sum and zeros drop (e.g., s^-1 + s^+1 -> 0).
+   using units  = collapse_units_t<typename run::units>;
+   using factor = typename run::factor;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   // This will probably replace some other calls
+   template<typename Dim>
+   struct simplified_dimension
+   {
+   private:
+      using initial_units = collapse_units_t<typename Dim::units>;
+
+      // We need to build this
+      using simplify = some_simplify_operation<initial_units>;
+
+      using simplified_factor = typename simplify::factor;
+      using simplified_units = typename simplify::units;
+      
+      using new_factor = multiply_factors_t<simplified_factor,
+         factor_t<
+            typename Dim::ratio,
+            typename Dim::ratio_exponents,
+            typename Dim::symbols
+         >
+      >;
+
+   public:
+      using type = typename base_dimension_from_tuple<
+         typename Dim::rep,
+         typename new_factor::ratio,
+         simplified_units,
+         tuple_cat_t<typename new_factor::ratios, typename new_factor::symbols>
+      >::dim;
+   };
+
+   template<typename Dim>
+   using simplified_dimension_t = typename simplified_dimension<Dim>::type;
+
+
+
+
+
+
+
+
 } // end Dimension
 
 #endif // DIMENSIONAL_FULL_SIMPLIFY_H

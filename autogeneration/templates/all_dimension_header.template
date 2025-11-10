@@ -2,12 +2,12 @@
 #define DIMENSIONS_H
 
 // Fundamental Dimensions
-{% for dim in dims.fundamental_dims.keys() %}
+{% for dim in fundamental_dims.keys() %}
 #include "dimensions/fundamental/{{ dim }}_dimension.h"
 {% endfor %}
 
 // Derived Dimensions
-{% for dim in dims.derived_dims.keys() %}
+{% for dim in derived_dims.keys() %}
 #include "dimensions/derived/{{ dim }}_dimension.h"
 {% endfor %}
 

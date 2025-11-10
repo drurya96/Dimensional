@@ -32,11 +32,14 @@ namespace dimension
      static constexpr int id = 0;
   };
 
-  template<> struct Conversion<radians, degrees>
-  {
-     using scale = factor_t<
-        std::ratio<180, 1>, symbol_exponent<symbols::pi, -1, 1>>;
-  };
+template<> struct Conversion<radians, degrees>
+{
+using scale = factor_t<
+   std::ratio<1, 1>,
+   std::tuple<ratio_exponent<std::ratio<2, 1>, 2, 1>, ratio_exponent<std::ratio<3, 1>, 2, 1>, ratio_exponent<std::ratio<5, 1>, 1, 1>>, std::tuple<symbol_exponent<symbols::pi, -1, 1>>>;
+};
+
+
 
 }
 

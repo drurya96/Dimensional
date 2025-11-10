@@ -32,11 +32,14 @@ namespace dimension
      static constexpr int id = 0;
   };
 
-  template<> struct Conversion<kelvin, rankine>
-  {
-     using scale = factor_t<
-        std::ratio<9, 5>>;
-  };
+template<> struct Conversion<kelvin, rankine>
+{
+using scale = factor_t<
+   std::ratio<1, 1>,
+   std::tuple<ratio_exponent<std::ratio<3, 1>, 2, 1>, ratio_exponent<std::ratio<5, 1>, -1, 1>>>;
+};
+
+
 
 }
 

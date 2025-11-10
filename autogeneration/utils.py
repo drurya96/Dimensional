@@ -1,89 +1,107 @@
-# in Generate.py (or a small helpers module)
-from typing import Any, Dict, List, Optional, Tuple, Iterable
+# utils.py
+from typing import Any, Dict, List, Tuple, Iterable
 from metadata.python_utils.unit_model import (
-    FundamentalBlock, DerivedBlock, FactorObject, Rational, SymbolTerm
+    FundamentalBlock, DerivedBlock,
+    FactorObject, Rational, SymbolTerm, RatioTerm,
+    HelperUnitDef,
 )
 
-def _unwrap_rational(r: Any) -> Tuple[int, int]:
-    # r can be Rational RootModel, list/tuple, or None
+# ---------- low-level unwraps ----------
+
+def _unwrap_rational_obj(r: Any) -> Tuple[int, int]:
+    """
+    Accepts None | Rational | dict {'num':..., 'den':...}
+    Returns (num, den) with den defaulted to 1.
+    """
     if r is None:
         return (1, 1)
-    if hasattr(r, "root"):
-        r = r.root
-    return (int(r[0]), int(r[1]))
-
-def _unwrap_symbol_term(st: Any) -> Tuple[str, Tuple[int, int]]:
-    # st is SymbolTerm RootModel or raw [name, Rational]
-    if hasattr(st, "root"):
-        st = st.root
-    name = str(st[0])
-    exp = st[1]
-    if hasattr(exp, "root"):
-        exp = exp.root
-    return name, (int(exp[0]), int(exp[1]))
+    if isinstance(r, Rational):
+        num = int(r.num)
+        den = 1 if r.den is None else int(r.den)
+        return (num, den)
+    # dict-like
+    num = int(r.get("num"))
+    den = int(r.get("den", 1))
+    return (num, den)
 
 def _qualify_symbol(name: str) -> str:
-    # assume your C++ symbols are in symbols::, and names in JSON already match identifiers
-    # If some are already qualified, detect and pass through.
     return name if "::" in name else f"symbols::{name}"
+
+def _unwrap_symbol_term_obj(st: Any) -> Tuple[str, Tuple[int, int]]:
+    """
+    Accepts SymbolTerm | dict {'name':..., 'exp': Rational?}
+    Returns (qualified_name, (exp_num, exp_den)).
+    """
+    if isinstance(st, SymbolTerm):
+        name = st.name
+        en, ed = _unwrap_rational_obj(st.exp)
+    else:
+        name = st["name"]
+        en, ed = _unwrap_rational_obj(st.get("exp"))
+    return _qualify_symbol(str(name)), (int(en), int(ed))
+
+def _unwrap_ratio_term_obj(rt: Any) -> Tuple[Tuple[int, int], Tuple[int, int]]:
+    """
+    Accepts RatioTerm | dict {'base': Rational, 'exp': Rational?}
+    Returns ((base_num, base_den), (exp_num, exp_den)).
+    """
+    if isinstance(rt, RatioTerm):
+        bn, bd = _unwrap_rational_obj(rt.base)
+        en, ed = _unwrap_rational_obj(rt.exp)
+    else:
+        bn, bd = _unwrap_rational_obj(rt["base"])
+        en, ed = _unwrap_rational_obj(rt.get("exp"))
+    return (int(bn), int(bd)), (int(en), int(ed))
+
+# ---------- public normalizer used by Jinja contexts ----------
 
 def normalize_conversion(conv: Any) -> Dict[str, Any]:
     """
-    Return a canonical dict for templating:
+    Canonical dict for templates (no raw scalar; keep rnum/rden=1 as a stable shim):
       {
-        "legacy_number": Optional[float],  # if the JSON was a bare number
-        "rnum": int,
-        "rden": int,
-        "e10": int,
-        "symbols": List[{"name": "symbols::pi", "num": 1, "den": 1}],
+        "rnum": 1,
+        "rden": 1,
+        "symbols":       [ {"name":"symbols::<id>","num":en,"den":ed}, ... ],
+        "ratioExponents":[ {"baseNum":bn,"baseDen":bd,"expNum":en,"expDen":ed}, ... ],
       }
     """
-    # Legacy number
-    if isinstance(conv, (int, float)):
-        return {
-            "legacy_number": float(conv),
-            "rnum": 1, "rden": 1, "e10": 0, "symbols": []
-        }
+    # FactorObject (Pydantic or plain dict per new schema)
+    if isinstance(conv, FactorObject):
+        sym_list = conv.sym or []
+        rex_list = conv.ratio or []
+    else:
+        # dict-like
+        sym_list = (conv.get("sym") or [])
+        rex_list = (conv.get("ratio") or [])
 
-    # Legacy [num, den]
-    if isinstance(conv, (list, tuple)) and len(conv) == 2 and isinstance(conv[0], (int, float)):
-        rnum, rden = conv
-        return {"legacy_number": None, "rnum": int(rnum), "rden": int(rden), "e10": 0, "symbols": []}
-
-    # FactorObject
-    # Allow FactorObject or plain dict with r/e10/sym
-    rnum, rden = 1, 1
-    e10 = 0
     symbols: List[Dict[str, int]] = []
+    ratio_exps: List[Dict[str, int]] = []
 
-    r = getattr(conv, "r", None) if hasattr(conv, "r") else conv.get("r") if isinstance(conv, dict) else None
-    if r is not None:
-        rnum, rden = _unwrap_rational(r)
+    for st in sym_list:
+        name, (en, ed) = _unwrap_symbol_term_obj(st)
+        symbols.append({"name": name, "num": en, "den": ed})
 
-    e10v = getattr(conv, "e10", None) if hasattr(conv, "e10") else conv.get("e10") if isinstance(conv, dict) else None
-    if e10v is not None:
-        e10 = int(e10v)
-
-    sym_list = getattr(conv, "sym", None) if hasattr(conv, "sym") else conv.get("sym") if isinstance(conv, dict) else None
-    if sym_list:
-        for st in sym_list:
-            name, (en, ed) = _unwrap_symbol_term(st)
-            symbols.append({"name": _qualify_symbol(name), "num": en, "den": ed})
+    for rt in rex_list:
+        (bn, bd), (en, ed) = _unwrap_ratio_term_obj(rt)
+        if bd == 0 or ed == 0:
+            raise ValueError("denominators in ratio terms must be non-zero")
+        ratio_exps.append({"baseNum": bn, "baseDen": bd, "expNum": en, "expDen": ed})
 
     return {
-        "legacy_number": None,
-        "rnum": rnum,
-        "rden": rden,
-        "e10": e10,
+        "rnum": 1,
+        "rden": 1,
         "symbols": symbols,
+        "ratioExponents": ratio_exps,
     }
+
+# ---------- SI prefixes (unchanged policy) ----------
 
 def _si_prefix_catalog():
     # name, abbr, power-of-10 exponent
     return [
         {"tag": "pico",  "abbr": "p",  "exp": -12},
         {"tag": "nano",  "abbr": "n",  "exp":  -9},
-        {"tag": "micro", "abbr": "u",  "exp":  -6},  # use "u" for μ
+        {"tag": "micro", "abbr": "u",  "exp":  -6},  # using 'u' for μ in identifiers
         {"tag": "milli", "abbr": "m",  "exp":  -3},
         {"tag": "centi", "abbr": "c",  "exp":  -2},
         {"tag": "deci",  "abbr": "d",  "exp":  -1},
@@ -95,13 +113,35 @@ def _si_prefix_catalog():
         {"tag": "tera",  "abbr": "T",  "exp":  12},
     ]
 
-def build_fundamental_render_items(blocks):
-    items = []
+# ---------- render item builders (restored & updated) ----------
+
+def build_fundamental_render_items(blocks: Iterable[FundamentalBlock]) -> List[Dict[str, Any]]:
+    """
+    Produces a list of dicts, each:
+      {
+        "Dimension": str,
+        "HasExtras": bool,
+        "BaseUnit":  str,
+        "Units": [
+           {
+             "key": str,
+             "Name": str,
+             "Abbreviation": str,
+             "SI_Prefixes": bool,
+             "is_base": bool,
+             "conv_from_base": normalized_factor_dict | None,
+             "si_generated": [ {generated SI unit info} ]
+           }, ...
+        ]
+      }
+    """
+    items: List[Dict[str, Any]] = []
     for b in blocks:
         base = str(b.BaseUnit)
         base_unit = b.Units[base]
-        # collect base->target conversions
-        to_map = {}
+
+        # Gather base -> target conversions from the base unit's "To" map
+        to_map: Dict[str, Dict[str, Any]] = {}
         convs = getattr(base_unit, "Conversions_1", None)
         if convs and convs.To:
             for target, factor in convs.To.items():
@@ -109,17 +149,18 @@ def build_fundamental_render_items(blocks):
 
         units = []
         for name, u in b.Units.items():
+            # SI variants for THIS unit (based on its own SI_Prefixes flag)
             with_si = []
             if bool(u.SI_Prefixes):
-                # generate prefixed units for THIS unit
                 for p in _si_prefix_catalog():
                     with_si.append({
-                        "key": f"{p['tag']}_{name}",               # e.g., kilo_meters
-                        "Name": f"{p['tag']}{u.Name}",             # e.g., kilometers
-                        "Abbreviation": f"{p['abbr']}{u.Abbreviation}",  # e.g., km
+                        "key": f"{p['tag']}_{name}",
+                        "Name": f"{p['tag']}{u.Name}",
+                        "Abbreviation": f"{p['abbr']}{u.Abbreviation}",
                         "exp": int(p["exp"]),
-                        "base_key": name,                           # unprefixed source
+                        "base_key": name,
                     })
+
             units.append({
                 "key": name,
                 "Name": u.Name,
@@ -127,7 +168,7 @@ def build_fundamental_render_items(blocks):
                 "SI_Prefixes": bool(u.SI_Prefixes),
                 "is_base": (name == base),
                 "conv_from_base": to_map.get(name),
-                "si_generated": with_si,  # list of generated SI units for this anchor
+                "si_generated": with_si,
             })
 
         items.append({
@@ -136,30 +177,23 @@ def build_fundamental_render_items(blocks):
             "BaseUnit": base,
             "Units": units,
         })
+
     return items
 
 def build_derived_render_items(blocks: Iterable[DerivedBlock]) -> List[Dict[str, Any]]:
     """
-    Returns a list of render-ready dicts for each derived dimension:
+    Returns list:
       {
         "Dimension": str,
         "HasExtras": bool,
         "Units": [
-           {
-             "key": "joules",
-             "Exponents": [ {"Unit":"kilo_grams","Num":1,"Den":1}, ... ]
-           }, ...
+          { "key": unit_key, "Exponents": [ {"Unit": "...","Num":int,"Den":1}, ... ] }
         ],
         "HelperUnits": [
-           {
-             "key": "calorie_mass",
-             "Dim": "mass",
-             "Name": "Caloriemass",
-             "Abbreviation": "Caloriemass",
-             "Conversions": [
-                {"To": "grams", **normalized_factor_dict}
-             ]
-           }, ...
+          {
+            "key": hk, "Dim": str, "Name": str, "Abbreviation": str,
+            "Conversions": [ {"To": to_name, **normalized_factor_dict}, ... ]
+          }
         ]
       }
     """
@@ -170,11 +204,7 @@ def build_derived_render_items(blocks: Iterable[DerivedBlock]) -> List[Dict[str,
             units_list.append({
                 "key": unit_key,
                 "Exponents": [
-                    {
-                        "Unit": e.Unit,            # string identifier
-                        "Num": int(e.Exponent),    # ints in your JSON model today
-                        "Den": 1                   # keep Den=1 (rational-ready if you extend later)
-                    }
+                    {"Unit": e.Unit, "Num": int(e.Exponent), "Den": 1}
                     for e in exps
                 ],
             })
@@ -182,8 +212,9 @@ def build_derived_render_items(blocks: Iterable[DerivedBlock]) -> List[Dict[str,
         helper_list: List[Dict[str, Any]] = []
         for hk, hu in (b.HelperUnits or {}).items():
             convs = []
-            if hu.Conversions_1 and hu.Conversions_1.To:
-                for to_name, factor in hu.Conversions_1.To.items():
+            c = hu.Conversions_1
+            if c and c.To:
+                for to_name, factor in c.To.items():
                     convs.append({"To": to_name, **normalize_conversion(factor)})
             helper_list.append({
                 "key": hk,
@@ -203,11 +234,11 @@ def build_derived_render_items(blocks: Iterable[DerivedBlock]) -> List[Dict[str,
 
 def build_derived_impl_items(blocks: Iterable[DerivedBlock]) -> List[Dict[str, Any]]:
     """
-    Render-ready dicts for DerivedDimension.impl template.
+    For DerivedDimension.impl:
       {
         "Dimension": str,
         "HasExtras": bool,
-        "Definition": [ {"dim": "length", "ExponentNum": 1, "ExponentDen": 1}, ... ]
+        "Definition": [ {"dim": str, "ExponentNum": int, "ExponentDen": 1}, ... ]
       }
     """
     out: List[Dict[str, Any]] = []
@@ -216,8 +247,8 @@ def build_derived_impl_items(blocks: Iterable[DerivedBlock]) -> List[Dict[str, A
         for d in (b.Definition or []):
             defs.append({
                 "dim": str(d.Dimension),
-                "ExponentNum": int(d.Exponent),  # current JSON uses ints
-                "ExponentDen": 1,                # future-proof if rationals later
+                "ExponentNum": int(d.Exponent),
+                "ExponentDen": 1,
             })
         out.append({
             "Dimension": str(b.Dimension),
@@ -226,8 +257,12 @@ def build_derived_impl_items(blocks: Iterable[DerivedBlock]) -> List[Dict[str, A
         })
     return out
 
-def build_header_context(fundamentals, derived):
-    # template uses .keys(), so give it dicts keyed by names
+def build_header_context(fundamentals: Iterable[FundamentalBlock],
+                         derived: Iterable[DerivedBlock]) -> Dict[str, Dict[str, bool]]:
+    """
+    Used by the all-dimensions header template.
+      returns { "fundamental_dims": {dim: True,...}, "derived_dims": {dim: True,...} }
+    """
     f = {str(b.Dimension): True for b in fundamentals}
     d = {str(b.Dimension): True for b in derived}
     return {"fundamental_dims": f, "derived_dims": d}

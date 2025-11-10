@@ -51,6 +51,12 @@ namespace dimension
       {
          using type = symbol_exponent_r<typename T::symbol, inverse_ratio_t<typename T::exponent>>;
       };
+
+      template<is_symbol_exponent T>
+      struct negate_exponent
+      {
+         using type = symbol_exponent_r<typename T::symbol, negate_ratio_t<typename T::exponent>>;
+      };
    }
 
    // TODO: All of these inversion logic should really live in a more generic handler for all exponent types
@@ -68,6 +74,24 @@ namespace dimension
 
    template<class Tuple>
    using tuple_invert_exponents_t = typename tuple_invert_exponents<Tuple>::type;
+
+   template<is_symbol_exponent T>
+   using negate_exponent_t = typename detail::negate_exponent<T>::type;
+
+   // Apply `negate_exponent_t` to each element of a std::tuple
+   template<class Tuple>
+   struct tuple_negate_exponents;
+
+   template<class... SE>
+   struct tuple_negate_exponents<std::tuple<SE...>> {
+      using type = std::tuple< negate_exponent_t<SE>... >;
+   };
+
+   template<class Tuple>
+   using tuple_negate_exponents_t = typename tuple_negate_exponents<Tuple>::type;
+
+
+
 
 
    template<typename... Ts>

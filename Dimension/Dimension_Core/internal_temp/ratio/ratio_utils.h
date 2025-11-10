@@ -23,6 +23,9 @@ namespace dimension {
    template<typename R>
    using inverse_ratio_t = std::ratio<R::den, R::num>;
 
+   template<typename R>
+   using negate_ratio_t = std::ratio<-R::num, R::den>;
+
 } // namespace dimension
 
 #endif // DIMENSIONAL_RATIO_UTILS_H

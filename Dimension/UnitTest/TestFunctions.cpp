@@ -53,7 +53,7 @@ namespace dimension
    };
 
    template<> struct Conversion<NonBaseUnit, meters> {
-      using scale = factor_t<std::ratio<314, 100>>;
+      using scale = factor_t<std::ratio<314, 100>, std::tuple<>>;
       static constexpr double slope = factor::eval_factor<scale, double>();
    };
 }

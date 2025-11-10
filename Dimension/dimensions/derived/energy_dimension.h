@@ -20,11 +20,12 @@ namespace dimension
      static constexpr int id = 0;
   };
 
-  template<> struct Conversion<calorie_mass, grams>
-  {
-     using scale = factor_t<
-        std::ratio<4184, 1>>;
-  };
+template<> struct Conversion<calorie_mass, grams>
+{
+  using scale = factor_t<
+    std::ratio<1, 1>,
+    std::tuple<ratio_exponent<std::ratio<2, 1>, 3, 1>, ratio_exponent<std::ratio<523, 1>, 1, 1>>>;
+};
 
   struct joules
   {

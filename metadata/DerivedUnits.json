@@ -49,7 +49,10 @@
         "Conversions": {
           "From": {},
           "To": {
-            "grams": { "r": [4184, 1] }
+            "grams": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": 3 } },
+              { "base": { "num": 523 }, "exp": { "num": 1 } }
+            ] }
           }
         }
       }
@@ -138,7 +141,13 @@
         "Conversions": {
           "From": {},
           "To": {
-            "grams": { "r": [101325, 1], "e10": 3 }
+            "grams": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": 3 } },
+              { "base": { "num": 3 }, "exp": { "num": 1 } },
+              { "base": { "num": 5 }, "exp": { "num": 5 } },
+              { "base": { "num": 7 }, "exp": { "num": 1 } },
+              { "base": { "num": 193 }, "exp": { "num": 1 } }
+            ] }
           }
         }
       },
@@ -149,7 +158,10 @@
         "Conversions": {
           "From": {},
           "To": {
-            "grams": { "r": [1, 1], "e10": 8 }
+            "grams": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": 8 } },
+              { "base": { "num": 5 }, "exp": { "num": 8 } }
+            ] }
           }
         }
       },
@@ -160,7 +172,13 @@
         "Conversions": {
           "From": {},
           "To": {
-            "grams": { "r": [13332231202220616, 1], "e10": -11 }
+            "grams": { "ratio": [
+              { "base": { "num": 3 }, "exp": { "num": 1 } },
+              { "base": { "num": 5 }, "exp": { "num": 4 } },
+              { "base": { "num": 7 }, "exp": { "num": 1 } },
+              { "base": { "num": 193 }, "exp": { "num": 1 } },
+              { "base": { "num": 19 }, "exp": { "num": -1 } }
+            ] }
           }
         }
       },
@@ -171,7 +189,15 @@
         "Conversions": {
           "From": {},
           "To": {
-            "grams": { "r": [3386386725364, 1], "e10": -6 }
+            "grams": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": -6 } },
+              { "base": { "num": 3 }, "exp": { "num": 1 } },
+              { "base": { "num": 5 }, "exp": { "num": -6 } },
+              { "base": { "num": 7 }, "exp": { "num": 1 } },
+              { "base": { "num": 127 }, "exp": { "num": 1 } },
+              { "base": { "num": 28019 }, "exp": { "num": 1 } },
+              { "base": { "num": 45317 }, "exp": { "num": 1 } }
+            ] }
           }
         }
       }
@@ -237,10 +263,20 @@
         "Conversions": {
           "From": {},
           "To": {
-            "meters": { "r": [3092440948, 1], "e10": -11 }
+            "meters": {
+              "ratio": [
+                { "base": { "num": 127 }, "exp": { "num": 1 } },
+                { "base": { "num": 2 },   "exp": { "num": -16, "den": 3 } },
+                { "base": { "num": 5 },   "exp": { "num": -4 } },
+                { "base": { "num": 3 },   "exp": { "num": 1, "den": 3 } },
+                { "base": { "num": 7 },   "exp": { "num": 1, "den": 3 } },
+                { "base": { "num": 11 },  "exp": { "num": 1, "den": 3 } }
+              ]
+            }
           }
         }
       },
+
       "cup_length": {
         "Dimension": "length",
         "Name": "Cuplength",
@@ -248,10 +284,20 @@
         "Conversions": {
           "From": {},
           "To": {
-            "meters": { "r": [61848767433875, 1], "e10": -15 }
+            "meters": {
+              "ratio": [
+                { "base": { "num": 127 }, "exp": { "num": 1 } },
+                { "base": { "num": 2 },   "exp": { "num": -13, "den": 3 } },
+                { "base": { "num": 5 },   "exp": { "num": -4 } },
+                { "base": { "num": 3 },   "exp": { "num": 1, "den": 3 } },
+                { "base": { "num": 7 },   "exp": { "num": 1, "den": 3 } },
+                { "base": { "num": 11 },  "exp": { "num": 1, "den": 3 } }
+              ]
+            }
           }
         }
       },
+
       "pint_length": {
         "Dimension": "length",
         "Name": "Pintlength",
@@ -259,10 +305,20 @@
         "Conversions": {
           "From": {},
           "To": {
-            "meters": { "r": [77924564, 1], "e10": -9 }
+            "meters": {
+              "ratio": [
+                { "base": { "num": 127 }, "exp": { "num": 1 } },
+                { "base": { "num": 2 },   "exp": { "num": -4 } },
+                { "base": { "num": 5 },   "exp": { "num": -4 } },
+                { "base": { "num": 3 },   "exp": { "num": 1, "den": 3 } },
+                { "base": { "num": 7 },   "exp": { "num": 1, "den": 3 } },
+                { "base": { "num": 11 },  "exp": { "num": 1, "den": 3 } }
+              ]
+            }
           }
         }
       },
+
       "quart_length": {
         "Dimension": "length",
         "Name": "Quartlength",
@@ -270,10 +326,20 @@
         "Conversions": {
           "From": {},
           "To": {
-            "meters": { "r": [9817886355045987, 1], "e10": -17 }
+            "meters": {
+              "ratio": [
+                { "base": { "num": 127 }, "exp": { "num": 1 } },
+                { "base": { "num": 2 },   "exp": { "num": -11, "den": 3 } },
+                { "base": { "num": 5 },   "exp": { "num": -4 } },
+                { "base": { "num": 3 },   "exp": { "num": 1, "den": 3 } },
+                { "base": { "num": 7 },   "exp": { "num": 1, "den": 3 } },
+                { "base": { "num": 11 },  "exp": { "num": 1, "den": 3 } }
+              ]
+            }
           }
         }
       },
+
       "gallon_length": {
         "Dimension": "length",
         "Name": "Gallonlength",
@@ -281,10 +347,20 @@
         "Conversions": {
           "From": {},
           "To": {
-            "meters": { "r": [155849128, 1], "e10": -9 }
+            "meters": {
+              "ratio": [
+                { "base": { "num": 127 }, "exp": { "num": 1 } },
+                { "base": { "num": 2 },   "exp": { "num": -3 } },
+                { "base": { "num": 5 },   "exp": { "num": -4 } },
+                { "base": { "num": 3 },   "exp": { "num": 1, "den": 3 } },
+                { "base": { "num": 7 },   "exp": { "num": 1, "den": 3 } },
+                { "base": { "num": 11 },  "exp": { "num": 1, "den": 3 } }
+              ]
+            }
           }
         }
       },
+
       "teaspoon_length": {
         "Dimension": "length",
         "Name": "Teaspoonlength",
@@ -292,10 +368,19 @@
         "Conversions": {
           "From": {},
           "To": {
-            "meters": { "r": [1701834420916624526, 1], "e10": -20 }
+            "meters": {
+              "ratio": [
+                { "base": { "num": 127 }, "exp": { "num": 1 } },
+                { "base": { "num": 2 },   "exp": { "num": -17, "den": 3 } },
+                { "base": { "num": 5 },   "exp": { "num": -4 } },
+                { "base": { "num": 7 },   "exp": { "num": 1, "den": 3 } },
+                { "base": { "num": 11 },  "exp": { "num": 1, "den": 3 } }
+              ]
+            }
           }
         }
       },
+
       "tablespoon_length": {
         "Dimension": "length",
         "Name": "Tablespoonlength",
@@ -303,7 +388,16 @@
         "Conversions": {
           "From": {},
           "To": {
-            "meters": { "r": [2454469962137835, 1], "e10": -17 }
+            "meters": {
+              "ratio": [
+                { "base": { "num": 127 }, "exp": { "num": 1 } },
+                { "base": { "num": 2 },   "exp": { "num": -17, "den": 3 } },
+                { "base": { "num": 5 },   "exp": { "num": -4 } },
+                { "base": { "num": 3 },   "exp": { "num": 1, "den": 3 } },
+                { "base": { "num": 7 },   "exp": { "num": 1, "den": 3 } },
+                { "base": { "num": 11 },  "exp": { "num": 1, "den": 3 } }
+              ]
+            }
           }
         }
       }
@@ -316,8 +410,33 @@
     "Definition": [
       { "Dimension": "length", "Exponent": 2 }
     ],
-    "Units": {},
-    "HelperUnits": {}
+    "Units": {
+      "hectares": [
+        { "Unit": "hecto_meters", "Exponent": 2 }
+      ],
+      "acres": [
+        { "Unit": "acre_length", "Exponent": 2 }
+      ]
+    },
+    "HelperUnits": {
+        "acre_length": {
+        "Dimension": "length",
+        "Name": "Acrelength",
+        "Abbreviation": "Acrelength",
+        "Conversions": {
+          "From": {},
+          "To": {
+            "meters": { "ratio": [
+              { "base": { "num": 3 }, "exp": { "num": 2 } },
+              { "base": { "num": 5 }, "exp": { "num": -4 } },
+              { "base": { "num": 11 }, "exp": { "num": 1 } },
+              { "base": { "num": 127 }, "exp": { "num": 1 } },
+              { "base": { "num": 10 }, "exp": { "num": 1, "den": 2 } }
+            ] }
+          }
+        }
+      }
+    }
   },
   {
     "Dimension": "frequency",

@@ -122,333 +122,450 @@ namespace dimension
      static constexpr int id = 0;
   };
 
-  template<> struct Conversion<meters, feet>
-  {
-     using scale = factor_t<
-        std::ratio<1250, 381>>;
-  };
-  template<> struct Conversion<meters, inches>
-  {
-     using scale = factor_t<
-        std::ratio<15000, 381>>;
-  };
-  template<> struct Conversion<meters, astronomical_units>
-  {
-     using scale = factor_t<
-        std::ratio<1, 149597870700>>;
-  };
-  template<> struct Conversion<meters, data_miles>
-  {
-     using scale = factor_t<
-        std::ratio<5, 9144>>;
-  };
-  template<> struct Conversion<meters, nautical_miles>
-  {
-     using scale = factor_t<
-        std::ratio<1, 1852>>;
-  };
-  template<> struct Conversion<meters, miles>
-  {
-     using scale = factor_t<
-        std::ratio<125, 201168>>;
-  };
-  template<> struct Conversion<meters, fathoms>
-  {
-     using scale = factor_t<
-        std::ratio<3937, 7200>>;
-  };
-  template<> struct Conversion<meters, furlong>
-  {
-     using scale = factor_t<
-        std::ratio<3937, 792000>>;
-  };
-  template<> struct Conversion<meters, yards>
-  {
-     using scale = factor_t<
-        std::ratio<1250, 1143>>;
-  };
-  template<> struct Conversion<meters, us_survey_feet>
-  {
-     using scale = factor_t<
-        std::ratio<3937, 1200>>;
-  };
+template<> struct Conversion<meters, feet>
+{
+using scale = factor_t<
+   std::ratio<1, 1>,
+   std::tuple<ratio_exponent<std::ratio<2, 1>, 1, 1>, ratio_exponent<std::ratio<3, 1>, -1, 1>, ratio_exponent<std::ratio<5, 1>, 4, 1>, ratio_exponent<std::ratio<127, 1>, -1, 1>>>;
+};
+template<> struct Conversion<meters, inches>
+{
+using scale = factor_t<
+   std::ratio<1, 1>,
+   std::tuple<ratio_exponent<std::ratio<2, 1>, 3, 1>, ratio_exponent<std::ratio<5, 1>, 4, 1>, ratio_exponent<std::ratio<127, 1>, -1, 1>>>;
+};
+template<> struct Conversion<meters, astronomical_units>
+{
+using scale = factor_t<
+   std::ratio<1, 1>,
+   std::tuple<ratio_exponent<std::ratio<2, 1>, -2, 1>, ratio_exponent<std::ratio<3, 1>, -1, 1>, ratio_exponent<std::ratio<5, 1>, -2, 1>, ratio_exponent<std::ratio<73, 1>, -1, 1>, ratio_exponent<std::ratio<877, 1>, -1, 1>, ratio_exponent<std::ratio<7789, 1>, -1, 1>>>;
+};
+template<> struct Conversion<meters, data_miles>
+{
+using scale = factor_t<
+   std::ratio<1, 1>,
+   std::tuple<ratio_exponent<std::ratio<2, 1>, -3, 1>, ratio_exponent<std::ratio<3, 1>, -2, 1>, ratio_exponent<std::ratio<5, 1>, 1, 1>, ratio_exponent<std::ratio<127, 1>, -1, 1>>>;
+};
+template<> struct Conversion<meters, nautical_miles>
+{
+using scale = factor_t<
+   std::ratio<1, 1>,
+   std::tuple<ratio_exponent<std::ratio<2, 1>, -2, 1>, ratio_exponent<std::ratio<463, 1>, -1, 1>>>;
+};
+template<> struct Conversion<meters, miles>
+{
+using scale = factor_t<
+   std::ratio<1, 1>,
+   std::tuple<ratio_exponent<std::ratio<2, 1>, -4, 1>, ratio_exponent<std::ratio<3, 1>, -2, 1>, ratio_exponent<std::ratio<5, 1>, 3, 1>, ratio_exponent<std::ratio<11, 1>, -1, 1>, ratio_exponent<std::ratio<127, 1>, -1, 1>>>;
+};
+template<> struct Conversion<meters, fathoms>
+{
+using scale = factor_t<
+   std::ratio<1, 1>,
+   std::tuple<ratio_exponent<std::ratio<3, 1>, -2, 1>, ratio_exponent<std::ratio<5, 1>, 4, 1>, ratio_exponent<std::ratio<127, 1>, -1, 1>>>;
+};
+template<> struct Conversion<meters, furlong>
+{
+using scale = factor_t<
+   std::ratio<1, 1>,
+   std::tuple<ratio_exponent<std::ratio<2, 1>, -1, 1>, ratio_exponent<std::ratio<3, 1>, -2, 1>, ratio_exponent<std::ratio<5, 1>, 3, 1>, ratio_exponent<std::ratio<11, 1>, -1, 1>, ratio_exponent<std::ratio<127, 1>, -1, 1>>>;
+};
+template<> struct Conversion<meters, yards>
+{
+using scale = factor_t<
+   std::ratio<1, 1>,
+   std::tuple<ratio_exponent<std::ratio<2, 1>, 1, 1>, ratio_exponent<std::ratio<3, 1>, -2, 1>, ratio_exponent<std::ratio<5, 1>, 4, 1>, ratio_exponent<std::ratio<127, 1>, -1, 1>>>;
+};
+template<> struct Conversion<meters, us_survey_feet>
+{
+using scale = factor_t<
+   std::ratio<1, 1>,
+   std::tuple<ratio_exponent<std::ratio<2, 1>, -4, 1>, ratio_exponent<std::ratio<3, 1>, -1, 1>, ratio_exponent<std::ratio<5, 1>, -2, 1>, ratio_exponent<std::ratio<31, 1>, 1, 1>, ratio_exponent<std::ratio<127, 1>, 1, 1>>>;
+};
 
-    struct pico_meters{};
+struct pico_meters{};
 
-    template<> struct unit_traits<pico_meters>
-    {
-       using dimension = lengthType;
-       static constexpr std::string_view name   = "picometers";
-       static constexpr std::string_view abbr   = "pm";
-       static constexpr std::string_view dimName= "length";
-       static constexpr int id = 0;
-    };
+template<> struct unit_traits<pico_meters>
+{
+  using dimension = lengthType;
+  static constexpr std::string_view name    = "picometers";
+  static constexpr std::string_view abbr    = "pm";
+  static constexpr std::string_view dimName = "length";
+  static constexpr int id = 0;
+};
 
-    // meters <-> pico_meters
-    // base->prefixed multiplies by 10^{-exp}
-    template<> struct Conversion<meters, pico_meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<12>>;
-    };
+// meters <-> pico_meters
+// base->prefixed multiplies by 10^{-exp}
+template<> struct Conversion<meters, pico_meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<12>>
+  >;
+};
 
-    // prefixed->base multiplies by 10^{+exp}
-    template<> struct Conversion<pico_meters, meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<-12>>;
-    };
-    struct nano_meters{};
+// prefixed->base multiplies by 10^{+exp}
+template<> struct Conversion<pico_meters, meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<-12>>
+  >;
+};
+struct nano_meters{};
 
-    template<> struct unit_traits<nano_meters>
-    {
-       using dimension = lengthType;
-       static constexpr std::string_view name   = "nanometers";
-       static constexpr std::string_view abbr   = "nm";
-       static constexpr std::string_view dimName= "length";
-       static constexpr int id = 0;
-    };
+template<> struct unit_traits<nano_meters>
+{
+  using dimension = lengthType;
+  static constexpr std::string_view name    = "nanometers";
+  static constexpr std::string_view abbr    = "nm";
+  static constexpr std::string_view dimName = "length";
+  static constexpr int id = 0;
+};
 
-    // meters <-> nano_meters
-    // base->prefixed multiplies by 10^{-exp}
-    template<> struct Conversion<meters, nano_meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<9>>;
-    };
+// meters <-> nano_meters
+// base->prefixed multiplies by 10^{-exp}
+template<> struct Conversion<meters, nano_meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<9>>
+  >;
+};
 
-    // prefixed->base multiplies by 10^{+exp}
-    template<> struct Conversion<nano_meters, meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<-9>>;
-    };
-    struct micro_meters{};
+// prefixed->base multiplies by 10^{+exp}
+template<> struct Conversion<nano_meters, meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<-9>>
+  >;
+};
+struct micro_meters{};
 
-    template<> struct unit_traits<micro_meters>
-    {
-       using dimension = lengthType;
-       static constexpr std::string_view name   = "micrometers";
-       static constexpr std::string_view abbr   = "um";
-       static constexpr std::string_view dimName= "length";
-       static constexpr int id = 0;
-    };
+template<> struct unit_traits<micro_meters>
+{
+  using dimension = lengthType;
+  static constexpr std::string_view name    = "micrometers";
+  static constexpr std::string_view abbr    = "um";
+  static constexpr std::string_view dimName = "length";
+  static constexpr int id = 0;
+};
 
-    // meters <-> micro_meters
-    // base->prefixed multiplies by 10^{-exp}
-    template<> struct Conversion<meters, micro_meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<6>>;
-    };
+// meters <-> micro_meters
+// base->prefixed multiplies by 10^{-exp}
+template<> struct Conversion<meters, micro_meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<6>>
+  >;
+};
 
-    // prefixed->base multiplies by 10^{+exp}
-    template<> struct Conversion<micro_meters, meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<-6>>;
-    };
-    struct milli_meters{};
+// prefixed->base multiplies by 10^{+exp}
+template<> struct Conversion<micro_meters, meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<-6>>
+  >;
+};
+struct milli_meters{};
 
-    template<> struct unit_traits<milli_meters>
-    {
-       using dimension = lengthType;
-       static constexpr std::string_view name   = "millimeters";
-       static constexpr std::string_view abbr   = "mm";
-       static constexpr std::string_view dimName= "length";
-       static constexpr int id = 0;
-    };
+template<> struct unit_traits<milli_meters>
+{
+  using dimension = lengthType;
+  static constexpr std::string_view name    = "millimeters";
+  static constexpr std::string_view abbr    = "mm";
+  static constexpr std::string_view dimName = "length";
+  static constexpr int id = 0;
+};
 
-    // meters <-> milli_meters
-    // base->prefixed multiplies by 10^{-exp}
-    template<> struct Conversion<meters, milli_meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<3>>;
-    };
+// meters <-> milli_meters
+// base->prefixed multiplies by 10^{-exp}
+template<> struct Conversion<meters, milli_meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<3>>
+  >;
+};
 
-    // prefixed->base multiplies by 10^{+exp}
-    template<> struct Conversion<milli_meters, meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<-3>>;
-    };
-    struct centi_meters{};
+// prefixed->base multiplies by 10^{+exp}
+template<> struct Conversion<milli_meters, meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<-3>>
+  >;
+};
+struct centi_meters{};
 
-    template<> struct unit_traits<centi_meters>
-    {
-       using dimension = lengthType;
-       static constexpr std::string_view name   = "centimeters";
-       static constexpr std::string_view abbr   = "cm";
-       static constexpr std::string_view dimName= "length";
-       static constexpr int id = 0;
-    };
+template<> struct unit_traits<centi_meters>
+{
+  using dimension = lengthType;
+  static constexpr std::string_view name    = "centimeters";
+  static constexpr std::string_view abbr    = "cm";
+  static constexpr std::string_view dimName = "length";
+  static constexpr int id = 0;
+};
 
-    // meters <-> centi_meters
-    // base->prefixed multiplies by 10^{-exp}
-    template<> struct Conversion<meters, centi_meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<2>>;
-    };
+// meters <-> centi_meters
+// base->prefixed multiplies by 10^{-exp}
+template<> struct Conversion<meters, centi_meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<2>>
+  >;
+};
 
-    // prefixed->base multiplies by 10^{+exp}
-    template<> struct Conversion<centi_meters, meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<-2>>;
-    };
-    struct deci_meters{};
+// prefixed->base multiplies by 10^{+exp}
+template<> struct Conversion<centi_meters, meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<-2>>
+  >;
+};
+struct deci_meters{};
 
-    template<> struct unit_traits<deci_meters>
-    {
-       using dimension = lengthType;
-       static constexpr std::string_view name   = "decimeters";
-       static constexpr std::string_view abbr   = "dm";
-       static constexpr std::string_view dimName= "length";
-       static constexpr int id = 0;
-    };
+template<> struct unit_traits<deci_meters>
+{
+  using dimension = lengthType;
+  static constexpr std::string_view name    = "decimeters";
+  static constexpr std::string_view abbr    = "dm";
+  static constexpr std::string_view dimName = "length";
+  static constexpr int id = 0;
+};
 
-    // meters <-> deci_meters
-    // base->prefixed multiplies by 10^{-exp}
-    template<> struct Conversion<meters, deci_meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<1>>;
-    };
+// meters <-> deci_meters
+// base->prefixed multiplies by 10^{-exp}
+template<> struct Conversion<meters, deci_meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<1>>
+  >;
+};
 
-    // prefixed->base multiplies by 10^{+exp}
-    template<> struct Conversion<deci_meters, meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<-1>>;
-    };
-    struct deca_meters{};
+// prefixed->base multiplies by 10^{+exp}
+template<> struct Conversion<deci_meters, meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<-1>>
+  >;
+};
+struct deca_meters{};
 
-    template<> struct unit_traits<deca_meters>
-    {
-       using dimension = lengthType;
-       static constexpr std::string_view name   = "decameters";
-       static constexpr std::string_view abbr   = "dam";
-       static constexpr std::string_view dimName= "length";
-       static constexpr int id = 0;
-    };
+template<> struct unit_traits<deca_meters>
+{
+  using dimension = lengthType;
+  static constexpr std::string_view name    = "decameters";
+  static constexpr std::string_view abbr    = "dam";
+  static constexpr std::string_view dimName = "length";
+  static constexpr int id = 0;
+};
 
-    // meters <-> deca_meters
-    // base->prefixed multiplies by 10^{-exp}
-    template<> struct Conversion<meters, deca_meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<-1>>;
-    };
+// meters <-> deca_meters
+// base->prefixed multiplies by 10^{-exp}
+template<> struct Conversion<meters, deca_meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<-1>>
+  >;
+};
 
-    // prefixed->base multiplies by 10^{+exp}
-    template<> struct Conversion<deca_meters, meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<1>>;
-    };
-    struct hecto_meters{};
+// prefixed->base multiplies by 10^{+exp}
+template<> struct Conversion<deca_meters, meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<1>>
+  >;
+};
+struct hecto_meters{};
 
-    template<> struct unit_traits<hecto_meters>
-    {
-       using dimension = lengthType;
-       static constexpr std::string_view name   = "hectometers";
-       static constexpr std::string_view abbr   = "hm";
-       static constexpr std::string_view dimName= "length";
-       static constexpr int id = 0;
-    };
+template<> struct unit_traits<hecto_meters>
+{
+  using dimension = lengthType;
+  static constexpr std::string_view name    = "hectometers";
+  static constexpr std::string_view abbr    = "hm";
+  static constexpr std::string_view dimName = "length";
+  static constexpr int id = 0;
+};
 
-    // meters <-> hecto_meters
-    // base->prefixed multiplies by 10^{-exp}
-    template<> struct Conversion<meters, hecto_meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<-2>>;
-    };
+// meters <-> hecto_meters
+// base->prefixed multiplies by 10^{-exp}
+template<> struct Conversion<meters, hecto_meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<-2>>
+  >;
+};
 
-    // prefixed->base multiplies by 10^{+exp}
-    template<> struct Conversion<hecto_meters, meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<2>>;
-    };
-    struct kilo_meters{};
+// prefixed->base multiplies by 10^{+exp}
+template<> struct Conversion<hecto_meters, meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<2>>
+  >;
+};
+struct kilo_meters{};
 
-    template<> struct unit_traits<kilo_meters>
-    {
-       using dimension = lengthType;
-       static constexpr std::string_view name   = "kilometers";
-       static constexpr std::string_view abbr   = "km";
-       static constexpr std::string_view dimName= "length";
-       static constexpr int id = 0;
-    };
+template<> struct unit_traits<kilo_meters>
+{
+  using dimension = lengthType;
+  static constexpr std::string_view name    = "kilometers";
+  static constexpr std::string_view abbr    = "km";
+  static constexpr std::string_view dimName = "length";
+  static constexpr int id = 0;
+};
 
-    // meters <-> kilo_meters
-    // base->prefixed multiplies by 10^{-exp}
-    template<> struct Conversion<meters, kilo_meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<-3>>;
-    };
+// meters <-> kilo_meters
+// base->prefixed multiplies by 10^{-exp}
+template<> struct Conversion<meters, kilo_meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<-3>>
+  >;
+};
 
-    // prefixed->base multiplies by 10^{+exp}
-    template<> struct Conversion<kilo_meters, meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<3>>;
-    };
-    struct mega_meters{};
+// prefixed->base multiplies by 10^{+exp}
+template<> struct Conversion<kilo_meters, meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<3>>
+  >;
+};
+struct mega_meters{};
 
-    template<> struct unit_traits<mega_meters>
-    {
-       using dimension = lengthType;
-       static constexpr std::string_view name   = "megameters";
-       static constexpr std::string_view abbr   = "Mm";
-       static constexpr std::string_view dimName= "length";
-       static constexpr int id = 0;
-    };
+template<> struct unit_traits<mega_meters>
+{
+  using dimension = lengthType;
+  static constexpr std::string_view name    = "megameters";
+  static constexpr std::string_view abbr    = "Mm";
+  static constexpr std::string_view dimName = "length";
+  static constexpr int id = 0;
+};
 
-    // meters <-> mega_meters
-    // base->prefixed multiplies by 10^{-exp}
-    template<> struct Conversion<meters, mega_meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<-6>>;
-    };
+// meters <-> mega_meters
+// base->prefixed multiplies by 10^{-exp}
+template<> struct Conversion<meters, mega_meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<-6>>
+  >;
+};
 
-    // prefixed->base multiplies by 10^{+exp}
-    template<> struct Conversion<mega_meters, meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<6>>;
-    };
-    struct giga_meters{};
+// prefixed->base multiplies by 10^{+exp}
+template<> struct Conversion<mega_meters, meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<6>>
+  >;
+};
+struct giga_meters{};
 
-    template<> struct unit_traits<giga_meters>
-    {
-       using dimension = lengthType;
-       static constexpr std::string_view name   = "gigameters";
-       static constexpr std::string_view abbr   = "Gm";
-       static constexpr std::string_view dimName= "length";
-       static constexpr int id = 0;
-    };
+template<> struct unit_traits<giga_meters>
+{
+  using dimension = lengthType;
+  static constexpr std::string_view name    = "gigameters";
+  static constexpr std::string_view abbr    = "Gm";
+  static constexpr std::string_view dimName = "length";
+  static constexpr int id = 0;
+};
 
-    // meters <-> giga_meters
-    // base->prefixed multiplies by 10^{-exp}
-    template<> struct Conversion<meters, giga_meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<-9>>;
-    };
+// meters <-> giga_meters
+// base->prefixed multiplies by 10^{-exp}
+template<> struct Conversion<meters, giga_meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<-9>>
+  >;
+};
 
-    // prefixed->base multiplies by 10^{+exp}
-    template<> struct Conversion<giga_meters, meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<9>>;
-    };
-    struct tera_meters{};
+// prefixed->base multiplies by 10^{+exp}
+template<> struct Conversion<giga_meters, meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<9>>
+  >;
+};
+struct tera_meters{};
 
-    template<> struct unit_traits<tera_meters>
-    {
-       using dimension = lengthType;
-       static constexpr std::string_view name   = "terameters";
-       static constexpr std::string_view abbr   = "Tm";
-       static constexpr std::string_view dimName= "length";
-       static constexpr int id = 0;
-    };
+template<> struct unit_traits<tera_meters>
+{
+  using dimension = lengthType;
+  static constexpr std::string_view name    = "terameters";
+  static constexpr std::string_view abbr    = "Tm";
+  static constexpr std::string_view dimName = "length";
+  static constexpr int id = 0;
+};
 
-    // meters <-> tera_meters
-    // base->prefixed multiplies by 10^{-exp}
-    template<> struct Conversion<meters, tera_meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<-12>>;
-    };
+// meters <-> tera_meters
+// base->prefixed multiplies by 10^{-exp}
+template<> struct Conversion<meters, tera_meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<-12>>
+  >;
+};
 
-    // prefixed->base multiplies by 10^{+exp}
-    template<> struct Conversion<tera_meters, meters>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<12>>;
-    };
+// prefixed->base multiplies by 10^{+exp}
+template<> struct Conversion<tera_meters, meters>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<12>>
+  >;
+};
+
+
+
+
+
+
+
+
+
+
+
 }
 
 

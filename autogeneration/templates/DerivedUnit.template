@@ -26,17 +26,28 @@ namespace dimension
      static constexpr int id = 0;
   };
 
-  {% for c in h.Conversions %}
-  template<> struct Conversion<{{ h.key }}, {{ c.To }}>
-  {
-     using scale = factor_t<
-        std::ratio<{{ c.rnum }}, {{ c.rden }}>
-        {%- if c.symbols|length > 0 or c.e10 != 0 -%}, {% endif -%}
-        {%- for s in c.symbols -%}{% if not loop.first %}, {% endif %}symbol_exponent<{{ s.name }}, {{ s.num }}, {{ s.den }}>{% endfor -%}
-        {%- if c.e10 != 0 %}{% if c.symbols|length > 0 %}, {% endif %}pow10<{{ c.e10 }}>{% endif -%}
-     >;
-  };
-  {% endfor %}
+{% for c in h.Conversions %}
+template<> struct Conversion<{{ h.key }}, {{ c.To }}>
+{
+  using scale = factor_t<
+    std::ratio<{{ c.rnum }}, {{ c.rden }}>,
+    std::tuple<
+      {%- for r in c.ratioExponents -%}
+        {{- ", " if not loop.first else "" -}}
+        ratio_exponent<std::ratio<{{ r.baseNum }}, {{ r.baseDen }}>, {{ r.expNum }}, {{ r.expDen }}>
+      {%- endfor -%}
+    >
+    {%- if c.symbols|length > 0 -%}
+    , std::tuple<
+      {%- for s in c.symbols -%}
+        {{- ", " if not loop.first else "" -}}
+        symbol_exponent<{{ s.name }}, {{ s.num }}, {{ s.den }}>
+      {%- endfor -%}
+    >
+    {%- endif -%}
+  >;
+};
+{% endfor %}
 
   {% endfor %}
   {% endif %}

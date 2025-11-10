@@ -19,6 +19,40 @@ namespace dimension
       using label = Label;
    };
 
+
+
+
+   template<typename Unit, class R, class Label = void>
+   struct unit_exponent_ratio {
+      // Optional safety checks (remove if you don’t want hard errors)
+      static_assert(R::num >= std::numeric_limits<int>::min() &&
+                  R::num <= std::numeric_limits<int>::max(),
+                  "unit_exponent_ratio: exponent numerator out of int range");
+      static_assert(R::den >= std::numeric_limits<int>::min() &&
+                  R::den <= std::numeric_limits<int>::max(),
+                  "unit_exponent_ratio: exponent denominator out of int range");
+
+      // Bridge intmax_t -> int via constexpr members, then use them as NTTPs
+      static constexpr int num = static_cast<int>(R::num);
+      static constexpr int den = static_cast<int>(R::den);
+
+      using type = unit_exponent<Unit, num, den, Label>;
+   };
+
+   template<typename Unit, class R, class Label = void>
+   using unit_exponent_ratio_t = typename unit_exponent_ratio<Unit, R, Label>::type;
+
+
+
+
+
+
+
+
+
+
+
+
    // ───────────────────────────── helper: map one unit_exponent ─────────────────────────────
    template<typename UE> struct to_primary_ue;                 // primary template
 

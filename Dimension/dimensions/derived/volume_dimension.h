@@ -20,11 +20,12 @@ namespace dimension
      static constexpr int id = 0;
   };
 
-  template<> struct Conversion<fluid_ounce_length, meters>
-  {
-     using scale = factor_t<
-        std::ratio<3092440948, 1>, pow10<-11>>;
-  };
+template<> struct Conversion<fluid_ounce_length, meters>
+{
+  using scale = factor_t<
+    std::ratio<1, 1>,
+    std::tuple<ratio_exponent<std::ratio<127, 1>, 1, 1>, ratio_exponent<std::ratio<2, 1>, -16, 3>, ratio_exponent<std::ratio<5, 1>, -4, 1>, ratio_exponent<std::ratio<3, 1>, 1, 3>, ratio_exponent<std::ratio<7, 1>, 1, 3>, ratio_exponent<std::ratio<11, 1>, 1, 3>>>;
+};
 
   struct cup_length{};
 
@@ -37,11 +38,12 @@ namespace dimension
      static constexpr int id = 0;
   };
 
-  template<> struct Conversion<cup_length, meters>
-  {
-     using scale = factor_t<
-        std::ratio<61848767433875, 1>, pow10<-15>>;
-  };
+template<> struct Conversion<cup_length, meters>
+{
+  using scale = factor_t<
+    std::ratio<1, 1>,
+    std::tuple<ratio_exponent<std::ratio<127, 1>, 1, 1>, ratio_exponent<std::ratio<2, 1>, -13, 3>, ratio_exponent<std::ratio<5, 1>, -4, 1>, ratio_exponent<std::ratio<3, 1>, 1, 3>, ratio_exponent<std::ratio<7, 1>, 1, 3>, ratio_exponent<std::ratio<11, 1>, 1, 3>>>;
+};
 
   struct pint_length{};
 
@@ -54,11 +56,12 @@ namespace dimension
      static constexpr int id = 0;
   };
 
-  template<> struct Conversion<pint_length, meters>
-  {
-     using scale = factor_t<
-        std::ratio<77924564, 1>, pow10<-9>>;
-  };
+template<> struct Conversion<pint_length, meters>
+{
+  using scale = factor_t<
+    std::ratio<1, 1>,
+    std::tuple<ratio_exponent<std::ratio<127, 1>, 1, 1>, ratio_exponent<std::ratio<2, 1>, -4, 1>, ratio_exponent<std::ratio<5, 1>, -4, 1>, ratio_exponent<std::ratio<3, 1>, 1, 3>, ratio_exponent<std::ratio<7, 1>, 1, 3>, ratio_exponent<std::ratio<11, 1>, 1, 3>>>;
+};
 
   struct quart_length{};
 
@@ -71,11 +74,12 @@ namespace dimension
      static constexpr int id = 0;
   };
 
-  template<> struct Conversion<quart_length, meters>
-  {
-     using scale = factor_t<
-        std::ratio<9817886355045987, 1>, pow10<-17>>;
-  };
+template<> struct Conversion<quart_length, meters>
+{
+  using scale = factor_t<
+    std::ratio<1, 1>,
+    std::tuple<ratio_exponent<std::ratio<127, 1>, 1, 1>, ratio_exponent<std::ratio<2, 1>, -11, 3>, ratio_exponent<std::ratio<5, 1>, -4, 1>, ratio_exponent<std::ratio<3, 1>, 1, 3>, ratio_exponent<std::ratio<7, 1>, 1, 3>, ratio_exponent<std::ratio<11, 1>, 1, 3>>>;
+};
 
   struct gallon_length{};
 
@@ -88,11 +92,12 @@ namespace dimension
      static constexpr int id = 0;
   };
 
-  template<> struct Conversion<gallon_length, meters>
-  {
-     using scale = factor_t<
-        std::ratio<155849128, 1>, pow10<-9>>;
-  };
+template<> struct Conversion<gallon_length, meters>
+{
+  using scale = factor_t<
+    std::ratio<1, 1>,
+    std::tuple<ratio_exponent<std::ratio<127, 1>, 1, 1>, ratio_exponent<std::ratio<2, 1>, -3, 1>, ratio_exponent<std::ratio<5, 1>, -4, 1>, ratio_exponent<std::ratio<3, 1>, 1, 3>, ratio_exponent<std::ratio<7, 1>, 1, 3>, ratio_exponent<std::ratio<11, 1>, 1, 3>>>;
+};
 
   struct teaspoon_length{};
 
@@ -105,11 +110,12 @@ namespace dimension
      static constexpr int id = 0;
   };
 
-  template<> struct Conversion<teaspoon_length, meters>
-  {
-     using scale = factor_t<
-        std::ratio<1701834420916624526, 1>, pow10<-20>>;
-  };
+template<> struct Conversion<teaspoon_length, meters>
+{
+  using scale = factor_t<
+    std::ratio<1, 1>,
+    std::tuple<ratio_exponent<std::ratio<127, 1>, 1, 1>, ratio_exponent<std::ratio<2, 1>, -17, 3>, ratio_exponent<std::ratio<5, 1>, -4, 1>, ratio_exponent<std::ratio<7, 1>, 1, 3>, ratio_exponent<std::ratio<11, 1>, 1, 3>>>;
+};
 
   struct tablespoon_length{};
 
@@ -122,11 +128,12 @@ namespace dimension
      static constexpr int id = 0;
   };
 
-  template<> struct Conversion<tablespoon_length, meters>
-  {
-     using scale = factor_t<
-        std::ratio<2454469962137835, 1>, pow10<-17>>;
-  };
+template<> struct Conversion<tablespoon_length, meters>
+{
+  using scale = factor_t<
+    std::ratio<1, 1>,
+    std::tuple<ratio_exponent<std::ratio<127, 1>, 1, 1>, ratio_exponent<std::ratio<2, 1>, -17, 3>, ratio_exponent<std::ratio<5, 1>, -4, 1>, ratio_exponent<std::ratio<3, 1>, 1, 3>, ratio_exponent<std::ratio<7, 1>, 1, 3>, ratio_exponent<std::ratio<11, 1>, 1, 3>>>;
+};
 
   struct liters
   {

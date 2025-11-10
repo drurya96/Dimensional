@@ -44,7 +44,7 @@ namespace dimension::details {
       // 1) Identical units → 1:1
       template<typename S>
       struct get_factor_type<S, S, void> {
-      using type = factor_t<std::ratio<1>>;
+      using type = factor_t<std::ratio<1>, std::tuple<>>;
       };
 
       // 2) Forward conversion available
@@ -59,8 +59,9 @@ namespace dimension::details {
       requires (!HasConversion<S, T> && HasConversion<T, S>)
       struct get_factor_type<S, T, void> {
       private:
-         using ratio = inverse_ratio_t<typename Conversion<T, S>::scale::ratio>;
-         using coefficients = tuple_invert_exponents_t<typename Conversion<T, S>::scale::symbols>;
+         using ratio = inverse_ratio_t<typename Conversion<T, S>::scale::ratio>; // TODO: Wrong, this should be something like "negate ratios", not inverse
+         using symbols = tuple_negate_exponents_t<typename Conversion<T, S>::scale::symbols>; // TODO: Wrong, this should be something like "negate ratios", not inverse
+         using ratios =  tuple_negate_ratio_exponents_t<typename Conversion<T, S>::scale::ratios>;
          // Notes to self as I go...
          //   coefficients may hold symbol_exponents or ratio_exponents
          //   I should generalize this to arbitrary coefficients
@@ -73,7 +74,8 @@ namespace dimension::details {
          // I think I need to have symbol_exponent and ratio_exponent (and maybe unit_exponent?) inherit from a common class
 
       public:
-         using type = factor_t<ratio, coefficients>;
+         using type = factor_t<ratio, ratios, symbols>;
+         //using type = factor_t<std::ratio<1>>; // temp for testing
       };
 
       // 4) Neither direction available → go through primary
@@ -85,12 +87,16 @@ namespace dimension::details {
             typename get_factor_type<S, unit_primary_t<S>>::type::ratio,
             typename get_factor_type<unit_primary_t<S>, T>::type::ratio
          >;
-         using coefficients = detail::multiply_symbol_tuples_t<
+         using symbols = detail::multiply_symbol_tuples_t<
             typename get_factor_type<S, unit_primary_t<S>>::type::symbols,
             typename get_factor_type<unit_primary_t<S>, T>::type::symbols
          >;
+         using ratios = multiply_ratio_exponent_tuples_t<
+            typename get_factor_type<S, unit_primary_t<S>>::type::ratios,
+            typename get_factor_type<unit_primary_t<S>, T>::type::ratios
+         >;
       public:
-         using type = factor_t<ratio, coefficients>;
+         using type = factor_t<ratio, ratios, symbols>;
       };
    }
 

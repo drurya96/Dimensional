@@ -162,7 +162,7 @@ TEST(FundamentalConversions, TestlengthConversions)
 
    EXPECT_NEAR(get_length_as<meters>(lengthInFurlong), 2011.68, TOLERANCE);
    EXPECT_NEAR(get_length_as<feet>(lengthInFurlong), 6600.0, TOLERANCE);
-   EXPECT_NEAR(get_length_as<inches>(lengthInFurlong), 79200.2, TOLERANCE);
+   EXPECT_NEAR(get_length_as<inches>(lengthInFurlong), 79200.0, TOLERANCE);
    EXPECT_NEAR(get_length_as<astronomical_units>(lengthInFurlong), 1.3448e-10, TOLERANCE);
    EXPECT_NEAR(get_length_as<data_miles>(lengthInFurlong), 1.10001, TOLERANCE);
    EXPECT_NEAR(get_length_as<nautical_miles>(lengthInFurlong), 1.08688, TOLERANCE);
@@ -380,13 +380,13 @@ TEST(FundamentalConversions, TestangleConversions)
    angle<degrees> angleInDegrees{180.0};  // 180 degrees, equivalent to pi radians
 
    EXPECT_NEAR(get_angle_as<degrees>(angleInDegrees), 180.0, TOLERANCE);
-   EXPECT_NEAR(get_angle_as<radians>(angleInDegrees), 3.14159, TOLERANCE);
+   EXPECT_NEAR(get_angle_as<radians>(angleInDegrees), std::numbers::pi_v<double>, TOLERANCE);
 
    // Test from radians to other units
-   angle<radians> angleInradians{3.14159};  // pi radians, equivalent to 180 degrees
+   angle<radians> angleInradians{std::numbers::pi_v<double>};  // pi radians, equivalent to 180 degrees
 
    EXPECT_NEAR(get_angle_as<degrees>(angleInradians), 180.0, TOLERANCE);
-   EXPECT_NEAR(get_angle_as<radians>(angleInradians), 3.14159, TOLERANCE);
+   EXPECT_NEAR(get_angle_as<radians>(angleInradians), std::numbers::pi_v<double>, TOLERANCE);
 
 }
 
@@ -415,9 +415,10 @@ TEST(FundamentalConversions, TestchargeConversions)
 
    // Test from coulombs to other units
    charge<coulombs> chargeInCoulombs{100.0};
+   constexpr double e_C = 1.602176634e-19;
 
    EXPECT_NEAR(get_charge_as<coulombs>(chargeInCoulombs), 100.0, TOLERANCE);
-   EXPECT_NEAR(get_charge_as<elementary_charges>(chargeInCoulombs), 6.2415090744607638e+20, TOLERANCE);
+   EXPECT_NEAR(get_charge_as<elementary_charges>(chargeInCoulombs), 100.0 / e_C, TOLERANCE);
 
    // Test from elementary_charges to other units
    charge<elementary_charges> chargeInElementarycharges{100.0};

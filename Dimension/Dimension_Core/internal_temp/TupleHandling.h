@@ -14,6 +14,19 @@ namespace dimension
    template<class Accum, class New>
    using append_t = tuple_cat_t<Accum, std::tuple<New>>;
 
+   // Primary template: defaults to false
+   template<typename T>
+   struct is_tuple : std::false_type {};
+
+   // Specialization for std::tuple<...>
+   template<typename... Ts>
+   struct is_tuple<std::tuple<Ts...>> : std::true_type {};
+
+   // Convenience variable template
+   template<typename T>
+   inline constexpr bool is_tuple_v = is_tuple<T>::value;
+
+
 } // end Dimension
 
 #endif // DIMENSIONAL_TUPLE_HANDLING_H

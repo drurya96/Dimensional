@@ -12,66 +12,82 @@
     },
 
     "Rational": {
-      "type": "object",
-      "description": "Exact rational number num/den (den defaults to 1).",
-      "properties": {
-        "num": { "type": "integer" },
-        "den": { "type": "integer", "not": { "const": 0 }, "default": 1 }
-      },
-      "required": ["num"],
-      "additionalProperties": false
+      "type": "array",
+      "prefixItems": [
+        { "type": "integer" },
+        { "type": "integer", "not": { "const": 0 } }
+      ],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2,
+      "description": "[num, den] exact rational."
     },
 
     "SymbolTerm": {
-      "type": "object",
-      "description": "Represents a named symbol raised to a rational exponent: name^(exp).",
-      "properties": {
-        "name": { "$ref": "#/$defs/Identifier" },
-        "exp": {
-          "$ref": "#/$defs/Rational",
-          "default": { "num": 1, "den": 1 }
-        }
-      },
-      "required": ["name"],
-      "additionalProperties": false
+      "type": "array",
+      "prefixItems": [
+        { "$ref": "#/$defs/Identifier", "description": "symbol name (e.g., \"pi\", \"sqrt2\", \"ten\")" },
+        { "$ref": "#/$defs/Rational", "description": "exponent as [num, den]" }
+      ],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
     },
 
-    "RatioTerm": {
-      "type": "object",
-      "description": "Represents a rational base raised to a rational exponent: (base)^(exp).",
-      "properties": {
-        "base": { "$ref": "#/$defs/Rational" },
-        "exp": {
-          "$ref": "#/$defs/Rational",
-          "default": { "num": 1, "den": 1 }
-        }
-      },
-      "required": ["base"],
-      "additionalProperties": false
+    "RatioExponentTerm": {
+      "type": "array",
+      "prefixItems": [
+        { "$ref": "#/$defs/Rational", "description": "base as [num, den]" },
+        { "$ref": "#/$defs/Rational", "description": "exponent as [num, den]" }
+      ],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
     },
 
     "FactorObject": {
       "type": "object",
-      "description": "factor = Π (ratio.base)^(ratio.exp) × Π (sym.name)^(sym.exp). No raw scalar.",
+      "description": "factor = (rational) × 10^e10 × Π sym_i^(exp_i)",
       "properties": {
-        "ratio": {
-          "type": "array",
-          "description": "List of rational-base terms (default empty).",
-          "items": { "$ref": "#/$defs/RatioTerm" },
-          "default": []
-        },
+        "r": { "$ref": "#/$defs/Rational" },
         "sym": {
           "type": "array",
-          "description": "List of symbol-base terms (default empty).",
-          "items": { "$ref": "#/$defs/SymbolTerm" },
-          "default": []
+          "items": { "$ref": "#/$defs/SymbolTerm" }
+        },
+        "ratioExponents": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/RatioExponentTerm" }
         }
       },
       "additionalProperties": false
     },
 
     "Factor": {
-      "$ref": "#/$defs/FactorObject"
+      "oneOf": [
+        { "$ref": "#/$defs/FactorObject" },
+
+        {
+          "$ref": "#/$defs/Rational",
+          "description": "BACK-COMPAT: [num, den] → {\"r\":[num,den]}"
+        },
+
+        {
+          "type": "array",
+          "prefixItems": [
+            { "type": ["integer", "number"] },
+            { "type": "string" }
+          ],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2,
+          "description": "BACK-COMPAT (legacy like [180, \"pi\"]). Interpret as r=[first,1] and sym=[[second,[-1,1]]]."
+        },
+
+        {
+          "type": "number",
+          "description": "BACK-COMPAT: numeric scalar (inexact). Prefer FactorObject."
+        }
+      ]
     },
 
     "ConversionMap": {
@@ -87,7 +103,7 @@
         "To":   { "$ref": "#/$defs/ConversionMap" }
       },
       "additionalProperties": false,
-      "required": ["From", "To"]
+      "required": [ "From", "To" ]
     },
 
     "UnitDef": {
@@ -98,7 +114,7 @@
         "SI_Prefixes": { "type": "boolean" },
         "Conversions": { "$ref": "#/$defs/Conversions" }
       },
-      "required": ["Name", "Abbreviation", "SI_Prefixes"],
+      "required": [ "Name", "Abbreviation", "SI_Prefixes" ],
       "additionalProperties": false
     },
 
@@ -114,7 +130,7 @@
         "Dimension": { "$ref": "#/$defs/Identifier" },
         "Exponent":  { "type": "integer" }
       },
-      "required": ["Dimension", "Exponent"],
+      "required": [ "Dimension", "Exponent" ],
       "additionalProperties": false
     },
 
@@ -124,19 +140,19 @@
         "Unit":     { "$ref": "#/$defs/Identifier" },
         "Exponent": { "type": "integer" }
       },
-      "required": ["Unit", "Exponent"],
+      "required": [ "Unit", "Exponent" ],
       "additionalProperties": false
     },
 
     "HelperUnitDef": {
       "type": "object",
       "properties": {
-        "Dimension":    { "$ref": "#/$defs/Identifier" },
-        "Name":         { "type": "string" },
-        "Abbreviation": { "type": "string" },
-        "Conversions":  { "$ref": "#/$defs/Conversions" }
+        "Dimension":   { "$ref": "#/$defs/Identifier" },
+        "Name":        { "type": "string" },
+        "Abbreviation":{ "type": "string" },
+        "Conversions": { "$ref": "#/$defs/Conversions" }
       },
-      "required": ["Dimension", "Name", "Abbreviation", "Conversions"],
+      "required": [ "Dimension", "Name", "Abbreviation", "Conversions" ],
       "additionalProperties": false
     },
 
@@ -158,7 +174,7 @@
           "additionalProperties": { "$ref": "#/$defs/UnitDef" }
         }
       },
-      "required": ["Dimension", "Fundamental", "HasExtras", "BaseUnit", "SI_Prefixes", "Units"],
+      "required": [ "Dimension", "Fundamental", "HasExtras", "BaseUnit", "SI_Prefixes", "Units" ],
       "additionalProperties": false
     },
 
@@ -183,7 +199,7 @@
         },
         "HelperUnits": { "$ref": "#/$defs/HelperUnitsMap" }
       },
-      "required": ["Dimension", "Fundamental", "HasExtras", "Definition", "Units", "HelperUnits"],
+      "required": [ "Dimension", "Fundamental", "HasExtras", "Definition", "Units", "HelperUnits" ],
       "additionalProperties": false
     },
 

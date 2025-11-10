@@ -26,46 +26,66 @@ namespace dimension
   {% endfor %}
 
   {# -------- Base -> other (exact) conversions -------- #}
-  {% for u in dim.Units if (not u.is_base) and u.conv_from_base %}
-  template<> struct Conversion<{{ dim.BaseUnit }}, {{ u.key }}>
-  {
-     {% set c = u.conv_from_base %}
-     using scale = factor_t<
-        std::ratio<{{ c.rnum }}, {{ c.rden }}>
-        {%- if c.symbols|length > 0 or c.e10 != 0 -%}, {% endif -%}
-        {%- for s in c.symbols -%}{% if not loop.first %}, {% endif %}symbol_exponent<{{ s.name }}, {{ s.num }}, {{ s.den }}>{% endfor -%}
-        {%- if c.e10 != 0 %}{% if c.symbols|length > 0 %}, {% endif %}pow10<{{ c.e10 }}>{% endif -%}
-     >;
-  };
-  {% endfor %}
+{% for u in dim.Units if (not u.is_base) and u.conv_from_base %}
+template<> struct Conversion<{{ dim.BaseUnit }}, {{ u.key }}>
+{
+{% set c = u.conv_from_base %}
+using scale = factor_t<
+   std::ratio<{{ c.rnum }}, {{ c.rden }}>,
+   std::tuple<
+      {%- for r in c.ratioExponents -%}
+      {{- ", " if not loop.first else "" -}}
+      ratio_exponent<std::ratio<{{ r.baseNum }}, {{ r.baseDen }}>, {{ r.expNum }}, {{ r.expDen }}>
+      {%- endfor -%}
+   >
+   {%- if c.symbols|length > 0 -%}
+   , std::tuple<
+      {%- for s in c.symbols -%}
+      {{- ", " if not loop.first else "" -}}
+      symbol_exponent<{{ s.name }}, {{ s.num }}, {{ s.den }}>
+      {%- endfor -%}
+   >
+   {%- endif -%}
+>;
+};
+{% endfor %}
 
   {# -------- Auto-generated SI-prefixed units -------- #}
   {% for u in dim.Units %}
-    {% for si in u.si_generated %}
-    struct {{ si.key }}{};
+{% for si in u.si_generated %}
+struct {{ si.key }}{};
 
-    template<> struct unit_traits<{{ si.key }}>
-    {
-       using dimension = {{ dim.Dimension }}Type;
-       static constexpr std::string_view name   = "{{ si.Name }}";
-       static constexpr std::string_view abbr   = "{{ si.Abbreviation }}";
-       static constexpr std::string_view dimName= "{{ dim.Dimension }}";
-       static constexpr int id = 0;
-    };
+template<> struct unit_traits<{{ si.key }}>
+{
+  using dimension = {{ dim.Dimension }}Type;
+  static constexpr std::string_view name    = "{{ si.Name }}";
+  static constexpr std::string_view abbr    = "{{ si.Abbreviation }}";
+  static constexpr std::string_view dimName = "{{ dim.Dimension }}";
+  static constexpr int id = 0;
+};
 
-    // {{ u.key }} <-> {{ si.key }}
-    // base->prefixed multiplies by 10^{-exp}
-    template<> struct Conversion<{{ u.key }}, {{ si.key }}>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<{{ -si.exp }}>>;
-    };
+// {{ u.key }} <-> {{ si.key }}
+// base->prefixed multiplies by 10^{-exp}
+template<> struct Conversion<{{ u.key }}, {{ si.key }}>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<{{ -si.exp }}>>
+  >;
+};
 
-    // prefixed->base multiplies by 10^{+exp}
-    template<> struct Conversion<{{ si.key }}, {{ u.key }}>
-    {
-        using scale = factor_t<std::ratio<1>, pow10<{{ si.exp }}>>;
-    };
-    {% endfor %}
+// prefixed->base multiplies by 10^{+exp}
+template<> struct Conversion<{{ si.key }}, {{ u.key }}>
+{
+  using scale = factor_t<
+    std::ratio<1>,
+    std::tuple<>,
+    std::tuple<pow10<{{ si.exp }}>>
+  >;
+};
+{% endfor %}
+
   {% endfor %}
 }
 

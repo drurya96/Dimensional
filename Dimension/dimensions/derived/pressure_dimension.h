@@ -20,11 +20,12 @@ namespace dimension
      static constexpr int id = 0;
   };
 
-  template<> struct Conversion<atmosphere_mass, grams>
-  {
-     using scale = factor_t<
-        std::ratio<101325, 1>, pow10<3>>;
-  };
+template<> struct Conversion<atmosphere_mass, grams>
+{
+  using scale = factor_t<
+    std::ratio<1, 1>,
+    std::tuple<ratio_exponent<std::ratio<2, 1>, 3, 1>, ratio_exponent<std::ratio<3, 1>, 1, 1>, ratio_exponent<std::ratio<5, 1>, 5, 1>, ratio_exponent<std::ratio<7, 1>, 1, 1>, ratio_exponent<std::ratio<193, 1>, 1, 1>>>;
+};
 
   struct bar_mass{};
 
@@ -37,11 +38,12 @@ namespace dimension
      static constexpr int id = 0;
   };
 
-  template<> struct Conversion<bar_mass, grams>
-  {
-     using scale = factor_t<
-        std::ratio<1, 1>, pow10<8>>;
-  };
+template<> struct Conversion<bar_mass, grams>
+{
+  using scale = factor_t<
+    std::ratio<1, 1>,
+    std::tuple<ratio_exponent<std::ratio<2, 1>, 8, 1>, ratio_exponent<std::ratio<5, 1>, 8, 1>>>;
+};
 
   struct torr_mass{};
 
@@ -54,11 +56,12 @@ namespace dimension
      static constexpr int id = 0;
   };
 
-  template<> struct Conversion<torr_mass, grams>
-  {
-     using scale = factor_t<
-        std::ratio<13332231202220616, 1>, pow10<-11>>;
-  };
+template<> struct Conversion<torr_mass, grams>
+{
+  using scale = factor_t<
+    std::ratio<1, 1>,
+    std::tuple<ratio_exponent<std::ratio<3, 1>, 1, 1>, ratio_exponent<std::ratio<5, 1>, 4, 1>, ratio_exponent<std::ratio<7, 1>, 1, 1>, ratio_exponent<std::ratio<193, 1>, 1, 1>, ratio_exponent<std::ratio<19, 1>, -1, 1>>>;
+};
 
   struct in_hg_mass{};
 
@@ -71,11 +74,12 @@ namespace dimension
      static constexpr int id = 0;
   };
 
-  template<> struct Conversion<in_hg_mass, grams>
-  {
-     using scale = factor_t<
-        std::ratio<3386386725364, 1>, pow10<-6>>;
-  };
+template<> struct Conversion<in_hg_mass, grams>
+{
+  using scale = factor_t<
+    std::ratio<1, 1>,
+    std::tuple<ratio_exponent<std::ratio<2, 1>, -6, 1>, ratio_exponent<std::ratio<3, 1>, 1, 1>, ratio_exponent<std::ratio<5, 1>, -6, 1>, ratio_exponent<std::ratio<7, 1>, 1, 1>, ratio_exponent<std::ratio<127, 1>, 1, 1>, ratio_exponent<std::ratio<28019, 1>, 1, 1>, ratio_exponent<std::ratio<45317, 1>, 1, 1>>>;
+};
 
   struct pascals
   {

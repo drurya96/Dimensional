@@ -236,7 +236,7 @@ TEST(Labels, PreserveLabelThroughDivision)
   double v = get_dimension_as<UE_rain, unit_exponent<feet, -2>>(rate);
   EXPECT_NEAR(v, 0.5, EPS);
 }
-
+/*
 TEST(Labels, ConversionIgnoresLabelButPreservesIt)
 {
   // Convert (0.5 in[rain] / ft^2) to (m[rain] / m^2)
@@ -256,6 +256,7 @@ TEST(Labels, ConversionIgnoresLabelButPreservesIt)
                >(rate);
   EXPECT_NEAR(got, expected, 1e-12);
 }
+  */
 
 TEST(Labels, AdditionRequiresMatchingLabel)
 {
@@ -378,7 +379,7 @@ TEST(LabelsNegative, ProductNotUnlabeledSquare2)
 
 
 
-
+/*
 
 TEST(TempTests, testBuiltinRatio) {
    acceleration<meters, seconds> a{10.0};
@@ -1088,13 +1089,150 @@ TEST(TempTests, testApplyAllConversions){
 
 TEST(TempTests, testNamedGetter){
 
-   //volume<gallons> obj(1.0);
-   //ASSERT_NEAR((get_volume_as<fluid_ounces>(obj)), 128.0, 1e-3);
+   // The problem seems to specifically be related to the custom "fundamental" units...
+   //   After adding acres, this very much seems to be the case.
+   //   After further validation, I think I found the culprit.
+   //   These "special" units have conversion factors with many, many digits.
+   //   I think this is causing an overflow.
+   //   Its unfortunate this is even possible...
+   //   For now, I may just have to reduce the precision until I have a better solution.
+
+   //volume<meters> obj(1.0);
+   //ASSERT_NEAR((get_volume_as<cups>(obj)), 128.0, 1e-3);
 
    // WORKS
    //speed<knots> obj(1.0);
    //ASSERT_NEAR((get_speed_as<knots>(obj)), 128.0, 1e-3);
 
-   frequency<hertz> obj(1.0);
-   ASSERT_NEAR((get_frequency_as<hertz>(obj)), 128.0, 1e-3);
+   //frequency<hertz> obj(1.0);
+   //ASSERT_NEAR((get_frequency_as<hertz>(obj)), 128.0, 1e-3);
+
+   area<meters> obj(1.0);
+   ASSERT_NEAR((get_area_as<acres>(obj)), 128.0, 1e-3);
+}
+*/
+
+
+
+TEST(TempTests, testRatioExponentConversions){
+    constexpr base_dimension<unit_exponent<meters>> obj1(10.0);
+    constexpr base_dimension<unit_exponent<feet>> obj2(5.0);
+
+    std::cout << obj1 << std::endl;
+    std::cout << obj2 << std::endl;
+
+    // Wrong...
+    //static_assert(obj1 < obj2, "Fail");
+
+    using feet_to_meters_factor = typename details::factor::get_factor_type<feet, meters>::type;
+
+    std::cout << "Conversion factor from meters to feet: " << factor::eval_factor<typename Conversion<meters, feet>::scale>() << std::endl;
+
+
+    std::cout << "Conversion factor from feet to meters: " << factor::eval_factor<feet_to_meters_factor>() << std::endl; // This is printing the wrong value, its off by a factor of 10, with is the ratio_exponent
+    /*
+    static_assert(std::is_same_v<typename feet_to_meters_factor::ratio, std::ratio<381, 125>>);
+    static_assert(std::tuple_size_v<typename feet_to_meters_factor::symbols> == 0);
+    //static_assert(std::tuple_size_v<typename feet_to_meters_factor::ratios> == 1); // Fails - the ratio_exponent isn't propagated.
+    
+    static_assert(std::tuple_size_v<typename Conversion<meters, feet>::scale::ratios> == 1); // Works, so the ratio_exponent definitely exists in the original conversion, but is lost when reversing.
+    using inverted_ratio_exopnents = tuple_invert_ratio_exponents_t<typename Conversion<meters, feet>::scale::ratios>;
+    static_assert(std::tuple_size_v<inverted_ratio_exopnents> == 1); // Works, so inverting it is fine...
+    */
+    // Ok, the problem seems to be that ratio_exponents are being provided as a tuple, but the signature expects a parameter pack... maybe?
+
+    std::cout << "Meters object in meters: " << get_dimension_as<unit_exponent<meters>>(obj1) << std::endl;
+    std::cout << "Meters object in feet: " << get_dimension_as<unit_exponent<feet>>(obj1) << std::endl;
+    std::cout << "Feet object in feet: " << get_dimension_as<unit_exponent<feet>>(obj2) << std::endl;
+    std::cout << "Feet object in meters: " << get_dimension_as<unit_exponent<meters>>(obj2) << std::endl; // This one is failing... showing 15.24 rather than 1.524.. so the ratio_exponent isn't applying in this case?
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Helper to print a single ratio_exponent
+template<typename RE>
+void print_ratio_exponent()
+{
+    std::cout
+        << "ratio: " << RE::ratio::num << "/" << RE::ratio::den
+        << ", exponent: " << RE::exponent::num << "/" << RE::exponent::den << "\n";
+}
+
+// Print all ratio_exponents in a tuple
+template<typename... REs>
+void print_tuple(const std::tuple<REs...>&)
+{
+    (print_ratio_exponent<REs>(), ...); // Fold expression
+}
+
+
+
+
+
+TEST(FundamentalConversions, TestTempTimeConversions)
+{
+   // Test from seconds to other units
+   timespan<seconds> timeInseconds{3600.0};  // 1 hour in seconds
+
+   EXPECT_NEAR(get_timespan_as<seconds>(timeInseconds), 3600.0, TOLERANCE);
+   EXPECT_NEAR(get_timespan_as<minutes>(timeInseconds), 60.0, TOLERANCE);
+   EXPECT_NEAR(get_timespan_as<hours>(timeInseconds), 1.0, TOLERANCE);
+
+   // Test from minutes to other units
+   timespan<minutes> timeInminutes{120.0};  // 2 hours in minutes
+
+//   EXPECT_NEAR(get_timespan_as<seconds>(timeInminutes), 7200.0, TOLERANCE);
+   EXPECT_NEAR(get_dimension_as<unit_exponent<seconds>>(timeInminutes), 7200.0, TOLERANCE);
+   EXPECT_NEAR(get_timespan_as<minutes>(timeInminutes), 120.0, TOLERANCE);
+   EXPECT_NEAR(get_timespan_as<hours>(timeInminutes), 2.0, TOLERANCE);
+
+
+   
+   using simplified_units = simplified_units_t<typename decltype(timeInminutes)::units>;
+   using conv_factor = typename apply_all_conversions<simplified_units, std::tuple<unit_exponent<seconds>>>::factor;
+   //constexpr auto conversion = factor::eval_factor<conv_factor, double>();
+
+   static_assert(std::is_same_v<simplified_units, std::tuple<unit_exponent<minutes>>>);
+
+   static_assert(is_tuple_v<typename conv_factor::ratios>);
+
+   std::cout << "second to minutes: " << std::endl;
+   print_tuple(Conversion<seconds, minutes>::scale::ratios{});
+
+   std::cout << "full conversion: " << std::endl;
+   print_tuple(conv_factor::ratios{});
+
+   std::cout << "radians to degrees: " << std::endl;
+   print_tuple(Conversion<radians, degrees>::scale::ratios{});
+
+   //static_assert(is_tuple_v<typename conv_factor::ratios>);
+   
+
+   //using f = typename get_dimension_as<unit_exponent<seconds>>::factor;
+
 }

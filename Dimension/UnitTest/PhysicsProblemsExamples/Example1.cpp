@@ -528,7 +528,7 @@ TEST(PhysicsProblemsExample1, AtmosphereCalculation)
     ASSERT_NEAR((get_pressure_as<pascals>(obj)), 1.0, 1e-7);
 }
 
-/*
+
 TEST(PhysicsProblemsExample1, volumeCaclulation)
 {
     using namespace dimension;
@@ -542,20 +542,5 @@ TEST(PhysicsProblemsExample1, volumeCaclulation)
     ASSERT_NEAR((get_volume_as<gallons>(obj)), 1.0, 1e-3);
     ASSERT_NEAR((get_volume_as<teaspoons>(obj)), 768.0, 1e-3);
     ASSERT_NEAR((get_volume_as<tablespoons>(obj)), 256.0, 1e-3);
-
-
-    //base_dimension<unit_exponent<seconds, -1>, unit_exponent<meters>, unit_exponent<Grams, -1>, unit_exponent<kilo_grams>> a(10.0);
-    base_dimension<unit_exponent<seconds, -1>, unit_exponent<meters>, unit_exponent<miles, -1>, unit_exponent<kilo_meters>> a(10.0);
-    //base_dimension<unit_exponent<seconds, -1>, unit_exponent<meters>> a(10.0);
-    //speed<seconds, meters> b = a;
-    //speed<Knots> a(10.0);
     
-    speed b = a;
-
-    static_assert(std::is_base_of_v<base_dimension<unit_exponent<meters>, unit_exponent<seconds, -1>>, decltype(b)>);
-    static_assert(std::is_same_v<speed<meters, seconds>, decltype(b)>);
-
-    ASSERT_NEAR((get_speed_as<meters, seconds>(b)), 6.21371, 0.001);
-
 }
-*/

@@ -60,7 +60,7 @@ namespace dimension
    // Identity: same unit representation → no conversions
    template<class... U>
    struct apply_all_conversions<std::tuple<U...>, std::tuple<U...>> {
-      using factor = factor_t<>;
+      using factor = factor_t<std::ratio<1>, std::tuple<>>;
       using ratio   = std::ratio<1>;
       using symbols = std::tuple<>;
    };
@@ -179,11 +179,34 @@ namespace dimension
       //       I think for now I should get things working by just yielding the value, but make a TODO for this...
 
       // This block is just to work it out, I can collapse this down.
-      using simplified_units = simplified_units_t<typename Dim::units>;
-      //using simplified_dim = typename base_dimension_from_tuple<typename Dim::rep, simplified_units>::dim;
-      using conv_factor = typename apply_all_conversions<simplified_units, std::tuple<Units...>>::factor;
-      constexpr auto conversion = factor::eval_factor<conv_factor, typename Dim::rep>();
-      return obj.get_apply_coefficients() * conversion;
+      //using simplified_units = simplified_units_t<typename Dim::units>;
+
+      // URGENT TODO: We don't just need the simplified units, we need to perform a full simplification operation.
+      // Doing so should include the conversion factors used during simplification
+      //   Currently, simplification almost certainly does not carry the conversion factors forward.. so more work is needed.
+
+      //using simplified_dim = simplified_dimension_t<Dim>;
+      //using conv_factor = typename apply_all_conversions<typename simplified_dim::units, std::tuple<Units...>>::factor; // Get the conversion factor for real conversions
+      //constexpr auto conversion = factor::eval_factor<conv_factor, typename Dim::rep>(); // Evaluate the conversion factor to a numeric value
+
+      //constexpr simplified_dim simplified_obj = obj;
+      //return simplified_obj.get_apply_coefficients() * conversion;
+
+      // 1) Simplify the source units at the type level
+      using src_units  = collapse_units_t<typename Dim::units>;
+      using simplify   = some_simplify_operation<src_units>;
+      using S_units    = typename simplify::units;   // simplified units of Dim
+      using S_factor   = typename simplify::factor;  // factor: (original -> simplified)
+
+      // 2) Factor to go from simplified source units -> requested target units
+      using U_factor = typename apply_all_conversions<S_units, std::tuple<Units...>>::factor;
+
+      // 3) Compose in the correct order: (original -> simplified) then (simplified -> target)
+      using F_total = multiply_factors_t<U_factor, S_factor>;
+
+      // 4) Evaluate once and scale runtime value
+      const auto k = factor::eval_factor<F_total, typename Dim::rep>();
+      return obj.get_raw() * k;
 
 
       //constexpr double coefficients = ratio_v<typename Dim::ratio> * multiply_symbol_exponent_values_v<typename Dim::symbols>;
@@ -229,6 +252,8 @@ namespace dimension
       using units = extract_units_t<Ts...>;
       using symbols = extract_symbols_t<Ts...>;
       using ratio = extract_ratio_t<Ts...>;
+      // URGEN TODO: Find all uses of base_dimension_from_tuple and ensure ratio_exponents are handled
+      using ratio_exponents = tuple_extract_ratio_exponents_t<std::tuple<Ts...>>;
 
       using simplified = simplified_units_t<units>;
       using rep = Rep;
@@ -373,7 +398,9 @@ namespace dimension
       {
          return static_cast<Rep>(get_raw() *
                                  ratio_v<ratio> * 
-                                 multiply_symbol_exponent_values_v<symbols>);
+                                 multiply_symbol_exponent_values_v<symbols> *
+                                 multiply_ratio_exponent_values_v<ratio_exponents>
+                              );
       }      
 
    private:
@@ -412,11 +439,14 @@ namespace dimension
       using Rep = std::common_type_t<typename Lhs::rep, typename Rhs::rep>;
       using ratio = std::ratio_divide<typename Lhs::ratio, typename Rhs::ratio>;
       using symbols = detail::divide_symbol_tuples_t<typename Lhs::symbols, typename Rhs::symbols>;
-      //using symbols = std::tuple<>;
+      using ratio_exponents = divide_ratio_exponent_tuples_t<typename Lhs::ratio_exponents, typename Rhs::ratio_exponents>;
+
+      using coeffs = tuple_cat_t<symbols, ratio_exponents>;
+
       using units_combined = tuple_cat_t<typename Lhs::units, typename FlipExponents<typename Rhs::units>::units>;
       using units = collapse_units_t<units_combined>;
 
-      return typename base_dimension_from_tuple<Rep, ratio, units, symbols>::dim(
+      return typename base_dimension_from_tuple<Rep, ratio, units, coeffs>::dim(
          lhs.get_raw() /
          rhs.get_raw()
       );
@@ -437,11 +467,14 @@ namespace dimension
       using Rep = std::common_type_t<typename Lhs::rep, typename Rhs::rep>;
       using ratio = std::ratio_multiply<typename Lhs::ratio, typename Rhs::ratio>;
       using symbols = detail::multiply_symbol_tuples_t<typename Lhs::symbols, typename Rhs::symbols>;
-      //using symbols = std::tuple<>;
+      using ratio_exponents = multiply_ratio_exponent_tuples_t<typename Lhs::ratio_exponents, typename Rhs::ratio_exponents>;
+
+      using coeffs = tuple_cat_t<symbols, ratio_exponents>;
+
       using units_combined = tuple_cat_t<typename Lhs::units, typename Rhs::units>;
       using units = collapse_units_t<units_combined>;
       
-      return typename base_dimension_from_tuple<Rep, ratio, units, symbols>::dim(
+      return typename base_dimension_from_tuple<Rep, ratio, units, coeffs>::dim(
          lhs.get_raw() *
          rhs.get_raw()
       );

@@ -6,6 +6,7 @@
 #include <ratio>
 
 #include "../TupleHandling.h"
+#include "../exponentiation/exponentiation.h"
 #include "ratio_utils.h"
 
 namespace dimension
@@ -25,6 +26,21 @@ namespace dimension
 
    template<typename T>
    concept is_ratio_exponent = is_ratio_exponent_v<std::remove_cvref_t<T>>;
+
+   template<is_ratio R, int Num, int Den>
+   constexpr double ratio_exp_value()
+   {
+      return pow_rational(ratio_v<R>, Num, Den);
+   }
+
+   template<is_ratio_exponent R>
+   constexpr double ratio_exponent_value()
+   {
+      return ratio_exp_value<typename R::ratio, R::exponent::num, R::exponent::den>();
+   }
+
+   template<is_ratio_exponent R>
+   inline constexpr double ratio_exponent_value_v = ratio_exponent_value<R>();
 
    template<typename RE, typename P>
    struct raise_ratio_exponent; // primary
@@ -184,7 +200,33 @@ namespace dimension
 
 
 
+
+      template<class... Ts>
+      constexpr double multiply_ratio_exponent_values_impl() {
+         return (1.0 * ... * ratio_exponent_value_v<Ts>);
+      }
+
+      template<class Tuple>
+      struct multiply_ratio_exponent_values;
+
+      template<class... Ts>
+      struct multiply_ratio_exponent_values<std::tuple<Ts...>> {
+         static constexpr double value = multiply_ratio_exponent_values_impl<Ts...>();
+      };
+
+
+
+
    }} // namespace detail::ratio_utils_impl
+
+   template<typename Tuple1, typename Tuple2>
+   using multiply_ratio_exponent_tuples_t = typename detail::ratio_utils_impl::multiply_ratio_exponent_tuples<Tuple1, Tuple2>::type;
+
+   template<typename Tuple1, typename Tuple2>
+   using divide_ratio_exponent_tuples_t = typename detail::ratio_utils_impl::divide_ratio_exponent_tuples<Tuple1, Tuple2>::type;
+
+   template<typename Tuple>
+   inline constexpr double multiply_ratio_exponent_values_v = detail::ratio_utils_impl::multiply_ratio_exponent_values<Tuple>::value;
 
    template<typename Tuple, typename P>
    using raise_all_ratio_exponents_t =
@@ -193,6 +235,105 @@ namespace dimension
    template<typename Tuple>
    using collapse_ratio_exponents_t =
       typename detail::ratio_utils_impl::collapse_ratio_exponents<Tuple>::type;
+
+
+
+   template<is_ratio_exponent T>
+   struct invert_ratio_exponent
+   {
+   private:
+      using exponent = inverse_ratio_t<typename T::exponent>;
+   public:
+      using type = ratio_exponent<typename T::ratio, exponent::num, exponent::den>;
+   };
+
+
+   template<is_ratio_exponent T>
+   using invert_ratio_exponent_t = typename invert_ratio_exponent<T>::type;
+
+   // Apply `invert_exponent_t` to each element of a std::tuple
+   template<class Tuple>
+   struct tuple_invert_ratio_exponents;
+
+   template<class... SE>
+   struct tuple_invert_ratio_exponents<std::tuple<SE...>> {
+      using type = std::tuple< invert_ratio_exponent_t<SE>... >;
+   };
+
+   template<class Tuple>
+   using tuple_invert_ratio_exponents_t = typename tuple_invert_ratio_exponents<Tuple>::type;
+
+
+
+
+   // Negate a single ratio_exponent
+   template<typename RE>
+   struct negate_ratio_exponent;
+
+   template<typename R, int Num, int Den>
+   struct negate_ratio_exponent<ratio_exponent<R, Num, Den>>
+   {
+      using type = ratio_exponent<R, -Num, Den>;
+   };
+
+   // Helper alias
+   template<typename RE>
+   using negate_ratio_exponent_t = typename negate_ratio_exponent<RE>::type;
+
+   // Apply to tuple
+   template<typename Tuple>
+   struct tuple_negate_ratio_exponents;
+
+   template<typename... REs>
+   struct tuple_negate_ratio_exponents<std::tuple<REs...>>
+   {
+      using type = std::tuple<negate_ratio_exponent_t<REs>...>;
+   };
+
+   template<typename Tuple>
+   using tuple_negate_ratio_exponents_t = typename tuple_negate_ratio_exponents<Tuple>::type;
+
+
+
+
+
+
+
+
+
+
+
+   // Collect only ratio_exponent types into a tuple
+   template<typename... Ts>
+   struct tuple_extract_ratio_exponents
+   {
+      using type = std::tuple<
+         Ts... // filtered by "is_ratio_exponent_v"
+         >;
+   };
+
+   // Specialization using pack expansion + std::conditional_t
+   template<typename... Ts>
+   struct tuple_extract_ratio_exponents<std::tuple<Ts...>>
+   {
+   private:
+      template<typename T>
+      using wrap_if_ratio_exp = std::conditional_t<
+         is_ratio_exponent_v<T>,
+         std::tuple<T>,
+         std::tuple<>
+      >;
+
+   public:
+      using type = decltype(std::tuple_cat(
+         wrap_if_ratio_exp<Ts>()...
+      ));
+   };
+
+   template<typename Tuple>
+   using tuple_extract_ratio_exponents_t = typename tuple_extract_ratio_exponents<Tuple>::type;
+
+
 
 }
 

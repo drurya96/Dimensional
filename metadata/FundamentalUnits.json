@@ -13,16 +13,67 @@
         "Conversions": {
           "From": {},
           "To": {
-            "feet": { "r": [1250, 381] },
-            "inches": { "r": [15000, 381] },
-            "astronomical_units": { "r": [1, 149597870700] },
-            "data_miles": { "r": [5, 9144] },
-            "nautical_miles": { "r": [1, 1852] },
-            "miles": { "r": [125, 201168] },
-            "fathoms": { "r": [3937, 7200] },
-            "furlong": { "r": [3937, 792000] },
-            "yards": { "r": [1250, 1143] },
-            "us_survey_feet": { "r": [3937, 1200] }
+            "feet": { "ratio": [
+              { "base": { "num": 2 }},
+              { "base": { "num": 3 }, "exp": { "num": -1 } },
+              { "base": { "num": 5 }, "exp": { "num": 4 } },
+              { "base": { "num": 127 }, "exp": { "num": -1 } }
+            ] },
+            "inches": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": 3 } },
+              { "base": { "num": 5 }, "exp": { "num": 4 } },
+              { "base": { "num": 127 }, "exp": { "num": -1 } }
+            ] },
+            "astronomical_units": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": -2 } },
+              { "base": { "num": 3 }, "exp": { "num": -1 } },
+              { "base": { "num": 5 }, "exp": { "num": -2 } },
+              { "base": { "num": 73 }, "exp": { "num": -1 } },
+              { "base": { "num": 877 }, "exp": { "num": -1 } },
+              { "base": { "num": 7789 }, "exp": { "num": -1 } }
+            ] },
+            "data_miles": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": -3 } },
+              { "base": { "num": 3 }, "exp": { "num": -2 } },
+              { "base": { "num": 5 }, "exp": { "num": 1 } },
+              { "base": { "num": 127 }, "exp": { "num": -1 } }
+            ] },
+            "nautical_miles": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": -2 } },
+              { "base": { "num": 463 }, "exp": { "num": -1 } }
+            ] },
+            "miles": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": -4 } },
+              { "base": { "num": 3 }, "exp": { "num": -2 } },
+              { "base": { "num": 5 }, "exp": { "num": 3 } },
+              { "base": { "num": 11 }, "exp": { "num": -1 } },
+              { "base": { "num": 127 }, "exp": { "num": -1 } }
+            ] },
+            "fathoms": { "ratio": [
+              { "base": { "num": 3 }, "exp": { "num": -2 } },
+              { "base": { "num": 5 }, "exp": { "num": 4 } },
+              { "base": { "num": 127 }, "exp": { "num": -1 } }
+            ] },
+            "furlong": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": -1 } },
+              { "base": { "num": 3 }, "exp": { "num": -2 } },
+              { "base": { "num": 5 }, "exp": { "num": 3 } },
+              { "base": { "num": 11 }, "exp": { "num": -1 } },
+              { "base": { "num": 127 }, "exp": { "num": -1 } }
+            ] },
+            "yards": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": 1 } },
+              { "base": { "num": 3 }, "exp": { "num": -2 } },
+              { "base": { "num": 5 }, "exp": { "num": 4 } },
+              { "base": { "num": 127 }, "exp": { "num": -1 } }
+            ] },
+            "us_survey_feet": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": -4 } },
+              { "base": { "num": 3 }, "exp": { "num": -1 } },
+              { "base": { "num": 5 }, "exp": { "num": -2 } },
+              { "base": { "num": 31 }, "exp": { "num": 1 } },
+              { "base": { "num": 127 }, "exp": { "num": 1 } }
+            ] }
           }
         }
       },
@@ -52,14 +103,68 @@
         "Conversions": {
           "From": {},
           "To": {
-            "pound_mass": { "r": [100000, 45359237] },
-            "ounces": { "r": [1600000, 45359237] },
-            "slugs": { "r": [609600000, 8896443230521] },
-            "grains": { "r": [100000000, 6479891] },
-            "stone": { "r": [50000, 317514659] },
-            "short_ton": { "r": [50, 45359237] },
-            "long_ton": { "r": [625, 635029318] },
-            "tonne": { "r": [1, 1], "e10": -6 }
+            "pound_mass": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": 5 } },
+              { "base": { "num": 5 }, "exp": { "num": 5 } },
+              { "base": { "num": 7 }, "exp": { "num": -1 } },
+              { "base": { "num": 11 }, "exp": { "num": -1 } },
+              { "base": { "num": 97 }, "exp": { "num": -1 } },
+              { "base": { "num": 6073 }, "exp": { "num": -1 } }
+            ] },
+            "ounces": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": 9 } },
+              { "base": { "num": 5 }, "exp": { "num": 5 } },
+              { "base": { "num": 7 }, "exp": { "num": -1 } },
+              { "base": { "num": 11 }, "exp": { "num": -1 } },
+              { "base": { "num": 97 }, "exp": { "num": -1 } },
+              { "base": { "num": 6073 }, "exp": { "num": -1 } }
+            ] },
+            "slugs": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": 9 } },
+              { "base": { "num": 3 }, "exp": { "num": 1 } },
+              { "base": { "num": 5 }, "exp": { "num": 5 } },
+              { "base": { "num": 127 }, "exp": { "num": 1 } },
+              { "base": { "num": 7 }, "exp": { "num": -2 } },
+              { "base": { "num": 11 }, "exp": { "num": -1 } },
+              { "base": { "num": 97 }, "exp": { "num": -1 } },
+              { "base": { "num": 6073 }, "exp": { "num": -1 } },
+              { "base": { "num": 28019 }, "exp": { "num": -1 } }
+            ] },
+            "grains": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": 8 } },
+              { "base": { "num": 5 }, "exp": { "num": 8 } },
+              { "base": { "num": 11 }, "exp": { "num": -1 } },
+              { "base": { "num": 97 }, "exp": { "num": -1 } },
+              { "base": { "num": 6073 }, "exp": { "num": -1 } }
+            ] },
+            "stone": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": 4 } },
+              { "base": { "num": 5 }, "exp": { "num": 5 } },
+              { "base": { "num": 7 }, "exp": { "num": -2 } },
+              { "base": { "num": 11 }, "exp": { "num": -1 } },
+              { "base": { "num": 97 }, "exp": { "num": -1 } },
+              { "base": { "num": 6073 }, "exp": { "num": -1 } }
+            ] },
+            "short_ton": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": 1 } },
+              { "base": { "num": 5 }, "exp": { "num": 2 } },
+              { "base": { "num": 7 }, "exp": { "num": -1 } },
+              { "base": { "num": 11 }, "exp": { "num": -1 } },
+              { "base": { "num": 97 }, "exp": { "num": -1 } },
+              { "base": { "num": 6073 }, "exp": { "num": -1 } }
+            ] },
+            "long_ton": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": -1 } },
+              { "base": { "num": 5 }, "exp": { "num": 4 } },
+              { "base": { "num": 7 }, "exp": { "num": -2 } },
+              { "base": { "num": 11 }, "exp": { "num": -1 } },
+              { "base": { "num": 97 }, "exp": { "num": -1 } },
+              { "base": { "num": 6073 }, "exp": { "num": -1 } }
+            ] },
+            "tonne": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": -6 } },
+              { "base": { "num": 5 }, "exp": { "num": -6 } }
+            ] }
           }
         }
       },
@@ -87,7 +192,14 @@
         "Conversions": {
           "From": {},
           "To": {
-            "pound_moles": { "r": [100000, 45359237] }
+            "pound_moles": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": 5 } },
+              { "base": { "num": 5 }, "exp": { "num": 5 } },
+              { "base": { "num": 7 }, "exp": { "num": -1 } },
+              { "base": { "num": 11 }, "exp": { "num": -1 } },
+              { "base": { "num": 97 }, "exp": { "num": -1 } },
+              { "base": { "num": 6073 }, "exp": { "num": -1 } }
+            ] }
           }
         }
       },
@@ -108,7 +220,16 @@
         "Conversions": {
           "From": {},
           "To": {
-            "degrees": { "r": [180, 1], "sym": [["pi", [-1, 1]]] }
+            "degrees": {
+              "ratio": [
+                { "base": { "num": 2 }, "exp": { "num": 2 } },
+                { "base": { "num": 3 }, "exp": { "num": 2 } },
+                { "base": { "num": 5 }, "exp": { "num": 1 } }
+              ],
+              "sym": [
+                { "name": "pi", "exp": { "num": -1 } }
+              ]
+            }
           }
         }
       },
@@ -129,7 +250,14 @@
         "Conversions": {
           "From": {},
           "To": {
-            "elementary_charges": { "r": [5, 801088317], "e10": 27 }
+            "elementary_charges": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": 27 } },
+              { "base": { "num": 3 }, "exp": { "num": -2 } },
+              { "base": { "num": 5 }, "exp": { "num": 28 } },
+              { "base": { "num": 19 }, "exp": { "num": -1 } },
+              { "base": { "num": 389 }, "exp": { "num": -1 } },
+              { "base": { "num": 12043 }, "exp": { "num": -1 } }
+            ] }
           }
         }
       },
@@ -150,8 +278,16 @@
         "Conversions": {
           "From": {},
           "To": {
-            "minutes": { "r": [1, 60] },
-            "hours": { "r": [1, 3600] }
+            "minutes": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": -2 } },
+              { "base": { "num": 3 }, "exp": { "num": -1 } },
+              { "base": { "num": 5 }, "exp": { "num": -1 } }
+            ] },
+            "hours": { "ratio": [
+              { "base": { "num": 2 }, "exp": { "num": -4 } },
+              { "base": { "num": 3 }, "exp": { "num": -2 } },
+              { "base": { "num": 5 }, "exp": { "num": -2 } }
+            ] }
           }
         }
       },
@@ -173,7 +309,10 @@
         "Conversions": {
           "From": {},
           "To": {
-            "rankine": { "r": [9, 5] }
+            "rankine": { "ratio": [
+              { "base": { "num": 3 }, "exp": { "num": 2 } },
+              { "base": { "num": 5 }, "exp": { "num": -1 } }
+            ] }
           }
         }
       },
