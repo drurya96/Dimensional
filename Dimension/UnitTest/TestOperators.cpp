@@ -168,23 +168,6 @@ TEST(Operators, DimensionNegative)
 }
 
 /*
-TEST(Operators, TestSetter) 
-{
-
-   using namespace std;
-
-   base_dimension<unit_exponent<meters>, unit_exponent<seconds, -1>> speed(25.0);
-
-   speed.SetVal<tuple<feet>, tuple<minutes>>(25.0);
-
-   double res = get_dimension_as<unit_exponent<meters>, unit_exponent<seconds, -1>>(speed);
-
-   cout << res << endl;
-
-}
-*/
-
-/*
 TEST(Operators, TestImplicitCastToAbsoluteQuantity)
 {
     using namespace dimension;

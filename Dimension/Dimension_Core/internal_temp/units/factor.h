@@ -35,27 +35,7 @@ namespace dimension {
       using ratios  = RatioExponentsTuple;
       using symbols = SymbolExponentsTuple;
    };
-/*
-   // Primary: variadic SE...
-   template<class Ratio = std::ratio<1>, class... SE>
-   struct factor_t {
-      using ratio   = Ratio;
 
-      using symbols = filter_tuple_t<is_symbol_exponent_pred,  std::tuple<SE...>>;
-      using ratios = filter_tuple_t<is_ratio_exponent_pred,  std::tuple<SE...>>;
-
-      // TODO: Consider symbolic exponents? I can already raise symbols to ratio powers, but what about using symbols *as* exponents?
-   };
-
-   // Specialization: second template arg is a std::tuple<...>
-   template<class Ratio, class... SE>
-   struct factor_t<Ratio, std::tuple<SE...>> {
-      using ratio   = Ratio;
-
-      using symbols = filter_tuple_t<is_symbol_exponent_pred,  std::tuple<SE...>>;
-      using ratios = filter_tuple_t<is_ratio_exponent_pred,  std::tuple<SE...>>;
-   };
-*/
    namespace factor
    {
       template<class Factor, typename Rep = double>
@@ -75,97 +55,46 @@ namespace dimension {
          return static_cast<Rep>(base_ratio * symbol_val * ratio_exp_val);
       }
    }
-/*
+
    template<typename Factor, is_ratio P>
    struct raise_factor;
 
-   // Specialization for your factor_t
-   template<class BaseRatio, class... SE, is_ratio P>
-   struct raise_factor<factor_t<BaseRatio, SE...>, P>
+   // Specialization for factor_t< BaseRatio, RatioExponentsTuple, SymbolExponentsTuple >
+   template<class BaseRatio, class RatioTuple, class SymbolTuple, is_ratio P>
+   struct raise_factor<factor_t<BaseRatio, RatioTuple, SymbolTuple>, P>
    {
-      static_assert(P::den != 0, "Exponent denominator cannot be zero");
+   static_assert(P::den != 0, "Exponent denominator cannot be zero");
 
-      using F          = factor_t<BaseRatio, SE...>;
-      using power      = P;
-      constexpr static bool kInteger = (power::den == 1);
+   using power      = P;
+   constexpr static bool kInteger = (power::den == 1);
 
-      // Pull grouped tuples from factor_t
-      using sym_tuple  = typename F::symbols; // tuple<symbol_exponent<...>, ...>
-      using rate_tuple = typename F::ratios;  // tuple<ratio_exponent<...>,  ...>
+   // Pull grouped tuples
+   using rate_tuple = RatioTuple;   // tuple<ratio_exponent<...>, ...>
+   using sym_tuple  = SymbolTuple;  // tuple<symbol_exponent<...>, ...>
 
-      // Scale all existing exponents by 'power'
-      using sym_scaled  = detail::raise_all_symbol_exponents_t<sym_tuple,  power>;   // EXPECTS: provided by you
-      using rate_scaled = raise_all_ratio_exponents_t<rate_tuple, power>;   // defined above
+   // Scale existing exponents
+   using rate_scaled = raise_all_ratio_exponents_t<rate_tuple, power>; // This seems to be a tuple
+   using sym_scaled  = detail::raise_all_symbol_exponents_t<sym_tuple, power>;
 
-      // Compute new base ratio
-      using raised_base_ratio =
-         std::conditional_t<
-            kInteger,
-            raise_ratio_t<BaseRatio, power::num>, // EXPECTS: your raise_ratio<R,int>::type
-            std::ratio<1>
-         >;
+   // Compute new base ratio
+   using raised_base_ratio =
+      std::conditional_t<
+         kInteger,
+         raise_ratio_t<BaseRatio, power::num>,
+         std::ratio<1>
+      >;
 
-      // If non-integer exponent, carry the power into ratios with a new ratio_exponent<BaseRatio, num, den>
-      using rate_with_base =
-         std::conditional_t<
-            kInteger,
-            rate_scaled,
-            append_t<rate_scaled, ratio_exponent<BaseRatio, power::num, power::den>>
-         >;
+   // If non-integer exponent, carry base ratio into ratio-exponents
+   using rate_with_base =
+      std::conditional_t<
+         kInteger,
+         rate_scaled,
+         append_t<rate_scaled, ratio_exponent<BaseRatio, power::num, power::den>>
+      >;
 
-      // Merge the two tuples of exponents
-      using merged = tuple_cat_t<sym_scaled, rate_with_base>;
-
-      // Build factor_t<raised_base_ratio, (merged elements...)> via call_unpack
-      struct builder {
-         template<class... Es>
-         auto operator()() -> factor_t<raised_base_ratio, Es...>;
-      };
-
-      using type = decltype(call_unpack<merged>(builder{}));
+   // Result
+   using type = factor_t<raised_base_ratio, rate_with_base, sym_scaled>; // rate_with_base should be a tuple, but suspect its just a ratio_exponent. Maybe same with sym_scaled. Need to check
    };
-*/
-
-
-template<typename Factor, is_ratio P>
-struct raise_factor;
-
-// Specialization for factor_t< BaseRatio, RatioExponentsTuple, SymbolExponentsTuple >
-template<class BaseRatio, class RatioTuple, class SymbolTuple, is_ratio P>
-struct raise_factor<factor_t<BaseRatio, RatioTuple, SymbolTuple>, P>
-{
-  static_assert(P::den != 0, "Exponent denominator cannot be zero");
-
-  using power      = P;
-  constexpr static bool kInteger = (power::den == 1);
-
-  // Pull grouped tuples
-  using rate_tuple = RatioTuple;   // tuple<ratio_exponent<...>, ...>
-  using sym_tuple  = SymbolTuple;  // tuple<symbol_exponent<...>, ...>
-
-  // Scale existing exponents
-  using rate_scaled = raise_all_ratio_exponents_t<rate_tuple, power>; // This seems to be a tuple
-  using sym_scaled  = detail::raise_all_symbol_exponents_t<sym_tuple, power>;
-
-  // Compute new base ratio
-  using raised_base_ratio =
-    std::conditional_t<
-      kInteger,
-      raise_ratio_t<BaseRatio, power::num>,
-      std::ratio<1>
-    >;
-
-  // If non-integer exponent, carry base ratio into ratio-exponents
-  using rate_with_base =
-    std::conditional_t<
-      kInteger,
-      rate_scaled,
-      append_t<rate_scaled, ratio_exponent<BaseRatio, power::num, power::den>>
-    >;
-
-  // Result
-  using type = factor_t<raised_base_ratio, rate_with_base, sym_scaled>; // rate_with_base should be a tuple, but suspect its just a ratio_exponent. Maybe same with sym_scaled. Need to check
-};
 
 
 
@@ -173,19 +102,15 @@ struct raise_factor<factor_t<BaseRatio, RatioTuple, SymbolTuple>, P>
    template<class F, class P>
    using raise_factor_t = typename raise_factor<F, P>::type;
 
-   // TODO: Next up I need the following two components:
-   //   Combine factors (i.e. multiply)
-   //   Reduce factors
-
-/*
    template<typename F1, typename F2>
    struct multiply_factors;
 
-   template<typename R1, typename... SE1, typename R2, typename... SE2>
-   struct multiply_factors<factor_t<R1, SE1...>, factor_t<R2, SE2...>> {
+   // factor_t< Ratio, RatioExponentsTuple, SymbolExponentsTuple >
+   template<class R1, class RE1, class SE1, class R2, class RE2, class SE2>
+   struct multiply_factors<factor_t<R1, RE1, SE1>, factor_t<R2, RE2, SE2>> {
    private:
-   using F1 = factor_t<R1, SE1...>;
-   using F2 = factor_t<R2, SE2...>;
+   using F1 = factor_t<R1, RE1, SE1>;
+   using F2 = factor_t<R2, RE2, SE2>;
 
    // grouped tuples from factors
    using s1 = typename F1::symbols;
@@ -195,51 +120,14 @@ struct raise_factor<factor_t<BaseRatio, RatioTuple, SymbolTuple>, P>
 
    // combine tuples
    using sC = typename detail::symbol_utils_impl::multiply_symbol_tuples<s1, s2>::type;
-   using rC = typename detail::ratio_utils_impl::multiply_ratio_exponent_tuples<r1, r2>::type;
+   using rC = typename detail::ratio_utils_impl::multiply_ratio_exponent_tuples<r1, r2>::type; // if this is a template<...><...>::type, keep as such
 
    // base ratio product
    using Rprod = std::ratio_multiply<R1, R2>;
 
-   // merge streams back to factor_t
-   using merged = tuple_cat_t<sC, rC>;
-
-   struct builder {
-      template<class... Es>
-      auto operator()() -> factor_t<Rprod, Es...>;
-   };
-
    public:
-   using type = decltype(call_unpack<merged>(builder{}));
+   using type = factor_t<Rprod, rC, sC>;
    };
-*/
-
-
-template<typename F1, typename F2>
-struct multiply_factors;
-
-// factor_t< Ratio, RatioExponentsTuple, SymbolExponentsTuple >
-template<class R1, class RE1, class SE1, class R2, class RE2, class SE2>
-struct multiply_factors<factor_t<R1, RE1, SE1>, factor_t<R2, RE2, SE2>> {
-private:
-  using F1 = factor_t<R1, RE1, SE1>;
-  using F2 = factor_t<R2, RE2, SE2>;
-
-  // grouped tuples from factors
-  using s1 = typename F1::symbols;
-  using s2 = typename F2::symbols;
-  using r1 = typename F1::ratios;
-  using r2 = typename F2::ratios;
-
-  // combine tuples
-  using sC = typename detail::symbol_utils_impl::multiply_symbol_tuples<s1, s2>::type;
-  using rC = typename detail::ratio_utils_impl::multiply_ratio_exponent_tuples<r1, r2>::type; // if this is a template<...><...>::type, keep as such
-
-  // base ratio product
-  using Rprod = std::ratio_multiply<R1, R2>;
-
-public:
-  using type = factor_t<Rprod, rC, sC>;
-};
 
 
 
@@ -363,11 +251,6 @@ public:
 
    template<class Tuple>
    using multiply_and_reduce_tuple_t = typename multiply_and_reduce_tuple<Tuple>::type;
-
-
-
-
-
 }
 
 #endif // DIMENSIONAL_FACTOR_H

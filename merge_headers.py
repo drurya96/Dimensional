@@ -18,7 +18,8 @@ import argparse, pathlib, re, sys
 from typing import Iterable, List
 import tiktoken
 
-DEFAULT_EXTS = {".h", ".hpp", ".hh", ".hxx", ".h++"}
+#DEFAULT_EXTS = {".h", ".hpp", ".hh", ".hxx", ".h++"}
+DEFAULT_EXTS = {".cpp"}
 
 _COMMENT_RX = re.compile(
     r"""//[^\n]*$           # // line comments

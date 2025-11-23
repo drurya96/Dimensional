@@ -11,8 +11,8 @@ set(TEST_SOURCES
 
     ${CMAKE_CURRENT_LIST_DIR}/TestFundamentalConversions.cpp
     ${CMAKE_CURRENT_LIST_DIR}/TestCompoundConversions.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/TestOperators.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/TestSimplification.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/TestOperators.cpp # Has commented tests
+    ${CMAKE_CURRENT_LIST_DIR}/TestSimplification.cpp # Has commented tests
     ${CMAKE_CURRENT_LIST_DIR}/TestCastOperators.cpp
     ${CMAKE_CURRENT_LIST_DIR}/TestStd.cpp
     ${CMAKE_CURRENT_LIST_DIR}/TestTrig.cpp
@@ -20,18 +20,12 @@ set(TEST_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/TestSymbols.cpp
     ${CMAKE_CURRENT_LIST_DIR}/PhysicsProblemsExamples/Example1.cpp
     ${CMAKE_CURRENT_LIST_DIR}/TestSerialization.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/TestPoint.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/TestSI.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/TestPrimeFactors.cpp
 
     #${CMAKE_CURRENT_LIST_DIR}/TestNewDimension.cpp
-
-
-    #${CMAKE_CURRENT_LIST_DIR}/TestQuantityAdditionSubtraction.cpp
-    #${CMAKE_CURRENT_LIST_DIR}/TestUtilities.cpp
-    
     ${CMAKE_CURRENT_LIST_DIR}/TestTemp.cpp
- 
-    
-
-
     ${CMAKE_CURRENT_LIST_DIR}/TestInclude.cpp
 )
 

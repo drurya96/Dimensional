@@ -36,80 +36,157 @@ namespace dimension
       return get_dimension_as<unit_exponent<T>>(obj);
    }
 
+   // Primary template
    template<typename... Ts>
    class timespan;
 
-   /// @brief timespan dimension type.
-   template<rep_type Rep, is_timespan_unit Unit, is_coefficient... Cs>
-   class timespan<Rep, Unit, Cs...> : public base_dimension_impl<Rep, unit_exponent<Unit>, Cs...>
+   // Helper: map (Rep, Unit, CoeffTuple) → base_dimension_impl<Rep, unit_exponent<Unit>, Cs...>
+   template<rep_type Rep, is_timespan_unit Unit, class CoeffTuple>
+   struct timespan_impl_from_tuple;
+
+   template<rep_type Rep, is_timespan_unit Unit, class... Cs>
+   struct timespan_impl_from_tuple<Rep, Unit, std::tuple<Cs...>>
    {
-      using impl = base_dimension_impl<Rep, unit_exponent<Unit>, Cs...>;
+      using type = base_dimension_impl<Rep, unit_exponent<Unit>, Cs...>;
+   };
+
+   /// @brief Primary specialization: Rep, Unit, CoeffTuple (symbolic-capable form).
+   template<rep_type Rep, is_timespan_unit Unit, class CoeffTuple>
+   class timespan<Rep, Unit, CoeffTuple>
+      : public timespan_impl_from_tuple<Rep, Unit, CoeffTuple>::type
+   {
+      using impl        = typename timespan_impl_from_tuple<Rep, Unit, CoeffTuple>::type;
+      using coeff_tuple = CoeffTuple;
 
    public:
+      using rep          = Rep;
+      using unit         = Unit;
+      using coefficients = coeff_tuple;
+
       /// @brief Default constructs to zero.
       constexpr timespan() : impl(0.0) {}
 
       /// @brief Construct with a numeric value.
       explicit constexpr timespan(double val) : impl(val) {}
 
-      // perfect-forward ctor so factory can pass symbols
+      // perfect-forward ctor so factory can pass symbols / coefficients
       template<typename V, is_coefficient... Ds>
-      requires std::is_constructible_v<Rep, V>
+      requires std::is_constructible_v<Rep, V> &&
+               std::same_as<std::tuple<Ds...>, coeff_tuple>
       explicit constexpr timespan(V&& v, Ds... ds)
-         : impl(static_cast<Rep>(std::forward<V>(v)), ds...) {}
+         : impl(static_cast<Rep>(std::forward<V>(v)), ds...)
+      {}
 
-      template<is_coefficient... Ds>
-      requires std::same_as<std::tuple<Cs...>, std::tuple<Ds...>>
+      /// @brief Construct from matching impl (preserves coefficients).
+      constexpr timespan(const impl& src)
+         : impl(src)
+      {}
+
+      /// @brief CTAD / symbolic ctor:
+      /// Takes any timespan dimension Dim whose simplified dimension exactly matches impl,
+      /// and copies the raw value without applying any conversion factor.
+      template<class Dim>
+      requires is_timespan<Dim> &&
+               std::is_same_v<simplify_dimension_t<Dim>, impl>
+      // Implicit on purpose for CTAD-based construction.
       // cppcheck-suppress noExplicitConstructor
-      constexpr timespan(const base_dimension_impl<Rep, unit_exponent<Unit>, Ds...>& src)
-         : impl(src) {}
+      constexpr timespan(const Dim& dim)
+         : impl(dim.get_raw())
+      {}
+   };
 
-      /// @brief Construct from another base_dimension of same timespan.
+   /// @brief Partial specialization: Rep, Unit → canonical mode (no coeff tuple in the type).
+   template<rep_type Rep, is_timespan_unit Unit>
+   class timespan<Rep, Unit> : public timespan<Rep, Unit, std::tuple<>>
+   {
+      using base = timespan<Rep, Unit, std::tuple<>>;
+
+   public:
+      using base::base;
+      using rep  = Rep;
+      using unit = Unit;
+
+      /// @brief Canonicalizing ctor from any timespan dimension.
+      /// Applies get_dimension_as<unit_exponent<Unit>> and loses symbolic factors.
       template<typename... Ts>
       requires is_timespan<base_dimension_impl<Rep, Ts...>>
       // Implicit conversion between same-dimension types is intentional.
       // cppcheck-suppress noExplicitConstructor
-      constexpr timespan(const base_dimension_impl<Rep, Ts...>& base)
-         : impl(get_dimension_as<unit_exponent<Unit>>(base)) {}
+      constexpr timespan(const base_dimension_impl<Rep, Ts...>& base_dim)
+         : base(get_dimension_as<unit_exponent<Unit>>(base_dim))
+      {}
    };
+
+   /// @brief Partial specialization: Unit only → default Rep = double.
+   template<is_timespan_unit Unit>
+   class timespan<Unit> : public timespan<double, Unit>
+   {
+   public:
+      using timespan<double, Unit>::timespan;
+      using rep  = double;
+      using unit = Unit;
+   };
+
+   // --- Factories ---------------------------------------------------------
 
    template<is_timespan_unit U, typename Rep, is_coefficient... Cs>
    requires (!is_coefficient<Rep>)
    [[maybe_unused]]
    constexpr auto make_timespan(Rep value, Cs... coeffs)
    {
-      ignore_unused(coeffs...);
-      return timespan<Rep, U, Cs...>(value);
+      using coeff_tuple = std::tuple<Cs...>;
+      ignore_unused(coeffs...); // coeffs are still primarily type-level here
+      return timespan<Rep, U, coeff_tuple>(value, coeffs...);
    }
 
    template<is_timespan_unit U, is_coefficient... Cs>
    [[maybe_unused]]
    constexpr auto make_timespan(Cs... coeffs)
    {
+      using coeff_tuple = std::tuple<Cs...>;
       ignore_unused(coeffs...);
-      return timespan<double, U, Cs...>(1.0);   // 1 × coeffs
+      // 1 × coeffs
+      return timespan<double, U, coeff_tuple>(1.0, coeffs...);
    }
 
-   template<is_timespan_unit Unit, is_coefficient... Cs>
-   class timespan<Unit, Cs...> : public timespan<double, Unit, Cs...>
-   {
-   public:
-      using timespan<double, Unit, Cs...>::timespan;
+   // --- Simplification → timespan mapping for CTAD ------------------------
+
+   template<class Dim>
+   struct simplify_timespan_dim; // primary
+
+   template<typename R, class UExp, class... Cs>
+   struct simplify_timespan_dim<base_dimension_impl<R, UExp, Cs...>> {
+      static_assert(is_timespan_unit<typename UExp::unit>);
+      using rep         = R;
+      using unit        = typename UExp::unit;
+      using coeff_tuple = std::tuple<Cs...>;
    };
 
-   /// @brief Deduction guides
-   template<is_timespan Dim>
+   template<class Dim>
+   using simplify_timespan_dim_t =
+      simplify_timespan_dim<simplify_dimension_t<Dim>>;
+
+   // --- Deduction guides --------------------------------------------------
+
+   // 1) General "expression" CTAD:
+   //    - Simplify the dimension type
+   //    - Map to timespan<Rep, Unit, CoeffTuple>
+   template<class Dim>
+   requires is_timespan<Dim>
    timespan(Dim) -> timespan<
-      typename Dim::rep,
-      simplified_unit_filter<timespanType, typename Dim::units>>;
+      typename simplify_timespan_dim_t<Dim>::rep,
+      typename simplify_timespan_dim_t<Dim>::unit,
+      typename simplify_timespan_dim_t<Dim>::coeff_tuple>;
 
-   template<rep_type Rep, is_timespan_unit Unit, is_coefficient... Cs>
-   timespan(const timespan<Rep, Unit, Cs...>&)
-      -> timespan<Rep, Unit, Cs...>;
+   // 2) Identity CTAD from an existing timespan<Rep, Unit, CoeffTuple>.
+   template<rep_type Rep, is_timespan_unit Unit, class CoeffTuple>
+   timespan(const timespan<Rep, Unit, CoeffTuple>&)
+      -> timespan<Rep, Unit, CoeffTuple>;
 
+   // 3) CTAD from a base_dimension_impl that already has simplified units + coefficients.
    template<rep_type R, is_timespan_unit U, is_coefficient... Cs>
    timespan(base_dimension_impl<R, unit_exponent<U>, Cs...>)
-      -> timespan<R, U, Cs...>;
+      -> timespan<R, U, std::tuple<Cs...>>;
 }
 
 #endif // STATIC_DIMENSION_TIMESPAN_IMPL_H

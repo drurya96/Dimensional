@@ -135,6 +135,53 @@ namespace dimension
 
    // ================ End simplified units check ==================
 
+
+
+   template<class Dim>
+   struct simplify_dimension; // primary
+
+   template<typename Rep, class... Ts>
+   struct simplify_dimension<base_dimension_impl<Rep, Ts...>> {
+   private:
+      using dim_type   = base_dimension_impl<Rep, Ts...>;
+      using rep_type   = typename dim_type::rep;
+
+      // 1) Simplify the *unit exponents* just like get_dimension_as does
+      using src_units  = collapse_units_t<typename dim_type::units>;
+      using simplify   = some_simplify_operation<src_units>;
+      using S_units    = typename simplify::units;   // canonical / simplified units
+      using S_factor   = typename simplify::factor;  // factor: (original -> S_units)
+
+      // 2) If you have an existing per-dimension factor type, fold it in here.
+      //    If not, treat the dimension's "own" factor as identity.
+      using dim_factor = factor_identity; // or typename dim_type::factor;
+      using total_factor = multiply_factors_t<S_factor, dim_factor>;
+
+      // 3) Reduce the factor so we end with a canonical (ratio, ratios, symbols) triple
+      using reduced = typename reduce_factor<total_factor>::type;
+      using ratio   = typename reduced::ratio;
+      using ratios  = typename reduced::ratios;   // tuple<ratio_exponent<...>, ...>
+      using symbols = typename reduced::symbols;  // tuple<symbol_exponent<...>, ...>
+
+      // 4) Build the new template parameter pack for base_dimension_impl:
+      //    [simplified unit_exponents...] + [coefficients from factor...]
+      using coeff_tuple   = tuple_cat_t<symbols, ratios>;
+      using final_params  = tuple_cat_t<S_units, coeff_tuple>;
+
+      struct builder {
+         template<class... Ps>
+         auto operator()() -> base_dimension_impl<rep_type, Ps...>;
+      };
+
+   public:
+      using type = decltype(call_unpack<final_params>(builder{}));
+   };
+
+   template<class Dim>
+   using simplify_dimension_t =
+      typename simplify_dimension<std::remove_cvref_t<Dim>>::type;
+
+
    /// @brief Return the internal value as a double in terms of the provided units
    /// @tparam NumTuple tuple of Unit types to convert numerator to
    /// @tparam DenTuple tuple of Unit types to convert denominator to
@@ -229,6 +276,59 @@ namespace dimension
 
    class base_dimension_marker{};
 
+
+
+
+
+
+
+
+/*
+   // We almost certainly have the following behavior elsewhere... clean this up later.
+
+   namespace detail {
+
+   // Per-axis factor: From unit U_from to U_to, raised by E (unit_exponent’s power)
+   template<class U_from, class U_to, int E>
+   struct unit_axis_factor {
+      using raw     = details::get_factor_t<U_from, U_to>;              // factor_t<...> (may include ratio_exponents & symbols)
+      using power   = std::ratio<E, 1>;
+      using raised  = raise_factor_t<raw, power>;               // apply exponent to the factor
+      using type    = raised;
+   };
+
+   // Convert two tuples of unit_exponent<Ui, Ei> elementwise into a single combined factor.
+   template<class FromTuple, class ToTuple>
+   struct tuple_units_factor;
+
+   template<class... FromUEs, class... ToUEs>
+   struct tuple_units_factor<std::tuple<FromUEs...>, std::tuple<ToUEs...>> {
+      static_assert(sizeof...(FromUEs) == sizeof...(ToUEs), "Unit arity mismatch");
+      // Require exponents match pairwise
+      static constexpr bool exps_match = ( (FromUEs::exp == ToUEs::exp) && ... );
+      static_assert(exps_match, "Mismatched exponents in unit tuples");
+
+      // Map each axis to a factor, then multiply & reduce once.
+      using type = multiply_and_reduce_n_t<
+         typename unit_axis_factor<typename FromUEs::unit, typename ToUEs::unit, FromUEs::exp>::type...
+      >;
+   };
+
+   template<class FromTuple, class ToTuple>
+   using tuple_units_factor_t = typename tuple_units_factor<FromTuple, ToTuple>::type;
+
+   } // namespace detail
+*/
+
+
+
+
+
+
+
+
+
+
    /// @brief A generic dimension class
    /// @details This class represents a dimension,
    ///    such as length, Time, speed, etc.
@@ -278,6 +378,55 @@ namespace dimension
                         "run-time coefficient tags (e.g. symbols::pi{}) are disallowed");
       }
 
+/*
+template<typename... OtherUnits>
+requires (
+   dimensionally_equivalent<
+      base_dimension_impl<Rep, Ts...>,
+      base_dimension_impl<Rep, OtherUnits...>
+   > &&
+   // avoid clashing with the normal copy-ctor
+   !std::is_same_v<
+      base_dimension_impl<Rep, Ts...>,
+      base_dimension_impl<Rep, OtherUnits...>
+   >
+)
+
+
+// Implicit conversion between dimensions of the same dimension is core to Dimensional
+// cppcheck-suppress noExplicitConstructor
+constexpr base_dimension_impl(base_dimension_impl<Rep, OtherUnits...> other)
+   : base_dimension_impl(
+        [&]() constexpr {
+            using this_units   = extract_units_t<Ts...>;
+            using other_units  = extract_units_t<OtherUnits...>;
+
+            using this_ratios  = tuple_extract_ratio_exponents_t<std::tuple<Ts...>>;
+            using other_ratios = tuple_extract_ratio_exponents_t<std::tuple<OtherUnits...>>;
+
+            using this_symbols = extract_symbols_t<Ts...>;
+            using other_symbols= extract_symbols_t<OtherUnits...>;
+
+            if constexpr (
+                std::is_same_v<this_units,   other_units>  &&
+                std::is_same_v<this_ratios,  other_ratios> &&
+                std::is_same_v<this_symbols, other_symbols>
+            )
+            {
+                // Fully identical representation (units + coefficients):
+                // keep all the type-level structure, just copy the numeric value.
+                return other.get_raw();
+            }
+            else
+            {
+                // Different representation (units and/or coefficients):
+                // use the existing conversion pipeline.
+                return get_dimension_as<Ts...>(other);
+            }
+        }()
+     )
+{}
+*/
 
       template<typename... OtherUnits>
       requires dimensionally_equivalent<base_dimension_impl<Rep, Ts...>, base_dimension_impl<Rep, OtherUnits...>>
@@ -287,7 +436,7 @@ namespace dimension
          base_dimension_impl(get_dimension_as<Ts...>(obj))
       {
       }
-      
+
       /// @brief Cast to double operator overload for Scalar types
       /// @details Cast the dimension to a double if unitless (i.e. scalar type) 
       template<typename U = simplified>
